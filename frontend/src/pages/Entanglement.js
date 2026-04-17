@@ -81,6 +81,8 @@ function SessionCard({ session, userId, onJoin, onComplete }) {
 }
 
 export default function Entanglement() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('entanglement', 8); }, []);
+
   const navigate = useNavigate();
   const [tab, setTab] = useState('meditations');
   const [meditations, setMeditations] = useState([]);

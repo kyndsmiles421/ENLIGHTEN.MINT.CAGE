@@ -192,6 +192,8 @@ function CouncilGlanceSection({ data, navigate }) {
 }
 
 export default function Dashboard() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('dashboard', 8); }, []);
+
   const { user, authHeaders, loading: authLoading } = useAuth();
   const { avatarB64 } = useAvatar();
   const navigate = useNavigate();

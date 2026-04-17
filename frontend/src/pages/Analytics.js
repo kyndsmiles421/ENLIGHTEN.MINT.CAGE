@@ -18,6 +18,8 @@ const ICON_MAP = {
 };
 
 export default function Analytics() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('analytics', 8); }, []);
+
   const { authHeaders } = useAuth();
   const navigate = useNavigate();
   const [achievements, setAchievements] = useState(null);

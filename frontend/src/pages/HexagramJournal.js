@@ -157,6 +157,8 @@ function JournalEntry({ entry, isLatest }) {
 }
 
 export default function HexagramJournal() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('hexagram_journal', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders, loading: authLoading, token } = useAuth();
   const { cosmicState, fetchCosmicState } = useCosmicState();

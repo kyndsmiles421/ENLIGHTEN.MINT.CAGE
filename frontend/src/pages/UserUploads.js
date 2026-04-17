@@ -133,6 +133,8 @@ function MediaCard({ item, onDelete }) {
 }
 
 export default function UserUploads() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('uploads', 8); }, []);
+
   const { token, authHeaders } = useAuth();
   const [uploads, setUploads] = useState([]);
   const [loading, setLoading] = useState(true);

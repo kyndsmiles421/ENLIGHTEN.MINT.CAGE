@@ -11,6 +11,7 @@ import { ChevronDown, Share2, LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 import Onboarding from '../components/Onboarding';
 import CinematicWalkthrough from '../components/CinematicWalkthrough';
+import DailyChallenges from '../components/DailyChallenges';
 
 const PILLARS = [
   { title: 'Practice', color: '#D8B4FE', items: [
@@ -173,6 +174,11 @@ export default function SovereignHub() {
       {/* Cinematic Walkthrough */}
       <div className="flex justify-center px-4 pb-4">
         <CinematicWalkthrough />
+      </div>
+
+      {/* V56.1 — Daily Elemental Challenges */}
+      <div className="px-4 pb-4">
+        <DailyChallenges compact />
       </div>
 
       {/* 7 Pillars — Accordion */}

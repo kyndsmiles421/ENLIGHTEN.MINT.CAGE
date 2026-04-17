@@ -19,6 +19,8 @@ import { useNavigate } from 'react-router-dom';
 import RecursiveLattice from '../components/RecursiveLattice';
 
 export default function RecursiveDivePage() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('recursive_dive', 8); }, []);
+
   const navigate = useNavigate();
   const [showInfo, setShowInfo] = useState(false);
   const [mintedSeeds, setMintedSeeds] = useState([]);

@@ -190,6 +190,8 @@ function StonePickerModal({ stones, onSlot, onClose }) {
 }
 
 export default function SmartDockPage() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('smartdock', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const latency = useLatency();

@@ -24,6 +24,8 @@ const LAYER_ICONS = {
 };
 
 export default function MediaLibrary() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('media', 8); }, []);
+
   const { user, authHeaders } = useAuth();
   const [tab, setTab] = useState('mine');
   const [items, setItems] = useState([]);

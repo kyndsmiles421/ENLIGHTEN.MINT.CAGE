@@ -46,6 +46,8 @@ function YantraVisual({ yantra }) {
 }
 
 export default function Yantra() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('yantra', 8); }, []);
+
   const [yantras, setYantras] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);

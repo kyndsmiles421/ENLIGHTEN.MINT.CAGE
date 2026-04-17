@@ -234,6 +234,8 @@ const TierCard = ({ tier, isSelected, onSelect, isLoading }) => {
 };
 
 export default function MembershipLoom() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('membership', 8); }, []);
+
   const navigate = useNavigate();
   const { user, token } = useAuth();
   const [selectedTier, setSelectedTier] = useState(null);

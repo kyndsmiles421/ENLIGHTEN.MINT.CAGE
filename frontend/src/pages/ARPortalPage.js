@@ -148,6 +148,8 @@ function ZoneCard({ zone, userPosition, onNavigate, onARActivate }) {
  * Main AR Portal Page
  */
 export default function ARPortalPage() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('arportal', 8); }, []);
+
   const { user, authHeaders } = useAuth();
   const navigate = useNavigate();
   

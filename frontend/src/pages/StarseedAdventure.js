@@ -6,10 +6,13 @@ import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { Sparkles, Star } from 'lucide-react';
 import { CosmicCanvas, CharacterSelect, GameScene } from '../components/starseed';
+import ProgressGate from '../components/ProgressGate';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function StarseedAdventure() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('starseed_adventure', 8); }, []);
+
   const { user, authHeaders, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -142,6 +145,7 @@ export default function StarseedAdventure() {
   }
 
   return (
+    <ProgressGate gateId="starseed-adventure" color="#C084FC">
     <div className="min-h-screen relative" data-testid="starseed-adventure-page">
       <CosmicCanvas
         originColor={activeOrigin?.color || '#C084FC'}
@@ -206,5 +210,6 @@ export default function StarseedAdventure() {
         )}
       </AnimatePresence>
     </div>
+    </ProgressGate>
   );
 }

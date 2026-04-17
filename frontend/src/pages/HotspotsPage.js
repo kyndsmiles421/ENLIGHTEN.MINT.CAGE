@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { MantraBanner } from '../components/MantraSystem';
 import GPSRadar from '../components/GPSRadar';
 
 export default function HotspotsPage() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('hotspots', 8); }, []);
+
   const navigate = useNavigate();
 
   return (

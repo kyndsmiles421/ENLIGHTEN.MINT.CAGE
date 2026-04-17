@@ -7,6 +7,8 @@ import { useAuth } from '../context/AuthContext';
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function SovereignDashboard() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('sovereign_dash', 8); }, []);
+
   const navigate = useNavigate();
   const { token, authHeaders } = useAuth();
   const [config, setConfig] = useState(null);

@@ -16,6 +16,8 @@ import { useNavigate } from 'react-router-dom';
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function EnlightenMintHub() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('hub', 8); }, []);
+
   const navigate = useNavigate();
   const [nodules, setNodules] = useState(0);
   const [isResonating, setIsResonating] = useState(false);

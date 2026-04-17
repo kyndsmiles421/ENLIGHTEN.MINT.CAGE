@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -159,6 +159,8 @@ function CompatibilityResult({ result, onBack }) {
 
 
 export default function Numerology() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('numerology', 8); }, []);
+
   const [tab, setTab] = useState('reading'); // 'reading' | 'compatibility'
   const [name, setName] = useState('');
   const [birthDate, setBirthDate] = useState('');

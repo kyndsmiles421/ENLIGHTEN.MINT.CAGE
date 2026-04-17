@@ -29,6 +29,8 @@ const RECURRENCE_OPTIONS = [
 const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function LiveSessions() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('live_session', 8); }, []);
+
   const { user, authHeaders } = useAuth();
   const navigate = useNavigate();
   const [sessions, setSessions] = useState([]);

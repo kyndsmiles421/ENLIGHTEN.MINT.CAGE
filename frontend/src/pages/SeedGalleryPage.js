@@ -514,6 +514,8 @@ SeedDetailModal.displayName = 'SeedDetailModal';
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function SeedGalleryPage() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('seed_gallery', 8); }, []);
+
   const navigate = useNavigate();
   
   const [seeds, setSeeds] = useState([]);

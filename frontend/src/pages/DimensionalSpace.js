@@ -158,6 +158,8 @@ function PhaseShiftModal({ currentDim, dimensions, level, dust, onShift, onClose
 }
 
 export default function DimensionalSpace() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('dimensional', 8); }, []);
+
   const { authHeaders } = useAuth();
   const navigate = useNavigate();
   const [grid, setGrid] = useState([]);

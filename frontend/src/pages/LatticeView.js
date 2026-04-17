@@ -72,6 +72,8 @@ function generateLatticeNodes() {
 }
 
 export default function LatticeView() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('lattice', 8); }, []);
+
   const navigate = useNavigate();
   const [nodes] = useState(generateLatticeNodes);
   const [activeLayer, setActiveLayer] = useState(5); // Current Z-depth layer (1-9)

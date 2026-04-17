@@ -12,6 +12,8 @@ const API = process.env.REACT_APP_BACKEND_URL;
 
 // --- SOVEREIGN SYSTEM COMPONENT ---
 export default function EnlightenmentOS() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('enlightenment', 8); }, []);
+
   const navigate = useNavigate();
   const { user, token } = useAuth();
   const [isBottomActive, setBottomActive] = useState(false);

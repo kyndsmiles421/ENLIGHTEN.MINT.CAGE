@@ -10,6 +10,7 @@ import {
   Play, XCircle, Trophy, Music, Flame, Droplets,
   Mountain, Gem, Sprout, Eye, Clock, Award, Skull, Shield
 } from 'lucide-react';
+import ProgressGate from '../components/ProgressGate';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -397,6 +398,8 @@ function DifficultyBadge({ difficulty }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function DreamRealms() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('dream_realms', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const headers = authHeaders;
@@ -518,6 +521,7 @@ export default function DreamRealms() {
   const nexusElements = nexus?.elements || {};
 
   return (
+    <ProgressGate gateId="dream-realms" color="#C084FC">
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }} data-testid="dream-realms-page">
       {/* Transition Shader */}
       <TransitionShader active={transitioning} color={transitionColor} onDone={() => setTransitioning(false)} />
@@ -778,5 +782,6 @@ export default function DreamRealms() {
         )}
       </AnimatePresence>
     </div>
+    </ProgressGate>
   );
 }

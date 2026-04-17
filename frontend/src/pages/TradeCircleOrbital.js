@@ -194,6 +194,8 @@ function TradeDetailPanel({ planet, onClose }) {
 }
 
 export default function TradeCircleOrbital() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('trade_circle', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders, loading: authLoading, token } = useAuth();
   const { cosmicState, fetchCosmicState } = useCosmicState();

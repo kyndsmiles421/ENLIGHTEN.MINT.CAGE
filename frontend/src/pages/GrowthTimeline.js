@@ -105,6 +105,8 @@ function MilestoneBadge({ m, index }) {
 
 /* ─── Main Timeline Page ─── */
 export default function GrowthTimeline() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('growth', 8); }, []);
+
   const { token } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState(null);

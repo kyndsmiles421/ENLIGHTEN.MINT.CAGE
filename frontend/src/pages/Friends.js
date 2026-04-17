@@ -755,6 +755,8 @@ const TABS = [
 ];
 
 export default function Friends() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('social', 8); }, []);
+
   const { user, authHeaders, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [tab, setTab] = useState('feed');

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -346,6 +346,8 @@ const TABS = [
 ];
 
 export default function MayanAstrology() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('mayan', 8); }, []);
+
   const [tab, setTab] = useState('birth');
 
   return (

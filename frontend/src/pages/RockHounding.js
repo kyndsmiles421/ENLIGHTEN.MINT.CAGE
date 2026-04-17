@@ -28,6 +28,8 @@ const ENERGY_MAX = 20;
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function RockHounding() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('rock_hounding', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const headers = authHeaders;

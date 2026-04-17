@@ -355,6 +355,8 @@ function MasteryCard({ element, data, scriptName }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function ForgottenLanguages() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('languages', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const headers = authHeaders;

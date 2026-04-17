@@ -135,6 +135,8 @@ const DANCES = [
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
 export default function DanceMusicStudio() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('dance_music', 8); }, []);
+
   const { user, authHeaders } = useAuth();
   const splitScreen = useSplitScreen();
   const [activeTab, setActiveTab] = useState('instruments');

@@ -310,6 +310,8 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
 }
 
 export default function Bible() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('sacred_texts', 8); }, []);
+
   const { token, authHeaders } = useAuth();
   const [categories, setCategories] = useState([]);
   const [books, setBooks] = useState([]);

@@ -9,6 +9,8 @@ import NarrationPlayer from '../components/NarrationPlayer';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Classes() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('classes', 8); }, []);
+
   const { user, authHeaders } = useAuth();
   const [classes, setClasses] = useState([]);
   const [enrollments, setEnrollments] = useState([]);

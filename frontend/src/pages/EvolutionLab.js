@@ -287,6 +287,8 @@ function DustConverter({ dust, onConvert }) {
 }
 
 export default function EvolutionLab() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('evolution', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const latency = useLatency();

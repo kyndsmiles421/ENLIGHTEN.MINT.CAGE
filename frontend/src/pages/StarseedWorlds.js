@@ -523,6 +523,8 @@ function ExplorationResult({ result, onClose }) {
    MAIN PAGE COMPONENT
    ═══════════════════════════════════ */
 export default function StarseedWorlds() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('starseed_worlds', 8); }, []);
+
   const { user, authHeaders, loading: authLoading } = useAuth();
   const { reduceParticles } = useSensory();
   const navigate = useNavigate();

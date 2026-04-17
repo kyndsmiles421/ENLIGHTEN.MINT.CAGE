@@ -17,6 +17,8 @@ import { ShieldStatus } from '../utils/SilenceShield';
  */
 
 export default function SilentSanctuary() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('silent_sanctuary', 8); }, []);
+
   const navigate = useNavigate();
   const { handleAction, isManualMode } = useEnlightenmentUI();
   const { 

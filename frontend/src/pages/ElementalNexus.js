@@ -482,6 +482,8 @@ function DecayBar({ decay }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function ElementalNexus() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('elemental', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const headers = authHeaders;

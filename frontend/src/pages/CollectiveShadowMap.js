@@ -45,6 +45,8 @@ function HotspotDot({ spot, maxCount }) {
 }
 
 export default function CollectiveShadowMap() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('shadow_work', 8); }, []);
+
   const { authHeaders } = useAuth();
   const navigate = useNavigate();
   const [hotspots, setHotspots] = useState([]);

@@ -229,6 +229,8 @@ function HostControls({ onColorChange, onFreqChange, activeColor, activeFreq, on
 
 /* ── Main Component ──────────────────────────────────────── */
 export default function SovereignCircle() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('sovereign_circle', 8); }, []);
+
   const navigate = useNavigate();
   const [screen, setScreen] = useState('lobby');
   const [roomId, setRoomId] = useState('');

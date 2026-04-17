@@ -21,6 +21,8 @@ const CHAKRA_COLORS = {
 };
 
 export default function Tantra() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('tantra', 8); }, []);
+
   const [practices, setPractices] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(true);

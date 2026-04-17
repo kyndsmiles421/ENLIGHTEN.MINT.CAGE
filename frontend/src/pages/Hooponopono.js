@@ -212,6 +212,8 @@ function HooponoponoSession({ target, targetName, duration, onEnd }) {
 
 /* ====== MAIN PAGE ====== */
 export default function Hooponopono() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('hooponopono', 8); }, []);
+
   const [target, setTarget] = useState('self');
   const [targetName, setTargetName] = useState('');
   const [duration, setDuration] = useState(10);

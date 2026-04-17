@@ -7,6 +7,8 @@ import axios from 'axios';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function RefractorDemo() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('refractor', 8); }, []);
+
   const [artifact, setArtifact] = useState(null);
   const [sampleId, setSampleId] = useState('BIO-CORE-001');
   const [sensorInput, setSensorInput] = useState(0.92);

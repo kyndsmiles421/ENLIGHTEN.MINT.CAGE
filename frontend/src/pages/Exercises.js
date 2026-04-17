@@ -10,6 +10,8 @@ import GuidedExperience from '../components/GuidedExperience';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Exercises() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('exercises', 8); }, []);
+
   const [exercises, setExercises] = useState([]);
   const [filter, setFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);

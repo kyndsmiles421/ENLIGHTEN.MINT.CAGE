@@ -16,6 +16,8 @@ import { useNavigate } from 'react-router-dom';
  */
 
 export default function QuantumLoom() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('quantum', 8); }, []);
+
   const navigate = useNavigate();
   const [nodules, setNodules] = useState(0);
   const [activePortal, setActivePortal] = useState(null); // 'TOP' | 'BOTTOM' | null

@@ -22,6 +22,8 @@ import {
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function StarseedRealm() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('starseed_realm', 8); }, []);
+
   const { user, authHeaders, loading: authLoading } = useAuth();
   const { reduceParticles } = useSensory();
   const navigate = useNavigate();

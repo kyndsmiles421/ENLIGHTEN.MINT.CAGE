@@ -506,6 +506,8 @@ const TABS = [
 ];
 
 export default function Cardology() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('cardology', 8); }, []);
+
   const { user, loading: authLoading } = useAuth();
   const [tab, setTab] = useState('birth');
 

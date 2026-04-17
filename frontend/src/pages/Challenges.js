@@ -304,6 +304,8 @@ function LeaderboardModal({ challengeId, challenges, onClose }) {
 
 // --- Main Challenges Page ---
 export default function Challenges() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('challenges', 8); }, []);
+
   const { user, authHeaders } = useAuth();
   const [challenges, setChallenges] = useState([]);
   const [myChallenges, setMyChallenges] = useState([]);

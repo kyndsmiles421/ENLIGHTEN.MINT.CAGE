@@ -182,6 +182,8 @@ const TABS = [
 ];
 
 export default function RPGPage() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('rpg', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const latency = useLatency();

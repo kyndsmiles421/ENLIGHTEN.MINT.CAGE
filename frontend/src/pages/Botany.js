@@ -382,6 +382,8 @@ function IdentifyPanel({ onIdentify, identifying, result }) {
 }
 
 export default function Botany() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('botany', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders, loading: authLoading, token } = useAuth();
   const [plants, setPlants] = useState([]);

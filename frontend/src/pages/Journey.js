@@ -742,6 +742,8 @@ function LessonView({ lesson, stage, onComplete, isCompleted, onBack }) {
 
 /* ====== MAIN PAGE ====== */
 export default function Journey() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('journey', 8); }, []);
+
   const { user, authHeaders } = useAuth();
   const { playCelebration } = useSensory();
   const [progress, setProgress] = useState({ completed_lessons: [], current_stage: 0 });

@@ -385,6 +385,8 @@ ActionButtons.displayName = 'ActionButtons';
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function TesseractExperience() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('tesseract', 8); }, []);
+
   const navigate = useNavigate();
   
   // The ONE hook that controls everything

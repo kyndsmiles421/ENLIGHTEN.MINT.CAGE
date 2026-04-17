@@ -137,6 +137,8 @@ const UNIVERSES = {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function MultiverseMap() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('multiverse', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const headers = authHeaders;

@@ -197,6 +197,8 @@ function StarSeedPanel({ components }) {
 }
 
 export default function RefinementLab() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('refinement', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const latency = useLatency();

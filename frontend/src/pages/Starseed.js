@@ -11,6 +11,8 @@ import axios from 'axios';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Starseed() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('starseed', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const { toggleFreq, activeFreqs } = useMixer();

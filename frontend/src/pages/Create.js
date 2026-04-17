@@ -20,6 +20,8 @@ const TYPES = [
 ];
 
 export default function Create() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('creation', 8); }, []);
+
   const { user, authHeaders } = useAuth();
   const [tab, setTab] = useState('create');
   const [type, setType] = useState('affirmation');

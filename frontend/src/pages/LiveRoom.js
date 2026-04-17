@@ -54,6 +54,8 @@ const VIDEO_MODES = {
 };
 
 export default function LiveRoom() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('live_session', 8); }, []);
+
   const { sessionId } = useParams();
   const { user, authHeaders } = useAuth();
   const { avatarB64 } = useAvatar();

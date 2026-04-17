@@ -13,6 +13,8 @@ import { useNavigate } from 'react-router-dom';
 import ShambhalaToolbar from '../components/ShambhalaToolbar';
 
 export default function SovereignLab() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('sovereign_lab', 8); }, []);
+
   const navigate = useNavigate();
   const [activeEngine, setActiveEngine] = useState(null);
   const [stats, setStats] = useState({ particles: 0, depth: 0 });

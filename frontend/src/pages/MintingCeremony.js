@@ -15,6 +15,8 @@ import SovereignStreamline, { useSovereignV7 } from '../utils/SovereignStreamlin
 import SovereignV9, { useSovereignV9 } from '../utils/SovereignV9';
 
 export default function MintingCeremony() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('minting', 8); }, []);
+
   const navigate = useNavigate();
   const [isMinting, setIsMinting] = useState(false);
   const [currentLayer, setCurrentLayer] = useState(0);

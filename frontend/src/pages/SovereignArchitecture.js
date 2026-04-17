@@ -17,6 +17,8 @@ const TIER_COLORS = { standard: '#22C55E', apprentice: '#60A5FA', artisan: '#A78
 const AGENT_ICONS = { compass: Compass, music: Music, 'map-pin': MapPin };
 
 export default function SovereignArchitecture() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('sovereign_arch', 8); }, []);
+
   const { authHeaders, authLoading, token } = useAuth();
   const navigate = useNavigate();
   const [status, setStatus] = useState(null);

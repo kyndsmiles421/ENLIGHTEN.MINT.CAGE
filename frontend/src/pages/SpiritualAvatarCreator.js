@@ -47,6 +47,8 @@ function CosmicBg({ reduceParticles }) {
 }
 
 export default function SpiritualAvatarCreator() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('spiritual_avatar', 8); }, []);
+
   const { user, authHeaders, loading: authLoading } = useAuth();
   const { reduceParticles } = useSensory();
   const navigate = useNavigate();

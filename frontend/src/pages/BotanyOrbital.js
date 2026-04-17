@@ -226,6 +226,8 @@ function DetailPanel({ planet, onClose, authHeaders }) {
 //  BOTANY ORBITAL — The Botanical garden as orbital 3D space
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 export default function BotanyOrbital() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('botany', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders, loading: authLoading, token } = useAuth();
   const { cosmicState, fetchCosmicState } = useCosmicState();

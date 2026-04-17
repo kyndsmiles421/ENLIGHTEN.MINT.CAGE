@@ -474,6 +474,8 @@ function BiometricsPanel({ activities, onLog, bioStats }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function MasteryAvenues() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('mastery', 8); }, []);
+
   const { authHeaders } = useAuth();
   const navigate = useNavigate();
   const [avenues, setAvenues] = useState([]);

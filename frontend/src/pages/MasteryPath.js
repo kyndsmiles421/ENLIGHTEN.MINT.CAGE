@@ -187,6 +187,8 @@ function AvenueCard({ avenue, onCompleteLesson, completing }) {
 
 // ━━━ MASTERY PATH PAGE ━━━
 export default function MasteryPath() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('mastery', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders, token, loading: authLoading } = useAuth();
   const { publishEvent } = useSovereign();

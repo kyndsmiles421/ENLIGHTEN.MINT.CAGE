@@ -23,6 +23,8 @@ const TIER_COLORS = {
 };
 
 export default function Codex() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('codex', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders, loading: authLoading, token } = useAuth();
   const { cosmicState, fetchCosmicState } = useCosmicState();

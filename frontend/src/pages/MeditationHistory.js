@@ -10,6 +10,8 @@ const TYPES = ['silent', 'guided', 'breath-focused', 'mantra', 'body-scan', 'vis
 const MOODS = ['calm', 'focused', 'anxious', 'restless', 'peaceful', 'energized', 'tired', 'grateful'];
 
 export default function MeditationHistory() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('meditation_review', 8); }, []);
+
   const { token, authHeaders } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);

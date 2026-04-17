@@ -135,6 +135,8 @@ function FaderStrip({ strip, index, isActive, faderPos, onSelect, onFaderChange 
 }
 
 export default function SovereignMasterEngine() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('sovereign_engine', 8); }, []);
+
   const navigate = useNavigate();
   const { user } = useAuth();
   const { accrue } = useWorkAccrual();

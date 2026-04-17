@@ -330,6 +330,8 @@ function ActiveEffectsBanner({ effects }) {
 }
 
 export default function CosmicStore() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('cosmic_store', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const latency = useLatency();

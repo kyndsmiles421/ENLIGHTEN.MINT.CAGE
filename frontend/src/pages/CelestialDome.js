@@ -25,6 +25,8 @@ import { useSpatialAudio, SOLFEGGIO_FREQUENCIES } from '../engines/SpatialAudioE
 const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function CelestialDome() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('celestial_dome', 8); }, []);
+
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const containerRef = useRef(null);

@@ -28,6 +28,8 @@ const DEED_TYPES = [
 ];
 
 export default function Sanctuary() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('sanctuary', 8); }, []);
+
   const navigate = useNavigate();
   const { user, token } = useAuth();
   const canvasRef = useRef(null);

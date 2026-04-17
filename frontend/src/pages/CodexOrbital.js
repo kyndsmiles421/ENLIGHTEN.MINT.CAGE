@@ -158,6 +158,8 @@ function CodexDetailPanel({ planet, onClose, onDive }) {
 }
 
 export default function CodexOrbital() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('codex', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders, loading: authLoading, token } = useAuth();
   const { cosmicState, fetchCosmicState } = useCosmicState();

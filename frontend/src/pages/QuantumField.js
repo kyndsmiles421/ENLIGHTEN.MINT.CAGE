@@ -258,6 +258,8 @@ function ShadowHistory({ history }) {
 }
 
 export default function QuantumField() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('quantum', 8); }, []);
+
   const { authHeaders } = useAuth();
   const navigate = useNavigate();
   const [sprites, setSprites] = useState([]);

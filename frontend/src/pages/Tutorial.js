@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -100,6 +100,8 @@ const SECTIONS = [
 ];
 
 export default function Tutorial() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('tutorial', 8); }, []);
+
   const navigate = useNavigate();
   const [showWalkthrough, setShowWalkthrough] = useState(false);
 

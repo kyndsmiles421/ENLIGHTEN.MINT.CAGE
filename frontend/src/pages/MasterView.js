@@ -67,6 +67,8 @@ function MetricRow({ label, value, color, sub }) {
 }
 
 export default function MasterView() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('master_view', 8); }, []);
+
   const { authHeaders } = useAuth();
   const navigate = useNavigate();
   const [audit, setAudit] = useState(null);

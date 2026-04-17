@@ -1,4 +1,4 @@
-import React, { Suspense, useState, useMemo } from 'react';
+import React, { Suspense, useState, useMemo, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars, Text, Float, PerspectiveCamera } from '@react-three/drei';
 
@@ -59,6 +59,8 @@ function SecureNode({ position, label, altitude, color }) {
 
 // --- 4. THE SYSTEM: All-In-One Established App ---
 export default function FractalEngine() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('fractal', 8); }, []);
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (

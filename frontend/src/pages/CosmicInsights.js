@@ -149,6 +149,8 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 export default function CosmicInsights() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('cosmic_insights', 8); }, []);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const [weather, setWeather] = useState(null);

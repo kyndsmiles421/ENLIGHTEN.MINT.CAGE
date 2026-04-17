@@ -316,6 +316,8 @@ function PsychePanel({ psycheState, psycheInfo }) {
 }
 
 export default function PlanetaryDepths() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('planetary', 8); }, []);
+
   const { authHeaders } = useAuth();
   const navigate = useNavigate();
   const [layers, setLayers] = useState([]);

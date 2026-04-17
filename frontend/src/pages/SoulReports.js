@@ -151,6 +151,8 @@ function ReportMarkdown({ text }) {
 
 /* ─── Main Page ─── */
 export default function SoulReports() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('soul_reports', 8); }, []);
+
   const { token } = useAuth();
   const [reports, setReports] = useState([]);
   const [activeReport, setActiveReport] = useState(null);

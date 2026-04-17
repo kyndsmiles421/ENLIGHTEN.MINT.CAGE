@@ -195,6 +195,8 @@ function VideoPlayerModal({ storyId, videoUrl, onClose }) {
 
 /* ─── Main Videos Page ─── */
 export default function Videos() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('videos', 8); }, []);
+
   const { authHeaders } = useAuth();
   const [tab, setTab] = useState('cinema');
   const [videos, setVideos] = useState([]);

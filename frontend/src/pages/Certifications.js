@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Certifications() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('certifications', 8); }, []);
+
   const { token, authHeaders } = useAuth();
   const [certs, setCerts] = useState([]);
   const [loading, setLoading] = useState(true);

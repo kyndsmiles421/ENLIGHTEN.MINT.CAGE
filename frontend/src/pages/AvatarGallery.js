@@ -388,6 +388,8 @@ function PublishModal({ onPublish, onClose, publishing }) {
    MAIN PAGE
    ═══════════════════════════════════ */
 export default function AvatarGallery() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('avatar_gallery', 8); }, []);
+
   const { user, authHeaders, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 

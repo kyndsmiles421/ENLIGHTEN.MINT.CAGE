@@ -103,6 +103,8 @@ function purgeGhostElements() {
 }
 
 export default function OrbitalHub() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('orbital', 8); }, []);
+
   const navigate = useNavigate();
   const { user } = useAuth();
   const audio = useHubAudio();

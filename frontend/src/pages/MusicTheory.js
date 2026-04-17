@@ -151,6 +151,8 @@ function ChladniCanvas({ frequency, locked, color }) {
 }
 
 export default function MusicTheory() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('music_theory', 8); }, []);
+
   const { toggleFreq } = useMixer();
   const { authHeaders } = useAuth();
   const [activeKey, setActiveKey] = useState(null);

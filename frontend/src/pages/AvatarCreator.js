@@ -493,6 +493,8 @@ function EnergyMeter({ energy, chakra, mood }) {
    ═══════════════════════════════════════════════ */
 
 export default function AvatarCreator() {
+  useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('avatar_creation', 8); }, []);
+
   const { authHeaders } = useAuth();
   const { refreshAvatar } = useAvatar();
 
