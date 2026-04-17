@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INFINITY SOVEREIGN — Enlighten.Mint.Cafe</title>
+    <meta name="description" content="A Sovereign Wellness Engine. 27 Workshops, 162 Materials, 243 Tools. Master trades, healing, sacred knowledge, and science in one 791KB organism.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0A0A12;
+            color: #F8FAFC;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        .hero {
+            text-align: center;
+            padding: 80px 24px 60px;
+            background: radial-gradient(ellipse at 50% 0%, rgba(139,92,246,0.08) 0%, transparent 60%);
+        }
+        .hero h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: 0.15em;
+            background: linear-gradient(135deg, #E0E7FF, #D4AF37);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        .hero .subtitle {
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(167,139,250,0.6);
+            margin-bottom: 32px;
+        }
+        .hero p {
+            max-width: 520px;
+            margin: 0 auto 40px;
+            font-size: 0.95rem;
+            color: rgba(248,250,252,0.6);
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+            margin-bottom: 48px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat .num {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: #D4AF37;
+        }
+        .stat .label {
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.25);
+        }
+        .cta {
+            display: inline-block;
+            padding: 14px 40px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(212,175,55,0.15));
+            border: 1px solid rgba(212,175,55,0.3);
+            color: #D4AF37;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .cta:hover {
+            background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(212,175,55,0.25));
+            border-color: rgba(212,175,55,0.5);
+        }
+        .domains {
+            padding: 60px 24px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .domains h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 300;
+            text-align: center;
+            margin-bottom: 32px;
+            color: rgba(248,250,252,0.8);
+        }
+        .domain-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .domain-card {
+            padding: 20px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .domain-card .name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .domain-card .count {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.3);
+        }
+        .privacy {
+            padding: 80px 24px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .privacy h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 24px;
+            color: rgba(248,250,252,0.8);
+        }
+        .privacy h3 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-top: 24px;
+            margin-bottom: 8px;
+            color: rgba(248,250,252,0.7);
+        }
+        .privacy p, .privacy ul {
+            font-size: 0.85rem;
+            color: rgba(248,250,252,0.45);
+            margin-bottom: 12px;
+        }
+        .privacy ul { padding-left: 20px; }
+        .privacy li { margin-bottom: 4px; }
+        .footer {
+            text-align: center;
+            padding: 40px 24px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .footer p {
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.15);
+        }
+        #privacy { scroll-margin-top: 40px; }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="subtitle">Enlighten.Mint.Cafe presents</div>
+        <h1>INFINITY SOVEREIGN</h1>
+        <p>A Sovereign Wellness Engine. Master trades, healing arts, sacred knowledge, science, and creative arts — all connected by an Oracle that bridges every domain through intent.</p>
+        <div class="stats">
+            <div class="stat"><div class="num">27</div><div class="label">Workshops</div></div>
+            <div class="stat"><div class="num">162</div><div class="label">Materials</div></div>
+            <div class="stat"><div class="num">243</div><div class="label">Tools</div></div>
+            <div class="stat"><div class="num">791</div><div class="label">KB Bundle</div></div>
+        </div>
+        <a href="https://play.google.com/store/apps/details?id=com.infinitysovereign.app" class="cta">Download on Google Play</a>
+    </div>
+
+    <div class="domains">
+        <h2>7 Domains of Mastery</h2>
+        <div class="domain-grid">
+            <div class="domain-card"><div class="name" style="color:#FBBF24">Trade & Craft</div><div class="count">10 modules — Masonry, Carpentry, Electrical, Plumbing, Landscaping, Welding, Automotive, HVAC, Machining, Forestry</div></div>
+            <div class="domain-card"><div class="name" style="color:#22C55E">Healing Arts</div><div class="count">6 modules — Nursing, Child Care, Elderly Care, First Aid, Nutrition, Permaculture</div></div>
+            <div class="domain-card"><div class="name" style="color:#D4AF37">Sacred Knowledge</div><div class="count">4 modules — Bible Study, Hermetics, Philosophy, Economics</div></div>
+            <div class="domain-card"><div class="name" style="color:#3B82F6">Science & Physics</div><div class="count">3 modules — Robotics, Anatomy, Geology</div></div>
+            <div class="domain-card"><div class="name" style="color:#EC4899">Creative Arts</div><div class="count">1 module — Music Theory</div></div>
+            <div class="domain-card"><div class="name" style="color:#A78BFA">Mind & Spirit</div><div class="count">1 module — Meditation</div></div>
+            <div class="domain-card"><div class="name" style="color:#F97316">Exploration</div><div class="count">2 modules — Public Speaking, Pedagogy</div></div>
+        </div>
+    </div>
+
+    <div class="privacy" id="privacy">
+        <h2>Privacy Policy</h2>
+        <p><strong>Effective Date:</strong> April 17, 2026</p>
+        <p><strong>App Name:</strong> INFINITY SOVEREIGN (Enlighten.Mint.Cafe)</p>
+        <p><strong>Developer:</strong> Steven Michael</p>
+        <p><strong>Contact:</strong> Rapid City, South Dakota, USA</p>
+
+        <h3>1. Information We Collect</h3>
+        <p>INFINITY SOVEREIGN is designed with a Sovereign-First architecture. We collect only what is necessary to operate the app:</p>
+        <ul>
+            <li><strong>Account Information:</strong> Email address and display name (if you choose to create an account). Guest access is available without any personal information.</li>
+            <li><strong>Progress Data:</strong> Workshop completion, XP earned, and Trade Passport progression — stored to maintain your learning journey.</li>
+            <li><strong>Device Information:</strong> We do not collect device identifiers, advertising IDs, or location data.</li>
+        </ul>
+
+        <h3>2. How We Use Information</h3>
+        <ul>
+            <li>To maintain your learning progress and RPG character data</li>
+            <li>To display your Trade Passport and Hybrid Title achievements</li>
+            <li>To authenticate your account (if registered)</li>
+        </ul>
+
+        <h3>3. Data Sharing</h3>
+        <p>We do not sell, rent, or share your personal information with third parties. Your data stays within the INFINITY SOVEREIGN ecosystem.</p>
+
+        <h3>4. Data Storage & Security</h3>
+        <p>Data is stored on secure, encrypted servers. All API communications use HTTPS. Passwords are hashed using bcrypt and never stored in plain text.</p>
+
+        <h3>5. Data Retention</h3>
+        <p>Your data is retained as long as your account is active. You may request deletion of your account and all associated data at any time by contacting us.</p>
+
+        <h3>6. Children's Privacy</h3>
+        <p>INFINITY SOVEREIGN is not directed at children under 13. We do not knowingly collect personal information from children under 13.</p>
+
+        <h3>7. Third-Party Services</h3>
+        <p>The app uses OpenAI's API for AI-powered features (contextual generators, deep dives). No personal user data is sent to third-party AI services — only anonymized prompts.</p>
+
+        <h3>8. Your Rights</h3>
+        <ul>
+            <li>Access your stored data at any time through the app</li>
+            <li>Request deletion of your account and data</li>
+            <li>Use the app as a guest without providing any personal information</li>
+        </ul>
+
+        <h3>9. Changes to This Policy</h3>
+        <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated effective date.</p>
+
+        <h3>10. Contact</h3>
+        <p>For privacy-related questions or data deletion requests, contact the developer through the Google Play Store listing or the in-app feedback system.</p>
+    </div>
+
+    <div class="footer">
+        <p>INFINITY SOVEREIGN by Steven Michael — Rapid City, South Dakota</p>
+        <p style="margin-top:8px">27 Workshops | 162 Materials | 243 Tools | 791KB Metabolic Seal</p>
+        <p style="margin-top:8px"><a href="#privacy" style="color:rgba(167,139,250,0.4);text-decoration:none">Privacy Policy</a></p>
+    </div>
+</body>
+</html>
