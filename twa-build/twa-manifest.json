@@ -1,0 +1,54 @@
+{
+  "packageId": "com.infinitysovereign.app",
+  "host": "zero-scale-physics.preview.emergentagent.com",
+  "name": "INFINITY SOVEREIGN",
+  "launcherName": "INFINITY",
+  "display": "standalone",
+  "themeColor": "#0A0A12",
+  "themeColorDark": "#0A0A12",
+  "navigationColor": "#0A0A12",
+  "navigationColorDark": "#0A0A12",
+  "navigationDividerColor": "#0A0A12",
+  "navigationDividerColorDark": "#0A0A12",
+  "backgroundColor": "#0A0A12",
+  "enableNotifications": false,
+  "startUrl": "/sovereign-hub",
+  "iconUrl": "https://zero-scale-physics.preview.emergentagent.com/store-assets/icon-512.png",
+  "maskableIconUrl": "https://zero-scale-physics.preview.emergentagent.com/store-assets/icon-512.png",
+  "monochromeIconUrl": "https://zero-scale-physics.preview.emergentagent.com/store-assets/icon-512.png",
+  "shortcuts": [
+    {
+      "name": "Oracle Search",
+      "short_name": "Oracle",
+      "url": "/sovereign-hub",
+      "chosenIconUrl": "https://zero-scale-physics.preview.emergentagent.com/store-assets/icon-192.png"
+    },
+    {
+      "name": "Trade Passport",
+      "short_name": "Passport",
+      "url": "/trade-passport",
+      "chosenIconUrl": "https://zero-scale-physics.preview.emergentagent.com/store-assets/icon-192.png"
+    }
+  ],
+  "signing": {
+    "keyPath": "./infinity-sovereign.keystore",
+    "alias": "infinity-sovereign"
+  },
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://zero-scale-physics.preview.emergentagent.com/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://zero-scale-physics.preview.emergentagent.com/",
+  "minSdkVersion": 19,
+  "appVersionCode": 1,
+  "appVersionName": "68.0.0",
+  "splashScreenFadeOutDuration": 300,
+  "signingMode": "new",
+  "fingerprint": ""
+}
