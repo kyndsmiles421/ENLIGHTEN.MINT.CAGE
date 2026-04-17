@@ -169,7 +169,7 @@ export default function Avatar3D({
         bottom: 0,
         width: 140,
         transform: 'translateX(-50%)',
-        zIndex: 3,
+        zIndex: 1,
       }}
       data-testid="avatar-3d-container"
     >

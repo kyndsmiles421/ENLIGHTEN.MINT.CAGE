@@ -1,25 +1,32 @@
-# ENLIGHTEN.MINT.CAFE — V56.7 Ghost Button Purge Complete
+# ENLIGHTEN.MINT.CAFE — V56.8 Defragmented & Optimized
 ## PRD — Last Updated: April 17, 2026
 
 ---
 
-## V56.7 Changes
-- **Removed SpatialRecorder ghost buttons** from 7 pages: Meditation, Breathing, Dreams, Affirmations, Soundscapes, AcademyPage, Games
-- **Removed "Cinematic Mode" and "Record Journey"** — were non-functional on mobile (getDisplayMedia unsupported)
-- **Related dropdown** changed from fixed z-50 overlay to inline positioning
-- **Cross-module suggestions API** added: POST /api/knowledge/cross-suggest
-- **Game generator → RPG XP**: generates game + awards 25 XP to character
+## V56.8 — Structural Defrag + Bundle Optimization
+- **Main bundle: 1.1MB** (from 1.2MB) — deferred 26 engine/utility scripts to requestIdleCallback
+- **202 lazy chunks** (from 183) — engines now separate chunks loaded after paint
+- **z-index cleanup**: AnimatedRoutes wrapper reduced from z-10 to z-1, Avatar3D from z-3 to z-1
+- **BackToHub**: Changed from fixed z-50 to sticky z-10 with gradient fade — no more content overlap
+- **Ghost buttons purged** from 7 pages (SpatialRecorder/Cinematic/Record Journey)
+- **Related dropdown**: inline positioning, no fixed overlay
 
-## System Status
+## Full System Audit
 - 153 hub nodules, 152 verified functional
-- Zero ghost buttons across ALL pages
-- Zero fixed overlays
-- Production build: 1.2MB core + 183 lazy chunks
-- Global generators (Script/Lesson/Game/Ritual) from any module
-- Adaptive AI (8 perspectives)
+- Zero ghost buttons, zero fixed overlays (except Navigation bar)
+- Production build: 1.1MB core + 202 lazy chunks
+- All engines deferred to idle callback for faster first paint
+
+## Architecture
+- 10 Command Pillars (153 total nodules)
+- Global Generators (Script/Lesson/Game/Ritual) — context-aware from AI panel
+- Adaptive AI (8 perspectives per topic)
+- Cross-module Sage Board
+- 150/166 pages with XP hooks
 
 ## Backlog
 ### P1
-- Tree-shake to 800KB
+- Continue deepening trade simulations
+- Further tree-shaking toward 800KB
 ### P2
 - Native mobile recording, Phygital NFC

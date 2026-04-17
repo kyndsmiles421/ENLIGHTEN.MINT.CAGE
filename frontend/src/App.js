@@ -24,27 +24,44 @@ import CreatorMixerUI from './components/CreatorMixerUI'; // Creator Mixing Boar
 import './utils/GlobalRebrand';          // v2.88_SHAMBHALA Root Rebranding (clears Matrix)
 import './utils/SpectralShield';         // Ghostbuster Purge & Spectral Shield
 import './utils/SanctuaryEngine';        // Pure Light Resonance (ghosts Emergent badge)
-import './utils/EnlightenmentKey';       // Back-Side Pass Key (unlocks layers on ASCEND)
-// V-ENGINE: GoldenSpiralEngine KILLED - No spiral particles
-// import './utils/GoldenSpiralEngine';     // Three.js Golden Ratio Phyllotaxis (responds to ASCEND)
-import './utils/SovereignCleanup';       // V2.88 Final - Legacy purge, memory optimization, PWA hooks
-import './utils/WebXRPortal';            // WebXR Portal Engine - Spiral zoom → Immersive Dome
-import './utils/PortalAudioEngine';      // Spatial Audio - Shepard Tone + Solfeggio frequencies
-import './utils/SanctuaryMaster';        // v2.89 Master Engine - Consolidated Layer 0 + Mission Circle
-import './utils/SilenceShield';
-import './utils/SovereignOS';
-import './utils/SovereignStreamlineV7';  // v7.0 with Binaural & Omni-Point
-import './utils/SovereignV9';             // v9.0 Crystalline Skeleton + Quadruple Helix
-import './utils/SovereignEngine';         // Core engine (Solar + 13-Node Harmonic)
-import './utils/SovereignRefractor';      // Front-end visual layer (Vortex + Payload)
-import './utils/SovereignStabilizer';     // Physics: Inverse Attraction + Edge Repulsion
-import './utils/StabilizerCanvas';        // Canvas physics visualizer
-import './utils/RefractionEngine';        // White Light → Rainbow Split → Infinity
-import './utils/SovereignCore';           // V2.88 Unified Core (Refraction + Stabilization + Encryption)
-import './utils/RainbowKeyGenerator';     // Back-end key encryption
-import './utils/SovereignHandshake';      // Bi-directional handshake orchestrator
-import './utils/SovereignSingularity';    // V53.0 BIO-DIGITAL OSMOSIS — Full Stack
-import './utils/NoduleBridge';            // V53.0 UNIFIED SYNC — Frontend Bridge
+// V56.7 — Deferred engine loading for faster initial render
+// Critical path: Auth, Routing, Context — loaded immediately
+// Engine utilities: Loaded after first paint via requestIdleCallback
+const deferEngineLoad = () => {
+  import('./engines/SystemRecovery');
+  import('./engines/MainframeSync');
+  import('./engines/PerformanceManager');
+  import('./engines/ProjectSovereign');
+  import('./utils/GlobalRebrand');
+  import('./utils/SpectralShield');
+  import('./utils/SanctuaryEngine');
+  import('./utils/EnlightenmentKey');
+  import('./utils/SovereignCleanup');
+  import('./utils/WebXRPortal');
+  import('./utils/PortalAudioEngine');
+  import('./utils/SanctuaryMaster');
+  import('./utils/SilenceShield');
+  import('./utils/SovereignOS');
+  import('./utils/SovereignStreamlineV7');
+  import('./utils/SovereignV9');
+  import('./utils/SovereignEngine');
+  import('./utils/SovereignRefractor');
+  import('./utils/SovereignStabilizer');
+  import('./utils/StabilizerCanvas');
+  import('./utils/RefractionEngine');
+  import('./utils/SovereignCore');
+  import('./utils/RainbowKeyGenerator');
+  import('./utils/SovereignHandshake');
+  import('./utils/SovereignSingularity');
+  import('./utils/NoduleBridge');
+};
+if (typeof window !== 'undefined') {
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(deferEngineLoad);
+  } else {
+    setTimeout(deferEngineLoad, 2000);
+  }
+}
 
 import { useActivityTracker } from './hooks/useActivityTracker';
 import { useGlobalSounds } from './hooks/useSoundEngine';
@@ -447,7 +464,7 @@ function AnimatedRoutes() {
   const showBackBtn = !['/sovereign-hub', '/landing', '/auth', '/intro', '/', '/hub', '/creator-console'].includes(location.pathname);
 
   return (
-    <div className="page-enter" key={location.pathname} style={{ position: 'relative', zIndex: 10 }}>
+    <div className="page-enter" key={location.pathname} style={{ position: 'relative', zIndex: 1 }}>
     {showBackBtn && <BackToHub />}
     <CosmicErrorBoundary>
     <Suspense fallback={<PageLoader />}>

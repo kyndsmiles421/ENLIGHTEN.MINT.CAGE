@@ -250,7 +250,7 @@ export default function BackToHub() {
   return (
     <>
       {/* Back + Related */}
-      <div className="fixed top-3 left-3 z-50 flex items-center gap-1.5" data-testid="nav-controls">
+      <div className="sticky top-0 left-0 right-0 z-10 flex items-center gap-1.5 px-3 pt-3 pb-2" style={{ background: 'linear-gradient(to bottom, rgba(10,10,18,0.95), rgba(10,10,18,0.8), transparent)' }} data-testid="nav-controls">
         <button
           onClick={() => navigate('/sovereign-hub')}
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all active:scale-95"
