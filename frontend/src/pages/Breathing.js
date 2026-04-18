@@ -616,7 +616,11 @@ export default function Breathing() {
                   );
                 })}
                 <div
-                  className="relative z-10 flex flex-col items-center justify-center"
+                  role="button"
+                  tabIndex={0}
+                  onClick={active ? stop : start}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); (active ? stop : start)(); } }}
+                  className="relative z-10 flex flex-col items-center justify-center cursor-pointer active:scale-[0.97] transition-transform"
                   style={{
                     width: '120px', height: '120px', borderRadius: '50%',
                     background: `radial-gradient(circle, ${pattern.color}50 0%, ${pattern.color}15 70%)`,
@@ -624,12 +628,14 @@ export default function Breathing() {
                     transform: `scale(${scale})`,
                     transition: `transform ${phaseRef.current.phase === 'inhale' ? pattern.inhale : phaseRef.current.phase === 'exhale' ? pattern.exhale : 0.3}s ease-in-out`,
                   }}
+                  data-testid="breath-orb-tap"
+                  aria-label={active ? 'Stop breathwork' : 'Start breathwork'}
                 >
                   <p className="text-3xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
                     {active ? timer : ''}
                   </p>
                   <p className="text-xs uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>
-                    {active ? phase : 'Ready'}
+                    {active ? phase : 'Tap to Begin'}
                   </p>
                 </div>
               </div>
