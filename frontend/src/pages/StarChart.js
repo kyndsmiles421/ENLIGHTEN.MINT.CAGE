@@ -1194,6 +1194,8 @@ export default function StarChart() {
     // Award XP for exploring constellation
     if (token) {
       axios.post(`${API}/star-chart/award-xp`, { action: 'constellation_explored', constellation_name: c.name }, { headers: authHeaders }).catch(() => {});
+      // Award Sparks for constellation identification
+      axios.post(`${API}/sparks/earn`, { action: 'constellation_identify', context: c.id || c.name?.toLowerCase() }, { headers: authHeaders }).catch(() => {});
     }
   }, [token, authHeaders]);
   const handleBirthMessage = useCallback((info) => setBirthMsg(info), []);

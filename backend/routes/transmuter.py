@@ -476,3 +476,6 @@ async def work_submit(data: dict = Body(...), user=Depends(get_current_user)):
         "tax_rate": result["tax_rate"],
         "dust_balance": updated_wallet["dust"],
     }
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━�

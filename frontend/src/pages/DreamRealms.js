@@ -400,6 +400,15 @@ function DifficultyBadge({ difficulty }) {
 export default function DreamRealms() {
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('dream_realms', 8); }, []);
 
+  // Sparks immersion timer — 1 Spark per minute in Dream Realms
+  useEffect(() => {
+    if (!token || token === 'guest_token') return;
+    const interval = setInterval(() => {
+      axios.post(`${API}/sparks/immersion`, { seconds: 60, zone: 'dream_realms' }, { headers: authHeaders }).catch(() => {});
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [token, authHeaders]);
+
   const navigate = useNavigate();
   const { authHeaders } = useAuth();
   const headers = authHeaders;

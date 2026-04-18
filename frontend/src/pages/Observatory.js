@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { Star, Sparkles, Volume2, VolumeX, Radio, Clock, Zap, ChevronRight } from 'lucide-react';
+import { Star, Sparkles, Volume2, VolumeX, Radio, Clock, Zap, ChevronRight, Telescope, Map } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useChaosOscillator, chaosGlow } from '../lib/ChaosEngine';
 
@@ -10,21 +11,21 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 /* ── Planet Visual Profiles ──────────────────────────────── */
 const PLANET_VISUALS = {
   Mercury: { bg: '#4A4A4A', accent: '#B8B8B8', glow: 'rgba(184,184,184,0.15)', desc: 'Scorched cratered world closest to the Sun', chaos: 1.8,
-    img: 'https://images.unsplash.com/photo-1568581357528-69b82742efa1?w=1200&q=80' },
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Mercury_in_true_color.jpg/1024px-Mercury_in_true_color.jpg' },
   Venus:   { bg: '#C4A35A', accent: '#F5D78E', glow: 'rgba(245,215,142,0.2)', desc: 'Shrouded in sulfuric clouds, 900°F surface', chaos: 1.3,
-    img: 'https://images.unsplash.com/photo-1633034974812-702a0da55cfc?w=1200&q=80' },
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/PIA23791-Venus-NewlyProcessedView-20200608.png/1024px-PIA23791-Venus-NewlyProcessedView-20200608.png' },
   Earth:   { bg: '#1E6B4E', accent: '#4FC3F7', glow: 'rgba(79,195,247,0.2)', desc: 'Our home, the pale blue dot', chaos: 1.0,
-    img: 'https://images.unsplash.com/photo-1736326268574-8bfa8c1b69a5?w=1200&q=80' },
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/The_Blue_Marble_%28remastered%29.jpg/1024px-The_Blue_Marble_%28remastered%29.jpg' },
   Mars:    { bg: '#8B3A2A', accent: '#E57C5B', glow: 'rgba(229,124,91,0.2)', desc: 'The red planet, iron-oxide dust storms', chaos: 1.2,
-    img: 'https://images.unsplash.com/photo-1660251146550-40e7c9d841b3?w=1200&q=80' },
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png/1024px-Mars_-_August_30_2021_-_Flickr_-_Kevin_M._Gill.png' },
   Jupiter: { bg: '#8B6914', accent: '#D4A843', glow: 'rgba(212,168,67,0.2)', desc: 'Great Red Spot, king of the gas giants', chaos: 0.8,
     img: 'https://images.unsplash.com/photo-1768032504914-dc0f699db615?w=1200&q=80' },
   Saturn:  { bg: '#C4A35A', accent: '#E8D48B', glow: 'rgba(232,212,139,0.18)', desc: 'Golden rings of ice and rock', chaos: 0.6,
-    img: 'https://images.unsplash.com/photo-1771422964049-2cc26fcd241b?w=1200&q=80' },
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Saturn_during_Equinox.jpg/1024px-Saturn_during_Equinox.jpg' },
   Uranus:  { bg: '#2F6B6B', accent: '#69D2D2', glow: 'rgba(105,210,210,0.15)', desc: 'Ice giant tilted on its side', chaos: 1.5,
-    img: 'https://images.unsplash.com/photo-1698243282692-616402a5d535?w=1200&q=80' },
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Uranus_Voyager2_color_calibrated.png/1024px-Uranus_Voyager2_color_calibrated.png' },
   Neptune: { bg: '#1B3A6B', accent: '#5B7FE5', glow: 'rgba(91,127,229,0.2)', desc: 'Supersonic winds, deep blue methane', chaos: 1.618,
-    img: 'https://images.unsplash.com/photo-1590821695525-1e86ef70a7ee?w=1200&q=80' },
+    img: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Neptune_Voyager2_color_calibrated.png/1024px-Neptune_Voyager2_color_calibrated.png' },
 };
 
 const DEEP_SKY_BG = 'https://images.unsplash.com/photo-1735213005665-f5b93d0795fe?w=1200&q=80';
@@ -192,7 +193,8 @@ function StarCard({ star, isSelected, onSelect, isPlaying, onToggleSound }) {
 
 /* ── Main Observatory ────────────────────────────────────── */
 export default function Observatory() {
-  const { authHeaders } = useAuth();
+  const { authHeaders, token } = useAuth();
+  const navigate = useNavigate();
   const [tab, setTab] = useState('orrery');
   const [planets, setPlanets] = useState([]);
   const [stars, setStars] = useState([]);
@@ -201,9 +203,20 @@ export default function Observatory() {
   const [selectedPlanet, setSelectedPlanet] = useState(null);
   const [selectedStar, setSelectedStar] = useState(null);
   const [expandedEvent, setExpandedEvent] = useState(null);
+  const [constellations, setConstellations] = useState([]);
+  const [selectedConstellation, setSelectedConstellation] = useState(null);
   const audio = useChaosOscillator({ chaosCoeff: 1.0, driftRange: 5, chaosEnabled: true });
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 10); }, []);
+
+  // Immersion timer — earn 1 Spark per minute of active Observatory use
+  useEffect(() => {
+    if (!token) return;
+    const interval = setInterval(() => {
+      axios.post(`${API}/sparks/immersion`, { seconds: 60, zone: 'observatory' }, { headers: authHeaders }).catch(() => {});
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [token, authHeaders]);
 
   useEffect(() => {
     const headers = authHeaders?.Authorization ? authHeaders : {};
@@ -213,6 +226,7 @@ export default function Observatory() {
     }).catch(() => {});
     axios.get(`${API}/observatory/stars`, { headers }).then(r => setStars(r.data.stars)).catch(() => {});
     axios.get(`${API}/observatory/events`, { headers }).then(r => { setEvents(r.data.events); setMoon(r.data.moon); }).catch(() => {});
+    axios.get(`${API}/observatory/constellations`, { headers }).then(r => setConstellations(r.data?.constellations || [])).catch(() => {});
   }, [authHeaders]);
 
   const planetVisual = selectedPlanet ? (PLANET_VISUALS[selectedPlanet.name] || { bg: '#333', accent: selectedPlanet.color, glow: `${selectedPlanet.color}20` }) : null;
@@ -232,6 +246,7 @@ export default function Observatory() {
   const TABS = [
     { id: 'orrery', label: 'Orrery', icon: Radio },
     { id: 'stars', label: 'Deep Sky', icon: Star },
+    { id: 'constellations', label: 'Constellations', icon: Map },
     { id: 'events', label: 'Live Events', icon: Sparkles },
   ];
 
@@ -451,6 +466,129 @@ export default function Observatory() {
                   </motion.div>
                 )}
               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ═══ CONSTELLATIONS TAB ═══ */}
+        {tab === 'constellations' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+            <p className="text-[8px] uppercase tracking-widest text-center" style={{ color: 'rgba(255,255,255,0.4)' }}>
+              20 Major Western Constellations — Tap to explore mythology & deep-sky objects
+            </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {constellations.map(c => {
+                const isOpen = selectedConstellation?.id === c.id;
+                return (
+                  <motion.button key={c.id} layout
+                    onClick={() => {
+                      setSelectedConstellation(isOpen ? null : c);
+                      if (!isOpen && token) {
+                        axios.post(`${API}/sparks/earn`, { action: 'constellation_identify', context: c.id }, { headers: authHeaders }).catch(() => {});
+                      }
+                    }}
+                    className="w-full text-left rounded-2xl overflow-hidden transition-all"
+                    style={{
+                      background: isOpen ? `${c.color}08` : 'rgba(0,0,0,0.25)',
+                      border: `1px solid ${isOpen ? `${c.color}30` : 'rgba(248,250,252,0.06)'}`,
+                    }}
+                    data-testid={`constellation-${c.id}`}>
+                    {/* Header */}
+                    <div className="px-4 py-3 flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ background: `${c.color}15`, border: `1px solid ${c.color}25` }}>
+                        <Star size={14} style={{ color: c.color }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium" style={{ color: 'rgba(248,250,252,0.9)' }}>{c.name}</span>
+                          <span className="text-[7px] uppercase tracking-wider px-1.5 py-0.5 rounded-full"
+                            style={{ background: `${c.color}12`, color: `${c.color}99` }}>{c.season}</span>
+                        </div>
+                        <p className="text-[8px] truncate" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                          {c.bright_stars?.slice(0, 3).join(', ')}
+                        </p>
+                      </div>
+                      <ChevronRight size={12} style={{
+                        color: 'rgba(248,250,252,0.15)',
+                        transform: isOpen ? 'rotate(90deg)' : 'none',
+                        transition: 'transform 0.2s'
+                      }} />
+                    </div>
+
+                    {/* Expanded Content */}
+                    <AnimatePresence>
+                      {isOpen && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                          className="px-4 pb-4 space-y-3" style={{ borderTop: `1px solid ${c.color}15` }}>
+                          {/* Mythology */}
+                          <div className="pt-3">
+                            <h4 className="text-[8px] uppercase tracking-widest mb-1.5" style={{ color: c.color }}>Mythology</h4>
+                            <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
+                              {c.mythology}
+                            </p>
+                          </div>
+
+                          {/* Bright Stars */}
+                          <div>
+                            <h4 className="text-[8px] uppercase tracking-widest mb-1.5" style={{ color: c.color }}>Bright Stars</h4>
+                            <div className="flex flex-wrap gap-1.5">
+                              {c.bright_stars?.map(s => (
+                                <span key={s} className="px-2 py-1 rounded-lg text-[8px]"
+                                  style={{ background: `${c.color}08`, border: `1px solid ${c.color}15`, color: 'rgba(255,255,255,0.7)' }}>
+                                  {s}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Deep Sky Objects */}
+                          {c.deep_sky?.length > 0 && (
+                            <div>
+                              <h4 className="text-[8px] uppercase tracking-widest mb-1.5" style={{ color: '#FBBF24' }}>
+                                <Telescope size={10} className="inline mr-1" />Deep Sky Objects
+                              </h4>
+                              <div className="space-y-1">
+                                {c.deep_sky.map(obj => (
+                                  <div key={obj} className="flex items-center gap-2 px-2 py-1.5 rounded-lg"
+                                    style={{ background: 'rgba(251,191,36,0.04)', border: '1px solid rgba(251,191,36,0.08)' }}>
+                                    <Sparkles size={8} style={{ color: '#FBBF24', flexShrink: 0 }} />
+                                    <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.7)' }}>{obj}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Stats */}
+                          <div className="flex gap-3 pt-1">
+                            <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                              Area: <span style={{ color: c.color }}>{c.area_sq_deg}°²</span>
+                            </div>
+                            <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                              Latin: <span style={{ color: 'rgba(255,255,255,0.55)' }}>{c.latin}</span>
+                            </div>
+                            <div className="text-[7px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                              Best: <span style={{ color: 'rgba(255,255,255,0.55)' }}>{c.best_viewing}</span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {/* Link to Star Chart */}
+            <div className="pt-4 text-center">
+              <button onClick={() => navigate('/star-chart')}
+                className="px-5 py-2.5 rounded-xl text-xs active:scale-95 transition-all"
+                style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)', color: '#A78BFA' }}
+                data-testid="link-star-chart">
+                <Map size={12} className="inline mr-2" />
+                Open Star Chart — Sky View
+              </button>
             </div>
           </motion.div>
         )}

@@ -138,6 +138,13 @@ export function MythologyPanel({ constellation, onClose, onReadingReady }) {
 
           {/* Actions */}
           <div className="flex items-center gap-2 mt-4 pt-3 flex-wrap" style={{ borderTop: `1px solid ${color}10` }}>
+            {/* Observatory Portal */}
+            <button onClick={() => navigate(`/observatory?tab=constellations&focus=${constellation.id || constellation.name?.toLowerCase()}`)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[10px] font-medium"
+              style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.15)', color: '#60A5FA' }}
+              data-testid="observatory-portal-btn">
+              <Eye size={10} /> Deep Dive in Observatory
+            </button>
             {onReadingReady && (
               <AstrologyReadingButton constellation={constellation} onReadingReady={onReadingReady} />
             )}
@@ -146,11 +153,6 @@ export function MythologyPanel({ constellation, onClose, onReadingReady }) {
               style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.15)', color: '#C084FC' }}
               data-testid="share-constellation-btn">
               <Share2 size={10} /> {sharing ? 'Sharing...' : 'Share'}
-            </button>
-            <button onClick={() => navigate('/star-chart')}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-[10px]"
-              style={{ background: 'rgba(248,250,252,0.03)', border: '1px solid rgba(248,250,252,0.06)', color: 'rgba(255,255,255,0.65)' }}>
-              <ChevronRight size={10} /> More Stories
             </button>
           </div>
         </div>

@@ -1,7 +1,0 @@
-file '01_obsidian_void_awakening.mp4'
-file '02_crystal_rainbow_refraction.mp4'
-file '03_digital_oracle_interface.mp4'
-file '04_wellness_transformation.mp4'
-file '05_mobile_sanctuary_reveal.mp4'
-file '06_immersive_experience.mp4'
-file '08_brand_finale.mp4'

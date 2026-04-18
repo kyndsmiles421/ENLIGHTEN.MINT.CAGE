@@ -132,7 +132,11 @@ function DivePanel({ material, isOpen, onClose, accentColor }) {
           )}
           {depth < maxD && (
             <button onClick={() => { setDepth(d => Math.min(maxD, d + 1));
-              if (typeof window.__workAccrue === 'function') window.__workAccrue(`${material.id}_dive`, 8); }}
+              if (typeof window.__workAccrue === 'function') window.__workAccrue(`${material.id}_dive`, 8);
+              // Earn Sparks for material dive
+              const t = localStorage.getItem('zen_token');
+              if (t && t !== 'guest_token') axios.post(`${API}/sparks/earn`, { action: 'workshop_material_dive', context: material.id }, { headers: { Authorization: `Bearer ${t}` } }).catch(() => {});
+            }}
               className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-[10px] uppercase tracking-wider"
               style={{ background: `${dc}12`, color: dc, border: `1px solid ${dc}30` }} data-testid="dive-deeper">
               <ChevronDown size={12} /> Dive Deeper
@@ -183,6 +187,9 @@ export default function UniversalWorkshop({ moduleId, title, subtitle, icon: Ico
     if (!selMat) return;
     setSelTool(tool); setDiveOpen(false); setTutorial(null); setActions(c => c + 1);
     if (typeof window.__workAccrue === 'function') window.__workAccrue(skillKey, 12);
+    // Earn Sparks for tool use
+    const t = localStorage.getItem('zen_token');
+    if (t && t !== 'guest_token') axios.post(`${API}/sparks/earn`, { action: 'workshop_tool_use', context: `${moduleId}_${tool.id}` }, { headers: { Authorization: `Bearer ${t}` } }).catch(() => {});
     try {
       setTutLoading(true);
       const h = isFullAuth ? { headers: authHeaders } : {};

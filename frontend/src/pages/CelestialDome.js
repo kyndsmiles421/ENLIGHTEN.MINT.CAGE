@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSpatialAudio, SOLFEGGIO_FREQUENCIES } from '../engines/SpatialAudioEngine';
+import axios from 'axios';
+
+const SPARK_API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 /**
  * CelestialDome.js — Refractal VR Entry Point
@@ -26,6 +29,17 @@ const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function CelestialDome() {
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('celestial_dome', 8); }, []);
+
+  // Sparks immersion timer — 1 Spark per minute in the Dome
+  useEffect(() => {
+    const token = localStorage.getItem('zen_token');
+    if (!token || token === 'guest_token') return;
+    const headers = { Authorization: `Bearer ${token}` };
+    const interval = setInterval(() => {
+      axios.post(`${SPARK_API}/sparks/immersion`, { seconds: 60, zone: 'celestial_dome' }, { headers }).catch(() => {});
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
