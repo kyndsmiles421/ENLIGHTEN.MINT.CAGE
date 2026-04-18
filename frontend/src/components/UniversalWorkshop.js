@@ -84,7 +84,7 @@ function ToolRing({ tools, selectedTool, onSelectTool, ringRadius = 155 }) {
   );
 }
 
-function DivePanel({ material, isOpen, onClose, accentColor }) {
+function DivePanel({ material, isOpen, onClose, accentColor, moduleId }) {
   const [depth, setDepth] = useState(0);
   useEffect(() => { setDepth(0); }, [material?.id]);
   if (!isOpen || !material) return null;
@@ -131,11 +131,13 @@ function DivePanel({ material, isOpen, onClose, accentColor }) {
             </button>
           )}
           {depth < maxD && (
-            <button onClick={() => { setDepth(d => Math.min(maxD, d + 1));
+            <button onClick={() => { const newDepth = Math.min(maxD, depth + 1); setDepth(newDepth);
               if (typeof window.__workAccrue === 'function') window.__workAccrue(`${material.id}_dive`, 8);
               // Earn Sparks for material dive
               const t = localStorage.getItem('zen_token');
               if (t && t !== 'guest_token') axios.post(`${API}/sparks/earn`, { action: 'workshop_material_dive', context: material.id }, { headers: { Authorization: `Bearer ${t}` } }).catch(() => {});
+              // V68.4: Fire Sovereign Universe signal for quest auto-detect
+              try { window.SovereignUniverse?.checkQuestLogic(`${moduleId}:dive:${material.id}:${newDepth}`, moduleId); } catch {}
             }}
               className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-[10px] uppercase tracking-wider"
               style={{ background: `${dc}12`, color: dc, border: `1px solid ${dc}30` }} data-testid="dive-deeper">
@@ -180,8 +182,11 @@ export default function UniversalWorkshop({ moduleId, title, subtitle, icon: Ico
   const handleMatTap = useCallback(() => {
     if (diveOpen) setDiveOpen(false);
     else { setDiveOpen(true); setTutorial(null); setSelTool(null);
-      if (typeof window.__workAccrue === 'function') window.__workAccrue(`${moduleId}_inspect`, 5); }
-  }, [diveOpen, moduleId]);
+      if (typeof window.__workAccrue === 'function') window.__workAccrue(`${moduleId}_inspect`, 5);
+      // V68.4: Fire Sovereign Universe signal — material identify
+      try { if (selMat) window.SovereignUniverse?.checkQuestLogic(`${moduleId}:material:${selMat.id}`, moduleId); } catch {}
+    }
+  }, [diveOpen, moduleId, selMat]);
 
   const handleToolSelect = useCallback(async (tool) => {
     if (!selMat) return;
@@ -281,7 +286,7 @@ export default function UniversalWorkshop({ moduleId, title, subtitle, icon: Ico
         )}
 
         <AnimatePresence>
-          {diveOpen && <DivePanel material={selMat} isOpen={diveOpen} onClose={() => setDiveOpen(false)} accentColor={accentColor} />}
+          {diveOpen && <DivePanel material={selMat} isOpen={diveOpen} onClose={() => setDiveOpen(false)} accentColor={accentColor} moduleId={moduleId} />}
         </AnimatePresence>
 
         <AnimatePresence>

@@ -22,6 +22,7 @@ import { CosmicStateProvider } from '../context/CosmicStateContext';
 import { CosmicThemeProvider } from '../context/CosmicThemeContext';
 import { OrbitalSentinelProvider } from '../context/OrbitalSentinelContext';
 import { SovereignProvider } from '../context/SovereignContext';
+import { SovereignUniverseProvider } from '../context/SovereignUniverseContext';
 import { MeshNetworkProvider } from '../context/MeshNetworkContext';
 import { EnlightenmentCafeProvider } from '../context/EnlightenmentCafeContext';
 import { EnlightenmentProvider } from '../context/EnlightenmentContext';
@@ -63,7 +64,9 @@ export default function SovereignProviders({ children }) {
       <RecursivePortal>
       <SceneProvider>
       <SystemMixerProvider>
+      <SovereignUniverseProvider>
         {children}
+      </SovereignUniverseProvider>
       </SystemMixerProvider>
       </SceneProvider>
       </RecursivePortal>

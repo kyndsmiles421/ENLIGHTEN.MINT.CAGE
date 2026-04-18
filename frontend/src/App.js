@@ -66,6 +66,7 @@ import Navigation from './components/Navigation';
 import ScrollToTop from './components/ScrollToTop';
 import InstallPrompt from './components/InstallPrompt';
 import CreditNudge from './components/CreditNudge';
+import TierGate from './components/TierGate';
 import { LatencyProvider } from './hooks/useLatencyPulse';
 import { setupAxiosInterceptors } from './utils/axiosInterceptor';
 import { CosmicErrorBoundary } from './components/CosmicErrorBoundary';
@@ -520,7 +521,7 @@ function AnimatedRoutes() {
         <Route path="/rock-hounding" element={<RockHounding />} />
         <Route path="/forgotten-languages" element={<ForgottenLanguages />} />
         <Route path="/cosmic-store" element={<CosmicStore />} />
-        <Route path="/evolution-lab" element={<EvolutionLab />} />
+        <Route path="/evolution-lab" element={<TierGate card="celestial_navigator" label="Evolution Lab"><EvolutionLab /></TierGate>} />
         <Route path="/refinement-lab" element={<RefinementLab />} />
         <Route path="/hotspots" element={<HotspotsPage />} />
         <Route path="/planetary-depths" element={<PlanetaryDepths />} />
@@ -570,7 +571,7 @@ function AnimatedRoutes() {
         <Route path="/void" element={<SilentSanctuary />} />
         <Route path="/mint" element={<MintingCeremony />} />
         <Route path="/minting-ceremony" element={<MintingCeremony />} />
-        <Route path="/vr/celestial-dome" element={<CelestialDome />} />
+        <Route path="/vr/celestial-dome" element={<TierGate card="celestial_navigator" label="Celestial Dome — Deep Sky"><CelestialDome /></TierGate>} />
         <Route path="/observatory" element={<Observatory />} />
         <Route path="/archives" element={<Archives />} />
         <Route path="/suanpan" element={<SuanpanMixer />} />

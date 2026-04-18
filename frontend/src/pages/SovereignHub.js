@@ -10,12 +10,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ChevronDown, Share2, LogOut, LogIn, Flame } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
+import { useSovereignUniverse } from '../context/SovereignUniverseContext';
 import Onboarding from '../components/Onboarding';
 import DailyChallenges from '../components/DailyChallenges';
 import OracleSearch from '../components/OracleSearch';
-import axios from 'axios';
-
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+import ActiveMissionHUD from '../components/ActiveMissionHUD';
 
 const PILLARS = [
   { title: 'Practice', color: '#D8B4FE', items: [
@@ -219,23 +218,13 @@ const PILLARS = [
 export default function SovereignHub() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { sparkData } = useSovereignUniverse();
   const [expanded, setExpanded] = useState(null);
   const [glowDomains, setGlowDomains] = useState([]);
-  const [sparkData, setSparkData] = useState(null);
 
   useEffect(() => {
     if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 5);
   }, []);
-
-  // Fetch Spark wallet
-  useEffect(() => {
-    if (!user) return;
-    const token = localStorage.getItem('zen_token');
-    if (!token || token === 'guest_token') return;
-    axios.get(`${API}/sparks/wallet`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => setSparkData(r.data))
-      .catch(() => {});
-  }, [user]);
 
   const togglePillar = (idx) => {
     setExpanded(prev => prev === idx ? null : idx);
@@ -334,6 +323,9 @@ export default function SovereignHub() {
           </Link>
         </div>
       )}
+
+      {/* V68.4 — Active Mission HUD (inline, below Spark Wallet) */}
+      <ActiveMissionHUD />
 
       {/* Utility Row: Sign In / Share / Sign Out */}
       <div className="flex justify-center gap-3 px-4 pb-6">
