@@ -183,6 +183,11 @@ async def phase_shift(
 
     if cost > 0:
         await db.users.update_one({"id": uid}, {"$inc": {"user_dust_balance": -cost}})
+        # V68.7 — Trade Ledger dust event (spend)
+        await db.dust_events.insert_one({
+            "user_id": uid, "amount": -cost, "kind": "spend",
+            "source": f"dimensions:phase_shift:{target_dimension}", "ts": now,
+        })
 
     shift_entry = {
         "id": str(uuid.uuid4())[:8],

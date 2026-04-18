@@ -440,6 +440,11 @@ async def harvest_node(req: HarvestRequest, user=Depends(get_current_user)):
 
     if target["reward_type"] == "kinetic_dust":
         await db.users.update_one({"id": uid}, {"$inc": {"user_dust_balance": reward}})
+        # V68.7 — Trade Ledger dust event
+        await db.dust_events.insert_one({
+            "user_id": uid, "amount": reward, "kind": "earn",
+            "source": f"cosmic_map:harvest:{target.get('type','node')}", "ts": now,
+        })
     else:
         await db.avenue_progress.update_one(
             {"user_id": uid},
@@ -676,6 +681,11 @@ async def harvest_power_spot(
     now = datetime.now(timezone.utc).isoformat()
 
     await db.users.update_one({"id": uid}, {"$inc": {"user_dust_balance": reward}})
+    # V68.7 — Trade Ledger dust event
+    await db.dust_events.insert_one({
+        "user_id": uid, "amount": reward, "kind": "earn",
+        "source": f"cosmic_map:power_spot:{spot_id}", "ts": now,
+    })
     await db.node_harvests.insert_one({
         "user_id": uid,
         "node_id": spot_id,

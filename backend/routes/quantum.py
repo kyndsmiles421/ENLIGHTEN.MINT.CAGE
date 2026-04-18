@@ -236,6 +236,11 @@ async def observe_shadow(
             },
         },
     )
+    # V68.7 — Trade Ledger dust event
+    await db.dust_events.insert_one({
+        "user_id": uid, "amount": dust_reward, "kind": "earn",
+        "source": f"quantum:shadow_collapse:{target.get('rarity','common')}", "ts": now,
+    })
 
     return {
         "success": True,
@@ -331,6 +336,11 @@ async def quantum_tunnel(
 
     # Deduct cost and move
     await db.users.update_one({"id": uid}, {"$inc": {"user_dust_balance": -cost}})
+    # V68.7 — Trade Ledger dust event (spend)
+    await db.dust_events.insert_one({
+        "user_id": uid, "amount": -cost, "kind": "spend",
+        "source": f"quantum:tunnel:{target_layer}", "ts": now,
+    })
 
     unlocked = (depth_doc or {}).get("unlocked_layers", ["crust"])
     if target_layer not in unlocked:
