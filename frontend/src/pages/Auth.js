@@ -23,11 +23,11 @@ export default function Auth() {
       if (mode === 'login') {
         await login(email, password);
         toast.success('Welcome back, cosmic traveler');
-        navigate('/dashboard');
+        navigate('/sovereign-hub');
       } else if (mode === 'register') {
         await register(name, email, password);
         toast.success('Your journey begins now');
-        navigate('/dashboard');
+        navigate('/sovereign-hub');
       } else if (mode === 'reset') {
         const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
         const res = await fetch(`${API}/auth/reset-password`, {

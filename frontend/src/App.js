@@ -425,7 +425,7 @@ function AnimatedRoutes() {
         <Route path="/mood" element={<MoodTracker />} />
         <Route path="/journal" element={<Journal />} />
         <Route path="/soundscapes" element={<Soundscapes />} />
-        <Route path="/dashboard" element={<Navigate to="/hub" replace />} />
+        <Route path="/dashboard" element={<Navigate to="/sovereign-hub" replace />} />
         <Route path="/exercises" element={<Exercises />} />
         <Route path="/nourishment" element={<Nourishment />} />
         <Route path="/frequencies" element={<Frequencies />} />
