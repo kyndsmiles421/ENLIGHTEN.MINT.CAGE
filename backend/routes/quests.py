@@ -51,7 +51,7 @@ QUESTS = [
         "steps": [
             {"id": "find_harmonics", "action": "Study Scales & Modes in Music Theory", "target": "/workshop/music", "auto_signal": "music:material:scales"},
             {"id": "learn_series", "action": "Dive to Depth 5 — the Harmonic Series", "target": "/workshop/music", "auto_signal": "music:dive:scales:5"},
-            {"id": "decode_signal", "action": "Return to Observatory and decode the frequency", "target": "/observatory", "auto_signal": "observatory:decode"},
+            {"id": "decode_signal", "action": "Return to Observatory — decode the frequency (or meditate 60s in stillness)", "target": "/observatory", "auto_signal": ["observatory:decode", "scene:immersion:observatory"]},
         ],
         "reward_sparks": 800,
         "reward_card": None,
@@ -170,19 +170,23 @@ async def auto_detect(data: dict = Body(...), user=Depends(get_current_user)):
     advanced = []
     for q in QUESTS:
         for s in q["steps"]:
-            if s.get("auto_signal", "").lower() == signal:
-                # Enforce ordered completion: only advance if prior steps are done
-                idx = q["steps"].index(s)
-                qp = progress.get("quests", {}).get(q["id"], {})
-                done_steps = qp.get("completed_steps", [])
-                prior_ok = all(q["steps"][i]["id"] in done_steps for i in range(idx))
-                if not prior_ok:
-                    continue
-                res = await _advance_step(user["id"], q, s, progress)
-                if res["status"] == "advanced":
-                    advanced.append(res)
-                    # Refresh progress snapshot so chained matches don't re-trigger
-                    progress = await db.quest_progress.find_one({"user_id": user["id"]}, {"_id": 0}) or {}
+            # V68.8 — auto_signal can be a single string OR a list of strings
+            raw = s.get("auto_signal", "")
+            signal_set = [raw] if isinstance(raw, str) else list(raw or [])
+            if signal not in (x.lower() for x in signal_set if x):
+                continue
+            # Enforce ordered completion: only advance if prior steps are done
+            idx = q["steps"].index(s)
+            qp = progress.get("quests", {}).get(q["id"], {})
+            done_steps = qp.get("completed_steps", [])
+            prior_ok = all(q["steps"][i]["id"] in done_steps for i in range(idx))
+            if not prior_ok:
+                continue
+            res = await _advance_step(user["id"], q, s, progress)
+            if res["status"] == "advanced":
+                advanced.append(res)
+                # Refresh progress snapshot so chained matches don't re-trigger
+                progress = await db.quest_progress.find_one({"user_id": user["id"]}, {"_id": 0}) or {}
     # Log the signal breadcrumb regardless
     try:
         await db.universe_signals.insert_one({

@@ -61,7 +61,10 @@ export function useImmersionPresence(sceneId, options = {}) {
     window.addEventListener('focus', onFocus);
 
     const tick = async () => {
+      // V68.8 Belt-and-suspenders: true presence requires BOTH focus AND visibility
+      // (prevents parked-tab farming even when visibility API misreports)
       if (!activeRef.current) return;
+      try { if (typeof document.hasFocus === 'function' && !document.hasFocus()) return; } catch {}
       try {
         const res = await axios.post(
           `${API}/presence/tick`,
