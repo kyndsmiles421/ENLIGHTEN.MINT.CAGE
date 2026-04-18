@@ -9,8 +9,9 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Layers, Star, Lock, ChevronDown, ChevronUp } from 'lucide-react';
+import { Shield, Layers, Star, Lock, ChevronDown, ChevronUp, Award, Coins, TrendingUp } from 'lucide-react';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -210,23 +211,45 @@ export default function TradePassport() {
   const { authHeaders, token } = useAuth();
   const [passport, setPassport] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [wallet, setWallet] = useState(null);
+  const [ledger, setLedger] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'ledger' ? 'trade' : 'merit';
+  const [tab, setTab] = useState(initialTab);
 
   const isFullAuth = token && token !== 'guest_token';
 
   const fetchPassport = useCallback(async () => {
     if (!isFullAuth) { setLoading(false); return; }
     try {
-      const res = await axios.get(`${API}/rpg/passport`, { headers: authHeaders });
-      setPassport(res.data);
-    } catch {
-      // Non-fatal
-    } finally { setLoading(false); }
+      const [p, w] = await Promise.all([
+        axios.get(`${API}/rpg/passport`, { headers: authHeaders }).catch(() => null),
+        axios.get(`${API}/wallet/balance`, { headers: authHeaders }).catch(() => null),
+      ]);
+      if (p?.data) setPassport(p.data);
+      if (w?.data) setWallet(w.data);
+    } catch { /* non-fatal */ }
+    finally { setLoading(false); }
   }, [authHeaders, isFullAuth]);
 
+  const fetchLedger = useCallback(async () => {
+    if (!isFullAuth || ledger) return;
+    try {
+      const r = await axios.get(`${API}/wallet/dust-ledger?limit=50`, { headers: authHeaders });
+      setLedger(r.data);
+    } catch { setLedger({ dust: wallet?.balance?.dust || 0, transactions: [] }); }
+  }, [authHeaders, isFullAuth, ledger, wallet]);
+
   useEffect(() => { fetchPassport(); }, [fetchPassport]);
+  useEffect(() => { if (tab === 'trade') fetchLedger(); }, [tab, fetchLedger]);
   useEffect(() => {
     if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 5);
   }, []);
+
+  const switchTab = (t) => {
+    setTab(t);
+    setSearchParams(t === 'trade' ? { tab: 'ledger' } : {}, { replace: true });
+  };
 
   return (
     <div className="min-h-screen px-4 py-6 sm:px-8" data-testid="trade-passport-page">
@@ -245,6 +268,36 @@ export default function TradePassport() {
           </p>
         </div>
 
+        {/* V68.5 — Merit / Trade Ledger tabs (Sparks vs. Dust firewall) */}
+        {isFullAuth && (
+          <div className="flex gap-2 mb-5" data-testid="passport-tabs">
+            <button
+              onClick={() => switchTab('merit')}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-[0.18em] transition-all active:scale-[0.98]"
+              style={{
+                background: tab === 'merit' ? 'rgba(167,139,250,0.1)' : 'rgba(255,255,255,0.02)',
+                border: `1px solid ${tab === 'merit' ? 'rgba(167,139,250,0.35)' : 'rgba(255,255,255,0.06)'}`,
+                color: tab === 'merit' ? '#A78BFA' : 'rgba(255,255,255,0.4)',
+              }}
+              data-testid="passport-tab-merit"
+            >
+              <Award size={12} /> Merit Ledger
+            </button>
+            <button
+              onClick={() => switchTab('trade')}
+              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-[0.18em] transition-all active:scale-[0.98]"
+              style={{
+                background: tab === 'trade' ? 'rgba(212,175,55,0.1)' : 'rgba(255,255,255,0.02)',
+                border: `1px solid ${tab === 'trade' ? 'rgba(212,175,55,0.35)' : 'rgba(255,255,255,0.06)'}`,
+                color: tab === 'trade' ? '#D4AF37' : 'rgba(255,255,255,0.4)',
+              }}
+              data-testid="passport-tab-trade"
+            >
+              <Coins size={12} /> Trade Ledger
+            </button>
+          </div>
+        )}
+
         {!isFullAuth ? (
           /* Guest state */
           <div className="rounded-2xl p-6 text-center"
@@ -262,7 +315,66 @@ export default function TradePassport() {
             <div className="w-6 h-6 border border-yellow-500/30 border-t-yellow-500 rounded-full animate-spin" />
           </div>
         ) : passport ? (
-          <div className="space-y-6">
+          tab === 'trade' ? (
+            /* ═══ TRADE LEDGER — Dust economy (spendable) ═══ */
+            <div className="space-y-5" data-testid="trade-ledger">
+              <div className="px-3.5 py-2 rounded-lg" style={{ background: 'rgba(212,175,55,0.04)', border: '1px solid rgba(212,175,55,0.15)' }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <Coins size={12} style={{ color: '#D4AF37' }} />
+                  <span className="text-[9px] uppercase tracking-[0.2em] font-bold" style={{ color: '#D4AF37' }}>Economy Firewall</span>
+                </div>
+                <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                  <span style={{ color: '#D4AF37' }}>Dust</span> is your <em>spendable</em> currency — convert to Credits, unlock tools, pay fees.
+                  Your <span style={{ color: '#A78BFA' }}>Sparks (Rank)</span> are untouched by this ledger; they are permanent merit.
+                </p>
+              </div>
+
+              <div className="rounded-2xl p-5 text-center" style={{
+                background: 'linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.02))',
+                border: '1px solid rgba(212,175,55,0.25)',
+              }}>
+                <div className="text-[10px] uppercase tracking-[0.25em] mb-2" style={{ color: 'rgba(212,175,55,0.7)' }}>Dust Balance</div>
+                <div className="text-4xl font-mono font-light" style={{ color: '#D4AF37', fontFamily: 'Cormorant Garamond, serif' }}>
+                  {(ledger?.dust ?? wallet?.balance?.dust ?? 0).toLocaleString()}
+                </div>
+                <div className="text-[9px] mt-2" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                  Earned through Dimensions, Quantum quests, Cosmic Map encounters, and volunteer hours.
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-[10px] font-bold uppercase tracking-[0.18em] mb-2 flex items-center gap-1.5"
+                  style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <TrendingUp size={11} /> Recent Transactions
+                </h2>
+                {ledger?.transactions?.length > 0 ? (
+                  <div className="space-y-1.5">
+                    {ledger.transactions.map((t, i) => (
+                      <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg text-[11px]"
+                        style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}
+                        data-testid={`dust-tx-${i}`}>
+                        <div className="flex-1 min-w-0">
+                          <div className="text-white/80 truncate">{t.source || t.kind || 'activity'}</div>
+                          {t.ts && <div className="text-[9px] text-white/30">{new Date(t.ts).toLocaleDateString()}</div>}
+                        </div>
+                        <span className={`font-mono font-bold ${t.amount >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                          {t.amount >= 0 ? '+' : ''}{(t.amount || 0).toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 px-3 rounded-xl"
+                    style={{ background: 'rgba(255,255,255,0.02)', border: '1px dashed rgba(255,255,255,0.06)' }}>
+                    <p className="text-[11px] text-white/40 italic">No dust transactions recorded yet.</p>
+                    <p className="text-[10px] text-white/30 mt-1">Explore Dimensions, Quantum, or Cosmic Map zones to begin earning Dust.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+          /* ═══ MERIT LEDGER — Rank / Sparks (permanent, never spent) ═══ */
+          <div className="space-y-6" data-testid="merit-ledger">
             {/* Overview bar */}
             <div className="grid grid-cols-4 gap-2" data-testid="passport-overview">
               {[
@@ -340,6 +452,7 @@ export default function TradePassport() {
               </div>
             </div>
           </div>
+          )
         ) : (
           <div className="text-center py-12">
             <p className="text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>

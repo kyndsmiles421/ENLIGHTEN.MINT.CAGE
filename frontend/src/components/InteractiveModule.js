@@ -203,15 +203,26 @@ function DiscoveryNode({ item, color, category, index, discovered, onDiscover, o
         )}
       </AnimatePresence>
 
-      {/* Element icon */}
-      <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-        style={{
-          background: `linear-gradient(135deg, ${itemColor}25, ${itemColor}08)`,
-          border: `1px solid ${itemColor}30`,
-          fontSize: 20,
-        }}>
-        {ELEMENT_SHAPES[element] || '✦'}
-      </div>
+      {/* Element icon OR item image if provided (mudras, crystals, etc.) */}
+      {item.image_url && discovered ? (
+        <div className="w-12 h-12 rounded-xl overflow-hidden"
+          style={{
+            background: `linear-gradient(135deg, ${itemColor}25, ${itemColor}08)`,
+            border: `1px solid ${itemColor}30`,
+            backgroundImage: `url(${item.image_url})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }} />
+      ) : (
+        <div className="w-12 h-12 rounded-xl flex items-center justify-center"
+          style={{
+            background: `linear-gradient(135deg, ${itemColor}25, ${itemColor}08)`,
+            border: `1px solid ${itemColor}30`,
+            fontSize: 20,
+          }}>
+          {ELEMENT_SHAPES[element] || '✦'}
+        </div>
+      )}
 
       {/* Title */}
       <p className="text-xs font-medium leading-tight" style={{
@@ -271,10 +282,25 @@ function StudyPanel({ item, color, category, onClose }) {
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
-            style={{ background: `${itemColor}15`, border: `1px solid ${itemColor}30` }}>
-            {item.element === 'Fire' ? '🔥' : item.element === 'Water' ? '💧' : item.chakra ? '💎' : '✦'}
-          </div>
+          {item.image_url ? (
+            <div
+              className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0"
+              style={{
+                background: `${itemColor}12`,
+                border: `1px solid ${itemColor}35`,
+                backgroundImage: `url(${item.image_url})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+              data-testid="item-image"
+              aria-label={`${title} visual`}
+            />
+          ) : (
+            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl"
+              style={{ background: `${itemColor}15`, border: `1px solid ${itemColor}30` }}>
+              {item.element === 'Fire' ? '🔥' : item.element === 'Water' ? '💧' : item.chakra ? '💎' : '✦'}
+            </div>
+          )}
           <div>
             <h3 className="text-lg font-semibold" style={{ color: '#fff' }}>{title}</h3>
             {subtitle && <p className="text-xs" style={{ color: itemColor }}>{subtitle}</p>}
@@ -304,6 +330,39 @@ function StudyPanel({ item, color, category, onClose }) {
               </span>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Mudra-specific: Hand Position (fingers + technique) */}
+      {item.hand_position && (
+        <div className="mb-4 px-3 py-2.5 rounded-lg" style={{ background: `${itemColor}08`, border: `1px solid ${itemColor}20` }}>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5" style={{ color: itemColor }}>Hand Position</p>
+          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.8)' }}>{item.hand_position}</p>
+        </div>
+      )}
+      {/* Mudra-specific: Practice instructions */}
+      {item.practice && (
+        <div className="mb-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5" style={{ color: itemColor }}>How to Practice</p>
+          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>{item.practice}</p>
+        </div>
+      )}
+      {/* Mudra-specific: Duration */}
+      {item.duration && (
+        <div className="mb-4 flex items-center gap-2">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: itemColor }}>Duration</span>
+          <span className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>{item.duration}</span>
+        </div>
+      )}
+      {/* Mudra-specific: Video demo link */}
+      {item.video_url && (
+        <div className="mb-4">
+          <a href={item.video_url} target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all active:scale-95"
+            style={{ background: `${itemColor}15`, border: `1px solid ${itemColor}35`, color: itemColor }}
+            data-testid="item-video-link">
+            ▶ {item.video_title || 'Watch demonstration video'}
+          </a>
         </div>
       )}
 
