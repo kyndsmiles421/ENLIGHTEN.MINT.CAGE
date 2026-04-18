@@ -7,12 +7,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import { ChevronDown, Share2, LogOut, LogIn } from 'lucide-react';
+import { ChevronDown, Share2, LogOut, LogIn, Flame } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import Onboarding from '../components/Onboarding';
 import DailyChallenges from '../components/DailyChallenges';
 import OracleSearch from '../components/OracleSearch';
+import axios from 'axios';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const PILLARS = [
   { title: 'Practice', color: '#D8B4FE', items: [
@@ -218,10 +221,21 @@ export default function SovereignHub() {
   const { user } = useAuth();
   const [expanded, setExpanded] = useState(null);
   const [glowDomains, setGlowDomains] = useState([]);
+  const [sparkData, setSparkData] = useState(null);
 
   useEffect(() => {
     if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 5);
   }, []);
+
+  // Fetch Spark wallet
+  useEffect(() => {
+    if (!user) return;
+    const token = localStorage.getItem('zen_token');
+    if (!token || token === 'guest_token') return;
+    axios.get(`${API}/sparks/wallet`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => setSparkData(r.data))
+      .catch(() => {});
+  }, [user]);
 
   const togglePillar = (idx) => {
     setExpanded(prev => prev === idx ? null : idx);
@@ -287,6 +301,39 @@ export default function SovereignHub() {
           ENLIGHTEN.MINT.CAFE
         </h1>
       </div>
+
+      {/* Spark Wallet — permanent score display */}
+      {sparkData && (
+        <div className="flex justify-center px-4 pb-3">
+          <Link to="/trade-passport" className="flex items-center gap-3 px-4 py-2 rounded-xl transition-all active:scale-95"
+            style={{ background: 'rgba(251,191,36,0.04)', border: '1px solid rgba(251,191,36,0.1)' }}
+            data-testid="spark-wallet">
+            <div className="flex items-center gap-1.5">
+              <Flame size={14} style={{ color: '#FBBF24' }} />
+              <span className="text-sm font-mono font-bold" style={{ color: '#FBBF24' }}>{sparkData.sparks}</span>
+              <span className="text-[7px] uppercase tracking-wider" style={{ color: 'rgba(251,191,36,0.5)' }}>Sparks</span>
+            </div>
+            {sparkData.next_card && (
+              <div className="flex items-center gap-1.5 pl-3" style={{ borderLeft: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="w-16 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                  <div className="h-full rounded-full" style={{
+                    width: `${Math.min(100, ((sparkData.sparks / sparkData.next_card.spark_threshold) * 100))}%`,
+                    background: sparkData.next_card.color,
+                  }} />
+                </div>
+                <span className="text-[7px]" style={{ color: `${sparkData.next_card.color}80` }}>{sparkData.next_card.name}</span>
+              </div>
+            )}
+            {sparkData.cards_earned?.length > 0 && (
+              <div className="flex items-center gap-1 pl-2">
+                {sparkData.cards_earned.slice(-3).map(c => (
+                  <div key={c.id} className="w-4 h-4 rounded-sm" style={{ background: `${c.color}25`, border: `1px solid ${c.color}40` }} title={c.name} />
+                ))}
+              </div>
+            )}
+          </Link>
+        </div>
+      )}
 
       {/* Utility Row: Sign In / Share / Sign Out */}
       <div className="flex justify-center gap-3 px-4 pb-6">
