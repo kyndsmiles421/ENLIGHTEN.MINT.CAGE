@@ -76,7 +76,8 @@ async def login(user: UserLogin):
     
     token = create_token(found["id"], found["name"])
     role = found.get("role", "user")
-    return {"token": token, "user": {"id": found["id"], "name": found["name"], "email": found["email"], "role": role}}
+    is_owner = bool(found.get("is_owner") or user.email == CREATOR_EMAIL)
+    return {"token": token, "user": {"id": found["id"], "name": found["name"], "email": found["email"], "role": role, "is_owner": is_owner, "is_admin": bool(found.get("is_admin") or role == "admin")}}
 
 
 class PasswordReset(BaseModel):

@@ -22,9 +22,9 @@ export default function TierGate({ card: requiredCard, label, children }) {
   const { user } = useAuth();
   const { sparkData, hasCard } = useSovereignUniverse();
 
-  // Creators / admins / council always pass
+  // Creators / admins / council / app owner always pass — no tier walls for the sovereign
   const role = user?.role;
-  const bypass = role === 'creator' || role === 'admin' || role === 'council';
+  const bypass = user?.is_owner || role === 'creator' || role === 'admin' || role === 'council' || role === 'owner';
 
   const isGuest = !user || user?.id === 'guest' || user?.role === 'guest';
 

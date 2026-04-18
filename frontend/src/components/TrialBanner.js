@@ -3,11 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Clock, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCreditsContext } from '../context/CreditContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function TrialBanner() {
   const { creditInfo } = useCreditsContext();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
+  // V68.9 — Never show trial/upgrade banner to the owner / admin / creator
+  if (user?.is_owner || user?.is_admin || user?.role === 'admin' || user?.role === 'creator' || user?.role === 'owner') return null;
   if (!creditInfo?.trial?.active) return null;
 
   const daysLeft = creditInfo.trial.days_left;

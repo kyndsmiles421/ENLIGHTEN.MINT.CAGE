@@ -14,6 +14,8 @@ export default function CreditNudge() {
 
   useEffect(() => {
     if (!user || !creditInfo || dismissed) { setShow(false); return; }
+    // V68.9 — Never show upgrade/credit nudge to the owner / admin / creator
+    if (user.is_owner || user.is_admin || user.role === 'admin' || user.role === 'creator' || user.role === 'owner') { setShow(false); return; }
     // Hide on hub, auth, landing
     if (location.pathname === '/hub' || location.pathname === '/' || location.pathname === '/auth') { setShow(false); return; }
     // Don't show for unlimited tiers
