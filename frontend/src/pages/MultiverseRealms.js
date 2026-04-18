@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Globe, Play, Volume2, Lock, Sparkles, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Globe, Play, Volume2, Lock, Sparkles, ChevronRight, Orbit } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMixer, FREQUENCIES as MIXER_FREQUENCIES, SOUNDS as MIXER_SOUNDS, INSTRUMENT_DRONES } from '../context/MixerContext';
 import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../components/CosmicFeedback';
@@ -9,6 +9,21 @@ import { toast } from 'sonner';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// V68.5 — Realm → 3D Scene portal mapping.
+// Each realm launches its actual THREE.js / WebGL experience.
+// Mapping is element/ambience-driven: the backend realms don't yet carry
+// a `scene_route` field, so we map by ID with sensible fallbacks.
+const REALM_TO_SCENE = {
+  astral_garden:   { route: '/vr/celestial-dome', label: 'Celestial Dome (VR)',      icon: Orbit },
+  crystal_caverns: { route: '/tesseract',         label: 'Tesseract Core (4D)',       icon: Sparkles },
+  celestial_ocean: { route: '/observatory',       label: 'Observatory (Sonified Sky)',icon: Orbit },
+  solar_temple:    { route: '/enlightenment-os',  label: 'Enlightenment OS',          icon: Sparkles },
+  void_sanctum:    { route: '/dimensional-space', label: 'Dimensional Space',         icon: Globe },
+  aurora_bridge:   { route: '/star-chart',        label: 'Star Chart (Live)',         icon: Orbit },
+};
+// Fallback for any future realm
+const DEFAULT_SCENE = { route: '/vr', label: 'VR Sanctuary', icon: Orbit };
 
 export default function MultiverseRealms() {
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('multiverse', 8); }, []);
@@ -213,13 +228,40 @@ export default function MultiverseRealms() {
                 </div>
               </div>
 
-              {/* Leave Button */}
-              <button onClick={leaveRealm}
-                className="w-full py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
-                style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)' }}
-                data-testid="leave-realm-btn">
-                <ArrowLeft size={14} /> Return to the Multiverse
-              </button>
+              {/* Leave Button + V68.5 Launch 3D Scene */}
+              {(() => {
+                const scene = REALM_TO_SCENE[activeRealm.realm.id] || DEFAULT_SCENE;
+                const SceneIcon = scene.icon;
+                const launch = () => {
+                  toast(`Entering ${scene.label}`);
+                  try { window.SovereignUniverse?.checkQuestLogic(`realm:enter:${activeRealm.realm.id}`, 'multiverse'); } catch {}
+                  navigate(scene.route);
+                };
+                return (
+                  <>
+                    <button onClick={launch}
+                      className="w-full py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 transition-all hover:scale-[1.01] mb-3"
+                      style={{
+                        background: `linear-gradient(135deg, ${activeRealm.realm.color}25, ${activeRealm.realm.color}0a)`,
+                        border: `1px solid ${activeRealm.realm.color}55`,
+                        color: activeRealm.realm.color,
+                        boxShadow: `0 0 22px ${activeRealm.realm.color}22, inset 0 0 14px ${activeRealm.realm.color}10`,
+                      }}
+                      data-testid="realm-launch-3d"
+                    >
+                      <SceneIcon size={15} />
+                      <span className="font-medium">Enter {scene.label}</span>
+                      <ChevronRight size={14} />
+                    </button>
+                    <button onClick={leaveRealm}
+                      className="w-full py-3 rounded-xl text-xs flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
+                      style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.5)' }}
+                      data-testid="leave-realm-btn">
+                      <ArrowLeft size={14} /> Return to the Multiverse
+                    </button>
+                  </>
+                );
+              })()}
             </motion.div>
           )}
         </AnimatePresence>

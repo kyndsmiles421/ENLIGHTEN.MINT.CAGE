@@ -297,7 +297,7 @@ export default function DimensionalSpace() {
       {/* Dimension descriptions */}
       <DimensionInfoPanel dimensions={dimensions} currentDim={position.dimension} level={level} />
 
-      {/* Navigation links */}
+      {/* Navigation links — V68.5: direct 3D portals */}
       <div className="grid grid-cols-2 gap-2">
         <button onClick={() => navigate('/planetary-depths')}
           className="py-2 rounded-lg text-[9px] flex items-center justify-center gap-1.5 transition-all hover:scale-[1.01]"
@@ -310,6 +310,18 @@ export default function DimensionalSpace() {
           style={{ background: 'rgba(239,68,68,0.06)', color: '#EF4444', border: '1px solid rgba(239,68,68,0.1)' }}
           data-testid="nav-quantum">
           <Eye size={10} /> Quantum Field
+        </button>
+        <button onClick={() => navigate('/tesseract')}
+          className="py-2 rounded-lg text-[9px] flex items-center justify-center gap-1.5 transition-all hover:scale-[1.01]"
+          style={{ background: 'rgba(139,92,246,0.1)', color: '#8B5CF6', border: '1px solid rgba(139,92,246,0.25)' }}
+          data-testid="nav-tesseract-3d">
+          <Atom size={10} /> Tesseract (4D)
+        </button>
+        <button onClick={() => navigate('/vr')}
+          className="py-2 rounded-lg text-[9px] flex items-center justify-center gap-1.5 transition-all hover:scale-[1.01]"
+          style={{ background: 'rgba(59,130,246,0.1)', color: '#3B82F6', border: '1px solid rgba(59,130,246,0.25)' }}
+          data-testid="nav-vr">
+          <Eye size={10} /> VR Sanctuary
         </button>
       </div>
 
