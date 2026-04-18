@@ -26,8 +26,10 @@ export default function TierGate({ card: requiredCard, label, children }) {
   const role = user?.role;
   const bypass = role === 'creator' || role === 'admin' || role === 'council';
 
+  const isGuest = !user || user?.id === 'guest' || user?.role === 'guest';
+
   if (bypass) return children;
-  if (!user) {
+  if (isGuest) {
     return (
       <GateShell label={label} requiredCard={requiredCard}>
         <div className="text-xs text-white/60 mb-4">Sign in with a Sovereign account to begin earning Sparks.</div>
