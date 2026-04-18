@@ -106,6 +106,66 @@ async def get_me(user=Depends(get_current_user)):
     return found
 
 
+# ─────────────────────────────────────────────────────────────────────
+# Account deletion — Google Play compliance (in-app delete requirement)
+# Removes the user and every row keyed by user_id / email / author_id.
+# ─────────────────────────────────────────────────────────────────────
+class DeleteConfirm(BaseModel):
+    confirm: str  # must equal "DELETE"
+
+
+@router.delete("/auth/me")
+async def delete_account(data: DeleteConfirm, user=Depends(get_current_user)):
+    """Permanently delete the authenticated user and all associated data."""
+    if data.confirm != "DELETE":
+        raise HTTPException(status_code=400, detail="Confirmation string must be 'DELETE'")
+
+    uid = user["id"]
+    email = user.get("email", "")
+
+    # Every collection that may hold user-scoped data. Missing collections are skipped silently.
+    user_id_collections = [
+        "users", "user_credits", "sparks_wallet", "spark_wallets", "quest_progress",
+        "rpg_characters", "rpg_inventory", "rpg_parties", "rpg_quest_log", "rpg_xp_log",
+        "universe_signals", "presence_log", "resonance_patterns", "council_links",
+        "gaming_cards", "lattice_nodes", "user_lattice", "notifications",
+        "starseed_characters", "starseed_encounters", "avatars",
+        "creator_earnings", "creator_payouts", "invite_codes_redeemed",
+        "push_subscriptions", "meditation_sessions", "journal_entries",
+        "mood_logs", "ritual_logs", "oracle_draws", "workshop_progress",
+    ]
+    email_collections = [
+        ("email_subscriptions", "email"),
+        ("waitlist", "email"),
+    ]
+
+    deleted_counts = {}
+    for coll in user_id_collections:
+        try:
+            res = await db[coll].delete_many({"user_id": uid})
+            if res.deleted_count:
+                deleted_counts[coll] = res.deleted_count
+        except Exception:
+            pass
+    # Also purge rows keyed by "id" (the user document itself)
+    try:
+        res = await db.users.delete_many({"id": uid})
+        if res.deleted_count:
+            deleted_counts["users"] = deleted_counts.get("users", 0) + res.deleted_count
+    except Exception:
+        pass
+    for coll, field in email_collections:
+        try:
+            res = await db[coll].delete_many({field: email})
+            if res.deleted_count:
+                deleted_counts[coll] = res.deleted_count
+        except Exception:
+            pass
+
+    logger.info(f"AUTH: account deleted | user_id={uid} email={email} purged={deleted_counts}")
+    return {"status": "deleted", "user_id": uid, "collections_purged": deleted_counts}
+
+
 
 # Admin setup — secured by a one-time setup key
 ADMIN_SETUP_KEY = os.environ.get("ADMIN_SETUP_KEY", "cosmic-creator-2026")

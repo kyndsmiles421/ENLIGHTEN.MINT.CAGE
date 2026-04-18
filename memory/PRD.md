@@ -17,6 +17,25 @@ Creative Arts (1), Mind & Spirit (1), Exploration (2). 162 materials × 6-depth 
 
 ## Changelog
 
+### V68.10 (Feb 19, 2026) — Play Store Compliance Sweep
+- **Privacy Policy page** (P0 Play Console blocker). Created `/app/frontend/src/pages/PrivacyPage.js` (React route `/privacy`, 8 color-coded sections, GDPR/COPPA-compliant) + `/app/frontend/public/privacy.html` (pure-HTML fallback for non-JS crawlers). Meta description + `<link rel="canonical">`. Deletion SLA: 14 days (30-day backup purge).
+- **Account-deletion flow** (Google Play in-app-delete requirement). New backend route `DELETE /api/auth/me` in `/app/backend/routes/auth.py`:
+  - Requires JSON body `{"confirm":"DELETE"}` (400 otherwise)
+  - Purges the user row + 28 user-scoped collections + email-keyed tables
+  - Returns `{"status":"deleted","user_id":…,"collections_purged":{…}}`
+  - Curl-verified: wrong confirm→400, correct confirm→200, subsequent `/auth/me`→404, re-login→401
+- **Danger Zone** in Settings (`/app/frontend/src/pages/Settings.js`):
+  - Red-bordered inline section (no modal — respects Flatland rule)
+  - Collapsed "Permanently Delete Account & Data" button expands in-place
+  - Type-DELETE-to-confirm input with live validation
+  - Red **🗑 Delete Permanently** button runs axios.delete → logout → localStorage.clear → `window.location = '/'`
+  - Footer email fallback for support
+- **RPG Cosmic Realm** equip UX fix (`/app/frontend/src/pages/RPGPage.js`):
+  - Removed `opacity-0 group-hover:opacity-100` from ItemCard Equip/Use buttons — they were invisible on every touchscreen
+  - Empty EquipSlot is now tappable ("Tap to equip") and auto-equips matching inventory item
+  - Character tab gained a "N items ready to equip · Open Inventory →" banner when unequipped gear exists
+  - Live-tested with owner account: Obsidian Amulet tap-equipped to Trinket, Vitality 1→3 confirmed
+
 ### V68.9 (Feb 19, 2026) — Play Store Cover Assets
 - Extracted the clean Sri Yantra tile from the user-supplied PWABuilder zip
   (buried inside a 1024×1024 screenshot — the colorful logo region was

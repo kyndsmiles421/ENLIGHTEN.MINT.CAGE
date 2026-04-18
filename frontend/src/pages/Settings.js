@@ -4,12 +4,16 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import {
   ArrowLeft, Volume2, VolumeX, Eye, Palette, Sparkles, Monitor,
-  Moon, Sun, TreePine, Zap, Shield, Bell, ChevronRight, Type, Contrast, Globe, Check
+  Moon, Sun, TreePine, Zap, Shield, Bell, ChevronRight, Type, Contrast, Globe, Check,
+  Trash2, AlertTriangle, LogOut, Loader2
 } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import FoundingArchitectPanel from '../components/FoundingArchitect';
+import axios from 'axios';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 function Section({ title, children }) {
   const { prefs } = useSensory();
@@ -90,9 +94,40 @@ export default function Settings() {
   const navigate = useNavigate();
   const { ambientOn, toggleAmbient, prefs, updatePref, themes } = useSensory();
   const { language, setLanguage, t } = useLanguage();
-  const { authHeaders } = useAuth();
+  const { authHeaders, user, logout } = useAuth();
   const isLight = prefs.theme === 'light';
   const subtle = isLight ? 'rgba(30,27,46,' : 'rgba(248,250,252,';
+
+  // Danger Zone — account deletion state
+  const [dangerOpen, setDangerOpen]   = useState(false);
+  const [deleteText, setDeleteText]   = useState('');
+  const [deleting, setDeleting]       = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (deleteText !== 'DELETE') {
+      toast.error('Type DELETE (all caps) to confirm');
+      return;
+    }
+    setDeleting(true);
+    try {
+      await axios.delete(`${API}/auth/me`, {
+        headers: authHeaders,
+        data: { confirm: 'DELETE' },
+      });
+      toast.success('Account permanently deleted');
+      // purge local state and bail to the landing page
+      try { logout?.(); } catch { /* noop */ }
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch { /* noop */ }
+      setTimeout(() => { window.location.href = '/'; }, 400);
+    } catch (err) {
+      setDeleting(false);
+      const msg = err?.response?.data?.detail || err?.message || 'Deletion failed — please contact sovereign@enlighten.mint.cafe';
+      toast.error(msg);
+    }
+  };
 
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }}>
@@ -361,6 +396,113 @@ export default function Settings() {
             <FoundingArchitectPanel authHeaders={authHeaders} />
           </div>
         </Section>
+
+        {/* Danger Zone — Google Play required in-app deletion flow */}
+        {user && (
+          <div className="mb-6" data-testid="danger-zone">
+            <p className="text-[10px] uppercase tracking-widest font-bold mb-3 px-1"
+              style={{ color: '#EF4444' }}>Danger Zone</p>
+            <div className="rounded-xl overflow-hidden"
+              style={{ background: 'rgba(239,68,68,0.03)', border: '1px solid rgba(239,68,68,0.15)' }}>
+              {!dangerOpen ? (
+                <button
+                  onClick={() => setDangerOpen(true)}
+                  className="w-full flex items-center justify-between px-4 py-3 text-left transition-all hover:bg-red-500/[0.04]"
+                  data-testid="open-delete-account">
+                  <div className="flex items-center gap-3">
+                    <Trash2 size={14} style={{ color: '#EF4444' }} />
+                    <div>
+                      <p className="text-xs font-medium" style={{ color: '#EF4444' }}>Permanently Delete Account & Data</p>
+                      <p className="text-[9px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                        Removes your account, wallet, quests, inventory and resonance history.
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight size={12} style={{ color: '#EF4444' }} />
+                </button>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="px-4 py-4"
+                  data-testid="delete-account-confirm">
+                  <div className="flex items-start gap-2 mb-3">
+                    <AlertTriangle size={14} style={{ color: '#EF4444', flexShrink: 0, marginTop: 2 }} />
+                    <div>
+                      <p className="text-[11px] font-bold mb-1" style={{ color: '#EF4444' }}>
+                        This action cannot be undone.
+                      </p>
+                      <p className="text-[10px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                        Your account <span style={{ color: 'var(--text-primary)' }}>({user.email})</span>, all your
+                        Sparks, Dust, Gaming Cards, quest progress, inventory, and resonance history will be removed
+                        from our database within seconds. Backups purge within 30 days.
+                      </p>
+                    </div>
+                  </div>
+
+                  <label className="block text-[10px] mb-1.5" style={{ color: 'var(--text-muted)' }}>
+                    Type <span className="font-mono font-bold" style={{ color: '#EF4444' }}>DELETE</span> to confirm:
+                  </label>
+                  <input
+                    type="text"
+                    value={deleteText}
+                    onChange={(e) => setDeleteText(e.target.value)}
+                    placeholder="DELETE"
+                    autoComplete="off"
+                    autoCapitalize="characters"
+                    spellCheck={false}
+                    className="w-full px-3 py-2 rounded-lg text-xs font-mono mb-3"
+                    style={{
+                      background: 'rgba(239,68,68,0.06)',
+                      border: `1px solid ${deleteText === 'DELETE' ? 'rgba(239,68,68,0.6)' : 'rgba(239,68,68,0.2)'}`,
+                      color: 'var(--text-primary)',
+                      outline: 'none',
+                    }}
+                    data-testid="delete-confirm-input"
+                  />
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => { setDangerOpen(false); setDeleteText(''); }}
+                      disabled={deleting}
+                      className="flex-1 px-3 py-2 rounded-lg text-[11px] font-medium transition-all"
+                      style={{
+                        background: `${subtle}0.04)`,
+                        border: `1px solid ${subtle}0.1)`,
+                        color: 'var(--text-primary)',
+                        opacity: deleting ? 0.4 : 1,
+                      }}
+                      data-testid="cancel-delete-account">
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={deleting || deleteText !== 'DELETE'}
+                      className="flex-1 px-3 py-2 rounded-lg text-[11px] font-bold transition-all flex items-center justify-center gap-1.5"
+                      style={{
+                        background: deleteText === 'DELETE' ? '#EF4444' : 'rgba(239,68,68,0.15)',
+                        border: '1px solid rgba(239,68,68,0.4)',
+                        color: '#fff',
+                        cursor: deleting || deleteText !== 'DELETE' ? 'not-allowed' : 'pointer',
+                        opacity: deleting ? 0.6 : 1,
+                      }}
+                      data-testid="confirm-delete-account">
+                      {deleting ? (
+                        <><Loader2 size={12} className="animate-spin" /> Deleting…</>
+                      ) : (
+                        <><Trash2 size={12} /> Delete Permanently</>
+                      )}
+                    </button>
+                  </div>
+
+                  <p className="text-[9px] mt-3 text-center" style={{ color: 'var(--text-muted)' }}>
+                    Questions? Email <a href="mailto:sovereign@enlighten.mint.cafe" style={{ color: '#C084FC' }}>sovereign@enlighten.mint.cafe</a>
+                  </p>
+                </motion.div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Reset */}
         <div className="text-center mt-4">
