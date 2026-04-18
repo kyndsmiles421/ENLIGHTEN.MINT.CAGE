@@ -17,6 +17,26 @@ Creative Arts (1), Mind & Spirit (1), Exploration (2). 162 materials × 6-depth 
 
 ## Changelog
 
+### V68.9 (Feb 19, 2026) — Play Store Cover Assets
+- Extracted the clean Sri Yantra tile from the user-supplied PWABuilder zip
+  (buried inside a 1024×1024 screenshot — the colorful logo region was
+  auto-located by saturation-mask bbox against the `windows/LargeTile.scale-400.png`).
+- Built a procedural cosmic-nebula background (deep indigo/violet gradient,
+  randomized star field, gold aura) so the cover stays sharp independent of
+  the source screenshot's resolution.
+- Composed 4 assets at `/app/frontend/public/store-assets/`:
+  - `feature-graphic-1024x500.png` — Google Play hero banner
+  - `app-icon-512.png` — Play Store hi-res icon
+  - `app-icon-1024.png` — oversize master (for future stores / OG / Apple)
+  - `og-cover-1200x630.png` — WhatsApp / Twitter / LinkedIn link preview
+- Wired `og:image` + `twitter:image` in `/app/frontend/public/index.html`
+  so social shares of the live site now render the new cover.
+- Rebuildable via `/app/backend/scripts/build_store_covers.py` (PIL only).
+- Uses serif-bold gold title ("ENLIGHTEN.MINT.CAFE"), white-on-black
+  tagline ("THE SOVEREIGN UNIFIED ENGINE"), amber "by INFINITY SOVEREIGN"
+  byline, and a bottom-right micro-label ("Sovereign PWA · 176+ Nodules · 9×9
+  Crystalline Lattice"). Title size auto-fits to canvas width.
+
 ### V68.4 (Feb 18, 2026) — Phase D: The Sovereign Guide
 - **Sovereign Universe Kernel** (`/app/frontend/src/context/SovereignUniverseContext.js`)
   - React Context + vanilla `window.SovereignUniverse` bridge (version 68.4)
