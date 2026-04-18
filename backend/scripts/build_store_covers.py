@@ -36,7 +36,8 @@ def extract_tile(path):
     x0,x1 = int(np.argmax(cols)), int(len(cols) - np.argmax(cols[::-1]))
     return im.crop((x0, y0, x1, y1))
 
-tile = extract_tile('/tmp/appstore/windows/LargeTile.scale-400.png')
+tile = extract_tile(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  "_source", "source-tile-1240.png"))
 print("raw tile:", tile.size)
 # The tile has the rounded-square artwork. Resize to 1024 square with sharpening
 tile_hi = tile.resize((1024, 1024), Image.LANCZOS).filter(ImageFilter.SHARPEN)
