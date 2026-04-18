@@ -136,3 +136,4 @@ Werkzeug==3.1.8
 yarl==1.23.0
 zipp==3.23.0
 twilio==9.10.4
+resend>=2.0.0

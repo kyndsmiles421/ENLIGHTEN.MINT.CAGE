@@ -104,79 +104,20 @@ function buildCovers() { runPython(path.join(SCRIPTS, "build_store_covers.py"));
 // ── 3. Generate the 3 Play Store phone frames ──────────────────────────
 function buildPlayStoreScreens() { runPython(path.join(SCRIPTS, "build_playstore_screens.py")); }
 
-// ── 4. Optional email delivery via SendGrid ───────────────────────────
+// ── 4. Optional email delivery via unified mailer (Resend → SendGrid) ─
 function emailBundle(toEmail) {
-  const py = `
-import os, base64, mimetypes, glob, sys
-from datetime import datetime, timezone
-OUT = "${OUT}"
-TO  = "${toEmail}"
-api = os.environ.get("SENDGRID_API_KEY")
-frm = os.environ.get("SENDGRID_FROM_EMAIL", "kyndsmiles@gmail.com")
-if not api:
-    print("SENDGRID_API_KEY missing — skipping email"); sys.exit(0)
-
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
-
-files = [
-  "feature-graphic-1024x500.png", "app-icon-512.png", "app-icon-1024.png",
-  "og-cover-1200x630.png",
-  "playstore-1-hub.png", "playstore-2-observatory.png", "playstore-3-lattice.png",
-]
-attachments = []
-for f in files:
-    p = os.path.join(OUT, f)
-    if not os.path.exists(p): continue
-    with open(p, "rb") as fh:
-        data = base64.b64encode(fh.read()).decode()
-    a = Attachment()
-    a.file_content = FileContent(data)
-    a.file_name    = FileName(f)
-    a.file_type    = FileType(mimetypes.guess_type(f)[0] or "application/octet-stream")
-    a.disposition  = Disposition("attachment")
-    attachments.append(a)
-
-now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-subject = "ENLIGHTEN.MINT.CAFE — Play Store Cover Bundle"
-html = f'''
-<div style="font-family: 'Playfair Display', Georgia, serif; background:#0a0514; color:#f5f0e6; padding:32px; border-radius:12px; max-width:680px; margin:auto">
-  <h1 style="color:#F0C470; letter-spacing:0.5px; margin-bottom:4px">ENLIGHTEN.MINT.CAFE</h1>
-  <p style="color:#FFB450; margin:0 0 24px 0; font-size:14px; letter-spacing:1px">THE SOVEREIGN UNIFIED ENGINE · by INFINITY SOVEREIGN</p>
-  <hr style="border:none; border-top:1px solid #F0C47055; margin:20px 0"/>
-  <p>Attached is the complete Google Play Store cover bundle, freshly regenerated {now}.</p>
-  <ul style="line-height:1.9">
-    <li><b>feature-graphic-1024x500.png</b> — Play Store hero banner</li>
-    <li><b>app-icon-512.png / app-icon-1024.png</b> — Store icons</li>
-    <li><b>og-cover-1200x630.png</b> — WhatsApp · X · LinkedIn preview</li>
-    <li><b>playstore-1-hub.png</b> — 176+ Sovereign Nodules frame</li>
-    <li><b>playstore-2-observatory.png</b> — Meditative Immersion frame</li>
-    <li><b>playstore-3-lattice.png</b> — 9×9 Crystalline Lattice frame</li>
-  </ul>
-  <p style="margin-top:20px">Regenerate any time with:<br/>
-  <code style="background:#1a0f2a; color:#F0C470; padding:6px 12px; border-radius:6px">node /app/backend/scripts/master_print.js</code></p>
-  <hr style="border:none; border-top:1px solid #F0C47055; margin:24px 0"/>
-  <p style="font-size:12px; color:#9a8a70">Sovereign PWA · 176+ Nodules · 9×9 Crystalline Lattice</p>
-</div>'''
-
-msg = Mail(from_email=frm, to_emails=TO, subject=subject, html_content=html)
-msg.attachment = attachments
-try:
-    resp = SendGridAPIClient(api).send(msg)
-    print(f"email → {TO}  status={resp.status_code}  attached={len(attachments)}")
-except Exception as e:
-    print("email FAILED:", e); sys.exit(1)
-`;
-  const tmp = "/tmp/_mp_mail.py";
-  fs.writeFileSync(tmp, py);
-  // Load SENDGRID_* from backend/.env manually so the subprocess has them
-  const be = fs.readFileSync(path.join(ROOT, "backend/.env"), "utf8");
-  const env = { ...process.env };
-  be.split("\n").forEach(l => {
-    const m = l.match(/^([A-Z0-9_]+)\s*=\s*(.*)$/);
-    if (m) env[m[1]] = m[2];
-  });
-  const r = spawnSync("python3", [tmp], { stdio: "inherit", env });
+  const env = { ...process.env, BUNDLE_TO: toEmail };
+  // Load backend/.env so RESEND_API_KEY / SENDGRID_API_KEY propagate
+  try {
+    const be = fs.readFileSync(path.join(ROOT, "backend/.env"), "utf8");
+    be.split("\n").forEach(l => {
+      const m = l.match(/^([A-Z0-9_]+)\s*=\s*(.*)$/);
+      if (m) env[m[1]] = m[2];
+    });
+  } catch {}
+  log(`▶ emailing bundle → ${toEmail} (Resend preferred, SendGrid fallback)`);
+  const r = spawnSync("python3", [path.join(SCRIPTS, "send_bundle.py")],
+                      { stdio: "inherit", env });
   if (r.status !== 0) die("email step failed");
 }
 
