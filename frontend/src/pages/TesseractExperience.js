@@ -41,6 +41,7 @@ import { useMotion, MotionStore } from '../context/MotionContext';
 // Components
 import KineticHUD from '../components/KineticHUD';
 import SeedHuntWidget from '../components/SeedHuntWidget';
+import QuestTerminalTrigger from '../components/QuestTerminalTrigger';
 import { DwellBloomIndicatorSimple } from '../components/DwellBloomIndicator';
 
 // SOVEREIGN: True 3D WebGL Lattice
@@ -747,6 +748,11 @@ export default function TesseractExperience() {
         >
           <Gem size={20} className="text-amber-500" />
         </button>
+      </div>
+
+      {/* V68.4 — Quest Terminal: wake the Tesseract */}
+      <div className="relative z-50">
+        <QuestTerminalTrigger signal="tesseract:activate" label="Activate — Apply the Quartz Resonance" hint="The lattice awaits your signal." />
       </div>
       
       {/* Main Lattice - Z-INDEX 999: Always top interactive layer */}

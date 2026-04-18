@@ -8,23 +8,84 @@
  *
  * Respects the "No Boxes on Boxes" rule: renders as part of the page flow.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Target, ChevronDown, CheckCircle2, Circle, Sparkles } from 'lucide-react';
 import { useSovereignUniverse } from '../context/SovereignUniverseContext';
+import { playQuestCompleteChord, playSolfeggio } from '../utils/solfeggioTone';
 
 export default function ActiveMissionHUD() {
   const { activeQuest, toastQueue, dismissToast } = useSovereignUniverse();
   const [expanded, setExpanded] = useState(false);
+  const [cardDrop, setCardDrop] = useState(null);
+  const playedIdsRef = useRef(new Set());
 
-  // Toast banners (inline, above HUD) for quest auto-detect fires
+  // When a toast reports quest_complete or a step advance, play the matching tone.
+  // Quest complete → triple-stack chord + card-drop cinematic (inline).
+  // Step advance → single 528Hz ping.
+  useEffect(() => {
+    for (const t of toastQueue) {
+      if (playedIdsRef.current.has(t.id)) continue;
+      playedIdsRef.current.add(t.id);
+      if (t.quest_complete) {
+        playQuestCompleteChord();
+        if (t.reward_card) {
+          setCardDrop({ id: t.id, card: t.reward_card, color: t.color, quest_name: t.quest_name });
+          // Auto-dismiss the cinematic inline panel after 5s (user can still tap to dismiss)
+          setTimeout(() => setCardDrop(prev => (prev && prev.id === t.id ? null : prev)), 5000);
+        }
+      } else {
+        playSolfeggio(528, 0.55, 0.09);
+      }
+    }
+  }, [toastQueue]);
+
   const toasts = toastQueue.slice(0, 3);
 
-  if (!activeQuest && toasts.length === 0) return null;
+  if (!activeQuest && toasts.length === 0 && !cardDrop) return null;
 
   return (
     <div className="flex flex-col items-center gap-1.5 px-4 pb-3" data-testid="active-mission-hud">
+      {/* Card-drop cinematic — inline, no overlay */}
+      <AnimatePresence>
+        {cardDrop && (
+          <motion.div
+            key={cardDrop.id}
+            initial={{ opacity: 0, scale: 0.8, y: -10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -6 }}
+            transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1] }}
+            className="w-full max-w-md flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer"
+            style={{
+              background: `linear-gradient(135deg, ${cardDrop.color || '#8B5CF6'}25, ${cardDrop.color || '#8B5CF6'}08)`,
+              border: `1px solid ${cardDrop.color || '#8B5CF6'}60`,
+              boxShadow: `0 0 24px ${cardDrop.color || '#8B5CF6'}40, inset 0 0 16px ${cardDrop.color || '#8B5CF6'}18`,
+            }}
+            onClick={() => setCardDrop(null)}
+            data-testid="quest-card-drop"
+          >
+            <motion.div
+              animate={{ rotate: [0, 8, -8, 0], scale: [1, 1.08, 1] }}
+              transition={{ duration: 1.2, repeat: Infinity, repeatDelay: 0.6 }}
+              className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+              style={{ background: `${cardDrop.color || '#8B5CF6'}30`, border: `1px solid ${cardDrop.color || '#8B5CF6'}80` }}
+            >
+              <Sparkles size={18} style={{ color: cardDrop.color || '#8B5CF6' }} />
+            </motion.div>
+            <div className="flex-1 text-left min-w-0">
+              <div className="text-[9px] uppercase tracking-[0.22em]" style={{ color: `${cardDrop.color || '#8B5CF6'}cc` }}>
+                Gaming Card Earned
+              </div>
+              <div className="text-sm font-bold text-white/95 truncate" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                {cardDrop.card.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+              </div>
+              <div className="text-[10px] text-white/60 truncate">via {cardDrop.quest_name}</div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Auto-detect toast ribbons (inline — not fixed) */}
       <AnimatePresence>
         {toasts.map(t => (

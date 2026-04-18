@@ -11,6 +11,7 @@ import {
   Mountain, Gem, Sprout, Eye, Clock, Award, Skull, Shield
 } from 'lucide-react';
 import ProgressGate from '../components/ProgressGate';
+import QuestTerminalTrigger from './../components/QuestTerminalTrigger';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -532,6 +533,9 @@ export default function DreamRealms() {
   return (
     <ProgressGate gateId="dream-realms" color="#C084FC">
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }} data-testid="dream-realms-page">
+      {/* V68.4 — Quest Terminal: Extinguish the Fire */}
+      <QuestTerminalTrigger signal="dream_realms:fire_extinguish" label="Extinguish the Wildfire" hint="Apply your Fire Triangle knowledge now." color="#EF4444" />
+
       {/* Transition Shader */}
       <TransitionShader active={transitioning} color={transitionColor} onDone={() => setTransitioning(false)} />
 

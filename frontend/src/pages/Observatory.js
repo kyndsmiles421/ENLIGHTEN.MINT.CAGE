@@ -5,6 +5,7 @@ import { Star, Sparkles, Volume2, VolumeX, Radio, Clock, Zap, ChevronRight, Tele
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useChaosOscillator, chaosGlow } from '../lib/ChaosEngine';
+import QuestTerminalTrigger from '../components/QuestTerminalTrigger';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -294,6 +295,8 @@ export default function Observatory() {
 
       {/* ── Content ── */}
       <div className="relative z-10 px-4 py-6 sm:px-8 max-w-3xl mx-auto">
+        {/* V68.4 — Quest Terminal: Decode the Frequency */}
+        <QuestTerminalTrigger signal="observatory:decode" label="Decode the Harmonic Frequency" hint="The stars are singing — receive them." color="#D4AF37" />
         <div className="mb-5">
           <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-1" style={{ color: immBg.color }}>
             <Star size={10} className="inline mr-1" /> The Observatory
