@@ -69,6 +69,26 @@ export default function MiniLattice() {
   const userFlat = data?.flat;
   const lastPath = data?.last_path || [];
 
+  // V68.7 — Share Resonance Pattern (native share or copy-to-clipboard fallback)
+  const handleShare = async () => {
+    const token = localStorage.getItem('zen_token');
+    if (!token || token === 'guest_token') return;
+    try {
+      const res = await axios.get(`${API}/share/pattern`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const { share_path, caption } = res.data || {};
+      if (!share_path) return;
+      const absoluteUrl = `${window.location.origin}${share_path}`;
+      // Prefer native Web Share API
+      if (navigator.share) {
+        await navigator.share({ title: 'My Sovereign Lattice', text: caption, url: absoluteUrl });
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(`${caption}\n${absoluteUrl}`);
+      }
+    } catch {}
+  };
+
   // Build the resonance line (SVG polyline) across last_path coords
   const pathPoints = lastPath
     .map(p => `${padding + p.x * cellSize + cellSize / 2},${padding + p.y * cellSize + cellSize / 2}`)
@@ -130,8 +150,13 @@ export default function MiniLattice() {
           const cy = padding + y * cellSize + cellSize / 2;
           const isCenter = x === 4 && y === 4;
           const isCurrent = currentCoord && currentCoord.x === x && currentCoord.y === y;
-          const r = isCenter ? 3.5 : (visited ? 2.8 : 1.6);
-          const opacity = visited ? 1 : 0.22;
+          // V68.7 PHI-weighted opacity: inner-ring nodes (closer to center) burn brighter
+          const dx = x - 4, dy = y - 4;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          const phi = 1.618033988;
+          const proximity = 1 / (1 + distance / phi); // 1.0 at center → ~0.28 at corners
+          const r = isCenter ? 3.5 : (visited ? 2.2 + proximity * 1.2 : 1.4 + proximity * 0.6);
+          const baseOpacity = visited ? (0.55 + proximity * 0.45) : 0.15 + proximity * 0.12;
           const clickable = Boolean(visited?.path);
           return (
             <g key={`node-${x}-${y}`}
@@ -139,13 +164,19 @@ export default function MiniLattice() {
               style={{ cursor: clickable ? 'pointer' : 'default' }}
               data-testid={isCurrent ? 'lattice-current-node' : `lattice-node-${x}-${y}`}>
               {isCurrent && (
-                <circle cx={cx} cy={cy} r={r + 3} fill="none"
-                  stroke={color} strokeWidth="0.8" opacity="0.8">
-                  <animate attributeName="r" values={`${r + 3};${r + 5};${r + 3}`} dur="2s" repeatCount="indefinite" />
-                  <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite" />
-                </circle>
+                <>
+                  {/* V68.7 Resonance pulse — expanding ring + glow halo */}
+                  <circle cx={cx} cy={cy} r={r + 3} fill="none"
+                    stroke={color} strokeWidth="0.8" opacity="0.8">
+                    <animate attributeName="r" values={`${r + 3};${r + 6};${r + 3}`} dur="1.618s" repeatCount="indefinite" />
+                    <animate attributeName="opacity" values="0.9;0.1;0.9" dur="1.618s" repeatCount="indefinite" />
+                  </circle>
+                  <circle cx={cx} cy={cy} r={r + 1.5} fill={color} opacity="0.25">
+                    <animate attributeName="opacity" values="0.35;0.15;0.35" dur="1.618s" repeatCount="indefinite" />
+                  </circle>
+                </>
               )}
-              <circle cx={cx} cy={cy} r={r} fill={color} opacity={opacity}>
+              <circle cx={cx} cy={cy} r={r} fill={color} opacity={baseOpacity}>
                 {visited && (
                   <title>{visited.path} · {type} · {visited.count}x</title>
                 )}
@@ -154,6 +185,22 @@ export default function MiniLattice() {
           );
         }))}
       </svg>
+      {/* V68.7 — Share Resonance Pattern */}
+      {data && data.unique_nodes_visited > 0 && (
+        <button
+          type="button"
+          onClick={handleShare}
+          className="mt-2 flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] uppercase tracking-[0.18em] transition-all active:scale-[0.96]"
+          style={{
+            background: 'rgba(192,132,252,0.06)',
+            border: '1px solid rgba(192,132,252,0.2)',
+            color: 'rgba(192,132,252,0.75)',
+          }}
+          data-testid="lattice-share-btn"
+        >
+          Share Resonance Pattern
+        </button>
+      )}
     </div>
   );
 }

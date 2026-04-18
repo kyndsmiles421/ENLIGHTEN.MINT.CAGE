@@ -221,6 +221,7 @@ const OrbitalHub = lazy(() => import('./pages/OrbitalHub'));
 const EnlightenMintHub = lazy(() => import('./pages/EnlightenMintHub'));
 const QuantumLoom = lazy(() => import('./pages/QuantumLoom'));
 const MembershipLoom = lazy(() => import('./pages/MembershipLoom'));
+const ResonanceShare = lazy(() => import('./pages/ResonanceShare'));
 const Sanctuary = lazy(() => import('./pages/Sanctuary'));
 const CelestialDome = lazy(() => import('./pages/CelestialDome'));
 const SilentSanctuary = lazy(() => import('./pages/SilentSanctuary'));
@@ -566,6 +567,7 @@ function AnimatedRoutes() {
         <Route path="/creator-console" element={<ApexCreatorPage />} />
         <Route path="/quantum-loom" element={<QuantumLoom />} />
         <Route path="/membership" element={<MembershipLoom />} />
+        <Route path="/resonance/:shareId" element={<ResonanceShare />} />
         <Route path="/sanctuary" element={<Sanctuary />} />
         <Route path="/silent-sanctuary" element={<SilentSanctuary />} />
         <Route path="/void" element={<SilentSanctuary />} />

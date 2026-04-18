@@ -18,6 +18,10 @@ import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const TICK_MS = 60000; // 60 seconds
+const ACTIVATE_DEBOUNCE_MS = 5000; // V68.7: prevent rapid-fire ghost nodes
+
+// Module-level debounce map: last activation timestamp per path
+const _lastActivate = new Map();
 
 export function useImmersionPresence(sceneId, options = {}) {
   const { silent = false } = options;
@@ -31,6 +35,12 @@ export function useImmersionPresence(sceneId, options = {}) {
     if (!sceneId) return;
     const token = localStorage.getItem('zen_token');
     if (!token || token === 'guest_token') return;
+    // V68.7 Debounce: skip if we activated this path within the last 5s
+    const key = location.pathname;
+    const last = _lastActivate.get(key) || 0;
+    const now = Date.now();
+    if (now - last < ACTIVATE_DEBOUNCE_MS) return;
+    _lastActivate.set(key, now);
     axios.post(
       `${API}/main-brain/activate`,
       { path: location.pathname },
