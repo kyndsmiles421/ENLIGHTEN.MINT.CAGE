@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -12,6 +12,10 @@ import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../compo
 import { useLatency, LatencyDot } from '../hooks/useLatencyPulse';
 import { toast } from 'sonner';
 import axios from 'axios';
+
+// Lazy-loaded 3D avatar previewer — only downloaded when the Character tab renders.
+// Keeps the RPG core bundle well under the 800KB Metabolic Seal.
+const CosmicAvatarPreview = lazy(() => import('../components/rpg/CosmicAvatarPreview'));
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -620,6 +624,20 @@ export default function RPGPage() {
           {/* CHARACTER TAB */}
           {tab === 'character' && (
             <motion.div key="char" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              {/* 3D Avatar Preview — gear colors tint the model */}
+              <Suspense fallback={
+                <div style={{
+                  width: 260, height: 260, margin: '0 auto 12px', borderRadius: 16,
+                  background: 'radial-gradient(circle at 50% 55%, rgba(129,140,248,0.08) 0%, rgba(6,3,18,0.9) 70%)',
+                  border: '1px solid rgba(129,140,248,0.15)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <CosmicInlineLoader size={18} />
+                </div>
+              }>
+                <CosmicAvatarPreview equipped={equipMap} size={260} />
+              </Suspense>
+
               {/* Equipment Slots */}
               <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>Equipment</p>
               {(() => {
