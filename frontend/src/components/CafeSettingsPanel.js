@@ -18,7 +18,47 @@ import { useMeshNetwork } from '../context/MeshNetworkContext';
  * - Color Mode: Light vs Dark (Parchment only)
  * - Atmosphere: Ambient sound, particles, depth blur, warm glow
  * - Show Suggested Paths: Explicitly request learned navigation suggestions
+ * - Lore Default: Action-First (collapsed) or Open (expanded) across all modules
  */
+
+// ─── V68.5: Global Lore Toggle (Thin-Client Action-First) ───
+function LoreDefaultToggle({ palette }) {
+  const [pref, setPref] = useState(() => {
+    try { return localStorage.getItem('global_lore_default') || 'closed'; }
+    catch { return 'closed'; }
+  });
+  const set = (v) => {
+    try { localStorage.setItem('global_lore_default', v); } catch {}
+    setPref(v);
+  };
+  const opts = [
+    { id: 'closed', label: 'Action-First', desc: 'Collapsed by default' },
+    { id: 'open', label: 'Lore-Open', desc: 'Expanded by default' },
+  ];
+  return (
+    <div className="grid grid-cols-2 gap-1.5" data-testid="lore-default-toggle">
+      {opts.map(o => (
+        <button
+          key={o.id}
+          onClick={() => set(o.id)}
+          className="px-3 py-2 rounded-lg text-left transition-all"
+          style={{
+            background: pref === o.id ? `${palette.gold}18` : 'transparent',
+            border: `1px solid ${pref === o.id ? palette.gold : 'rgba(255,255,255,0.08)'}`,
+          }}
+          data-testid={`lore-default-${o.id}`}
+        >
+          <div className="text-[10px] font-bold uppercase tracking-wider"
+            style={{ color: pref === o.id ? palette.gold : palette.inkMuted }}>
+            {o.label}
+          </div>
+          <div className="text-[8px]" style={{ color: palette.inkMuted }}>{o.desc}</div>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function CafeSettingsPanel({ isOpen, onClose }) {
   const {
     viewTier,
@@ -275,6 +315,18 @@ export default function CafeSettingsPanel({ isOpen, onClose }) {
                   {showingPaths ? 'Paths Shown (12s)' : 'Show Suggested Paths'}
                 </button>
               </div>
+            </div>
+
+            {/* V68.5 — Global Lore Toggle (Sovereign Thin-Client Mode) */}
+            <div>
+              <label className="text-[10px] uppercase tracking-widest font-semibold mb-2 block"
+                style={{ color: palette.inkMuted }}>
+                Lore Default
+              </label>
+              <LoreDefaultToggle palette={palette} />
+              <p className="text-[9px] mt-1.5" style={{ color: palette.inkMuted }}>
+                Action-First: gestures & practice render first. Lore (descriptions, properties) stays collapsed by default to keep the UI lean.
+              </p>
             </div>
 
             {/* Zone Focus */}

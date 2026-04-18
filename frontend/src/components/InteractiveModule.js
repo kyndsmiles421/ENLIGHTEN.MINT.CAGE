@@ -265,6 +265,24 @@ function StudyPanel({ item, color, category, onClose }) {
   const description = item.description || item.core_principle || '';
   const tags = item.properties || item.benefits || item.uses || [];
 
+  // V68.5 Thin-Client: Action-First priority.
+  // Lore (description + tags + lore-blocks) is collapsed by default.
+  // Global flag `global_lore_default` can force it open/closed across the app.
+  const [showLore, setShowLore] = useState(() => {
+    try {
+      const pref = localStorage.getItem('global_lore_default');
+      return pref === 'open';
+    } catch { return false; }
+  });
+
+  // Action data = what the user DOES (render first, always)
+  const hasActionData = Boolean(item.hand_position || item.practice || item.duration || item.video_url);
+  // Lore data = contextual text/tags (render second, behind toggle)
+  const hasLore = Boolean(
+    description || tags.length > 0 || item.ingredients || item.systems ||
+    item.preparations || item.spiritual || item.healing
+  );
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -279,7 +297,7 @@ function StudyPanel({ item, color, category, onClose }) {
       }}
       data-testid="study-panel"
     >
-      {/* Header */}
+      {/* Header — minimal, Action-First */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           {item.image_url ? (
@@ -306,114 +324,147 @@ function StudyPanel({ item, color, category, onClose }) {
             {subtitle && <p className="text-xs" style={{ color: itemColor }}>{subtitle}</p>}
           </div>
         </div>
-        <button onClick={onClose} className="p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)' }}>
+        <button onClick={onClose} className="p-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.05)' }} data-testid="study-close">
           <XIcon size={14} style={{ color: 'rgba(255,255,255,0.4)' }} />
         </button>
       </div>
 
-      {/* Description */}
-      <p className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.75)' }}>
-        {description}
-      </p>
-
-      {/* Tags */}
-      {tags.length > 0 && (
-        <div className="mb-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: itemColor }}>
-            {item.properties ? 'Properties' : item.benefits ? 'Benefits' : 'Uses'}
-          </p>
-          <div className="flex flex-wrap gap-1.5">
-            {tags.map((tag, i) => (
-              <span key={i} className="text-xs px-2.5 py-1 rounded-full"
-                style={{ background: `${itemColor}12`, color: itemColor, border: `1px solid ${itemColor}20` }}>
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Mudra-specific: Hand Position (fingers + technique) */}
-      {item.hand_position && (
-        <div className="mb-4 px-3 py-2.5 rounded-lg" style={{ background: `${itemColor}08`, border: `1px solid ${itemColor}20` }}>
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5" style={{ color: itemColor }}>Hand Position</p>
-          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.8)' }}>{item.hand_position}</p>
-        </div>
-      )}
-      {/* Mudra-specific: Practice instructions */}
-      {item.practice && (
-        <div className="mb-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5" style={{ color: itemColor }}>How to Practice</p>
-          <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.75)' }}>{item.practice}</p>
-        </div>
-      )}
-      {/* Mudra-specific: Duration */}
-      {item.duration && (
-        <div className="mb-4 flex items-center gap-2">
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: itemColor }}>Duration</span>
-          <span className="text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>{item.duration}</span>
-        </div>
-      )}
-      {/* Mudra-specific: Video demo link */}
-      {item.video_url && (
-        <div className="mb-4">
-          <a href={item.video_url} target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium transition-all active:scale-95"
-            style={{ background: `${itemColor}15`, border: `1px solid ${itemColor}35`, color: itemColor }}
-            data-testid="item-video-link">
-            ▶ {item.video_title || 'Watch demonstration video'}
-          </a>
-        </div>
-      )}
-
-      {/* Extra fields */}
-      {item.ingredients && (
-        <div className="mb-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: '#FCD34D' }}>Ingredients</p>
-          <div className="flex flex-wrap gap-1.5">
-            {item.ingredients.map((ing, i) => (
-              <span key={i} className="text-xs px-2.5 py-1 rounded-full"
-                style={{ background: 'rgba(252,211,77,0.1)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.2)' }}>{ing}</span>
-            ))}
-          </div>
-        </div>
-      )}
-      {item.systems && (
-        <div className="mb-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: '#2DD4BF' }}>Body Systems</p>
-          <div className="flex flex-wrap gap-1.5">
-            {item.systems.map((sys, i) => (
-              <span key={i} className="text-xs px-2.5 py-1 rounded-full"
-                style={{ background: 'rgba(45,212,191,0.1)', color: '#2DD4BF', border: '1px solid rgba(45,212,191,0.2)' }}>{sys}</span>
-            ))}
-          </div>
-        </div>
-      )}
-      {item.preparations && (
-        <div className="mb-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: '#A78BFA' }}>How to Use</p>
-          {item.preparations.map((p, i) => (
-            <div key={i} className="flex items-start gap-2 mb-1">
-              <span className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style={{ background: '#A78BFA' }} />
-              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{p}</p>
+      {/* ═══ ACTION STREAM (rendered first, always visible) ═══ */}
+      {hasActionData && (
+        <div className="mb-3" data-testid="action-stream">
+          {item.hand_position && (
+            <div className="mb-3 px-3 py-2.5 rounded-lg" style={{ background: `${itemColor}08`, border: `1px solid ${itemColor}20` }}>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5" style={{ color: itemColor }}>Hand Position</p>
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)' }}>{item.hand_position}</p>
             </div>
-          ))}
+          )}
+          {item.practice && (
+            <div className="mb-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5" style={{ color: itemColor }}>How to Practice</p>
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.8)' }}>{item.practice}</p>
+            </div>
+          )}
+          <div className="flex items-center gap-3 flex-wrap">
+            {item.duration && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: `${itemColor}99` }}>Duration</span>
+                <span className="text-xs" style={{ color: 'rgba(255,255,255,0.75)' }}>{item.duration}</span>
+              </div>
+            )}
+            {item.video_url && (
+              <a href={item.video_url} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-medium transition-all active:scale-95"
+                style={{ background: `${itemColor}15`, border: `1px solid ${itemColor}35`, color: itemColor }}
+                data-testid="item-video-link">
+                ▶ {item.video_title || 'Demo video'}
+              </a>
+            )}
+          </div>
         </div>
       )}
-      {item.spiritual && (
-        <div className="mb-3">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: '#C084FC' }}>Spiritual</p>
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{item.spiritual}</p>
-        </div>
+
+      {/* ═══ LORE TOGGLE (default collapsed — kilobyte budget) ═══ */}
+      {hasLore && (
+        <button
+          type="button"
+          onClick={() => setShowLore(v => !v)}
+          className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-[0.18em] transition-all"
+          style={{
+            background: showLore ? `${itemColor}10` : 'rgba(255,255,255,0.02)',
+            border: `1px solid ${showLore ? `${itemColor}25` : 'rgba(255,255,255,0.05)'}`,
+            color: showLore ? itemColor : 'rgba(255,255,255,0.45)',
+          }}
+          data-testid="study-lore-toggle"
+        >
+          <span>{showLore ? 'Hide Lore' : 'Show Lore & Context'}</span>
+          <span className="text-[9px] opacity-60">{showLore ? '−' : '+'}</span>
+        </button>
       )}
-      {item.healing && (
-        <div className="mb-3">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: '#22C55E' }}>Healing</p>
-          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{item.healing}</p>
-        </div>
-      )}
+
+      <AnimatePresence initial={false}>
+        {showLore && hasLore && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+            data-testid="study-lore-panel"
+          >
+            <div className="pt-3">
+              {description && (
+                <p className="text-sm leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.72)' }}>
+                  {description}
+                </p>
+              )}
+              {tags.length > 0 && (
+                <div className="mb-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: itemColor }}>
+                    {item.properties ? 'Properties' : item.benefits ? 'Benefits' : 'Uses'}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {tags.map((tag, i) => (
+                      <span key={i} className="text-xs px-2.5 py-1 rounded-full"
+                        style={{ background: `${itemColor}12`, color: itemColor, border: `1px solid ${itemColor}20` }}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {item.ingredients && (
+                <div className="mb-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: '#FCD34D' }}>Ingredients</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {item.ingredients.map((ing, i) => (
+                      <span key={i} className="text-xs px-2.5 py-1 rounded-full"
+                        style={{ background: 'rgba(252,211,77,0.1)', color: '#FCD34D', border: '1px solid rgba(252,211,77,0.2)' }}>{ing}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {item.systems && (
+                <div className="mb-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: '#2DD4BF' }}>Body Systems</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {item.systems.map((sys, i) => (
+                      <span key={i} className="text-xs px-2.5 py-1 rounded-full"
+                        style={{ background: 'rgba(45,212,191,0.1)', color: '#2DD4BF', border: '1px solid rgba(45,212,191,0.2)' }}>{sys}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {item.preparations && (
+                <div className="mb-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-2" style={{ color: '#A78BFA' }}>How to Use</p>
+                  {item.preparations.map((p, i) => (
+                    <div key={i} className="flex items-start gap-2 mb-1">
+                      <span className="w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0" style={{ background: '#A78BFA' }} />
+                      <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{p}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {item.spiritual && (
+                <div className="mb-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: '#C084FC' }}>Spiritual</p>
+                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{item.spiritual}</p>
+                </div>
+              )}
+              {item.healing && (
+                <div className="mb-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: '#22C55E' }}>Healing</p>
+                  <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{item.healing}</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Caution always visible — safety trumps lore toggle */}
       {item.caution && (
-        <div className="mb-3 py-2 px-3 rounded-lg" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.12)' }}>
+        <div className="mt-3 py-2 px-3 rounded-lg" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.12)' }}>
           <p className="text-[10px] font-bold uppercase tracking-[0.15em] mb-0.5" style={{ color: '#EF4444' }}>Caution</p>
           <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>{item.caution}</p>
         </div>
@@ -422,7 +473,7 @@ function StudyPanel({ item, color, category, onClose }) {
       {/* Action bar */}
       <div className="flex items-center gap-2 flex-wrap mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
         <NarrationPlayer
-          text={`${title}. ${description}. ${item.spiritual || ''} ${item.healing || ''}`}
+          text={`${title}. ${item.hand_position || ''} ${item.practice || description}`}
           label="Listen" color={itemColor} context={category}
         />
         <DeepDive topic={title} category={category} context={subtitle} color={itemColor} label={`Explore deeper`} />
