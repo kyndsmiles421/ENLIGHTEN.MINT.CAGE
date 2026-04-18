@@ -81,29 +81,40 @@ function ItemCard({ item, onEquip, onUse, compact }) {
           {!compact && item.stats && <div className="flex flex-wrap gap-1 mt-1">{Object.entries(item.stats).map(([s, v]) => <span key={s} className="text-[7px] px-1 py-0.5 rounded" style={{ background: `${STAT_COLORS[s] || '#818CF8'}10`, color: STAT_COLORS[s] || '#818CF8' }}>+{v} {s}</span>)}</div>}
           {!compact && item.element && <span className="text-[7px] px-1 py-0.5 rounded mt-1 inline-block capitalize" style={{ background: 'rgba(129,140,248,0.06)', color: '#818CF8' }}>{item.element}</span>}
         </div>
-        <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {item.slot && onEquip && <button onClick={(e) => { e.stopPropagation(); onEquip(item.id); }} className="p-1 rounded text-[7px]" style={{ background: 'rgba(129,140,248,0.1)', color: '#818CF8' }} data-testid={`equip-${item.id}`}>Equip</button>}
-          {item.category === 'consumable' && onUse && <button onClick={(e) => { e.stopPropagation(); onUse(item.id); }} className="p-1 rounded text-[7px]" style={{ background: 'rgba(34,197,94,0.1)', color: '#22C55E' }} data-testid={`use-${item.id}`}>Use</button>}
+        <div className="flex flex-col gap-1">
+          {item.slot && onEquip && <button onClick={(e) => { e.stopPropagation(); onEquip(item.id); }} className="px-2 py-1 rounded text-[9px] font-medium" style={{ background: 'rgba(129,140,248,0.15)', color: '#818CF8', border: '1px solid rgba(129,140,248,0.25)' }} data-testid={`equip-${item.id}`}>Equip</button>}
+          {item.category === 'consumable' && onUse && <button onClick={(e) => { e.stopPropagation(); onUse(item.id); }} className="px-2 py-1 rounded text-[9px] font-medium" style={{ background: 'rgba(34,197,94,0.15)', color: '#22C55E', border: '1px solid rgba(34,197,94,0.25)' }} data-testid={`use-${item.id}`}>Use</button>}
         </div>
       </div>
     </motion.div>
   );
 }
 
-function EquipSlot({ slot, item, onUnequip }) {
+function EquipSlot({ slot, item, onUnequip, onTapEmpty }) {
   const Icon = SLOT_ICONS[slot] || Star;
+  const isEmpty = !item;
   return (
-    <div className="rounded-xl p-3 text-center group"
-      style={{ background: item ? `${item.rarity_color}08` : 'rgba(255,255,255,0.02)', border: `1px solid ${item ? `${item.rarity_color}15` : 'rgba(255,255,255,0.04)'}` }}
+    <div
+      role={isEmpty && onTapEmpty ? 'button' : undefined}
+      tabIndex={isEmpty && onTapEmpty ? 0 : undefined}
+      onClick={isEmpty && onTapEmpty ? () => onTapEmpty(slot) : undefined}
+      onKeyDown={isEmpty && onTapEmpty ? (e) => { if (e.key === 'Enter' || e.key === ' ') onTapEmpty(slot); } : undefined}
+      className="rounded-xl p-3 text-center group transition-all"
+      style={{
+        background: item ? `${item.rarity_color}08` : 'rgba(129,140,248,0.04)',
+        border: `1px solid ${item ? `${item.rarity_color}15` : 'rgba(129,140,248,0.15)'}`,
+        cursor: isEmpty && onTapEmpty ? 'pointer' : 'default',
+        touchAction: 'manipulation',
+      }}
       data-testid={`slot-${slot}`}>
-      <div className="w-10 h-10 mx-auto rounded-xl flex items-center justify-center mb-1.5" style={{ background: item ? `${item.rarity_color}10` : 'rgba(255,255,255,0.03)' }}>
-        <Icon size={18} style={{ color: item ? item.rarity_color : 'rgba(255,255,255,0.15)' }} />
+      <div className="w-10 h-10 mx-auto rounded-xl flex items-center justify-center mb-1.5" style={{ background: item ? `${item.rarity_color}10` : 'rgba(129,140,248,0.08)' }}>
+        <Icon size={18} style={{ color: item ? item.rarity_color : '#818CF8' }} />
       </div>
       <p className="text-[9px] capitalize mb-0.5" style={{ color: 'var(--text-muted)' }}>{slot}</p>
       {item ? (
         <><p className="text-[10px] font-medium truncate" style={{ color: item.rarity_color }}>{item.name}</p>
-          {onUnequip && <button onClick={() => onUnequip(slot)} className="mt-1 text-[7px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }} data-testid={`unequip-${slot}`}>Remove</button>}</>
-      ) : <p className="text-[8px]" style={{ color: 'rgba(255,255,255,0.1)' }}>Empty</p>}
+          {onUnequip && <button onClick={(e) => { e.stopPropagation(); onUnequip(slot); }} className="mt-1 text-[7px] px-2 py-0.5 rounded" style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }} data-testid={`unequip-${slot}`}>Remove</button>}</>
+      ) : <p className="text-[8px] font-medium" style={{ color: '#818CF8' }}>Tap to equip</p>}
     </div>
   );
 }
@@ -611,9 +622,49 @@ export default function RPGPage() {
             <motion.div key="char" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               {/* Equipment Slots */}
               <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-muted)' }}>Equipment</p>
+              {(() => {
+                const unequippedGear = (inventory?.items || []).filter(i => i?.slot && ['head','body','conduit','trinket'].includes(i.slot) && !equipMap[i.slot]);
+                const emptySlots = ['head','body','conduit','trinket'].filter(s => !equipMap[s]);
+                return unequippedGear.length > 0 && emptySlots.length > 0 ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="rounded-xl p-3 mb-3 flex items-center justify-between gap-3"
+                    style={{ background: 'rgba(129,140,248,0.08)', border: '1px solid rgba(129,140,248,0.2)' }}
+                    data-testid="gear-ready-cta">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Package size={16} style={{ color: '#818CF8', flexShrink: 0 }} />
+                      <p className="text-[11px] truncate" style={{ color: 'var(--text-primary)' }}>
+                        <span style={{ color: '#818CF8', fontWeight: 600 }}>{unequippedGear.length}</span> item{unequippedGear.length > 1 ? 's' : ''} ready to equip
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setTab('inventory')}
+                      className="px-3 py-1.5 rounded-lg text-[10px] font-medium flex-shrink-0"
+                      style={{ background: '#818CF8', color: '#fff' }}
+                      data-testid="jump-to-inventory">
+                      Open Inventory →
+                    </button>
+                  </motion.div>
+                ) : null;
+              })()}
               <div className="grid grid-cols-4 gap-2 mb-5">
                 {['head', 'body', 'conduit', 'trinket'].map(slot => (
-                  <EquipSlot key={slot} slot={slot} item={equipMap[slot]} onUnequip={unequipItem} />
+                  <EquipSlot
+                    key={slot}
+                    slot={slot}
+                    item={equipMap[slot]}
+                    onUnequip={unequipItem}
+                    onTapEmpty={() => {
+                      const match = (inventory?.items || []).find(i => i?.slot === slot);
+                      if (match) {
+                        equipItem(match.id);
+                      } else {
+                        setTab('inventory');
+                        toast.info(`No ${slot} gear found. Earn items via Rock Hounding, Bosses, or Shop.`);
+                      }
+                    }}
+                  />
                 ))}
               </div>
               {/* Stats */}
