@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import {
   ArrowLeft, Volume2, VolumeX, Eye, Palette, Sparkles, Monitor,
   Moon, Sun, TreePine, Zap, Shield, Bell, ChevronRight, Type, Contrast, Globe, Check,
-  Trash2, AlertTriangle, LogOut, Loader2, Download
+  Trash2, AlertTriangle, LogOut, Loader2, Download, Mail, MailCheck, MailX
 } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
@@ -103,6 +103,27 @@ export default function Settings() {
   const [deleteText, setDeleteText]   = useState('');
   const [deleting, setDeleting]       = useState(false);
   const [exporting, setExporting]     = useState(false);
+  const [mailTestStatus, setMailTestStatus] = useState(null); // null | 'sending' | 'ok' | 'err'
+
+  const handleMailTest = async () => {
+    if (mailTestStatus === 'sending') return;
+    setMailTestStatus('sending');
+    try {
+      const res = await axios.post(`${API}/admin/mail-test`, {}, { headers: authHeaders });
+      if (res.data?.ok) {
+        toast.success(`Sent via ${res.data.provider} → ${res.data.to}`, { description: `Message ID: ${res.data.message_id}` });
+        setMailTestStatus('ok');
+      } else {
+        toast.error(`Mailer error: ${res.data?.error || 'unknown'}`);
+        setMailTestStatus('err');
+      }
+    } catch (err) {
+      const msg = err?.response?.data?.detail || err?.message || 'Mail test failed';
+      toast.error(msg);
+      setMailTestStatus('err');
+    }
+    setTimeout(() => setMailTestStatus(null), 5000);
+  };
 
   const handleDataExport = async () => {
     if (exporting) return;
@@ -455,6 +476,38 @@ export default function Settings() {
                 <ChevronRight size={12} style={{ color: '#818CF8' }} />
               </button>
             </div>
+
+            {/* Admin-only: Mailer self-test */}
+            {(user.is_owner || user.role === 'admin') && (
+              <div className="rounded-xl overflow-hidden mb-3"
+                style={{ background: 'rgba(240,196,112,0.04)', border: '1px solid rgba(240,196,112,0.2)' }}>
+                <button
+                  onClick={handleMailTest}
+                  disabled={mailTestStatus === 'sending'}
+                  className="w-full flex items-center justify-between px-4 py-3 text-left transition-all hover:bg-amber-400/[0.05]"
+                  style={{ opacity: mailTestStatus === 'sending' ? 0.6 : 1, cursor: mailTestStatus === 'sending' ? 'wait' : 'pointer' }}
+                  data-testid="mail-test-btn">
+                  <div className="flex items-center gap-3">
+                    {mailTestStatus === 'sending' && <Loader2 size={14} className="animate-spin" style={{ color: '#F0C470' }} />}
+                    {mailTestStatus === 'ok'      && <MailCheck   size={14} style={{ color: '#22C55E' }} />}
+                    {mailTestStatus === 'err'     && <MailX       size={14} style={{ color: '#EF4444' }} />}
+                    {!mailTestStatus              && <Mail        size={14} style={{ color: '#F0C470' }} />}
+                    <div>
+                      <p className="text-xs font-medium" style={{ color: '#F0C470' }}>
+                        {mailTestStatus === 'sending' ? 'Dispatching…'
+                          : mailTestStatus === 'ok'    ? 'Delivered — check inbox'
+                          : mailTestStatus === 'err'   ? 'Delivery failed'
+                          : 'Send Mailer Test  ·  Admin'}
+                      </p>
+                      <p className="text-[9px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                        Fires a Resend → SendGrid self-test to your own email.
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight size={12} style={{ color: '#F0C470' }} />
+                </button>
+              </div>
+            )}
 
             <div className="rounded-xl overflow-hidden"
               style={{ background: 'rgba(239,68,68,0.03)', border: '1px solid rgba(239,68,68,0.15)' }}>

@@ -6,6 +6,7 @@ import uuid
 import bcrypt
 import os
 from models import UserCreate, UserLogin
+from utils.resend_mailer import send_email, provider_status
 
 router = APIRouter()
 
@@ -383,3 +384,69 @@ async def update_avatar(data: dict, user=Depends(get_current_user)):
         {"$set": {"avatar": avatar}},
     )
     return {"success": True, "avatar": avatar}
+
+
+
+# ─────────────────────────────────────────────────────────────────────
+# Admin mailer self-test — verifies Resend/SendGrid deliverability
+# Owner/admin only. Safe to call repeatedly.
+# ─────────────────────────────────────────────────────────────────────
+class MailTestRequest(BaseModel):
+    to: str | None = None  # defaults to the caller's email
+
+
+@router.post("/admin/mail-test")
+async def admin_mail_test(data: MailTestRequest, user=Depends(get_current_user)):
+    # Owner/admin gate
+    full = await db.users.find_one({"id": user["id"]}, {"_id": 0, "email": 1, "role": 1, "is_owner": 1})
+    if not full:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not (full.get("is_owner") or full.get("role") == "admin"):
+        raise HTTPException(status_code=403, detail="Admin privileges required")
+
+    to = data.to or full.get("email")
+    if not to:
+        raise HTTPException(status_code=400, detail="No recipient email on file")
+
+    ps = provider_status()
+    if ps["active_provider"] == "disabled":
+        raise HTTPException(status_code=503,
+                            detail="No mail provider configured (set RESEND_API_KEY or SENDGRID_API_KEY)")
+
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    subject = "ENLIGHTEN.MINT.CAFE — Mailer Self-Test"
+    html = f"""<!DOCTYPE html><html><body style="margin:0;padding:0;background:#050210;font-family:Georgia,serif">
+<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#050210">
+  <tr><td align="center" style="padding:32px 16px">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="560" style="max-width:560px;background:#0a0514;border-radius:14px;color:#f5f0e6">
+      <tr><td style="padding:28px 32px;text-align:center">
+        <h1 style="color:#F0C470;margin:0 0 4px 0;font-size:22px;letter-spacing:1px">Mailer Self-Test</h1>
+        <p style="color:#FFB450;margin:0 0 20px;font-size:11px;letter-spacing:2px">ENLIGHTEN.MINT.CAFE · SOVEREIGN UNIFIED ENGINE</p>
+        <p style="font-size:14px;line-height:1.6;color:rgba(245,240,230,0.8);margin:0 0 16px">
+          If you're reading this, your mailer pipeline is <b style="color:#22C55E">LIVE</b>.
+        </p>
+        <div style="background:#1a0f2a;border-radius:8px;padding:14px;text-align:left;font-family:Courier,monospace;font-size:12px;color:#F0C470;margin:16px 0">
+          provider : {ps["active_provider"]}<br>
+          sender   : {ps.get("resend_from") or ps.get("sendgrid_from")}<br>
+          time     : {now}<br>
+          user     : {full.get("email")}
+        </div>
+        <p style="font-size:11px;color:rgba(248,250,252,0.4);margin:16px 0 0">
+          Sovereign PWA · 176+ Nodules · 9×9 Crystalline Lattice
+        </p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>"""
+
+    result = await send_email(to=to, subject=subject, html=html)
+    logger.info(f"AUTH: mail-test | to={to} provider={result.provider} ok={result.ok} id={result.message_id}")
+    return {
+        "ok": result.ok,
+        "provider": result.provider,
+        "message_id": result.message_id,
+        "error": result.error,
+        "to": to,
+        "provider_status": ps,
+    }
