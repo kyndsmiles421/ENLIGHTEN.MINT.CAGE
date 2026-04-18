@@ -53,8 +53,10 @@ async def presence_tick(data: dict = Body(...), user=Depends(get_current_user)):
     if last:
         last_ts = last.get("ts")
         if isinstance(last_ts, str):
-            try: last_ts = datetime.fromisoformat(last_ts.replace("Z", "+00:00"))
-            except Exception: last_ts = None
+            try:
+                last_ts = datetime.fromisoformat(last_ts.replace("Z", "+00:00"))
+            except Exception:
+                last_ts = None
         if last_ts and (now - last_ts).total_seconds() < MIN_SECONDS_BETWEEN_TICKS:
             # Too soon — return current state without granting
             return {

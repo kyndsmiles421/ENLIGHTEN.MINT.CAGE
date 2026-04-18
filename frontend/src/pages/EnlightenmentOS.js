@@ -7,12 +7,14 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useImmersionPresence } from '../hooks/useImmersionPresence';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
 // --- SOVEREIGN SYSTEM COMPONENT ---
 export default function EnlightenmentOS() {
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('enlightenment', 8); }, []);
+  useImmersionPresence('enlightenment_os');
 
   const navigate = useNavigate();
   const { user, token } = useAuth();

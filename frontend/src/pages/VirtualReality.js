@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Maximize2, Minimize2, Wind, Timer, Flame, Star, Eye, BookOpen, Volume2, VolumeX, Compass, Play, X, Film, Loader2, SkipForward, SkipBack, Pause, Sparkles, Atom, Crosshair } from 'lucide-react';
 import * as THREE from 'three';
+import { useImmersionPresence } from '../hooks/useImmersionPresence';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -28,6 +29,7 @@ export default function VirtualReality() {
   const sceneRef = useRef({});
   const { authHeaders } = useAuth();
   const navigate = useNavigate();
+  useImmersionPresence('vr_sanctuary');
   const [energyState, setEnergyState] = useState(null);
   const [avatarConfig, setAvatarConfig] = useState(null);
   const [hoveredPortal, setHoveredPortal] = useState(null);

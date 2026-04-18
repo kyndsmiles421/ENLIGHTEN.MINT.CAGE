@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useChaosOscillator, chaosGlow } from '../lib/ChaosEngine';
 import QuestTerminalTrigger from '../components/QuestTerminalTrigger';
+import { useImmersionPresence } from '../hooks/useImmersionPresence';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -196,6 +197,7 @@ function StarCard({ star, isSelected, onSelect, isPlaying, onToggleSound }) {
 export default function Observatory() {
   const { authHeaders, token } = useAuth();
   const navigate = useNavigate();
+  useImmersionPresence('observatory');
   const [tab, setTab] = useState('orrery');
   const [planets, setPlanets] = useState([]);
   const [stars, setStars] = useState([]);

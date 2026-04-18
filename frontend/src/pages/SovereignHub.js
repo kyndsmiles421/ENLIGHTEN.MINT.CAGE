@@ -16,6 +16,7 @@ import DailyChallenges from '../components/DailyChallenges';
 import OracleSearch from '../components/OracleSearch';
 import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
+import MiniLattice from '../components/MiniLattice';
 
 const PILLARS = [
   { title: 'Practice', color: '#D8B4FE', items: [
@@ -297,6 +298,9 @@ export default function SovereignHub() {
 
       {/* V68.4 — Active Mission HUD (inline, below wallet pills) */}
       <ActiveMissionHUD />
+
+      {/* V68.6 — Sovereign Mini-Lattice (9x9 crystalline journey) */}
+      <MiniLattice />
 
       {/* Utility Row: Sign In / Share / Sign Out */}
       <div className="flex justify-center gap-3 px-4 pb-6">

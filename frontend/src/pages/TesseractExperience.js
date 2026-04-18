@@ -46,6 +46,7 @@ import { DwellBloomIndicatorSimple } from '../components/DwellBloomIndicator';
 
 // SOVEREIGN: True 3D WebGL Lattice
 import TesseractCanvas from '../components/TesseractCanvas';
+import { useImmersionPresence } from '../hooks/useImmersionPresence';
 
 // MOB-01: Touch Normalization for mobile
 import { useTouchNormalization, normalizeTouch } from '../hooks/useTouchNormalization';
@@ -387,6 +388,7 @@ ActionButtons.displayName = 'ActionButtons';
 
 export default function TesseractExperience() {
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('tesseract', 8); }, []);
+  useImmersionPresence('tesseract');
 
   const navigate = useNavigate();
   

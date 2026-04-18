@@ -12,6 +12,7 @@
  * Respects Thin-Client philosophy — no UI, no new deps, pure hook.
  */
 import { useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 
@@ -20,8 +21,22 @@ const TICK_MS = 60000; // 60 seconds
 
 export function useImmersionPresence(sceneId, options = {}) {
   const { silent = false } = options;
+  const location = useLocation();
   const timerRef = useRef(null);
   const activeRef = useRef(true); // true when tab visible + focused
+
+  // V68.6 Scout Activation: fire /main-brain/activate on mount only
+  // (pull-based intentionality — entering a scene IS the signal)
+  useEffect(() => {
+    if (!sceneId) return;
+    const token = localStorage.getItem('zen_token');
+    if (!token || token === 'guest_token') return;
+    axios.post(
+      `${API}/main-brain/activate`,
+      { path: location.pathname },
+      { headers: { Authorization: `Bearer ${token}` } }
+    ).catch(() => {});
+  }, [sceneId, location.pathname]);
 
   useEffect(() => {
     if (!sceneId) return;

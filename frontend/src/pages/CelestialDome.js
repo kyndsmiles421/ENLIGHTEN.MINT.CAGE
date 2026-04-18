@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSpatialAudio, SOLFEGGIO_FREQUENCIES } from '../engines/SpatialAudioEngine';
+import { useImmersionPresence } from '../hooks/useImmersionPresence';
 import axios from 'axios';
 
 const SPARK_API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -29,6 +30,7 @@ const API = process.env.REACT_APP_BACKEND_URL;
 
 export default function CelestialDome() {
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('celestial_dome', 8); }, []);
+  useImmersionPresence('celestial_dome');
 
   // Sparks immersion timer — 1 Spark per minute in the Dome
   useEffect(() => {

@@ -14,11 +14,11 @@ ROUTES:
 - GET  /api/main-brain/shader-params - Get GPU shader uniforms for L² Fractal
 """
 
-from fastapi import APIRouter, HTTPException
-from deps import logger
+from fastapi import APIRouter, HTTPException, Body, Depends
+from deps import logger, db, get_current_user
 from datetime import datetime, timezone
 
-from utils.sovereign_main_brain import main_brain
+from utils.sovereign_main_brain import main_brain, activate_node_for_route, get_coord_for_route, ROUTE_TO_COORD
 
 
 router = APIRouter()
@@ -157,3 +157,98 @@ async def get_sacred_constants():
             "resonance_flow": "(RESONANCE^PHI) + (PHI^PHI)",
         },
     }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# 🗺 V68.6 — ROUTE ACTIVATION ENDPOINTS (Scout Mode)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.post("/main-brain/activate")
+async def activate_route(data: dict = Body(...), user=Depends(get_current_user)):
+    """
+    Pull-based intentionality: the client calls this ONLY when a module is
+    actually entered (workshop, practice, 3D scene). Menu hops are noise.
+    Marks the lattice node as active + records the activation in the user's
+    personal pattern (for the Mini-Lattice visualization).
+    """
+    path = str(data.get("path", "")).strip()
+    if not path:
+        raise HTTPException(status_code=400, detail="path required")
+
+    # Activate the global lattice node (PHI-weighted charge bump)
+    activation = activate_node_for_route(path)
+    if not activation:
+        # Unmapped route — record it but don't fail
+        return {"activated": False, "reason": "route_not_mapped", "path": path}
+
+    # Record user-specific activation
+    now = datetime.now(timezone.utc).isoformat()
+    coord = activation["coord"]
+    await db.lattice_activations.update_one(
+        {"user_id": user["id"], "x": coord["x"], "y": coord["y"]},
+        {
+            "$set": {
+                "user_id": user["id"],
+                "x": coord["x"],
+                "y": coord["y"],
+                "path": path,
+                "type": activation["type"],
+                "last_activation": now,
+            },
+            "$inc": {"activation_count": 1},
+            "$setOnInsert": {"first_activation": now},
+        },
+        upsert=True,
+    )
+
+    return {
+        "activated": True,
+        "path": path,
+        "coord": coord,
+        "node_type": activation["type"],
+        "charge": activation["charge"],
+        "resonance": activation["resonance"],
+    }
+
+
+@router.get("/main-brain/user-lattice")
+async def get_user_lattice(user=Depends(get_current_user)):
+    """
+    Returns the user's personal 9x9 activation pattern: which nodes they've
+    visited, how many times, and the user's resonance flow across the grid.
+    """
+    cursor = db.lattice_activations.find(
+        {"user_id": user["id"]},
+        {"_id": 0},
+    ).sort("last_activation", -1)
+    activations = await cursor.to_list(length=100)
+
+    # Build a flat 9x9 map for the UI — zero fallback for unvisited
+    flat = [[None for _ in range(main_brain.LATTICE_SIZE)] for _ in range(main_brain.LATTICE_SIZE)]
+    last_path = []  # chronological walk (most recent last)
+    for a in activations:
+        x, y = a["x"], a["y"]
+        flat[y][x] = {
+            "count": a.get("activation_count", 1),
+            "type": a.get("type"),
+            "path": a.get("path"),
+            "last_activation": a.get("last_activation"),
+        }
+    # Last path = reverse chronological → chronological, dedup adjacent repeats, limit to 8
+    chrono = list(reversed(activations))[-8:]
+    last_path = [{"x": a["x"], "y": a["y"], "type": a.get("type"), "path": a.get("path")} for a in chrono]
+
+    return {
+        "lattice_size": main_brain.LATTICE_SIZE,
+        "center": list(main_brain.CENTER_NODE),
+        "flat": flat,
+        "last_path": last_path,
+        "total_activations": sum(a.get("activation_count", 1) for a in activations),
+        "unique_nodes_visited": len(activations),
+    }
+
+
+@router.get("/main-brain/route-map")
+async def get_route_map():
+    """Expose the route→coordinate mapping so clients can pre-highlight."""
+    return {"mapping": ROUTE_TO_COORD, "lattice_size": main_brain.LATTICE_SIZE}

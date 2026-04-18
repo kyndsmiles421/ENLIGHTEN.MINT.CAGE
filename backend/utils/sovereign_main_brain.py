@@ -409,6 +409,130 @@ main_brain = SovereignMainBrain()
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
+# 🗺 ROUTE → LATTICE COORDINATE MAP (V68.6 Scout Activation)
+# The Main Brain owns the single source of truth: every route in the app is
+# assigned an (x, y) position on the 9x9 grid. NODE_TYPE is determined by the
+# existing geometric logic in _calculate_node_type(), not by the route.
+# Adjacent routes share adjacent coordinates so the user's journey traces a
+# geometrically meaningful path across the lattice.
+# ═══════════════════════════════════════════════════════════════════════════════
+
+ROUTE_TO_COORD = {
+    # CORE (center)
+    "/sovereign-hub":       (4, 4),
+    "/tesseract":           (4, 4),
+
+    # ORACLE ring (divination, deep-sight)
+    "/oracle":              (2, 4),
+    "/observatory":         (6, 4),
+    "/vr/celestial-dome":   (7, 3),
+    "/star-chart":          (7, 5),
+    "/dreams":              (1, 3),
+    "/dream-realms":        (1, 5),
+    "/enlightenment-os":    (4, 2),
+    "/divination-oracle":   (3, 4),
+
+    # PORTAL (corners + extended corners — realms & navigation)
+    "/multiverse-realms":   (0, 0),
+    "/multiverse-map":      (8, 0),
+    "/dimensional-space":   (0, 8),
+    "/vr":                  (8, 8),
+    "/planetary-depths":    (1, 1),
+    "/quantum-field":       (7, 7),
+    "/cosmic-map":          (1, 7),
+    "/starseed":            (7, 1),
+    "/starseed-adventure":  (6, 0),
+    "/starseed-realm":      (2, 0),
+    "/starseed-worlds":     (0, 6),
+
+    # MIXER (audio / frequency — top + bottom rails)
+    "/soundscapes":         (3, 0),
+    "/meditation":          (5, 0),
+    "/breathing":           (4, 0),
+    "/meditation-history":  (4, 1),
+    "/instruments":         (3, 1),
+    "/sound-healing":       (5, 1),
+
+    # GENERATOR (creation / AI)
+    "/academy":             (4, 6),
+    "/creator-console":     (3, 6),
+    "/evolution-lab":       (5, 6),
+    "/ai-broker":           (3, 7),
+    "/sage":                (5, 7),
+    "/omni":                (4, 7),
+    "/refinement":          (2, 6),
+    "/daily-briefing":      (6, 6),
+
+    # LEDGER (economy)
+    "/trade-passport":      (6, 4),
+    "/membership":          (6, 3),
+    "/marketplace":         (6, 5),
+    "/sovereign-ledger":    (7, 4),
+    "/sparks-gallery":      (6, 2),
+
+    # RELAY (interconnect — edges & practice paths)
+    "/mudras":              (3, 2),
+    "/acupressure":         (5, 2),
+    "/reiki":               (2, 3),
+    "/nourishment":         (6, 5),
+    "/herbology":           (2, 5),
+    "/elixirs":             (6, 5),
+    "/aromatherapy":         (3, 5),
+    "/crystals":            (5, 5),
+
+    # VAULT (collections / assets)
+    "/seed-gallery":        (0, 4),
+    "/seed-hunt":           (0, 3),
+    "/sacred-texts":        (0, 5),
+    "/codex":               (1, 4),
+
+    # SHIELD (corners near border — protection & identity)
+    "/auth":                (8, 4),
+    "/profile":             (8, 3),
+    "/settings":            (8, 5),
+}
+
+
+def get_coord_for_route(path: str) -> tuple | None:
+    """Resolve a route path (including /workshop/:id patterns) to (x, y)."""
+    if not path:
+        return None
+    # Exact match
+    if path in ROUTE_TO_COORD:
+        return ROUTE_TO_COORD[path]
+    # Workshop modules → deterministic hash into RELAY ring
+    if path.startswith("/workshop/"):
+        slug = path[len("/workshop/"):].split("/", 1)[0]
+        # Hash the slug to a stable position on RELAY ring
+        h = sum(ord(c) for c in slug) if slug else 0
+        # 16 RELAY edge positions: top/bottom rows 2 and 6, cols 1-7 excluding center columns
+        relay_positions = [(i, 2) for i in [2, 3, 4, 5, 6]] + [(i, 6) for i in [1, 2, 6, 7]] + [(2, i) for i in [3, 5]] + [(6, i) for i in [3, 5]]
+        return relay_positions[h % len(relay_positions)]
+    # Default to CORE
+    return None
+
+
+def activate_node_for_route(path: str) -> dict | None:
+    """Activate the lattice node corresponding to a route. Updates charge + active flag."""
+    coord = get_coord_for_route(path)
+    if not coord:
+        return None
+    x, y = coord
+    node = main_brain.lattice[y][x]
+    node["active"] = True
+    # PHI-weighted charge bump
+    node["charge"] = round(min(1.0, node["charge"] + (1.0 / main_brain.PHI) * 0.2), 4)
+    node["resonance"] = round(main_brain.RESONANCE_CONST * node["charge"], 6)
+    node["last_activation"] = datetime.now(timezone.utc).isoformat()
+    return {
+        "coord": {"x": x, "y": y},
+        "type": node["type_name"],
+        "charge": node["charge"],
+        "resonance": node["resonance"],
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
 # 🔧 CONVENIENCE FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════════════
 
