@@ -114,6 +114,74 @@ class DeleteConfirm(BaseModel):
     confirm: str  # must equal "DELETE"
 
 
+# Collections tracked by user_id (shared by export + delete)
+USER_SCOPED_COLLECTIONS = [
+    "users", "user_credits", "sparks_wallet", "spark_wallets", "quest_progress",
+    "rpg_characters", "rpg_inventory", "rpg_parties", "rpg_quest_log", "rpg_xp_log",
+    "universe_signals", "presence_log", "resonance_patterns", "council_links",
+    "gaming_cards", "lattice_nodes", "user_lattice", "notifications",
+    "starseed_characters", "starseed_encounters", "avatars",
+    "creator_earnings", "creator_payouts", "invite_codes_redeemed",
+    "push_subscriptions", "meditation_sessions", "journal_entries",
+    "mood_logs", "ritual_logs", "oracle_draws", "workshop_progress",
+]
+
+
+@router.get("/auth/export")
+async def export_account(user=Depends(get_current_user)):
+    """Export all user-scoped data as a single JSON bundle (GDPR Art. 20)."""
+    uid = user["id"]
+
+    # Fetch fresh user doc so we have the real email + confirm not deleted
+    me = await db.users.find_one({"id": uid}, {"_id": 0, "password": 0})
+    if not me:
+        raise HTTPException(status_code=404, detail="Account not found")
+    email = me.get("email", "")
+
+    export_data = {
+        "export_metadata": {
+            "exported_at": datetime.now(timezone.utc).isoformat(),
+            "user_id": uid,
+            "email": email,
+            "format": "ENLIGHTEN.MINT.CAFE Sovereign Data Export v1",
+            "notice": "This bundle contains all data associated with your account. "
+                      "Retain it as a personal backup. Importing into another instance "
+                      "is not currently supported.",
+        },
+        "collections": {},
+    }
+
+    total_docs = 0
+    for coll in USER_SCOPED_COLLECTIONS:
+        try:
+            # Never return the bcrypt password hash in the export
+            projection = {"_id": 0, "password": 0} if coll == "users" else {"_id": 0}
+            cursor = db[coll].find({"user_id": uid}, projection) if coll != "users" \
+                     else db[coll].find({"id": uid}, projection)
+            rows = await cursor.to_list(length=None)
+            if rows:
+                export_data["collections"][coll] = rows
+                total_docs += len(rows)
+        except Exception as e:
+            logger.warning(f"AUTH: export skipped {coll} | {e}")
+
+    # Also pull rows keyed by email
+    for coll, field in [("email_subscriptions", "email"), ("waitlist", "email")]:
+        try:
+            rows = await db[coll].find({field: email}, {"_id": 0}).to_list(length=None)
+            if rows:
+                export_data["collections"][coll] = rows
+                total_docs += len(rows)
+        except Exception:
+            pass
+
+    export_data["export_metadata"]["total_documents"] = total_docs
+    export_data["export_metadata"]["total_collections"] = len(export_data["collections"])
+
+    logger.info(f"AUTH: export generated | user_id={uid} docs={total_docs} collections={len(export_data['collections'])}")
+    return export_data
+
+
 @router.delete("/auth/me")
 async def delete_account(data: DeleteConfirm, user=Depends(get_current_user)):
     """Permanently delete the authenticated user and all associated data."""
@@ -123,38 +191,24 @@ async def delete_account(data: DeleteConfirm, user=Depends(get_current_user)):
     uid = user["id"]
     email = user.get("email", "")
 
-    # Every collection that may hold user-scoped data. Missing collections are skipped silently.
-    user_id_collections = [
-        "users", "user_credits", "sparks_wallet", "spark_wallets", "quest_progress",
-        "rpg_characters", "rpg_inventory", "rpg_parties", "rpg_quest_log", "rpg_xp_log",
-        "universe_signals", "presence_log", "resonance_patterns", "council_links",
-        "gaming_cards", "lattice_nodes", "user_lattice", "notifications",
-        "starseed_characters", "starseed_encounters", "avatars",
-        "creator_earnings", "creator_payouts", "invite_codes_redeemed",
-        "push_subscriptions", "meditation_sessions", "journal_entries",
-        "mood_logs", "ritual_logs", "oracle_draws", "workshop_progress",
-    ]
-    email_collections = [
-        ("email_subscriptions", "email"),
-        ("waitlist", "email"),
-    ]
-
     deleted_counts = {}
-    for coll in user_id_collections:
+    for coll in USER_SCOPED_COLLECTIONS:
         try:
+            if coll == "users":
+                continue  # deleted explicitly below
             res = await db[coll].delete_many({"user_id": uid})
             if res.deleted_count:
                 deleted_counts[coll] = res.deleted_count
         except Exception:
             pass
-    # Also purge rows keyed by "id" (the user document itself)
+    # Purge the user document itself
     try:
         res = await db.users.delete_many({"id": uid})
         if res.deleted_count:
-            deleted_counts["users"] = deleted_counts.get("users", 0) + res.deleted_count
+            deleted_counts["users"] = res.deleted_count
     except Exception:
         pass
-    for coll, field in email_collections:
+    for coll, field in [("email_subscriptions", "email"), ("waitlist", "email")]:
         try:
             res = await db[coll].delete_many({field: email})
             if res.deleted_count:

@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import {
   ArrowLeft, Volume2, VolumeX, Eye, Palette, Sparkles, Monitor,
   Moon, Sun, TreePine, Zap, Shield, Bell, ChevronRight, Type, Contrast, Globe, Check,
-  Trash2, AlertTriangle, LogOut, Loader2
+  Trash2, AlertTriangle, LogOut, Loader2, Download
 } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
@@ -102,6 +102,33 @@ export default function Settings() {
   const [dangerOpen, setDangerOpen]   = useState(false);
   const [deleteText, setDeleteText]   = useState('');
   const [deleting, setDeleting]       = useState(false);
+  const [exporting, setExporting]     = useState(false);
+
+  const handleDataExport = async () => {
+    if (exporting) return;
+    setExporting(true);
+    try {
+      const res = await axios.get(`${API}/auth/export`, { headers: authHeaders });
+      const meta = res.data?.export_metadata || {};
+      const json = JSON.stringify(res.data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      const stamp = new Date().toISOString().slice(0, 10);
+      a.href     = url;
+      a.download = `enlightenmintcafe-export-${stamp}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success(`Exported ${meta.total_documents || 0} records across ${meta.total_collections || 0} collections`);
+    } catch (err) {
+      const msg = err?.response?.data?.detail || err?.message || 'Export failed';
+      toast.error(msg);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const handleDeleteAccount = async () => {
     if (deleteText !== 'DELETE') {
@@ -401,7 +428,34 @@ export default function Settings() {
         {user && (
           <div className="mb-6" data-testid="danger-zone">
             <p className="text-[10px] uppercase tracking-widest font-bold mb-3 px-1"
-              style={{ color: '#EF4444' }}>Danger Zone</p>
+              style={{ color: '#EF4444' }}>Your Data & Account</p>
+
+            {/* Data Export — GDPR Art. 20 (always visible, always one-click) */}
+            <div className="rounded-xl overflow-hidden mb-3"
+              style={{ background: 'rgba(129,140,248,0.04)', border: '1px solid rgba(129,140,248,0.18)' }}>
+              <button
+                onClick={handleDataExport}
+                disabled={exporting}
+                className="w-full flex items-center justify-between px-4 py-3 text-left transition-all hover:bg-indigo-500/[0.04]"
+                style={{ opacity: exporting ? 0.6 : 1, cursor: exporting ? 'wait' : 'pointer' }}
+                data-testid="export-data-btn">
+                <div className="flex items-center gap-3">
+                  {exporting
+                    ? <Loader2 size={14} className="animate-spin" style={{ color: '#818CF8' }} />
+                    : <Download size={14} style={{ color: '#818CF8' }} />}
+                  <div>
+                    <p className="text-xs font-medium" style={{ color: '#818CF8' }}>
+                      {exporting ? 'Preparing your bundle…' : 'Download My Data'}
+                    </p>
+                    <p className="text-[9px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                      Export every Spark, quest, inventory item and resonance record as a JSON file.
+                    </p>
+                  </div>
+                </div>
+                <ChevronRight size={12} style={{ color: '#818CF8' }} />
+              </button>
+            </div>
+
             <div className="rounded-xl overflow-hidden"
               style={{ background: 'rgba(239,68,68,0.03)', border: '1px solid rgba(239,68,68,0.15)' }}>
               {!dangerOpen ? (
