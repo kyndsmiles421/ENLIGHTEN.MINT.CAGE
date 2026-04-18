@@ -33,9 +33,20 @@ Creative Arts (1), Mind & Spirit (1), Exploration (2). 162 materials × 6-depth 
   - Inline pill beneath Spark Wallet in `SovereignHub.js`
   - Expands inline to reveal step list, hint, jump-to links
   - Shows auto-advance toast ribbons (inline — no fixed overlay)
+  - Plays 528Hz Solfeggio ping on step advance, triple-chord on quest complete
+  - Inline Gaming Card cinematic on quest complete (no modal)
 - **Tier Gating** (`/app/frontend/src/components/TierGate.js`)
   - `/evolution-lab` + `/vr/celestial-dome` require `celestial_navigator` Gaming Card
   - Creator/admin/council bypass. Guests get sign-in CTA.
+- **Terminal Signal Triggers** (`/app/frontend/src/components/QuestTerminalTrigger.js`)
+  - Mounted on `/tesseract`, `/dream-realms`, `/observatory`
+  - Renders inline only when prior quest steps are complete — self-hides otherwise
+- **Solfeggio Tone Utility** (`/app/frontend/src/utils/solfeggioTone.js`)
+  - Web Audio API bell-envelope oscillators (no new deps)
+  - 528Hz "transformation" tone + 528/639/741 chord stack on quest complete
+- **Card-earned API fix** (`/app/backend/routes/sparks.py` + `sovereign_universe.py`)
+  - `/sparks/wallet`, `/sparks/cards`, `/universe/state` now merge threshold-based
+    AND quest-reward cards (e.g. tesseract_key is visible even at 2398 sparks)
 - **Workshop Signal Wiring** (`UniversalWorkshop.js`)
   - `handleMatTap` fires `<module>:material:<id>` when user opens a dive
   - "Dive Deeper" fires `<module>:dive:<material>:<depth>`

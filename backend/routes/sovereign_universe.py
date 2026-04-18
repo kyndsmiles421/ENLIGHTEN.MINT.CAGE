@@ -21,8 +21,13 @@ async def get_universe_state(user=Depends(get_current_user)):
     """Aggregate: wallet + quests progress — one round-trip for the Hub."""
     wallet = await get_spark_wallet(user["id"], user.get("role", "user"))
     sparks = wallet["sparks"]
-    earned_cards = [c for c in GAMING_CARDS if sparks >= c["spark_threshold"]]
-    next_card = next((c for c in GAMING_CARDS if sparks < c["spark_threshold"]), None)
+    earned_ids = {c["id"] for c in GAMING_CARDS if sparks >= c["spark_threshold"]}
+    for ce in wallet.get("cards_earned", []):
+        cid = ce.get("card_id") if isinstance(ce, dict) else None
+        if cid:
+            earned_ids.add(cid)
+    earned_cards = [c for c in GAMING_CARDS if c["id"] in earned_ids]
+    next_card = next((c for c in GAMING_CARDS if c["id"] not in earned_ids), None)
 
     progress = await db.quest_progress.find_one({"user_id": user["id"]}, {"_id": 0}) or {}
     quests_out = []

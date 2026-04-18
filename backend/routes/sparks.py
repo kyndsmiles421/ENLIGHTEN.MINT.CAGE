@@ -72,8 +72,16 @@ async def get_spark_wallet(user_id: str, role: str = "user") -> dict:
 async def get_sparks(user=Depends(get_current_user)):
     wallet = await get_spark_wallet(user["id"], user.get("role", "user"))
     sparks = wallet["sparks"]
-    earned_cards = [c for c in GAMING_CARDS if sparks >= c["spark_threshold"]]
-    next_card = next((c for c in GAMING_CARDS if sparks < c["spark_threshold"]), None)
+    # Threshold-based cards
+    earned_ids = {c["id"] for c in GAMING_CARDS if sparks >= c["spark_threshold"]}
+    # Add quest-reward cards persisted in wallet.cards_earned (deduped)
+    for ce in wallet.get("cards_earned", []):
+        cid = ce.get("card_id") if isinstance(ce, dict) else None
+        if cid:
+            earned_ids.add(cid)
+    earned_cards = [c for c in GAMING_CARDS if c["id"] in earned_ids]
+    # Next card = lowest-threshold unearned
+    next_card = next((c for c in GAMING_CARDS if c["id"] not in earned_ids), None)
     return {
         "sparks": sparks,
         "total_earned": wallet["total_earned"],
@@ -148,7 +156,13 @@ async def log_immersion(data: dict = Body(...), user=Depends(get_current_user)):
 async def get_all_cards(user=Depends(get_current_user)):
     wallet = await get_spark_wallet(user["id"], user.get("role", "user"))
     sparks = wallet["sparks"]
-    cards = [{**c, "earned": sparks >= c["spark_threshold"], "progress": round(min(sparks / c["spark_threshold"], 1.0), 3)} for c in GAMING_CARDS]
+    # Union of threshold + quest-reward cards
+    quest_reward_ids = {ce.get("card_id") for ce in wallet.get("cards_earned", []) if isinstance(ce, dict)}
+    cards = [{
+        **c,
+        "earned": (sparks >= c["spark_threshold"]) or (c["id"] in quest_reward_ids),
+        "progress": round(min(sparks / c["spark_threshold"], 1.0), 3),
+    } for c in GAMING_CARDS]
     return {"cards": cards, "sparks": sparks}
 
 
