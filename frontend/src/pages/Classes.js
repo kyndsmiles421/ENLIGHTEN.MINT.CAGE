@@ -91,7 +91,7 @@ export default function Classes() {
     const nextLesson = classDetail.lessons[lessonIndex + 1];
 
     return (
-      <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+      <div className="min-h-screen pt-20 pb-40 px-5" style={{ background: 'transparent' }}>
         <div className="max-w-4xl mx-auto">
           <button onClick={() => setOpenLesson(null)}
             className="text-sm mb-6 flex items-center gap-1" style={{ color: 'var(--text-muted)' }}
@@ -175,7 +175,7 @@ export default function Classes() {
     const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
 
     return (
-      <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+      <div className="min-h-screen pt-20 pb-40 px-5" style={{ background: 'transparent' }}>
         <div className="max-w-4xl mx-auto">
           <button onClick={() => { setSelectedClass(null); setClassDetail(null); }}
             className="text-sm mb-6 flex items-center gap-1" style={{ color: 'var(--text-muted)' }}
@@ -280,7 +280,7 @@ export default function Classes() {
 
   // Catalog / My Classes / Certifications
   return (
-    <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+    <div className="min-h-screen pt-20 pb-40 px-5" style={{ background: 'transparent' }}>
       <div className="max-w-3xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: '#FCD34D' }}>

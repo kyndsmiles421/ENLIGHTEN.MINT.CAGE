@@ -80,7 +80,7 @@ export default function SovereignArchitecture() {
   const UserIcon = TIER_ICONS[userTier];
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: '#0A0A0F', color: '#F8FAFC' }} data-testid="sovereign-architecture-page">
+    <div className="min-h-screen pb-40" style={{ background: '#0A0A0F', color: '#F8FAFC' }} data-testid="sovereign-architecture-page">
       {/* Ambient glow */}
       <div className="fixed inset-0 pointer-events-none" style={{
         background: `radial-gradient(ellipse at 30% 20%, ${userColor}08 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(139,92,246,0.04) 0%, transparent 50%)`,

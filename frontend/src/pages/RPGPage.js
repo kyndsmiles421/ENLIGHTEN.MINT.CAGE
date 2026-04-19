@@ -460,7 +460,7 @@ export default function RPGPage() {
   });
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }} data-testid="rpg-page">
+    <div className="min-h-screen pb-40" style={{ background: 'var(--bg-primary)' }} data-testid="rpg-page">
       {/* Persistent Sovereign HUD — follows user through every stage */}
       <SovereignStageHUD anchor="bottom-left" compact />
 

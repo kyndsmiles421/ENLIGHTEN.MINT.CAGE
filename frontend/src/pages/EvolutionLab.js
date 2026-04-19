@@ -378,7 +378,7 @@ export default function EvolutionLab() {
       clearVisionActive={controller.clearVisionActive}
       moduleName="evolution-lab">
 
-      <div className="min-h-screen pb-24" data-testid="evolution-lab-page">
+      <div className="min-h-screen pb-40" data-testid="evolution-lab-page">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3">
           <button onClick={() => navigate(-1)} className="p-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)' }}

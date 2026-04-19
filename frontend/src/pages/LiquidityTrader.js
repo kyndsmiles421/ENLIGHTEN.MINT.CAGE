@@ -560,7 +560,7 @@ export default function LiquidityTrader() {
   ];
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'transparent' }} data-testid="liquidity-trader-page">
+    <div className="min-h-screen pb-40" style={{ background: 'transparent' }} data-testid="liquidity-trader-page">
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'rgba(3,3,8,0.9)', backdropFilter: 'none'}}>
         <button onClick={() => navigate(-1)} className="p-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)' }} data-testid="trader-back-btn">

@@ -360,7 +360,7 @@ export default function DanceMusicStudio() {
   ];
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }} data-testid="dance-music-studio">
+    <div className="min-h-screen pb-40" style={{ background: 'var(--bg-primary)' }} data-testid="dance-music-studio">
       {/* Header */}
       <div className="px-6 pt-8 pb-4">
         <motion.h1 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}

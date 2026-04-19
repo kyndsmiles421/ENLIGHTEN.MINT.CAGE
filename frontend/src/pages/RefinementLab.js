@@ -312,7 +312,7 @@ export default function RefinementLab() {
       clearVisionActive={controller.clearVisionActive}
       moduleName="refinement-lab">
 
-      <div className="min-h-screen pb-24" data-testid="refinement-lab-page">
+      <div className="min-h-screen pb-40" data-testid="refinement-lab-page">
         <div className="flex items-center justify-between px-4 py-3">
           <button onClick={() => navigate(-1)} className="p-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)' }}
             data-testid="refine-back-btn">

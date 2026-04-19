@@ -54,7 +54,7 @@ export default function FeedbackPage() {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-4 max-w-2xl mx-auto" data-testid="feedback-page">
+    <div className="min-h-screen pt-20 pb-40 px-4 max-w-2xl mx-auto" data-testid="feedback-page">
       <div className="flex items-center gap-3 mb-6">
         <button onClick={() => navigate(-1)} className="p-2 rounded-lg hover:bg-white/5" data-testid="feedback-back">
           <ArrowLeft size={18} style={{ color: 'var(--text-muted)' }} />

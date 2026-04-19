@@ -441,7 +441,7 @@ export default function Teachings() {
     : teachers;
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-5" data-testid="teachings-page">
+    <div className="min-h-screen pt-20 pb-40 px-5" data-testid="teachings-page">
       <div className="max-w-4xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {activeTeacher ? (

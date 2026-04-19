@@ -142,7 +142,7 @@ export default function SpiritualAvatarCreator() {
   const hasSelections = Object.values(selections).some(v => v && (Array.isArray(v) ? v.length > 0 : true));
 
   return (
-    <div className="min-h-screen pb-24 relative" style={{ background: 'var(--bg-primary)' }}>
+    <div className="min-h-screen pb-40 relative" style={{ background: 'var(--bg-primary)' }}>
       <CosmicBg reduceParticles={reduceParticles} />
 
       {/* Header */}

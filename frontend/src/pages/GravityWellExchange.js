@@ -43,7 +43,7 @@ export default function GravityWellExchange() {
   if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: 'transparent' }}><Sparkles className="animate-spin" color="#2DD4BF" /></div>;
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'transparent' }} data-testid="gravity-well-page">
+    <div className="min-h-screen pb-40" style={{ background: 'transparent' }} data-testid="gravity-well-page">
       <div className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'rgba(3,3,8,0.9)', backdropFilter: 'none'}}>
         <button onClick={() => navigate(-1)} className="p-2 rounded-xl" style={{ background: 'rgba(255,255,255,0.04)' }} data-testid="gravity-back-btn"><ArrowLeft size={16} color="#F8FAFC" /></button>
         <h1 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Gravity Well Exchange</h1>

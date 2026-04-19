@@ -146,7 +146,7 @@ export default function RockHounding() {
       visualDirectives={controller.visualDirectives}
       biomeContext={controller.biomeContext}>
 
-      <div className="pb-24" data-testid="rock-hounding-page">
+      <div className="pb-40" data-testid="rock-hounding-page">
         {/* Header */}
         <div className="px-4 pt-4 pb-3 flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-lg flex items-center justify-center"

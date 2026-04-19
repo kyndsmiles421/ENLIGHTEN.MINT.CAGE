@@ -286,7 +286,7 @@ export default function Oracle() {
 
   return (
     
-      <div className="pt-16 pb-24 px-5" style={{ position: 'relative', zIndex: 2 }}>
+      <div className="pt-16 pb-40 px-5" style={{ position: 'relative', zIndex: 2 }}>
       {/* Crystal Transition Overlay */}
       <AnimatePresence>
         {isTransitioning && (

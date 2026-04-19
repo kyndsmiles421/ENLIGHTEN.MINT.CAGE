@@ -655,7 +655,7 @@ export default function AcademyPage() {
   const filteredPrograms = activeZone ? programs.filter(p => p.zone === activeZone) : programs;
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-5 max-w-3xl mx-auto" style={{ background: 'transparent' }}>
+    <div className="min-h-screen pt-20 pb-40 px-5 max-w-3xl mx-auto" style={{ background: 'transparent' }}>
       <ImmersiveOverlay active={intensity === 'immersive'} />
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>

@@ -532,7 +532,7 @@ export default function DreamRealms() {
 
   return (
     <ProgressGate gateId="dream-realms" color="#C084FC">
-    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }} data-testid="dream-realms-page">
+    <div className="min-h-screen pb-40" style={{ background: 'var(--bg-primary)' }} data-testid="dream-realms-page">
       {/* V68.4 — Quest Terminal: Extinguish the Fire */}
       <QuestTerminalTrigger signal="dream_realms:fire_extinguish" label="Extinguish the Wildfire" hint="Apply your Fire Triangle knowledge now." color="#EF4444" />
 

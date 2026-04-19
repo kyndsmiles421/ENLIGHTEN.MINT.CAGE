@@ -585,7 +585,7 @@ export default function Games() {
   if (activeGame) {
     const GameComponent = activeGame.Component;
     return (
-      <div className="min-h-screen pt-20 pb-24 px-5 max-w-2xl mx-auto" style={{ background: 'transparent' }} data-testid="games-page">
+      <div className="min-h-screen pt-20 pb-40 px-5 max-w-2xl mx-auto" style={{ background: 'transparent' }} data-testid="games-page">
         <button onClick={() => setActiveGame(null)}
           className="flex items-center gap-2 text-xs mb-8 group" style={{ color: 'rgba(255,255,255,0.5)' }}
           data-testid="game-back-btn">
@@ -618,7 +618,7 @@ export default function Games() {
   ];
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-5 max-w-3xl mx-auto" style={{ background: 'transparent' }} data-testid="games-page">
+    <div className="min-h-screen pt-20 pb-40 px-5 max-w-3xl mx-auto" style={{ background: 'transparent' }} data-testid="games-page">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-2 mb-1">
           <Gamepad2 size={14} style={{ color: '#FCD34D' }} />

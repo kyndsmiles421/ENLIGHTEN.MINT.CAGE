@@ -363,7 +363,7 @@ export default function Challenges() {
   const totalCheckins = myChallenges.reduce((a, m) => a + (m.total_checkins || 0), 0);
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+    <div className="min-h-screen pt-20 pb-40 px-5" style={{ background: 'transparent' }}>
       <div className="max-w-3xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.25em] mb-4" style={{ color: '#FCD34D' }}>

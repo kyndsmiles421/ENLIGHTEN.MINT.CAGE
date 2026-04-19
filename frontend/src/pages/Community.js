@@ -474,7 +474,7 @@ export default function Community() {
   };
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+    <div className="min-h-screen pt-20 pb-40 px-5" style={{ background: 'transparent' }}>
       <div className="max-w-3xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-start justify-between mb-12">

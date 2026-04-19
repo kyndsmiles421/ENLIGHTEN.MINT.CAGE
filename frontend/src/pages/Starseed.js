@@ -94,7 +94,7 @@ export default function Starseed() {
   const restart = () => { setPhase('intro'); setChapter(null); setPath([]); };
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'radial-gradient(ellipse at 30% 20%, rgba(129,140,248,0.06) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(192,132,252,0.04) 0%, transparent 50%), var(--bg-primary)' }}>
+    <div className="min-h-screen pb-40" style={{ background: 'radial-gradient(ellipse at 30% 20%, rgba(129,140,248,0.06) 0%, transparent 60%), radial-gradient(ellipse at 70% 80%, rgba(192,132,252,0.04) 0%, transparent 50%), var(--bg-primary)' }}>
       <div className="px-4 pt-4 max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">

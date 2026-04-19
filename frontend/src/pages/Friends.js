@@ -784,7 +784,7 @@ export default function Friends() {
   if (authLoading) return null;
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }} data-testid="friends-page">
+    <div className="min-h-screen pt-20 pb-40 px-5" style={{ background: 'transparent' }} data-testid="friends-page">
       <ShareModal open={showShare} onClose={() => setShowShare(false)} authHeaders={authHeaders} />
 
       <div className="max-w-3xl mx-auto relative z-10">

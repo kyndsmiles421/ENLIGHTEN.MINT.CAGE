@@ -92,7 +92,7 @@ export default function MultiverseRealms() {
   }, [stopAll]);
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: activeRealm ? `linear-gradient(135deg, ${activeRealm.realm.gradient[0]}, ${activeRealm.realm.gradient[1]})` : 'radial-gradient(ellipse at 50% 20%, rgba(129,140,248,0.05) 0%, transparent 50%), var(--bg-primary)', transition: 'background 1s ease' }}>
+    <div className="min-h-screen pb-40" style={{ background: activeRealm ? `linear-gradient(135deg, ${activeRealm.realm.gradient[0]}, ${activeRealm.realm.gradient[1]})` : 'radial-gradient(ellipse at 50% 20%, rgba(129,140,248,0.05) 0%, transparent 50%), var(--bg-primary)', transition: 'background 1s ease' }}>
       <div className="px-4 pt-4 max-w-2xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">

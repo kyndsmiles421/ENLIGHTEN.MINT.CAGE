@@ -68,7 +68,7 @@ export default function CrystalMarketplace() {
   });
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'transparent', color: '#fff', fontFamily: 'monospace' }} data-testid="crystal-marketplace-page">
+    <div className="min-h-screen pb-40" style={{ background: 'transparent', color: '#fff', fontFamily: 'monospace' }} data-testid="crystal-marketplace-page">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-40" style={{ background: 'transparent', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <button onClick={() => navigate(-1)} className="p-2" data-testid="crystal-back-btn"><ArrowLeft size={16} /></button>

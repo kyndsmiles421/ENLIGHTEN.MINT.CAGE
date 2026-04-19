@@ -194,7 +194,7 @@ export default function Numerology() {
 
   return (
     
-      <div className="pt-20 pb-24 px-5" data-testid="numerology-page">
+      <div className="pt-20 pb-40 px-5" data-testid="numerology-page">
       <div className="max-w-3xl mx-auto relative z-10">
         <AnimatePresence mode="wait">
           {result ? (

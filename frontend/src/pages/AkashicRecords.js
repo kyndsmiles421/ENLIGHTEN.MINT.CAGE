@@ -268,7 +268,7 @@ export default function AkashicRecords() {
   }
 
   return (
-    <div className="min-h-screen px-4 pt-20 pb-24" data-testid="akashic-records-page">
+    <div className="min-h-screen px-4 pt-20 pb-40" data-testid="akashic-records-page">
       {!activeSession ? (
         <PromptSelector
           prompts={prompts}

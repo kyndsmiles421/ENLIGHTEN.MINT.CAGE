@@ -675,7 +675,7 @@ export default function StarseedWorlds() {
   });
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }}>
+    <div className="min-h-screen pb-40" style={{ background: 'var(--bg-primary)' }}>
       {/* Header */}
       <div className="sticky top-0 z-30 px-4 py-3 flex items-center gap-3"
         style={{ background: 'rgba(10,10,15,0.85)', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>

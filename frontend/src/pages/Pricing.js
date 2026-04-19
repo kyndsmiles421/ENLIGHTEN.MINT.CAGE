@@ -156,7 +156,7 @@ export default function Pricing() {
   const fromTrial = searchParams.get('from') === 'trial';
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }}>
+    <div className="min-h-screen pb-40" style={{ background: 'var(--bg-primary)' }}>
       {/* Polling overlay */}
       <AnimatePresence>
         {polling && (

@@ -279,7 +279,7 @@ export default function MusicLounge() {
   const isPaused = audioCtxRef.current?.state === 'suspended' && playing;
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-4 max-w-3xl mx-auto" data-testid="music-lounge-page">
+    <div className="min-h-screen pt-20 pb-40 px-4 max-w-3xl mx-auto" data-testid="music-lounge-page">
       {/* Header */}
       <div className="flex items-center gap-3 mb-8">
         <button onClick={() => navigate(-1)} className="p-2 rounded-lg hover:bg-white/5 transition-all" data-testid="music-back-btn">

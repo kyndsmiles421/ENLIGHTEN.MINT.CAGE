@@ -219,7 +219,7 @@ export default function CosmicInsights() {
   const journalData = i?.journal_report || {};
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }} data-testid="cosmic-insights-page">
+    <div className="min-h-screen pb-40" style={{ background: 'var(--bg-primary)' }} data-testid="cosmic-insights-page">
       {/* Header */}
       <div className="px-4 pt-4 pb-3 flex items-center gap-3">
         <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-lg flex items-center justify-center"

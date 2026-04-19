@@ -815,7 +815,7 @@ function Footer() {
 
   return (
     <>
-      <footer className="relative z-10 pt-20 pb-24 px-5 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
+      <footer className="relative z-10 pt-20 pb-40 px-5 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col items-center md:items-start gap-4">
             <span className="text-sm font-light" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-secondary)' }}>

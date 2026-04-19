@@ -786,7 +786,7 @@ export default function Journey() {
   // Lesson detail view
   if (activeLesson && activeStage) {
     return (
-      <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+      <div className="min-h-screen pt-20 pb-40 px-5" style={{ background: 'transparent' }}>
         <div className="max-w-3xl mx-auto">
           <CelebrationBurst active={celebrating} onComplete={() => setCelebrating(false)} />
           <LessonView
@@ -802,7 +802,7 @@ export default function Journey() {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+    <div className="min-h-screen pt-20 pb-40 px-5" style={{ background: 'transparent' }}>
       <div className="max-w-3xl mx-auto">
         <CelebrationBurst active={celebrating} onComplete={() => setCelebrating(false)} />
 

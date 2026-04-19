@@ -229,7 +229,7 @@ export default function Learn() {
   // Lesson view
   if (selectedLesson) {
     return (
-      <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+      <div className="min-h-screen pt-20 pb-40 px-5" style={{ background: 'transparent' }}>
         <div className="max-w-3xl mx-auto relative z-10">
           <button
             onClick={() => setSelectedLesson(null)}
@@ -254,7 +254,7 @@ export default function Learn() {
   // Module detail view
   if (selectedModule) {
     return (
-      <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }}>
+      <div className="min-h-screen pt-20 pb-40 px-5" style={{ background: 'transparent' }}>
         <div className="max-w-3xl mx-auto relative z-10">
           <button
             onClick={() => setSelectedModule(null)}
@@ -330,7 +330,7 @@ export default function Learn() {
   const totalLessons = modules.reduce((s, m) => s + m.total_lessons, 0);
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-5" style={{ background: 'transparent' }} data-testid="learn-page">
+    <div className="min-h-screen pt-20 pb-40 px-5" style={{ background: 'transparent' }} data-testid="learn-page">
       <div className="max-w-3xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-4" style={{ color: '#E879F9' }}>

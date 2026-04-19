@@ -235,7 +235,7 @@ export default function MultiverseMap() {
   const selRegion = universe.regions.find(r => r.id === selectedRegion);
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }} data-testid="multiverse-map-page">
+    <div className="min-h-screen pb-40" style={{ background: 'var(--bg-primary)' }} data-testid="multiverse-map-page">
       {/* Header */}
       <div className="px-4 pt-4 pb-2 flex items-center gap-3">
         <button onClick={() => navigate(-1)} className="w-8 h-8 rounded-lg flex items-center justify-center"

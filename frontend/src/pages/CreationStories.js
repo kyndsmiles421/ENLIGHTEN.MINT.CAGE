@@ -179,7 +179,7 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
           </div>
           <p className="text-lg font-semibold" style={{ color: 'rgba(248,250,252,0.8)', fontFamily: 'Cormorant Garamond, serif', textShadow: '0 2px 12px rgba(0,0,0,0.15)' }}>{story.title}</p>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 z-10 px-8 pb-24">
+        <div className="absolute bottom-0 left-0 right-0 z-10 px-8 pb-40">
           <AnimatePresence mode="wait">
             <motion.p key={currentScene} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.8 }}
               className="text-base md:text-lg leading-relaxed max-w-3xl mx-auto text-center"

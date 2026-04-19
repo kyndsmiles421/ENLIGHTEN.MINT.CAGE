@@ -165,7 +165,7 @@ export default function ReadingList() {
   const personalizedBooks = data?.personalized || [];
 
   return (
-    <div className="min-h-screen px-4 pt-20 pb-24" data-testid="reading-list-page">
+    <div className="min-h-screen px-4 pt-20 pb-40" data-testid="reading-list-page">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">

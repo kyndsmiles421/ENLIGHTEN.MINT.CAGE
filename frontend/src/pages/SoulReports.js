@@ -216,14 +216,14 @@ export default function SoulReports() {
 
   if (activeReport) {
     return (
-      <div className="min-h-screen px-4 pt-20 pb-24" data-testid="soul-reports-page">
+      <div className="min-h-screen px-4 pt-20 pb-40" data-testid="soul-reports-page">
         <ReportView report={activeReport} onBack={() => { setActiveReport(null); fetchReports(); }} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen px-4 pt-20 pb-24" data-testid="soul-reports-page">
+    <div className="min-h-screen px-4 pt-20 pb-40" data-testid="soul-reports-page">
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">

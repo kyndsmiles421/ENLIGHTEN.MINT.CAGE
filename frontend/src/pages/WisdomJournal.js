@@ -186,7 +186,7 @@ export default function WisdomJournal() {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" style={{ color: 'var(--text-muted)' }} /></div>;
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-5" data-testid="wisdom-journal-page">
+    <div className="min-h-screen pt-20 pb-40 px-5" data-testid="wisdom-journal-page">
       <div className="max-w-3xl mx-auto relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{ color: '#A78BFA' }}>

@@ -246,7 +246,7 @@ export default function ARPortalPage() {
   
   return (
     <div 
-      className="min-h-screen pb-24"
+      className="min-h-screen pb-40"
       style={{ background: 'transparent', paddingTop: '70px' }}
       data-testid="ar-portal-page"
     >

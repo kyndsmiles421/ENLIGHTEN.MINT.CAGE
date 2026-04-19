@@ -383,7 +383,7 @@ export default function SmartDock() {
   return createPortal(
     <div
       ref={dockRef}
-      className="fixed"
+      className="fixed smart-dock-shell"
       onPointerDown={bringToFront}
       style={{
         ...posStyle,
@@ -392,11 +392,19 @@ export default function SmartDock() {
         maxHeight: 'calc(100vh - 40px)',
         overflowY: 'auto',
         transition: isDragging ? 'none' : 'left 0.3s ease, top 0.3s ease, bottom 0.3s ease, right 0.3s ease',
+        // V68.14: Glass shell — pointer-events pass-through on the empty wrapper
+        // so 3D raycaster beneath can still catch clicks. Individual buttons
+        // re-enable pointer-events via .smart-dock-shell > * below.
+        pointerEvents: 'none',
       }}
       data-testid="smart-dock"
       data-orientation={dockOrientation}
       data-snapped={snappedEdge || 'none'}
     >
+      {/* V68.14: pointer-events pass-through — scoped CSS hack so children remain interactive */}
+      <style>{`
+        .smart-dock-shell > * { pointer-events: auto; }
+      `}</style>
       {/* ── Floating panels (render above the dock) ── */}
       <AnimatePresence>
         {activePanel === 'harmony' && (

@@ -155,7 +155,7 @@ export default function GrowthTimeline() {
   const { weeks, category_breakdown, milestones, stats, recent_highlights } = data;
 
   return (
-    <div className="min-h-screen px-4 pt-20 pb-24" data-testid="growth-timeline-page">
+    <div className="min-h-screen px-4 pt-20 pb-40" data-testid="growth-timeline-page">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-start justify-between mb-8">

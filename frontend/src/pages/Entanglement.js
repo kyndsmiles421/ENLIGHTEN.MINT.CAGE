@@ -152,7 +152,7 @@ export default function Entanglement() {
   }
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }}>
+    <div className="min-h-screen pb-40" style={{ background: 'var(--bg-primary)' }}>
       <div className="px-4 pt-4 max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-4">
           <button onClick={() => navigate(-1)} className="p-2 rounded-lg hover:bg-white/5"

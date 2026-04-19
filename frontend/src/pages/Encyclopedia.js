@@ -251,7 +251,7 @@ function VRTraditionView({ tradition, exploreResult, onClose, onExplore, explori
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto relative z-10 px-6 pt-20 pb-24" style={{ scrollbarWidth: 'none' }}>
+      <div className="flex-1 overflow-y-auto relative z-10 px-6 pt-20 pb-40" style={{ scrollbarWidth: 'none' }}>
         <div className="max-w-2xl mx-auto">
           {/* Title */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2, duration: 0.8 }} className="text-center mb-10">

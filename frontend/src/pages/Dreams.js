@@ -365,7 +365,7 @@ export default function Dreams() {
   if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" style={{ color: 'rgba(255,255,255,0.3)' }} /></div>;
 
   return (
-    <div className="min-h-screen pt-20 pb-24 px-5 max-w-3xl mx-auto" data-testid="dreams-page" style={{ background: 'transparent' }}>
+    <div className="min-h-screen pt-20 pb-40 px-5 max-w-3xl mx-auto" data-testid="dreams-page" style={{ background: 'transparent' }}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-2 mb-1">
           <Moon size={14} style={{ color: '#A78BFA' }} />

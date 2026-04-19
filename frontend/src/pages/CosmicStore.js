@@ -455,7 +455,7 @@ export default function CosmicStore() {
       clearVisionActive={controller.clearVisionActive}
       moduleName="cosmic-store">
 
-      <div className="min-h-screen pb-24" data-testid="cosmic-store-page">
+      <div className="min-h-screen pb-40" data-testid="cosmic-store-page">
         <StoreHeader credits={credits} onBack={() => navigate(-1)} />
 
         {/* Active Effects */}
