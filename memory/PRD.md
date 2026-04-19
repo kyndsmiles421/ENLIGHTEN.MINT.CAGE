@@ -1,6 +1,28 @@
 # ENLIGHTEN.MINT.CAFE — V68.4 Sovereign Guide
 ## PRD — Last Updated: Feb 20, 2026
 
+## 🔒 V68.13 (Feb 20, 2026) — Mobile Tap Audit + Seven Pillars Sprint
+
+**User caught:** "Begin Guided Session" button on /meditation appeared dead on mobile. Root cause: GuidedSession used `position: relative` and rendered BELOW the grid + SmartDock, so taps were working but the resulting overlay was off-screen/occluded on mobile viewports.
+
+**Fix shipped:**
+- Meditation.js now hides the mode toggle + category filters + cards grid while `activeSession` is truthy
+- GuidedSession auto-scrolls its own root into view on mount via `scrollIntoView({ behavior: 'smooth' })`
+- Added explicit "← Back to Meditations" button for fast exit
+- Min-height of 70vh on session root so Pause/Play/Sound/End controls are never buried
+
+**Exhaustive mobile audit followed (iteration_359):**
+25 pages validated on iPhone-size viewport (390×844). 100% pass rate. Zero click-to-nothing bugs. Backend 14/14 regression pass. Pytest suite durable at `/app/backend/tests/test_iteration_359_mobile_audit.py`.
+
+**Seven Pillars Sprint shipped earlier today:**
+- `GET /api/pillars/resonance` — user's per-pillar WIREFRAME/BLOOM/OBSIDIAN state driven by `lattice_activations` + `quest_progress`
+- `<SovereignStageHUD />` — persistent Sparks/Dust/Mission pill across Fractal Engine, VR, Celestial Dome, RPG, with `sovereign:immersion-tick` accrual pulse
+- FractalEngine.js — 7 classical pillars (Wellness/Culinary/Academy/Oracle/Craft/Community/Sanctuary) rendered as floating icosahedra orbiting the Crystalline Silhouette (Phase 4a avatar)
+- Crystalline Silhouette: procedural Three.js figure with Sparks-reactive aura (violet→gold tier thresholds), Dust-reactive eye glow, immersion-tick core pulse, tilted halo ring
+- Portal Routing: click → 1.2s eased camera fly-to → inline readout card → ENTER DOMAIN navigates to real sub-page
+- Bonus: Solfeggio resonance tones (528/417/741/963/639/396/852 Hz) on click; OBSIDIAN nodes additionally tone on hover (throttled)
+- Credit Policy v2 in CREDIT_SYSTEM.md §7.5: Acquired Credits 14-day window + 30% retention fee; Volunteer/Immersion Credits non-refundable non-exchangeable ("Time-is-Final")
+
 ## 🔒 V68.12 (Feb 20, 2026) — The 3D Black-Screen Truth
 
 User caught that iteration_358 missed the real 3D bug: every R3F page was silently throwing `R3F: Cannot set "x-line-number"` recursively on load. iteration_358 tested only SVG pages (MiniLattice on Sovereign Hub), never the actual R3F canvases.
