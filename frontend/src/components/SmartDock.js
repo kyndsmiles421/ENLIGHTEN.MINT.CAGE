@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Waves, Headphones, Send, BookOpen, X, Sparkles, Loader2, Play, Pause, GripHorizontal, Moon, Volume2, VolumeX, Square, Globe, Activity, Zap, Music, Award, Crown, Shield, Hexagon } from 'lucide-react';
+import PanelHeader from './PanelHeader';
 import { useAuth } from '../context/AuthContext';
 import { useMixer } from '../context/MixerContext';
 import { useFocus } from '../context/FocusContext';
@@ -797,15 +798,13 @@ function HarmonicsPanel({ onClose, token, authHeaders }) {
       }}
       data-testid="harmonics-panel"
     >
-      <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
-        <div className="flex items-center gap-2">
-          <Moon size={11} style={{ color: data?.atmosphere?.accent || '#818CF8' }} />
-          <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: `${data?.atmosphere?.accent || '#818CF8'}CC` }}>Cosmic Harmonics</span>
-        </div>
-        <button onClick={() => { onClose(); }} className="p-1 rounded-lg hover:bg-white/5">
-          <X size={11} style={{ color: 'rgba(255,255,255,0.7)' }} />
-        </button>
-      </div>
+      <PanelHeader
+        label="Cosmic Harmonics"
+        color={data?.atmosphere?.accent || '#818CF8'}
+        fullscreenPath="/frequencies"
+        onClose={onClose}
+        testId="dock-harmonics"
+      />
 
       {loading ? (
         <div className="flex justify-center py-6">
@@ -925,10 +924,13 @@ function MixerPanel({ onClose, navigate }) {
       }}
       data-testid="dock-mixer-panel"
     >
-      <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
-        <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: '#818CF8' }}>Production Console</span>
-        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
-      </div>
+      <PanelHeader
+        label="Production Console"
+        color="#818CF8"
+        fullscreenPath="/cosmic-mixer"
+        onClose={onClose}
+        testId="dock-mixer"
+      />
 
       {/* Master Volume */}
       <div className="px-3 py-2 flex items-center gap-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.03)' }}>
@@ -1072,13 +1074,13 @@ function AssistantPanel({ onClose, token, authHeaders }) {
       }}
       data-testid="assistant-panel"
     >
-      <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
-        <div className="flex items-center gap-2">
-          <Sparkles size={11} style={{ color: '#C084FC' }} />
-          <span className="text-[10px] font-medium" style={{ color: '#F8FAFC' }}>Sage</span>
-        </div>
-        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
-      </div>
+      <PanelHeader
+        label="Sage"
+        color="#C084FC"
+        fullscreenPath="/coach"
+        onClose={onClose}
+        testId="dock-assistant"
+      />
       <div ref={scrollRef} className="px-3 py-2 space-y-2 overflow-y-auto" style={{ maxHeight: '220px', scrollbarWidth: 'thin' }}>
         {messages.length === 0 && (
           <p className="text-[9px] text-center py-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
@@ -1158,10 +1160,13 @@ function FrequencyPanel({ onClose }) {
       }}
       data-testid="frequency-panel"
     >
-      <div className="flex items-center justify-between px-3 py-2" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
-        <span className="text-[9px] uppercase tracking-widest font-medium" style={{ color: '#2DD4BF' }}>Solfeggio Tones</span>
-        <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5"><X size={11} style={{ color: 'rgba(255,255,255,0.7)' }} /></button>
-      </div>
+      <PanelHeader
+        label="Solfeggio Tones"
+        color="#2DD4BF"
+        fullscreenPath="/frequencies"
+        onClose={onClose}
+        testId="dock-freq"
+      />
       <div className="p-2 space-y-0.5">
         {FREQUENCIES.map(f => {
           const isActive = activeFreqs.has(f.freq);
