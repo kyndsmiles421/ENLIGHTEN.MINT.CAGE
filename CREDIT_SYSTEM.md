@@ -84,6 +84,41 @@ Any engineering change that introduces:
 
 ---
 
+## 7.5 Refund & Return Policy (V68.13 — February 20, 2026)
+
+ENLIGHTEN.MINT.CAFE recognizes **two distinct classes** of in-app currency for the purpose of refunds and returns:
+
+### A. Acquired Credits (Purchased via Stripe)
+- Source: User paid USD via Stripe hosted Checkout to receive Dust / Credits.
+- Refund window: 14 days from purchase date, per standard consumer-protection norms.
+- **30% Resource Retention Fee:** Any authorized return is subject to a 30% retention fee covering (i) Stripe processing costs, (ii) server/database resources already provisioned, and (iii) Emergent compute cycles allocated to the user's session.
+- Refund mechanism: USD refund minus retention fee, issued back to the original payment method via Stripe. No in-app currency is ever converted back to fiat outside of this authorized refund path.
+
+### B. Volunteer / Immersion Credits (Earned via Presence)
+- Source: The user earned these credits by spending time in the Sanctuary at the baseline rate of **10 Credits per hour** (immersion accrual via `POST /api/sparks/immersion`).
+- **Non-refundable. Non-exchangeable.** These credits represent a finalized energy-for-time exchange. Once earned they are locked into the Sanctuary ecosystem forever.
+- Rationale: Time already spent cannot be returned to the user; therefore the credits minted by that time cannot be converted back to external value. This is the "Air-Gap" that keeps the loop closed.
+
+### C. HUD & Wallet Display
+- The user-facing HUD shows a **single unified Sparks counter** to preserve the 3D aesthetic.
+- The full split (`earned_volunteer` vs `acquired_external`) is exposed in:
+  1. The Wallet Ledger page (`/profile` → Wallet tab)
+  2. The Credit Policy section of Settings
+  3. The Refund Request flow (if/when initiated — forces acknowledgment of the split and the 30% retention)
+- API: `GET /api/sparks/wallet` returns `sparks`, `earned_volunteer`, `acquired_external` sub-fields.
+
+### D. Disclosure in Terms of Service
+The following verbatim language is bound into the Terms of Service at `/terms`:
+
+> "Credits obtained via external exchange (Stripe) are subject to a 30% Resource Retention Fee upon authorized return within 14 days of purchase. Credits earned through the 10 Credits/hour immersion baseline are **Non-Refundable and Non-Exchangeable**. These represent a finalized energy exchange for time spent within the Sanctuary and hold zero external cash value."
+
+### E. Google Play Console disclosure
+- **App Content → Financial Features:** In-app virtual currency (Sparks / Dust) — Closed-loop, non-convertible to fiat.
+- **Data Safety:** No financial data collected beyond what Stripe handles during hosted Checkout.
+- **Purchase policy:** Standard in-app purchases with transparent 30% retention on authorized refunds for Acquired Credits only.
+
+---
+
 ## 8. Contact
 
 Questions from reviewers or regulators:

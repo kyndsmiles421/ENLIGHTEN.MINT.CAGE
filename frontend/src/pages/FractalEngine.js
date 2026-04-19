@@ -43,15 +43,17 @@ const RESONANCE_TONE = {
   sanctuary: 852,  // Return to spiritual order
 };
 
-// ── Seven nodes positioned on a hexagon with central Sanctuary ────────
+// ── Seven nodes positioned on a hexagon with the user Avatar at center ─
+// (Sanctuary sits at [0, 2.4, 0] instead of center — the user's silhouette
+// now owns the central singularity.)
 const PILLAR_POSITIONS = [
-  { id: 'sanctuary', position: [0, 0, 0] },                        // center
-  { id: 'wellness',  position: [ 3.2,  1.8, 0] },                  // upper right
-  { id: 'culinary',  position: [ 3.2, -1.8, 0] },                  // lower right
-  { id: 'academy',   position: [ 0.0,  3.4, 0] },                  // top
-  { id: 'oracle',    position: [ 0.0, -3.4, 0] },                  // bottom
-  { id: 'craft',     position: [-3.2,  1.8, 0] },                  // upper left
-  { id: 'community', position: [-3.2, -1.8, 0] },                  // lower left
+  { id: 'sanctuary', position: [ 0.0,  3.6, 0] },                  // top (moved up — avatar owns center)
+  { id: 'wellness',  position: [ 3.4,  1.6, 0] },                  // upper right
+  { id: 'culinary',  position: [ 3.4, -1.6, 0] },                  // lower right
+  { id: 'academy',   position: [ 2.0, -3.2, 0] },                  // lower right-below
+  { id: 'oracle',    position: [-2.0, -3.2, 0] },                  // lower left-below
+  { id: 'craft',     position: [-3.4,  1.6, 0] },                  // upper left
+  { id: 'community', position: [-3.4, -1.6, 0] },                  // lower left
 ];
 
 // ── Web Audio helper — plays a brief Solfeggio pluck ──────────────────
@@ -131,9 +133,142 @@ function PillarNode({ position, pillar, isActive, isHovered, onActivate, onHover
   );
 }
 
+// ── Crystalline Silhouette — user's sovereign avatar at lattice center ─
+// Procedural Three.js figure with Sparks-reactive aura, Dust-reactive eye
+// glow, and an Inner Core that bright-pulses on every immersion tick.
+//
+// State-based presentation:
+//   sparks < 1k   → dim violet silhouette, small aura
+//   1k-25k        → steady violet with subtle cyan halo
+//   25k-99k       → amber-tinted aura (ARTISAN/ORACLE threshold)
+//   ≥100k         → gold SOVEREIGN aura, fully luminous
+//
+// When the SovereignStageHUD emits `sovereign:immersion-tick`, the core
+// flashes brighter for ~900ms (mirrors the HUD accrual ring).
+function CrystallineSilhouette({ sparks, dust }) {
+  const groupRef = useRef();
+  const coreRef = useRef();
+  const auraRef = useRef();
+  const haloRef = useRef();
+  const eyeLeftRef = useRef();
+  const eyeRightRef = useRef();
+  const pulseRef = useRef({ active: false, startT: 0 });
+
+  // Derive aesthetic from Sparks/Dust
+  const s = Number(sparks) || 0;
+  const d = Number(dust) || 0;
+  const auraColor = useMemo(() => {
+    if (s >= 100000) return new THREE.Color('#D4AF37');     // SOVEREIGN
+    if (s >= 25000)  return new THREE.Color('#FBBF24');     // ORACLE / ARTISAN
+    if (s >= 1000)   return new THREE.Color('#A78BFA');     // NAVIGATOR
+    return new THREE.Color('#6D28D9');                      // SEED / CITIZEN
+  }, [s]);
+  const auraRadius = useMemo(() => {
+    // log scale so bigger wallets don't explode the scene
+    return 1.3 + Math.min(1.6, Math.log10(Math.max(s, 1)) * 0.28);
+  }, [s]);
+  const eyeGlow = useMemo(() => Math.min(1.0, 0.35 + d / 30000), [d]);
+
+  // Listen for immersion tick — flash core
+  useEffect(() => {
+    const onTick = () => {
+      pulseRef.current.active = true;
+      pulseRef.current.startT = performance.now();
+    };
+    window.addEventListener('sovereign:immersion-tick', onTick);
+    return () => window.removeEventListener('sovereign:immersion-tick', onTick);
+  }, []);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    if (groupRef.current) {
+      groupRef.current.rotation.y = t * 0.15;
+      groupRef.current.position.y = Math.sin(t * 0.6) * 0.12;
+    }
+    // Continuous gentle aura breath
+    if (auraRef.current) {
+      const breath = 1.0 + Math.sin(t * 1.3) * 0.04;
+      auraRef.current.scale.set(breath, breath, breath);
+      auraRef.current.material.opacity = 0.06 + Math.sin(t * 1.3) * 0.02;
+    }
+    if (haloRef.current) {
+      haloRef.current.rotation.z = t * 0.35;
+      haloRef.current.material.opacity = 0.22 + Math.sin(t * 0.9) * 0.04;
+    }
+    // Core pulse on immersion-tick event
+    if (coreRef.current) {
+      let coreIntensity = 0.7 + Math.sin(t * 2.1) * 0.06;
+      if (pulseRef.current.active) {
+        const elapsed = performance.now() - pulseRef.current.startT;
+        if (elapsed < 900) {
+          const p = 1 - elapsed / 900;
+          coreIntensity += p * 0.9; // bright flash that decays
+        } else {
+          pulseRef.current.active = false;
+        }
+      }
+      coreRef.current.material.emissiveIntensity = coreIntensity;
+    }
+    // Eyes track viewer ever so slightly
+    if (eyeLeftRef.current && eyeRightRef.current) {
+      const wobble = Math.sin(t * 0.7) * 0.04;
+      eyeLeftRef.current.material.emissiveIntensity = eyeGlow + wobble;
+      eyeRightRef.current.material.emissiveIntensity = eyeGlow + wobble;
+    }
+  });
+
+  return (
+    <group ref={groupRef} position={[0, -0.4, 0]} frustumCulled={false}>
+      {/* Outer aura sphere */}
+      <mesh ref={auraRef} frustumCulled={false}>
+        <sphereGeometry args={[auraRadius, 24, 24]} />
+        <meshBasicMaterial color={auraColor} transparent opacity={0.08} side={THREE.BackSide} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </mesh>
+
+      {/* Thin crystalline halo ring — tilted */}
+      <mesh ref={haloRef} rotation={[Math.PI / 2.2, 0, 0]} frustumCulled={false}>
+        <torusGeometry args={[auraRadius * 0.78, 0.015, 8, 64]} />
+        <meshBasicMaterial color={auraColor} transparent opacity={0.25} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+
+      {/* Body — tapered pillar */}
+      <mesh position={[0, -0.3, 0]} frustumCulled={false}>
+        <cylinderGeometry args={[0.22, 0.42, 1.6, 20, 1, true]} />
+        <meshStandardMaterial color={auraColor} transparent opacity={0.55} emissive={auraColor} emissiveIntensity={0.22} side={THREE.DoubleSide} depthWrite={false} />
+      </mesh>
+
+      {/* Inner core (bright luminous node where the heart sits) */}
+      <mesh ref={coreRef} position={[0, 0.1, 0]} frustumCulled={false}>
+        <sphereGeometry args={[0.16, 16, 16]} />
+        <meshStandardMaterial color="#ffffff" emissive={auraColor} emissiveIntensity={0.7} toneMapped={false} />
+      </mesh>
+
+      {/* Head — subtle crystal */}
+      <mesh position={[0, 0.85, 0]} frustumCulled={false}>
+        <icosahedronGeometry args={[0.28, 1]} />
+        <meshStandardMaterial color={auraColor} wireframe transparent opacity={0.65} emissive={auraColor} emissiveIntensity={0.35} />
+      </mesh>
+      {/* Head solid inner */}
+      <mesh position={[0, 0.85, 0]} frustumCulled={false}>
+        <sphereGeometry args={[0.2, 18, 18]} />
+        <meshStandardMaterial color={auraColor} transparent opacity={0.42} emissive={auraColor} emissiveIntensity={0.2} />
+      </mesh>
+
+      {/* Eyes — Dust-reactive glow */}
+      <mesh ref={eyeLeftRef} position={[-0.07, 0.88, 0.18]} frustumCulled={false}>
+        <sphereGeometry args={[0.025, 8, 8]} />
+        <meshStandardMaterial color="#ffffff" emissive="#00ffcc" emissiveIntensity={eyeGlow} toneMapped={false} />
+      </mesh>
+      <mesh ref={eyeRightRef} position={[0.07, 0.88, 0.18]} frustumCulled={false}>
+        <sphereGeometry args={[0.025, 8, 8]} />
+        <meshStandardMaterial color="#ffffff" emissive="#00ffcc" emissiveIntensity={eyeGlow} toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
+
 // ── 2000-star buffer-geometry starfield (replaces drei/Stars) ─────────
-function Starfield({ count = 2000 }) {
-  const ref = useRef();
+function Starfield({ count = 2000 }) {  const ref = useRef();
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
@@ -196,6 +331,7 @@ export default function FractalEngine() {
   const [activeId, setActiveId] = useState(null);
   const [hoveredId, setHoveredId] = useState(null);
   const [soundOn, setSoundOn] = useState(true);
+  const [avatarStats, setAvatarStats] = useState({ sparks: 0, dust: 0 });
   const audioCtxRef = useRef(null);
   const lastHoverToneRef = useRef(0);
 
@@ -226,6 +362,28 @@ export default function FractalEngine() {
     axios.get(`${API}/pillars${token && token !== 'guest_token' ? '/resonance' : ''}`, { headers: h })
       .then((r) => setPillars(r.data?.pillars || []))
       .catch(() => setPillars([]));
+  }, []);
+
+  // Fetch Sparks + Dust so the Crystalline Silhouette can react
+  useEffect(() => {
+    const token = localStorage.getItem('zen_token');
+    if (!token || token === 'guest_token') return;
+    const h = { Authorization: `Bearer ${token}` };
+    const load = async () => {
+      try {
+        const [s, w] = await Promise.allSettled([
+          axios.get(`${API}/sparks/wallet`, { headers: h }),
+          axios.get(`${API}/treasury/balance`, { headers: h }),
+        ]);
+        setAvatarStats({
+          sparks: s.status === 'fulfilled' ? (s.value.data?.sparks ?? 0) : 0,
+          dust:   w.status === 'fulfilled' ? (w.value.data?.balance ?? w.value.data?.user_dust_balance ?? 0) : 0,
+        });
+      } catch { /* silent */ }
+    };
+    load();
+    const t = setInterval(load, 30000);
+    return () => clearInterval(t);
   }, []);
 
   // Merge positions with pillar data (preserves declared order)
@@ -296,7 +454,7 @@ export default function FractalEngine() {
         letterSpacing: '3px', zIndex: 5, pointerEvents: 'none',
         whiteSpace: 'nowrap',
       }}>
-        CLICK A PILLAR · OBSIDIAN NODES EMIT RESONANCE ON HOVER
+        CLICK A PILLAR · YOUR SOVEREIGN FORM ANCHORS THE LATTICE
       </div>
 
       {/* Inline Pillar Readout Card (expands when a node is activated) */}
@@ -336,6 +494,7 @@ export default function FractalEngine() {
 
         <Suspense fallback={null}>
           <Starfield count={2000} />
+          <CrystallineSilhouette sparks={avatarStats.sparks} dust={avatarStats.dust} />
           {pillarNodes.map((p) => (
             <PillarNode
               key={p.id}
