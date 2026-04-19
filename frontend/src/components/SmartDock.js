@@ -107,6 +107,10 @@ export default function SmartDock() {
     localStorage.setItem(WIDGET_FOCUS_KEY, 'dock');
     setZBoost(true);
     window.dispatchEvent(new CustomEvent('widget-focus', { detail: 'dock' }));
+    // V68.14: Avatar resonance — pulse the Crystalline Silhouette's core whenever
+    // the user touches the mixer. Visually confirms the "nervous-system" link
+    // between the Sovereign HUD avatar and the control surface.
+    window.dispatchEvent(new CustomEvent('sovereign:immersion-tick'));
   }, []);
 
   useEffect(() => {
@@ -401,9 +405,23 @@ export default function SmartDock() {
       data-orientation={dockOrientation}
       data-snapped={snappedEdge || 'none'}
     >
-      {/* V68.14: pointer-events pass-through — scoped CSS hack so children remain interactive */}
+      {/* V68.14: pointer-events pass-through + "sunken console" ground glow (pure CSS, no perspective transform — keeps tap targets accurate on mobile) */}
       <style>{`
         .smart-dock-shell > * { pointer-events: auto; }
+        /* Soft radial floor-light under the dock — gives the "recessed into 3D floor" impression without any perspective transform that would break mobile hitboxes */
+        .smart-dock-shell::before {
+          content: '';
+          position: absolute;
+          left: 50%;
+          top: 100%;
+          transform: translate(-50%, -40%);
+          width: 140%;
+          height: 60px;
+          background: radial-gradient(ellipse at center, rgba(192,132,252,0.18) 0%, rgba(192,132,252,0) 65%);
+          pointer-events: none;
+          z-index: -1;
+          filter: blur(8px);
+        }
       `}</style>
       {/* ── Floating panels (render above the dock) ── */}
       <AnimatePresence>

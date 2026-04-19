@@ -99,7 +99,7 @@ function ChatView({ session, onSend, onBack, sending }) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)]" data-testid="akashic-chat-view">
+    <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 160px - var(--dock-total-clearance, 144px))' }} data-testid="akashic-chat-view">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4 flex-shrink-0">
         <button onClick={onBack} className="p-2 rounded-xl hover:bg-white/5 transition-colors" data-testid="akashic-back-btn">
@@ -200,25 +200,27 @@ export default function AkashicRecords() {
 
   const startSession = async (prompt) => {
     if (!token) { toast.error('Sign in to access the Akashic Records'); return; }
+    // Instant optimistic UI — show the chat view immediately with a loading state
+    // so the user sees feedback within one tap-frame (no dead-tap perception).
+    setActiveSession({ id: null, messages: [{ role: 'user', text: prompt.prompt, timestamp: new Date().toISOString() }], prompt_id: prompt.id });
+    setSending(true);
     try {
       const res = await axios.post(`${API}/akashic/sessions`, { prompt_id: prompt.id }, { headers });
       const sid = res.data.session_id;
-      setActiveSession({ id: sid, messages: [], prompt_id: prompt.id });
-      // Send the guided opening prompt automatically
-      setSending(true);
       const chatRes = await axios.post(`${API}/akashic/chat`, { session_id: sid, message: prompt.prompt }, { headers });
-      setActiveSession(prev => ({
-        ...prev,
+      setActiveSession({
+        id: sid,
+        prompt_id: prompt.id,
         messages: [
           { role: 'user', text: prompt.prompt, timestamp: new Date().toISOString() },
           { role: 'assistant', text: chatRes.data.reply, timestamp: new Date().toISOString() },
         ],
-      }));
-      setSending(false);
+      });
     } catch {
       toast.error('Could not open the Records');
-      setSending(false);
+      setActiveSession(null);
     }
+    setSending(false);
   };
 
   const openSession = async (sessionId) => {

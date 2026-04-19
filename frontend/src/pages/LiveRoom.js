@@ -698,7 +698,7 @@ export default function LiveRoom() {
   }
 
   return (
-    <div className="flex flex-col overflow-hidden" style={{ background: '#0A0B14', height: 'calc(100vh - 56px)', position: 'relative', zIndex: 30 }} data-testid="live-room">
+    <div className="flex flex-col overflow-hidden" style={{ background: '#0A0B14', height: 'calc(100vh - 56px - var(--dock-total-clearance, 144px))', position: 'relative', zIndex: 30 }} data-testid="live-room">
       {/* Scene Background */}
       <div className="absolute inset-0 z-0">
         <SceneBackground session={session} />
