@@ -1,5 +1,19 @@
 # ENLIGHTEN.MINT.CAFE — V68.4 Sovereign Guide
-## PRD — Last Updated: Feb 18, 2026
+## PRD — Last Updated: Feb 20, 2026
+
+## 🔒 V68.11 (Feb 20, 2026) — Full Sovereign Audit (Play Store Ship-Gate)
+User requested "make sure every function is functioning inside and out and everything is connected and working proper" before production deploy to `enlighten.mint.cafe`. Testing agent iteration_358 ran full regression sweep.
+
+**Result: 100% GREEN — zero critical, zero minor, zero UI/design issues.**
+
+- Backend 15/15 tests passed: auth (register/login/me), GDPR export (real data, 40+ docs / 7 collections), GDPR delete (wipes throwaway user + returns 401 on re-login), owner bypass (sparks=99999, dust=10000, no trial nudge), Resend mailer (ok=true, provider=resend), Stripe (5 tiers + webhook reachable), sampled modules (meditation/journal/trade-circle/rpg/botany/bible/acupressure/breathing/coach).
+- Static Play Store compliance: `/privacy.html`, `/delete-account.html`, `/.well-known/assetlinks.json` all 200 with both SHA-256 fingerprints (91:55:43… Play Signing + C1:78:D0… Upload).
+- Frontend: Home 3D canvas renders (R3F v9.6.0 black-screen bug confirmed fixed), login flow → Sovereign Hub, 9x9 lattice renders, neural-connector-layer has `pointerEvents=none` (no Flatland Trap), RPG mobile inventory shows 4 tap-visible Equip/Use buttons at 375x812, Pricing shows 5 tiers, Settings toggles work, SPA routes `/privacy` and `/delete-account` render.
+- **Metabolic Seal held: 248 KB gzipped main bundle (31% of the 800 KB ceiling).**
+- Pytest suite: `/app/backend/tests/test_v68_8_sovereign_audit.py` (durable regression guardrail).
+
+**Deploy status: code is production-ready. Awaiting user to click Deploy + wire `enlighten.mint.cafe` CNAME at DNS registrar.**
+
 
 Sovereign Unified Engine (PWA). 176+ surfaced nodules, zero hidden modules.
 No modals, no overlays — inline expansion only. Core bundle <800KB (Metabolic Seal).
