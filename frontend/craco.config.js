@@ -23,6 +23,11 @@ if (config.enableHealthCheck) {
 }
 
 let webpackConfig = {
+  babel: {
+    presets: [
+      ['@babel/preset-react', { runtime: 'automatic' }]
+    ],
+  },
   eslint: {
     configure: {
       extends: ["plugin:react-hooks/recommended"],

@@ -1,6 +1,27 @@
 # ENLIGHTEN.MINT.CAFE — V68.4 Sovereign Guide
 ## PRD — Last Updated: Feb 20, 2026
 
+## 🔒 V68.12 (Feb 20, 2026) — The 3D Black-Screen Truth
+
+User caught that iteration_358 missed the real 3D bug: every R3F page was silently throwing `R3F: Cannot set "x-line-number"` recursively on load. iteration_358 tested only SVG pages (MiniLattice on Sovereign Hub), never the actual R3F canvases.
+
+**Root cause (confirmed via source dive + web search):** Collision between Emergent's dev-mode visual-edits Babel plugin (injects `x-line-number`, `x-id`, `x-component` onto every JSX element) and R3F v9.6's stricter `applyProps` reconciler (tries to pierce dashed props as paths `obj.x['line-number']` and throws when the target doesn't exist on Three.js instances).
+
+**Permanent fix shipped:**
+- `frontend/patches/@react-three+fiber+9.6.0.patch` — adds `prop.startsWith('x-')` skip to R3F's `RESERVED_PROPS` filter in `applyProps` and `diffProps` (events-*.esm.js, events-*.cjs.dev.js, events-*.cjs.prod.js).
+- `package.json` gets `"postinstall": "patch-package"` so the fix auto-reapplies on every `yarn install`.
+- `jsconfig.json` gets `"jsx": "react-jsx"` + `craco.config.js` gets `@babel/preset-react` with `runtime: 'automatic'` for React 19 alignment.
+- `src/index.js` gets a React DevTools inject-hook guard (belt-and-suspenders).
+
+**Visual rehabilitation (proven with screenshots):**
+- `FractalEngine.js` — rebuilt: 3 floating geodesic icosahedrons (cyan/magenta/yellow) on 2000-star field, plain-mesh stack (no drei `<Text>`/`<Stars>`), purple HUD, click-to-reveal atmospheric data card. Zero errors on load.
+- `CelestialDome.js` — HUD moved from `flex-end` → `center` so the ACTIVATE button isn't buried under the global SmartDock. Clicking it boots 2000 purple/gold/cyan particles + edge geometry + orbital rings.
+- `VirtualReality.js` — Cosmic Sanctuary star size 1.5→2.4 and nebula opacity 0.04-0.08 → 0.18-0.28. The cosmos is now actually visible.
+- `MiniLattice` (unchanged, already SVG) — now demonstrably lighting up as user traverses the Sovereign lattice (3/81 nodes + resonance line captured in verification screenshots).
+
+**Disk discipline:** Purged 4.8 GB (`node_modules/.cache`, `enlightenment_cafe_code.zip`, `_captures/`). `/app` back to 51% used.
+
+
 ## 🔒 V68.11 (Feb 20, 2026) — Full Sovereign Audit (Play Store Ship-Gate)
 User requested "make sure every function is functioning inside and out and everything is connected and working proper" before production deploy to `enlighten.mint.cafe`. Testing agent iteration_358 ran full regression sweep.
 

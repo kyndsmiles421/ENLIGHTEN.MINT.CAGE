@@ -40,22 +40,24 @@ function SecureNode({ position, label, altitude, color, onActivate, isActive }) 
   });
 
   return (
-    <mesh
-      ref={meshRef}
-      position={position}
-      frustumCulled={false}
-      onClick={(e) => { e.stopPropagation(); onActivate(); }}
-      onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
-      onPointerOut={() => { document.body.style.cursor = 'auto'; }}
-    >
-      <icosahedronGeometry args={[1, 2]} />
-      <meshStandardMaterial
-        color={isActive ? color : '#222'}
-        wireframe={!isActive}
-        emissive={isActive ? color : '#000'}
-        emissiveIntensity={isActive ? 0.75 : 0}
-      />
-    </mesh>
+      <mesh
+        ref={meshRef}
+        position={position}
+        frustumCulled={false}
+        onClick={(e) => { e.stopPropagation(); onActivate(); }}
+        onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer'; }}
+        onPointerOut={() => { document.body.style.cursor = 'auto'; }}
+      >
+        <icosahedronGeometry args={[1, 2]} />
+        <meshStandardMaterial
+          color={color}
+          wireframe={!isActive}
+          emissive={color}
+          emissiveIntensity={isActive ? 0.8 : 0.25}
+          transparent
+          opacity={isActive ? 1 : 0.65}
+        />
+      </mesh>
   );
 }
 
