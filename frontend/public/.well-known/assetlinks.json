@@ -3,7 +3,40 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.enlighten-mint-cafe.me",
+      "package_name": "me.enlightenmintcafe.twa",
+      "sha256_cert_fingerprints": [
+        "91:55:43:73:20:C2:46:95:D5:58:0A:65:E0:02:1C:6C:32:49:57:3D:ED:8B:D6:D6:E7:E0:48:07:EE:BA:B3:31",
+        "C1:78:D0:3C:58:B1:E7:34:38:95:ED:C7:C7:6D:A6:5A:59:79:EB:AE:8D:6F:20:60:37:39:F0:D5:F0:1C:F8:28"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "me.enlighten_mint_cafe.twa",
+      "sha256_cert_fingerprints": [
+        "91:55:43:73:20:C2:46:95:D5:58:0A:65:E0:02:1C:6C:32:49:57:3D:ED:8B:D6:D6:E7:E0:48:07:EE:BA:B3:31",
+        "C1:78:D0:3C:58:B1:E7:34:38:95:ED:C7:C7:6D:A6:5A:59:79:EB:AE:8D:6F:20:60:37:39:F0:D5:F0:1C:F8:28"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.enlightenmintcafe.twa",
+      "sha256_cert_fingerprints": [
+        "91:55:43:73:20:C2:46:95:D5:58:0A:65:E0:02:1C:6C:32:49:57:3D:ED:8B:D6:D6:E7:E0:48:07:EE:BA:B3:31",
+        "C1:78:D0:3C:58:B1:E7:34:38:95:ED:C7:C7:6D:A6:5A:59:79:EB:AE:8D:6F:20:60:37:39:F0:D5:F0:1C:F8:28"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.enlighten_mint_cafe.me",
       "sha256_cert_fingerprints": [
         "91:55:43:73:20:C2:46:95:D5:58:0A:65:E0:02:1C:6C:32:49:57:3D:ED:8B:D6:D6:E7:E0:48:07:EE:BA:B3:31",
         "C1:78:D0:3C:58:B1:E7:34:38:95:ED:C7:C7:6D:A6:5A:59:79:EB:AE:8D:6F:20:60:37:39:F0:D5:F0:1C:F8:28"
