@@ -20,3 +20,4 @@ All public content (workshops, materials, tools, meditation, mudras, crystals) o
 ## Notes
 - Backend auth field is `password` (bcrypt-hashed), not `password_hash` — don't mix them.
 - CREATOR_EMAIL is hardcoded in `/app/backend/routes/auth.py` line 57. Changing the owner email requires a backend edit.
+- **Owner account self-seeds on server startup** via `/app/backend/utils/owner_seed.py`. Password defaults to `Sovereign2026!` unless `OWNER_SEED_PASSWORD` env var is set. Idempotent — re-verifies existing account, creates if missing. This means every fresh deploy (prod Atlas, sandbox, etc.) will have the owner account ready on first backend startup.

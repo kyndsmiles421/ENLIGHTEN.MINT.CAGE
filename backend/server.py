@@ -191,9 +191,17 @@ async def startup_tasks():
     from tasks import push_scheduler_loop, credit_refresh_loop
     from routes.plants import reset_plant_watering
     from routes.collective_resonance import resonance_aggregation_loop
+    from utils.owner_seed import seed_owner_account
 
     await ensure_indexes()
     await reset_plant_watering()
+    # Idempotent owner-account provisioning — ensures kyndsmiles@gmail.com
+    # exists on any fresh deployment (prod Atlas ≠ sandbox MongoDB).
+    try:
+        seed_result = await seed_owner_account()
+        logger.info(f"Owner seed: {seed_result}")
+    except Exception as e:
+        logger.error(f"Owner seed failed (non-fatal): {e}")
     asyncio.create_task(push_scheduler_loop())
     asyncio.create_task(credit_refresh_loop())
     asyncio.create_task(resonance_aggregation_loop())
