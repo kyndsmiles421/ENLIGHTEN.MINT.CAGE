@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSpatialAudio, SOLFEGGIO_FREQUENCIES } from '../engines/SpatialAudioEngine';
 import { useImmersionPresence } from '../hooks/useImmersionPresence';
 import axios from 'axios';
+import SovereignStageHUD from '../components/SovereignStageHUD';
 
 const SPARK_API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -430,6 +431,8 @@ export default function CelestialDome() {
 
   return (
     <div className="celestial-dome-page" data-testid="celestial-dome">
+      {/* Persistent Sovereign HUD (Sparks / Dust / Mission) */}
+      <SovereignStageHUD anchor="top-right" />
       <style>{`
         .celestial-dome-page {
           position: relative;

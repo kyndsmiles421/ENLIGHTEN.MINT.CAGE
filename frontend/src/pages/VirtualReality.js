@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Maximize2, Minimize2, Wind, Timer, Flame, Star, Eye, BookOpen, Volume2, VolumeX, Compass, Play, X, Film, Loader2, SkipForward, SkipBack, Pause, Sparkles, Atom, Crosshair } from 'lucide-react';
 import * as THREE from 'three';
 import { useImmersionPresence } from '../hooks/useImmersionPresence';
+import SovereignStageHUD from '../components/SovereignStageHUD';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -1086,6 +1087,9 @@ export default function VirtualReality() {
 
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: '100vh', background: 'transparent' }} data-testid="vr-page">
+      {/* Persistent Sovereign HUD — follows user through the 3D stage */}
+      <SovereignStageHUD anchor="top-right" />
+
       {/* 3D Scene */}
       <div ref={mountRef} className="w-full h-full" data-testid="vr-canvas-container" />
 

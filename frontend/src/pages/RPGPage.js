@@ -12,6 +12,7 @@ import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../compo
 import { useLatency, LatencyDot } from '../hooks/useLatencyPulse';
 import { toast } from 'sonner';
 import axios from 'axios';
+import SovereignStageHUD from '../components/SovereignStageHUD';
 
 // Lazy-loaded 3D avatar previewer — only downloaded when the Character tab renders.
 // Keeps the RPG core bundle well under the 800KB Metabolic Seal.
@@ -460,6 +461,9 @@ export default function RPGPage() {
 
   return (
     <div className="min-h-screen pb-24" style={{ background: 'var(--bg-primary)' }} data-testid="rpg-page">
+      {/* Persistent Sovereign HUD — follows user through every stage */}
+      <SovereignStageHUD anchor="bottom-left" compact />
+
       {/* Header */}
       <div className="sticky top-0 z-10 px-4 py-3" style={{ background: 'rgba(8,8,16,0.9)', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <div className="flex items-center justify-between mb-3">
