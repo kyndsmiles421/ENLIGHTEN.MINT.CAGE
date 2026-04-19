@@ -231,7 +231,8 @@ export default function VirtualReality() {
     starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
     starGeo.setAttribute('size', new THREE.BufferAttribute(starSizes, 1));
     starGeo.setAttribute('color', new THREE.BufferAttribute(starColors, 3));
-    const starMat = new THREE.PointsMaterial({ size: 1.5, vertexColors: true, transparent: true, opacity: 0.9, sizeAttenuation: true });
+    // V68.11: boosted star size 1.5→2.4 for visibility; keep 0.9 opacity
+    const starMat = new THREE.PointsMaterial({ size: 2.4, vertexColors: true, transparent: true, opacity: 0.95, sizeAttenuation: true });
     const stars = new THREE.Points(starGeo, starMat);
     scene.add(stars);
 
@@ -242,7 +243,8 @@ export default function VirtualReality() {
       const nebulaGeo = new THREE.PlaneGeometry(120 + Math.random() * 200, 120 + Math.random() * 200);
       const nebulaMat = new THREE.MeshBasicMaterial({
         color: nebulaColors[i % nebulaColors.length],
-        transparent: true, opacity: 0.04 + Math.random() * 0.04,
+        // V68.11: boosted nebula opacity 0.04-0.08 → 0.18-0.28 so clouds are actually visible
+        transparent: true, opacity: 0.18 + Math.random() * 0.10,
         side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending,
       });
       const nebula = new THREE.Mesh(nebulaGeo, nebulaMat);

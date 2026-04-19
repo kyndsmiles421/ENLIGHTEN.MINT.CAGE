@@ -455,8 +455,8 @@ export default function CelestialDome() {
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: flex-end;
-          padding: 40px;
+          justify-content: center;
+          padding: 40px 40px 180px;
         }
         
         .dome-hud {
