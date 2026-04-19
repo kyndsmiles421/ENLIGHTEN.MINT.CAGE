@@ -223,8 +223,19 @@ function GuidedSession({ meditation, onEnd }) {
   const intervalRef = useRef(null);
   const audioCtxRef = useRef(null);
   const nodesRef = useRef([]);
+  const rootRef = useRef(null);
   const { playCelebration } = useSensory();
   const totalDuration = meditation.duration * 60;
+
+  // Auto-scroll the session into view on mount (mobile critical — the grid
+  // used to stay above and the user thought the button was dead).
+  useEffect(() => {
+    if (rootRef.current && typeof rootRef.current.scrollIntoView === 'function') {
+      rootRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
+    }
+  }, [meditation.id]);
 
   // Manual sound toggle function
   const toggleSound = useCallback(() => {
@@ -309,8 +320,9 @@ function GuidedSession({ meditation, onEnd }) {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      ref={rootRef}
       className="relative w-full flex flex-col items-center justify-center p-6"
-      style={{ background: 'transparent' }}
+      style={{ background: 'transparent', minHeight: '70vh' }}
       data-testid="guided-session"
     >
       <CelebrationBurst active={celebrating} onComplete={() => { setCelebrating(false); onEnd(); }} />
@@ -1307,7 +1319,8 @@ export default function Meditation() {
         </p>
       </motion.div>
 
-        {/* Mode Toggle */}
+        {/* Mode Toggle — hide while a guided session is active so the session owns the viewport on mobile */}
+        {!activeSession && (
         <div className="flex gap-2 mb-8 flex-wrap" data-testid="meditation-mode-toggle">
           {[
             { id: 'guided', label: 'Guided Meditations', icon: Sparkles },
@@ -1330,8 +1343,9 @@ export default function Meditation() {
             );
           })}
         </div>
+        )}
 
-        {mode === 'guided' ? (
+        {activeSession ? null : mode === 'guided' ? (
           <>
             {/* Category filters */}
             <div className="flex gap-2 mb-8 flex-wrap" data-testid="meditation-category-filters">
@@ -1395,32 +1409,56 @@ export default function Meditation() {
           <TimerMode />
         )}
 
-        <div className="mt-16">
-          <FeaturedVideos category="meditation" color="#D8B4FE" title="Meditation Practice Videos" />
-        </div>
+        {!activeSession && (
+          <div className="mt-16">
+            <FeaturedVideos category="meditation" color="#D8B4FE" title="Meditation Practice Videos" />
+          </div>
+        )}
 
-      {/* Guided Session Overlay */}
+      {/* Guided Session — inline, grid hides while active so it owns the viewport */}
       <AnimatePresence>
         {activeSession && (
-          <GuidedSession meditation={activeSession} onEnd={async () => {
-            // Log meditation completion and get plant growth
-            try {
-              const res = await axios.post(`${API}/meditation-history/log`, {
-                type: activeSession.category || 'guided',
-                duration_minutes: activeSession.duration,
-                focus: activeSession.name,
-                share_to_community: true,
-              }, { headers: authHeaders });
-              const pg = res.data?.plant_growth;
-              if (pg) {
-                toast.success(`${pg.plant_name} received cosmic nourishment${pg.grew ? ` and grew to ${pg.new_stage}!` : '!'}`);
-              }
-              if (res.data?.shared) {
-                toast.success('Shared to community!');
-              }
-            } catch {}
-            setActiveSession(null);
-          }} />
+          <motion.div
+            key="guided-session-wrap"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="mt-4"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setActiveSession(null)}
+                data-testid="guided-session-back"
+                className="flex items-center gap-2 px-4 py-2 rounded-full text-xs"
+                style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--text-muted)' }}
+              >
+                ← Back to Meditations
+              </button>
+              <span className="text-xs" style={{ color: activeSession.color }}>
+                {activeSession.name}
+              </span>
+            </div>
+            <GuidedSession meditation={activeSession} onEnd={async () => {
+              // Log meditation completion and get plant growth
+              try {
+                const res = await axios.post(`${API}/meditation-history/log`, {
+                  type: activeSession.category || 'guided',
+                  duration_minutes: activeSession.duration,
+                  focus: activeSession.name,
+                  share_to_community: true,
+                }, { headers: authHeaders });
+                const pg = res.data?.plant_growth;
+                if (pg) {
+                  toast.success(`${pg.plant_name} received cosmic nourishment${pg.grew ? ` and grew to ${pg.new_stage}!` : '!'}`);
+                }
+                if (res.data?.shared) {
+                  toast.success('Shared to community!');
+                }
+              } catch {}
+              setActiveSession(null);
+            }} />
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
