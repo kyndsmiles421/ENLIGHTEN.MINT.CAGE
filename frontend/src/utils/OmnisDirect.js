@@ -339,7 +339,7 @@ const OmegaArchitect = {
     },
     
     evolveUI(resonance) {
-      if (resonance > 200) return { theme: 'OMEGA_TRANSCENDENCE', description: 'Pure thought, biometric only' };
+      if (resonance > 200) return { theme: 'OMEGA_TRANSCENDENCE', description: 'Pure thought, resonance only' };
       if (resonance > 144) return { theme: 'CRYSTALLINE_VOID', description: 'Refracted rainbow light' };
       if (resonance > 100) return { theme: 'REFINED_MASONRY', description: 'Geometric precision' };
       return { theme: 'OBSIDIAN_VOID', description: 'Deep black foundation' };
@@ -352,7 +352,7 @@ const OmegaArchitect = {
     secondaryAnchor: { lat: 43.8, lng: -103.5, name: 'Masonry School Node' },
     handshake: 'SendGrid Verified: SOVEREIGN_TRUST',
     holographics: '54-Layer L² Fractal Overlay',
-    biometricSync: '144Hz SEG Harmonic',
+    resonanceSync: '144Hz SEG Harmonic',
   },
 
   /**

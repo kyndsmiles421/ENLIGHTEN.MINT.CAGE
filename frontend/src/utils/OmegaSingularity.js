@@ -237,13 +237,13 @@ const OmegaSingularity = {
   // ═══════════════════════════════════════════════════════════════════════════
   
   /**
-   * Generate art parameters from biometric input
-   * @param {number} heartRate - Current heart rate
+   * Generate art parameters from resonance input
+   * @param {number} pulseValue - Current pulse value
    * @param {number} resonance - User resonance level
    */
-  generateBiometricArt(heartRate = 72, resonance = SEG_HZ) {
-    // Map heart rate to color hue (40-120 BPM → 0-360 hue)
-    const hue = ((heartRate - 40) / 80) * 360;
+  generateResonanceArt(pulseValue = 72, resonance = SEG_HZ) {
+    // Map pulse value to color hue (40-120 Hz → 0-360 hue)
+    const hue = ((pulseValue - 40) / 80) * 360;
     
     // Map resonance to saturation and lightness
     const saturation = Math.min(100, (resonance / SEG_HZ) * 100);
@@ -268,7 +268,7 @@ const OmegaSingularity = {
         fibonacciIndex: fibIndex,
         layers: Math.min(54, fibIndex + 1),
       },
-      inputs: { heartRate, resonance },
+      inputs: { pulseValue, resonance },
       timestamp: new Date().toISOString(),
     };
   },

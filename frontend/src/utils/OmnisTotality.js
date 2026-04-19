@@ -52,7 +52,7 @@ const UI_THEMES = {
     border: 'invisible',
     accent: '#FFFFFF',
     font: 'none',
-    description: 'Pure thought, biometric intent only',
+    description: 'Pure thought, resonance intent only',
   },
 };
 

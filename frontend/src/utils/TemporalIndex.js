@@ -134,7 +134,7 @@ const TemporalIndex = {
       modules: [
         { id: 'holographic-canvas', name: 'Holographic Canvas Systems', layer: 38 },
         { id: 'thought-projection', name: 'Thought-to-Light Projection', layer: 40 },
-        { id: 'biometric-art', name: 'Biometric Art Generation', layer: 42 },
+        { id: 'resonance-art', name: 'Resonance Art Generation', layer: 42 },
         { id: 'consciousness-art', name: 'Consciousness-Based Creation', layer: 44 },
         { id: 'quantum-aesthetics', name: 'Quantum Aesthetic Theory', layer: 46 },
         { id: 'light-weaving', name: 'Pure Light Weaving', layer: 48 },
