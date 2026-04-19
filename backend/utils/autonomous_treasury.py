@@ -66,7 +66,7 @@ class AutonomousTreasury:
     PHI = 1.618033988749895
     PHI_CAP = 0.01618  # φ-based spending cap (1.618%)
     
-    # V29.2 GAMIFIED: No USD values
+    # V29.2 GAMIFIED: No in-app merit values
     FANS_PER_HOUR = 10              # Primary: 10 Fans/hr
     CREDITS_PER_HOUR = 5            # Secondary: 5 Credits/hr
     CREDIT_UNIT = "Fans"
@@ -92,8 +92,8 @@ class AutonomousTreasury:
         """Initialize the Singularity Kernel V29.1 FINAL — Hybrid Economy Mode."""
         
         # V29.1 FINAL: Hybrid Ledger (Internal USD + Frontend Fans)
-        self.equity_reservoir = 0.00          # Real USD value (internal)
-        self.internal_volunteer_value = 0.00  # Tracks $15/hr internally
+        self.equity_reservoir = 0.00          # Real in-app merit value (internal)
+        self.internal_volunteer_value = 0.00  # Tracks 10 credits/hr internally
         self.escrow_vault = 0.00
         self.autopay_enabled = True
         self.lox_stable = True
@@ -171,7 +171,7 @@ class AutonomousTreasury:
         """
         V29.1 FINAL: Record volunteer contribution with HYBRID tracking.
         
-        - Internal: Tracks $15/hr USD value (for admin/accounting)
+        - Internal: Tracks 10 credits/hr in-app merit value (for admin/accounting)
         - Frontend: Awards 10 Fans/hr (gamification display)
         - Server Floor: $5 minimum maintained
         
@@ -621,7 +621,7 @@ class AutonomousTreasury:
                 "T2_LABOR": {
                     "label": "LABOR RATE",
                     "amount": self.tiers["T2_LABOR"],
-                    "formula": "$15/hr Volunteer Credits",
+                    "formula": "10 credits/hr Volunteer Credits",
                     "status": "📊 TRACKING",
                     "fader_position": 2,  # Layer A fader #2 (Equity Gain)
                 },

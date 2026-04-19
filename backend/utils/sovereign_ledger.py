@@ -4,7 +4,7 @@ sovereign_ledger.py
 
 THE COSMIC LEDGER: Tracks all sovereign transactions including:
 - Math Refraction Licenses (Proof of Math economy)
-- Volunteer Credit ($15/hr) conversions
+- Volunteer Credit (10 credits/hr) conversions
 - Aether Fund equity transfers
 - L² Fractal Engine script injections
 
@@ -30,7 +30,7 @@ class SovereignLedger:
     # Constants
     PHI = 1.618033988749895
     INVERSE_PHI = 1 / PHI  # 0.618... The Math Tax coefficient
-    VOLUNTEER_RATE = 15.00  # $15/hr Commonality Constant
+    VOLUNTEER_RATE = 10.0  # 10 credits/hr Commonality Constant
     SEG_FREQUENCY = 144  # Hz
     
     # In-memory ledger (production would use MongoDB)
@@ -72,7 +72,7 @@ class SovereignLedger:
     ) -> Dict[str, Any]:
         """
         Validates and executes the transfer of Equity for high-tier math.
-        Integrates the $15/hr volunteer credit logic into the purchase power.
+        Integrates the 10 credits/hr volunteer credit logic into the purchase power.
         
         MATH TAX: price × (1/φ) — The Golden Ratio Tax
         This feeds back into the Aether Fund for ecosystem sustainability.
@@ -185,7 +185,7 @@ class SovereignLedger:
     ) -> Dict[str, Any]:
         """
         Log volunteer hours and convert to credits.
-        $15/hr Commonality Constant applies.
+        10 credits/hr Commonality Constant applies.
         """
         ledger = cls.get_or_create_ledger(user_id)
         

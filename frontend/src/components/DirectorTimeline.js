@@ -6,7 +6,7 @@
  * - 4 draggable tracks (Law/Art/Logic/Wellness)
  * - Timeline scrubber (Past/Present/Future)
  * - Keyframe markers
- * - Render meter ($15/hr usage tracker)
+ * - Render meter (10 credits/hr usage tracker)
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -138,7 +138,7 @@ export default function DirectorTimeline({ isOpen, onClose }) {
       } else {
         await axios.post(`${API}/omnis/director/render-meter/start`);
         setRenderMeter({ ...renderMeter, is_active: true });
-        toast.success('Render Meter Started', { description: '$15/hr Knowledge Equity tracking' });
+        toast.success('Render Meter Started', { description: '10 credits/hr Credit Accrual tracking' });
       }
     } catch (err) {
       console.log('Render meter toggle skipped');

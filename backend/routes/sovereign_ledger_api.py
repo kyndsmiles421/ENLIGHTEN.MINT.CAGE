@@ -107,7 +107,7 @@ async def log_volunteer_hours(
     """
     V-FINAL SOVEREIGN LEDGER — LOG VOLUNTEER HOURS
     
-    Log volunteer hours and convert to credits at $15/hr rate.
+    Log volunteer hours and convert to credits at 10 credits/hr rate.
     Also adds equity bonus at 1/φ rate.
     """
     return sovereign_ledger.log_volunteer_hours(user_id, hours, activity)

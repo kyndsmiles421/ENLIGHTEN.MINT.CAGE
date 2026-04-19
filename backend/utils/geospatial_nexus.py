@@ -15,7 +15,7 @@ THE THREE NODES:
 │  └─ Type: GATEWAY | Utility: Public Portal with Multi-Language QR Crystal  │
 │                                                                             │
 │  NODE 2: RAPID CITY CENTRAL (44.0831°N, 103.2244°W)                        │
-│  └─ Type: ADVOCACY | Utility: Legislative Sync & Volunteer Hub ($15/hr)    │
+│  └─ Type: ADVOCACY | Utility: Legislative Sync & Volunteer Hub (10 credits/hr)    │
 │                                                                             │
 │  NODE 3: BLACK ELK SANCTUARY (43.8661°N, 103.5314°W)                       │
 │  └─ Type: RESONANCE | Utility: Deep LOx-cooled Superconducting Sessions    │

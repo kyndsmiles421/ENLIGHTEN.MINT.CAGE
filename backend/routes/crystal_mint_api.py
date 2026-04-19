@@ -30,7 +30,7 @@ async def check_eligibility(user=Depends(get_current_user)):
     Check if the authenticated user is eligible to mint a Sovereign Mastery NFT.
     
     Requirements:
-    - 10,000+ volunteer credits (~666.67 hours @ $15/hr)
+    - 10,000+ volunteer credits (~1000 hours @ 10 credits/hr)
     - At least one Math Refraction license owned
     
     Returns eligibility status with progress details.

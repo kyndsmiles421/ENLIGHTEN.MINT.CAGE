@@ -10,7 +10,7 @@ No more "Failed to load" errors. Everything interconnected.
 NODULES:
 - Star Chart (16 constellations, 21 cultures)
 - The Vault (Archives, Journal, Ledger)
-- Trade Circle (Credits, Marketplace, $15/hr)
+- Trade Circle (Credits, Marketplace, 10 credits/hr)
 - Oracle (5 divination systems)
 - Manifest Bar (Hub, Trade, Oracle, Discover, Mixer)
 - UI Theme (Obsidian Void / Crystal Rainbow)
@@ -40,7 +40,7 @@ class V53_LogicEngine:
     COMPOSITE = 690         # Composite Frequency
     
     # Financial Constants
-    HOURLY_RATE = 15.0      # $15/hr Volunteer Credit
+    HOURLY_RATE = 10.0      # 10 credits/hr Volunteer Credit
     
     # Solfeggio Frequency Map
     SOLFEGGIO_MAP = {

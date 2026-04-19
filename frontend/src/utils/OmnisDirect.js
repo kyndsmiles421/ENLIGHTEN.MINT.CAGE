@@ -10,9 +10,9 @@
  * 3. Holographic Overlays (Flower of Life HUD)
  * 4. GPS Phygital Lock (Masonry School anchor)
  * 5. Biometric Keyframing (144Hz trigger)
- * 6. RPG Progression (Knowledge Equity tracking)
+ * 6. RPG Progression (Credit Accrual tracking)
  * 7. Adaptive UI (Obsidian → Rainbow morphing)
- * 8. Automated Billing ($15/hr deduction)
+ * 8. Automated Billing (10 credits/hr deduction)
  * 9. AI Teaching Ghost (AR tutor projection)
  * 10. The Sovereign Movie (54-layer synthesis)
  */
@@ -184,7 +184,7 @@ const DirectorEngine = {
   },
 
   /**
-   * 3. RENDER METER - Track $15/hr usage
+   * 3. RENDER METER - Track 10 credits/hr usage
    */
   startRenderMeter() {
     this.renderMeter.startTime = Date.now();
@@ -322,7 +322,7 @@ const OmegaArchitect = {
     hud: 'Perplexity-Threaded Search Centroid',
     timeline: 'PowerDirector Multi-Track (Law/Art/Logic/Wellness)',
     mixer: 'Creator Control Mixer V9999.4 (Resonance/Flux/Tier)',
-    renderMeter: 'Real-time $15/hr Usage Tracker',
+    renderMeter: 'Real-time 10 credits/hr Usage Tracker',
   },
 
   // GAME ENGINE: Moves 4-6 (RPG + Aion Generator)
@@ -365,7 +365,7 @@ const OmegaArchitect = {
       3: () => ({ name: 'Holographic Overlays', result: 'Flower of Life HUD layer active' }),
       4: () => ({ name: 'GPS Phygital Lock', result: `Masonry School anchor: ${this.phygital.secondaryAnchor.lat}°N` }),
       5: () => ({ name: 'Biometric Keyframing', result: '144Hz pulse trigger configured' }),
-      6: () => ({ name: 'RPG Progression', result: 'Knowledge Equity tracking active' }),
+      6: () => ({ name: 'RPG Progression', result: 'Credit Accrual tracking active' }),
       7: () => ({ name: 'Adaptive UI', result: this.gameEngine.evolveUI(144).theme }),
       8: () => ({ name: 'Automated Billing', result: `$${this.usageRate}/hr Circular Ledger active` }),
       9: () => ({ name: 'AI Teaching Ghost', result: 'AR tutor projection at Black Hills' }),

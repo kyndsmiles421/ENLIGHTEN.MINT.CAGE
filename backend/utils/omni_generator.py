@@ -7,14 +7,14 @@
 
 THE GENERATOR doesn't just provide "electricity"—it provides the COHERENCE
 that binds professional cooking (cottage food logistics), engineering,
-the $15/hr volunteer economy, and the Seven Seals Network into one living engine.
+the 10 credits/hr volunteer economy, and the Seven Seals Network into one living engine.
 
 FORMULA: L² = (Thermal × Economic × Community) / π
 
 INPUTS:
 - LOX Cooling (-183°C superconductivity)
 - Market Resonance (Aether Fund)
-- Volunteer Credits ($15/hr pulse)
+- Volunteer Credits (10 credits/hr pulse)
 
 OUTPUTS:
 - Crystal Power (UI glow intensity)
@@ -62,7 +62,7 @@ class OmniGenerator:
     RESONANCE = (PHI ** 2) / math.pi  # 0.833346
     LOX_CRITICAL_TEMP = -183.0  # Celsius
     BASELINE_EQUITY = 49018.24
-    VOLUNTEER_RATE = 15.00
+    VOLUNTEER_RATE = 10.0
     
     # System-Wide Sector Weights
     SECTORS = {
@@ -182,7 +182,7 @@ class OmniGenerator:
         economic_thrust = (equity / self.BASELINE_EQUITY) * self.PHI
         self._generator_state["economic_thrust"] = economic_thrust
         
-        # 3. COMMUNITY: The $15/hr Volunteer Pulse
+        # 3. COMMUNITY: The 10 credits/hr Volunteer Pulse
         volunteer_credits = ledger_status["volunteer"]["credits"]
         community_pulse = self.RESONANCE * (1 + volunteer_credits / 1000)
         self._generator_state["community_pulse"] = community_pulse

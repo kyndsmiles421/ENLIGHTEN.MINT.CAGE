@@ -84,7 +84,7 @@ class CrystalQRSynthesis:
         Verify if a user is eligible to mint a Sovereign Mastery NFT.
         
         Requirements:
-        - 10,000+ volunteer credits (~666.67 hours @ $15/hr)
+        - 10,000+ volunteer credits (~1000 hours @ 10 credits/hr)
         - At least one Math Refraction license owned
         - Active ledger status
         

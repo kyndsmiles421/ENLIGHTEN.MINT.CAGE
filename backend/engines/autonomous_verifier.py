@@ -26,7 +26,7 @@ class SovereignAutoPilot:
     Automated verification of Volunteer Hours and Tier Access.
     
     SUSTAINABILITY ENGINE V1.3:
-    - $15.00 per volunteer hour (adjusted reciprocity)
+    - 10 credits per hour (closed-loop merit, no external value)
     - $5.00 Cafe Fund Floor (minimum contribution)
     - Auto-approve up to 4 hours for valid activities
     """
@@ -47,7 +47,7 @@ class SovereignAutoPilot:
     AUTO_APPROVE_LIMIT = 4.0
     
     # SUSTAINABILITY V1.3: Adjusted credit value
-    CREDIT_VALUE = 15.00  # $15 per volunteer hour
+    CREDIT_VALUE = 10.0  # 10 credits per hour (closed-loop merit, no external value)
     
     # CAFE FUND FLOOR: Minimum contribution
     CAFE_FUND_FLOOR = 5.00

@@ -22,12 +22,12 @@ class ReciprocityGate:
     The Reciprocity Gate — Volunteer Hours → Access Credits
     
     SUSTAINABILITY ENGINE V1.3:
-    - $15.00 per volunteer hour (adjusted reciprocity)
+    - 10 credits per hour (closed-loop merit, no external value)
     - $5.00 Cafe Fund Floor (minimum contribution)
     - 20% Early Adopter Discount
     """
     
-    CREDIT_VALUE_PER_HOUR = 15.00  # ADJUSTED: $15 per volunteer hour
+    CREDIT_VALUE_PER_HOUR = 10.0  # ADJUSTED: 10 credits per hour (closed-loop merit, no external value)
     MARKET_RATE = 50.00  # Standard market rate
     SOVEREIGN_DISCOUNT = 0.20  # 20% below market
     CAFE_FUND_FLOOR = 5.00  # Minimum contribution to cover operational costs

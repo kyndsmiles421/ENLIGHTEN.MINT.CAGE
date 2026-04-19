@@ -50,7 +50,7 @@ class OmegaSentinel:
     INVERSE_PHI = 1 / PHI  # 0.618... (Math Tax)
     TRANSFER_TAX = 1 / (PHI ** 2)  # 0.382... (Transfer Tax)
     RESONANCE = (PHI ** 2) / math.pi  # 0.833346
-    VOLUNTEER_RATE = 15.00
+    VOLUNTEER_RATE = 10.0
     SEG_FREQUENCY = 144
     LOX_TEMP = -183.0
     
