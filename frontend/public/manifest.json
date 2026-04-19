@@ -2,7 +2,7 @@
   "name": "ENLIGHTEN.MINT.CAFE",
   "short_name": "Enlighten",
   "description": "Wellness OS powered by Sacred Geometry and Zero-Scale Physics.",
-  "id": "com.enlighten.mint.cafe",
+  "id": "com.enlighten-mint-cafe.me",
   "start_url": "/sovereign-hub",
   "scope": "/",
   "display": "fullscreen",
@@ -17,7 +17,7 @@
   "related_applications": [
     {
       "platform": "play",
-      "id": "com.enlighten.mint.cafe"
+      "id": "com.enlighten-mint-cafe.me"
     }
   ],
   "icons": [

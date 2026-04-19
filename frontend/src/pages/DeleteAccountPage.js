@@ -54,7 +54,7 @@ export default function DeleteAccountPage() {
               <h2 style={{ color: '#22C55E', fontSize: 18, margin: 0 }}>Account Deleted</h2>
             </div>
             <p style={{ fontSize: 13, lineHeight: 1.6, margin: '0 0 10px' }}>Your account and all associated data have been permanently removed. Backup systems purge within 30 days.</p>
-            <p style={{ fontSize: 11, color: 'rgba(248,250,252,0.5)', margin: 0 }}>Questions? <a href="mailto:sovereign@enlighten.mint.cafe" style={{ color: '#F0C470' }}>sovereign@enlighten.mint.cafe</a></p>
+            <p style={{ fontSize: 11, color: 'rgba(248,250,252,0.5)', margin: 0 }}>Questions? <a href="mailto:sovereign@enlighten-mint-cafe.me" style={{ color: '#F0C470' }}>sovereign@enlighten-mint-cafe.me</a></p>
           </div>
         ) : (
           <>
@@ -111,7 +111,7 @@ export default function DeleteAccountPage() {
                 <h4 style={{ fontSize: 12, color: '#818CF8', margin: 0 }}>Can&apos;t sign in?</h4>
               </div>
               <p style={{ fontSize: 12, lineHeight: 1.6, margin: 0 }}>
-                Email <a href="mailto:sovereign@enlighten.mint.cafe?subject=Account%20Deletion%20Request" style={{ color: '#F0C470' }}>sovereign@enlighten.mint.cafe</a> from the address on your account with subject &quot;Account Deletion Request&quot;. We confirm and complete deletion within 7 business days.
+                Email <a href="mailto:sovereign@enlighten-mint-cafe.me?subject=Account%20Deletion%20Request" style={{ color: '#F0C470' }}>sovereign@enlighten-mint-cafe.me</a> from the address on your account with subject &quot;Account Deletion Request&quot;. We confirm and complete deletion within 7 business days.
               </p>
             </div>
           </>

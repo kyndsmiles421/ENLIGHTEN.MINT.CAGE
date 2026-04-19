@@ -122,7 +122,7 @@ The following verbatim language is bound into the Terms of Service at `/terms`:
 ## 8. Contact
 
 Questions from reviewers or regulators:
-**sovereign@enlighten.mint.cafe** — response SLA 7 business days.
+**sovereign@enlighten-mint-cafe.me** — response SLA 7 business days.
 
 ---
 

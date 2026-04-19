@@ -45,7 +45,7 @@ export default function PrivacyPage() {
       icon: Trash2,
       title: 'Your Rights & Data Deletion',
       color: '#EF4444',
-      content: 'You can request at any time: (i) a copy of all data we hold about you, (ii) correction of inaccuracies, (iii) full account deletion. To request deletion, email sovereign@enlighten.mint.cafe or open Settings → "Delete my account" in the app. Your account, associated wallet, quest log, and inventory are permanently removed within 14 days; backups purge within 30 days.',
+      content: 'You can request at any time: (i) a copy of all data we hold about you, (ii) correction of inaccuracies, (iii) full account deletion. To request deletion, email sovereign@enlighten-mint-cafe.me or open Settings → "Delete my account" in the app. Your account, associated wallet, quest log, and inventory are permanently removed within 14 days; backups purge within 30 days.',
     },
     {
       icon: Shield,
@@ -57,7 +57,7 @@ export default function PrivacyPage() {
       icon: Mail,
       title: 'Contact',
       color: '#A78BFA',
-      content: 'Privacy enquiries, access requests, or deletion requests: sovereign@enlighten.mint.cafe. For legal notices, please include "PRIVACY" in the subject line. We respond within 7 business days.',
+      content: 'Privacy enquiries, access requests, or deletion requests: sovereign@enlighten-mint-cafe.me. For legal notices, please include "PRIVACY" in the subject line. We respond within 7 business days.',
     },
   ];
 

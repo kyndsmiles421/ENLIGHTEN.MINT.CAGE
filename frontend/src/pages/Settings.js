@@ -172,7 +172,7 @@ export default function Settings() {
       setTimeout(() => { window.location.href = '/'; }, 400);
     } catch (err) {
       setDeleting(false);
-      const msg = err?.response?.data?.detail || err?.message || 'Deletion failed — please contact sovereign@enlighten.mint.cafe';
+      const msg = err?.response?.data?.detail || err?.message || 'Deletion failed — please contact sovereign@enlighten-mint-cafe.me';
       toast.error(msg);
     }
   };
@@ -603,7 +603,7 @@ export default function Settings() {
                   </div>
 
                   <p className="text-[9px] mt-3 text-center" style={{ color: 'var(--text-muted)' }}>
-                    Questions? Email <a href="mailto:sovereign@enlighten.mint.cafe" style={{ color: '#C084FC' }}>sovereign@enlighten.mint.cafe</a>
+                    Questions? Email <a href="mailto:sovereign@enlighten-mint-cafe.me" style={{ color: '#C084FC' }}>sovereign@enlighten-mint-cafe.me</a>
                   </p>
                 </motion.div>
               )}

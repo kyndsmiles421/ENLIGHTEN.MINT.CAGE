@@ -1,6 +1,6 @@
 {
-  "packageId": "com.enlighten.mint.cafe",
-  "host": "enlighten.mint.cafe",
+  "packageId": "com.enlighten-mint-cafe.me",
+  "host": "enlighten-mint-cafe.me",
   "name": "ENLIGHTEN.MINT.CAFE",
   "launcherName": "Enlighten",
   "display": "fullscreen",
@@ -11,8 +11,8 @@
   "backgroundColor": "#000000",
   "enableNotifications": true,
   "startUrl": "/sovereign-hub",
-  "iconUrl": "https://enlighten.mint.cafe/logo512.png",
-  "maskableIconUrl": "https://enlighten.mint.cafe/maskable_512.png",
+  "iconUrl": "https://enlighten-mint-cafe.me/logo512.png",
+  "maskableIconUrl": "https://enlighten-mint-cafe.me/maskable_512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "./android.keystore",
@@ -25,29 +25,29 @@
       "name": "Wellness",
       "short_name": "Wellness",
       "url": "/breathing",
-      "icons": [{"src": "https://enlighten.mint.cafe/logo192.png", "sizes": "192x192"}]
+      "icons": [{"src": "https://enlighten-mint-cafe.me/logo192.png", "sizes": "192x192"}]
     },
     {
       "name": "Oracle",
       "short_name": "Oracle",
       "url": "/oracle",
-      "icons": [{"src": "https://enlighten.mint.cafe/logo192.png", "sizes": "192x192"}]
+      "icons": [{"src": "https://enlighten-mint-cafe.me/logo192.png", "sizes": "192x192"}]
     },
     {
       "name": "Earth Medicine",
       "short_name": "Medicine",
       "url": "/herbology",
-      "icons": [{"src": "https://enlighten.mint.cafe/logo192.png", "sizes": "192x192"}]
+      "icons": [{"src": "https://enlighten-mint-cafe.me/logo192.png", "sizes": "192x192"}]
     },
     {
       "name": "Academy",
       "short_name": "Academy",
       "url": "/academy",
-      "icons": [{"src": "https://enlighten.mint.cafe/logo192.png", "sizes": "192x192"}]
+      "icons": [{"src": "https://enlighten-mint-cafe.me/logo192.png", "sizes": "192x192"}]
     }
   ],
   "generatorApp": "bubblewrap-cli",
-  "webManifestUrl": "https://enlighten.mint.cafe/manifest.json",
+  "webManifestUrl": "https://enlighten-mint-cafe.me/manifest.json",
   "fallbackType": "customtabs",
   "features": {
     "locationDelegation": { "enabled": false },
