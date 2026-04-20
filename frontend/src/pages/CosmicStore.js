@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLatency } from '../hooks/useLatencyPulse';
 import useGameController from '../hooks/useGameController';
 import GameModuleWrapper from '../components/game/GameModuleWrapper';
+import { guardCheckoutForTWA } from '../utils/paymentGate';
 import {
   ArrowLeft, Crown, Eye, Radio, Package, Zap, Key, Sparkles,
   Sun, Flame, Monitor, Film, Coins, ShoppingBag, ChevronRight,
@@ -393,6 +394,7 @@ export default function CosmicStore() {
   };
 
   const handleBuyCredits = async (packageId) => {
+    if (guardCheckoutForTWA(`credits:${packageId}`)) return;
     setPurchasing(true);
     try {
       const baseUrl = window.location.origin;
@@ -412,6 +414,7 @@ export default function CosmicStore() {
   };
 
   const handleSubscribeNexus = async () => {
+    if (guardCheckoutForTWA('nexus_subscribe')) return;
     setPurchasing(true);
     try {
       const baseUrl = window.location.origin;

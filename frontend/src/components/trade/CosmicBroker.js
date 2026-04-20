@@ -6,6 +6,7 @@ import {
   Coins, ShoppingBag, ArrowDownUp, Gem, Wind, Cpu,
   ChevronRight, Minus, Plus, Sparkles, CreditCard, Lock
 } from 'lucide-react';
+import { guardCheckoutForTWA } from '../../utils/paymentGate';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -201,6 +202,7 @@ export default function CosmicBroker({ authHeaders }) {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleBuyCredits = async (packId) => {
+    if (guardCheckoutForTWA(`trade_credits:${packId}`)) return;
     setBuying(packId);
     try {
       const baseUrl = window.location.origin;

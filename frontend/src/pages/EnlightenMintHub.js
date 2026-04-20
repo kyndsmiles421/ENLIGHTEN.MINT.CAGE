@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { guardCheckoutForTWA } from '../utils/paymentGate';
 
 /**
  * EnlightenMintHub.js — Quantum Loom Interface
@@ -99,6 +100,7 @@ export default function EnlightenMintHub() {
   }, [nodules]);
 
   const handleStripeCheckout = async (tier) => {
+    if (guardCheckoutForTWA(`hub_checkout:${tier}`)) return;
     try {
       // Call backend to create checkout session
       const res = await fetch(`${API}/api/subscriptions/checkout-subscription`, {

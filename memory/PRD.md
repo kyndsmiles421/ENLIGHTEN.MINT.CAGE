@@ -1,6 +1,19 @@
 # ENLIGHTEN.MINT.CAFE — V68.16 Sovereign Guide
 ## PRD — Last Updated: Feb 20, 2026
 
+## 🔒 V68.17 (Feb 20, 2026) — Gatekeeper Wired + Cosmetic Bundle Store LIVE
+
+**Door D — Stripe × Google Play gating COMPLETE (all 7 real-money surfaces wired):**
+- Handler-level `guardCheckoutForTWA()` added at the top of every Stripe checkout call: `EconomyPage.handleSubscribe/handlePurchasePack/handlePurchasePolymath`, `CosmicStore.handleBuyCredits/handleSubscribeNexus`, `MembershipLoom.handleTierSelect`, `EnlightenMintHub.handleStripeCheckout`, `EnlightenmentContext.initiateAetherFlow`, `CosmicBroker.handleBuyCredits`.
+- Dust-only endpoints (`/sovereigns/purchase-session`, `/sovereigns/purchase-utility`, `/treasury/purchase`) were audited and confirmed NOT Stripe — left untouched.
+- `SovereignStageHUD` now carries a universal **"+" Top-Up pill** — always opens `enlighten-mint-cafe.me/economy?from=hud` in an external browser tab. One-tap Stripe handoff on every platform, zero ambiguity for Play Store reviewers.
+- `/app/STRIPE_ANDROID_POLICY.md` documents the full 2026 policy stance.
+
+**Cosmetic Bundle Store LIVE (backend + Mirror integration):**
+- New `/app/backend/routes/cosmetic_bundles.py` — `GET /api/cosmetic-bundles` lists + `POST /api/cosmetic-bundles/purchase` debits Sparks and auto-equips the items into `rpg_equipped`. 3 starter bundles seeded once from Mongo (editable live, zero redeploy): **Sovereign Gold** (2500 cr, legendary body + rare head + legendary trinket), **Oracle Violet** (1200 cr, epic head + uncommon body), **Artisan Obsidian** (450 cr, uncommon head + common trinket).
+- The Fractal Engine's Metabolic Mirror reads `rpg_equipped` directly, so every bundle purchase creates an *instant* visual transformation of the 3D silhouette at the lattice center — the highest-conversion surface in the app.
+- End-to-end verified (screenshot): owner spent 1200 → balance 98,801 → silhouette flipped from gold to green body + violet Saturn crown in the same session. No page refresh.
+
 ## 🔒 V68.16 (Feb 20, 2026) — Metabolic Mirror + Stripe Android Gatekeeper
 
 **Door C — Metabolic Mirror (LIVE, visually verified):** the user's 2D RPG equipment from `GET /api/rpg/character` now binds to the 3D `CrystallineSilhouette` at the center of the Fractal Engine:

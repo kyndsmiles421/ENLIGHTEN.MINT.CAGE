@@ -15,10 +15,15 @@
  */
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Award, Coins, Compass } from 'lucide-react';
+import { Award, Coins, Compass, Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+// External top-up URL — ALWAYS opens in the default browser (new tab) so
+// that on Google Play TWA the Stripe checkout lives clearly outside the
+// APK, avoiding the 30% Play Billing cut. On every other platform this
+// still opens a new tab but the UX is identical.
+const TOPUP_URL = 'https://enlighten-mint-cafe.me/economy?from=hud';
 
 export default function SovereignStageHUD({ anchor = 'top-right', compact = false }) {
   const { user } = useAuth();
@@ -152,6 +157,30 @@ export default function SovereignStageHUD({ anchor = 'top-right', compact = fals
             <span style={{ fontWeight: 700 }}>{Number(dust).toLocaleString()}</span>
           </div>
         )}
+        {/* Top-Up pill — always opens external web checkout (TWA-safe) */}
+        <a
+          href={TOPUP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-testid="stage-hud-topup"
+          title="Top up credits on the web"
+          style={{
+            background: 'rgba(0,0,0,0.55)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(0,255,204,0.35)',
+            borderRadius: 999,
+            padding: '6px 10px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            fontSize: 11,
+            color: '#00ffcc',
+            textDecoration: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          <Plus size={12} />
+        </a>
       </div>
 
       {missionText && !compact && (

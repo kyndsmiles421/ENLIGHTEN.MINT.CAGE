@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { guardCheckoutForTWA } from '../utils/paymentGate';
 
 /**
  * MembershipLoom.js — Refractal Membership Selection
@@ -316,6 +317,8 @@ export default function MembershipLoom() {
       navigate('/auth?redirect=/membership');
       return;
     }
+
+    if (guardCheckoutForTWA(`membership:${tier.id}`)) return;
 
     setIsLoading(true);
 

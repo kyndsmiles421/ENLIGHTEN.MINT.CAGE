@@ -1,4 +1,5 @@
 import React, { createContext, useReducer, useContext, useCallback, useMemo } from 'react';
+import { guardCheckoutForTWA } from '../utils/paymentGate';
 
 /**
  * EnlightenmentContext.js — The Sovereign State Machine
@@ -112,6 +113,7 @@ export const EnlightenmentProvider = ({ children }) => {
 
   // 3. THE ECONOMY: Stripe Four-Tiered Integration
   const initiateAetherFlow = useCallback(async (tier) => {
+    if (guardCheckoutForTWA(`aether:${tier}`)) return;
     try {
       const token = localStorage.getItem('zen_token');
       

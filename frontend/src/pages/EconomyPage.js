@@ -6,6 +6,7 @@ import {
   Coffee, Code, Leaf, Briefcase, Eye, Compass, Wand2,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { guardCheckoutForTWA } from '../utils/paymentGate';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -296,6 +297,7 @@ export default function EconomyPage() {
       setLoading('');
       return;
     }
+    if (guardCheckoutForTWA(`subscribe:${tierId}`)) return;
     setLoading(tierId);
     try {
       const res = await fetch(`${API}/api/economy/subscribe`, {
@@ -309,6 +311,7 @@ export default function EconomyPage() {
   };
 
   const handlePurchasePack = async (packId) => {
+    if (guardCheckoutForTWA(`pack:${packId}`)) return;
     setLoading(packId);
     try {
       const res = await fetch(`${API}/api/economy/purchase-pack`, {
@@ -322,6 +325,7 @@ export default function EconomyPage() {
   };
 
   const handlePurchasePolymath = async () => {
+    if (guardCheckoutForTWA('polymath')) return;
     setLoading('polymath');
     try {
       const res = await fetch(`${API}/api/economy/purchase-polymath`, {
