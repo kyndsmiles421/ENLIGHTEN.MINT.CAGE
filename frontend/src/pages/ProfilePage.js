@@ -68,8 +68,22 @@ function TonePlayer({ frequency, playing }) {
   return null;
 }
 
-function AvatarDisplay({ style, size = 80, name = '?' }) {
+function AvatarDisplay({ style, size = 80, name = '?', avatarB64 = null }) {
   const avatarStyle = AVATAR_STYLES.find(a => a.id === style) || AVATAR_STYLES[0];
+  if (avatarB64) {
+    const src = avatarB64.startsWith('data:') ? avatarB64 : `data:image/png;base64,${avatarB64}`;
+    return (
+      <div className="rounded-full overflow-hidden"
+        style={{
+          width: size, height: size,
+          background: `linear-gradient(135deg, ${avatarStyle.colors[0]}, ${avatarStyle.colors[1]})`,
+          boxShadow: `0 0 ${size / 3}px ${avatarStyle.colors[0]}55`,
+          border: `2px solid ${avatarStyle.colors[0]}66`,
+        }}>
+        <img src={src} alt={name} className="w-full h-full object-cover" />
+      </div>
+    );
+  }
   return (
     <div className="rounded-full flex items-center justify-center font-bold"
       style={{
@@ -84,10 +98,12 @@ function AvatarDisplay({ style, size = 80, name = '?' }) {
   );
 }
 
+
 export default function ProfilePage() {
   const { userId } = useParams();
   const { user, authHeaders } = useAuth();
   const [profile, setProfile] = useState(null);
+  const [avatarB64, setAvatarB64] = useState(null);
   const [covers, setCovers] = useState([]);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -101,14 +117,19 @@ export default function ProfilePage() {
     if (userId && (!user || userId !== user.id)) {
       // Viewing someone else's public profile
       axios.get(`${API}/profile/public/${userId}`)
-        .then(r => { setProfile(r.data); setDraft(r.data); })
+        .then(r => { setProfile(r.data); setDraft(r.data); setAvatarB64(r.data.avatar_b64 || null); })
         .catch(() => toast.error('Profile not found'))
         .finally(() => setLoading(false));
     } else if (user) {
-      axios.get(`${API}/profile/me`, { headers: authHeaders })
-        .then(r => { setProfile(r.data); setDraft(r.data); })
-        .catch(() => {})
-        .finally(() => setLoading(false));
+      Promise.allSettled([
+        axios.get(`${API}/profile/me`, { headers: authHeaders }),
+        axios.get(`${API}/ai-visuals/my-avatar`, { headers: authHeaders }),
+      ]).then(([p, a]) => {
+        if (p.status === 'fulfilled') { setProfile(p.value.data); setDraft(p.value.data); }
+        if (a.status === 'fulfilled' && a.value.data?.status === 'active' && a.value.data?.image_b64) {
+          setAvatarB64(a.value.data.image_b64);
+        }
+      }).finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
@@ -136,7 +157,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'transparent' }} data-testid="restricted-profile">
         <div className="p-12 text-center max-w-md">
-          <AvatarDisplay style={profile.avatar_style} size={80} name={profile.display_name || '?'} />
+          <AvatarDisplay style={profile.avatar_style} size={80} name={profile.display_name || '?'} avatarB64={avatarB64} />
           <h2 className="text-2xl font-light mt-6 mb-2" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
             {profile.display_name}
           </h2>
@@ -174,7 +195,7 @@ export default function ProfilePage() {
         {/* Avatar + Name */}
         <div className="flex items-end gap-6 mb-8">
           <div className="relative">
-            <AvatarDisplay style={p.avatar_style} size={120} name={p.display_name || p.name || user?.name || '?'} />
+            <AvatarDisplay style={p.avatar_style} size={120} name={p.display_name || p.name || user?.name || '?'} avatarB64={avatarB64} />
             {p.vibe_status && (
               <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full text-xs whitespace-nowrap"
                 style={{ background: `${themeColor}20`, border: `1px solid ${themeColor}30`, color: themeColor }}>
@@ -426,7 +447,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span style={{ color: 'var(--text-secondary)' }}>Avatar</span>
-                  <AvatarDisplay style={p.avatar_style} size={24} name={p.display_name || p.name || user?.name || '?'} />
+                  <AvatarDisplay style={p.avatar_style} size={24} name={p.display_name || p.name || user?.name || '?'} avatarB64={avatarB64} />
                 </div>
               </div>
             </div>

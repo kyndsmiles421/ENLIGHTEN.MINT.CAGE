@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import { ChevronDown, Share2, LogOut, LogIn } from 'lucide-react';
+import { ChevronDown, Share2, LogOut, LogIn, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { useSovereignUniverse } from '../context/SovereignUniverseContext';
@@ -118,6 +118,8 @@ const PILLARS = [
     { label: 'Nexus', route: '/nexus' },
   ]},
   { title: 'Sage AI Coach', color: '#38BDF8', items: [
+    { label: 'My Sanctuary (Profile)', route: '/profile' },
+    { label: 'Friends', route: '/friends' },
     { label: 'Voice Conversations', route: '/coach' },
     { label: 'Daily Briefing', route: '/daily-briefing' },
     { label: 'Cosmic Profile', route: '/cosmic-profile' },
@@ -331,6 +333,16 @@ export default function SovereignHub() {
         >
           <Share2 size={14} /> Share
         </button>
+        {user && (
+          <Link
+            to="/profile"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-medium transition-all active:scale-95"
+            style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.2)', color: '#C084FC' }}
+            data-testid="hub-my-sanctuary"
+          >
+            <User size={14} /> My Sanctuary
+          </Link>
+        )}
       </div>
 
       {/* V56.1 — Daily Elemental Challenges */}

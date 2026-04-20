@@ -38,11 +38,19 @@ async def customize_profile(data: ProfileCustomize, user=Depends(get_current_use
 async def get_my_profile(user=Depends(get_current_user)):
     profile = await db.profiles.find_one({"user_id": user["id"]}, {"_id": 0})
     user_doc = await db.users.find_one({"id": user["id"]}, {"_id": 0, "password": 0})
+    # Attach active AI-generated avatar image so the portrait renders on
+    # the Profile page and shared links without a second round-trip.
+    ai_avatar = await db.user_avatars.find_one(
+        {"user_id": user["id"], "is_active": True},
+        {"_id": 0, "image_b64": 1},
+    )
+    avatar_b64 = (ai_avatar or {}).get("image_b64") or None
     if not profile:
-        return {"user_id": user["id"], "display_name": user_doc.get("name"), "bio": "", "cover_image": COVER_PRESETS[0]["url"], "theme_color": "#D8B4FE", "avatar_style": "purple-teal", "vibe_status": "", "favorite_quote": "", "music_choice": "none", "music_frequency": 432, "show_stats": True, "show_activity": True, "visibility": "public", "message_privacy": "everyone"}
+        return {"user_id": user["id"], "display_name": user_doc.get("name"), "bio": "", "cover_image": COVER_PRESETS[0]["url"], "theme_color": "#D8B4FE", "avatar_style": "purple-teal", "vibe_status": "", "favorite_quote": "", "music_choice": "none", "music_frequency": 432, "show_stats": True, "show_activity": True, "visibility": "public", "message_privacy": "everyone", "avatar_b64": avatar_b64}
     profile["display_name"] = profile.get("display_name") or user_doc.get("name")
     profile.setdefault("visibility", "public")
     profile.setdefault("message_privacy", "everyone")
+    profile["avatar_b64"] = avatar_b64
     return profile
 
 @router.get("/profile/public/{user_id}")
@@ -86,7 +94,7 @@ async def get_public_profile_full(user_id: str, user=Depends(get_current_user_op
                     "message": "This profile is only visible to friends.",
                 }
 
-    mood_count, journal_count, post_count, ritual_sessions, challenge_count, follower_count, recent_posts = await asyncio.gather(
+    mood_count, journal_count, post_count, ritual_sessions, challenge_count, follower_count, recent_posts, ai_avatar = await asyncio.gather(
         db.moods.count_documents({"user_id": user_id}),
         db.journal.count_documents({"user_id": user_id}),
         db.community_posts.count_documents({"user_id": user_id}),
@@ -94,6 +102,7 @@ async def get_public_profile_full(user_id: str, user=Depends(get_current_user_op
         db.challenge_participants.count_documents({"user_id": user_id}),
         db.follows.count_documents({"following_id": user_id}),
         db.community_posts.find({"user_id": user_id}, {"_id": 0}).sort("created_at", -1).to_list(5),
+        db.user_avatars.find_one({"user_id": user_id, "is_active": True}, {"_id": 0, "image_b64": 1}),
     )
     return {
         "id": user_id,
@@ -105,6 +114,7 @@ async def get_public_profile_full(user_id: str, user=Depends(get_current_user_op
         "cover_image": profile.get("cover_image", COVER_PRESETS[0]["url"]),
         "avatar_style": profile.get("avatar_style", "purple-teal"),
         "avatar_url": profile.get("avatar_url"),
+        "avatar_b64": (ai_avatar or {}).get("image_b64"),
         "theme_color": profile.get("theme_color", "#D8B4FE"),
         "music_choice": profile.get("music_choice", "none"),
         "music_frequency": profile.get("music_frequency", 432),

@@ -1,6 +1,30 @@
 # ENLIGHTEN.MINT.CAFE — V68.16 Sovereign Guide
 ## PRD — Last Updated: Feb 20, 2026
 
+## 🔒 V68.18 (Feb 20, 2026) — Identity Restored + Profile Discoverability
+
+**User caught:** the 3D silhouette looked "generic" compared to the Dashboard's real AI-generated portrait. And there was no obvious way to find or share your own profile page.
+
+**Root causes:**
+- FractalEngine's `CrystallineSilhouette` rendered an abstract procedural head. It never loaded the user's real avatar from `/api/ai-visuals/my-avatar`.
+- `ProfilePage` itself showed a letter-initial gradient instead of the AI portrait.
+- `/api/profile/me` and `/api/profile/public/:userId` never attached `avatar_b64`, so even the public/shareable profile fell back to the placeholder.
+- `SovereignHub` had no prominent "My Profile" button — users had to dig through tile menus to find `/profile`.
+
+**Fixes shipped:**
+- `FractalEngine` now fetches `/api/ai-visuals/my-avatar` + `/api/profile/me` and passes `avatarB64` + `profileColor` into `CrystallineSilhouette`. The silhouette's head is now a proper camera-billboarded plane (using `useThree().camera` + `lookAt`) displaying the real AI portrait, framed by a torus ring tinted in the user's theme color.
+- Identity priority: **Equipment rarity > Profile `theme_color` > Sparks tier colour** — the user's personal palette beats the merit fallback.
+- Clicking the 3D silhouette navigates to `/profile`. Display name floats below the avatar ("TAP YOUR FORM TO OPEN YOUR SANCTUARY").
+- `SovereignStageHUD` gained an identity chip (real avatar thumbnail) — persistent across every 3D stage, tap → `/profile`.
+- `ProfilePage` now also uses `avatarB64` for the 120px avatar + sidebar chip, not just the gradient.
+- Backend `/api/profile/me` and `/api/profile/public/:userId` now attach `avatar_b64` from `db.user_avatars` (`is_active: true`) so **shared profile links show the real AI portrait to anyone who opens them**.
+- `SovereignHub` gets a prominent **"My Sanctuary"** Link button next to Sign Out + Share. Hub nav menu also gains `My Sanctuary (Profile)` and `Friends` tiles.
+
+**End-to-end proof (screenshot-verified):**
+- Fractal Engine centerpiece renders the ethereal AI face, framed by amethyst ring, with green body (Robe of Tranquility) + violet Saturn crown + gold trinket orbit + display name "HAPPY" floating below.
+- `/profile` shows the same portrait at 120px with Share + Edit buttons.
+- Sovereign Hub shows "My Sanctuary" button + wallet pills + Share.
+
 ## 🔒 V68.17 (Feb 20, 2026) — Gatekeeper Wired + Cosmetic Bundle Store LIVE
 
 **Door D — Stripe × Google Play gating COMPLETE (all 7 real-money surfaces wired):**

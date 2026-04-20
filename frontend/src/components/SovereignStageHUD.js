@@ -15,7 +15,8 @@
  */
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Award, Coins, Compass, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Award, Coins, Compass, Plus, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -27,10 +28,13 @@ const TOPUP_URL = 'https://enlighten-mint-cafe.me/economy?from=hud';
 
 export default function SovereignStageHUD({ anchor = 'top-right', compact = false }) {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [sparks, setSparks] = useState(null);
   const [dust, setDust] = useState(null);
   const [mission, setMission] = useState(null);
   const [pulse, setPulse] = useState(false);
+  const [avatarB64, setAvatarB64] = useState(null);
+  const [displayName, setDisplayName] = useState(null);
 
   const pos = (() => {
     switch (anchor) {
@@ -69,6 +73,25 @@ export default function SovereignStageHUD({ anchor = 'top-right', compact = fals
     return () => clearInterval(t);
   }, [user]);
 
+  // Fetch avatar + profile display_name for the identity chip
+  useEffect(() => {
+    if (!user) return;
+    const token = localStorage.getItem('zen_token');
+    if (!token || token === 'guest_token') return;
+    const h = { Authorization: `Bearer ${token}` };
+    const loadIdentity = async () => {
+      const [a, p] = await Promise.allSettled([
+        axios.get(`${API}/ai-visuals/my-avatar`, { headers: h }),
+        axios.get(`${API}/profile/me`, { headers: h }),
+      ]);
+      if (a.status === 'fulfilled' && a.value.data?.status === 'active' && a.value.data?.image_b64) {
+        setAvatarB64(a.value.data.image_b64);
+      }
+      if (p.status === 'fulfilled') setDisplayName(p.value.data?.display_name || null);
+    };
+    loadIdentity();
+  }, [user]);
+
   // Pulse on successful immersion accrual — piggyback on a custom DOM event.
   useEffect(() => {
     const onPulse = () => {
@@ -99,7 +122,36 @@ export default function SovereignStageHUD({ anchor = 'top-right', compact = fals
         fontFamily: 'monospace',
       }}
     >
-      <div style={{ display: 'flex', gap: '8px' }}>
+      <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+        {/* Identity chip — tap to open your own sanctuary (/profile) */}
+        <button
+          type="button"
+          onClick={() => navigate('/profile')}
+          data-testid="stage-hud-profile"
+          title={`Open ${displayName || 'your'} Sanctuary`}
+          style={{
+            background: 'rgba(0,0,0,0.55)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(192,132,252,0.35)',
+            borderRadius: 999,
+            padding: avatarB64 ? 2 : '6px 8px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            cursor: 'pointer',
+            color: '#C084FC',
+          }}
+        >
+          {avatarB64 ? (
+            <img
+              src={avatarB64.startsWith('data:') ? avatarB64 : `data:image/png;base64,${avatarB64}`}
+              alt={displayName || 'avatar'}
+              style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', display: 'block' }}
+            />
+          ) : (
+            <User size={12} />
+          )}
+        </button>
         {sparks != null && (
           <div
             data-testid="stage-hud-sparks"

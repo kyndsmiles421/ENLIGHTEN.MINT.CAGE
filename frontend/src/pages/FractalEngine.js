@@ -163,21 +163,23 @@ function PillarNode({ position, pillar, isActive, isHovered, onActivate, onHover
 // Priority rule: equipment ALWAYS wins for body/aura colour; Sparks tier
 // layers on top as halo/eye-glow intensity (merit shows through without
 // stealing the user's chosen palette).
-function CrystallineSilhouette({ sparks, dust, equipment = null }) {
+function CrystallineSilhouette({ sparks, dust, equipment = null, avatarB64 = null, profileColor = null, onClick = null }) {
   const groupRef = useRef();
   const coreRef = useRef();
   const auraRef = useRef();
   const haloRef = useRef();
   const crownHaloRef = useRef();
   const trinketRingRef = useRef();
+  const portraitRef = useRef();
   const eyeLeftRef = useRef();
   const eyeRightRef = useRef();
   const pulseRef = useRef({ active: false, startT: 0 });
+  const { camera } = useThree();
 
   const s = Number(sparks) || 0;
   const d = Number(dust) || 0;
 
-  // --- Tier aura (Sparks-driven) ---
+  // --- Tier aura (Sparks-driven, merit fallback) ---
   const tierColor = useMemo(() => {
     if (s >= 100000) return new THREE.Color('#D4AF37');     // SOVEREIGN
     if (s >= 25000)  return new THREE.Color('#FBBF24');     // ORACLE / ARTISAN
@@ -185,27 +187,49 @@ function CrystallineSilhouette({ sparks, dust, equipment = null }) {
     return new THREE.Color('#6D28D9');                      // SEED / CITIZEN
   }, [s]);
 
-  // --- Equipment-driven palette (Mirror) ---
+  // --- Profile identity (user's chosen theme colour, from /profile/me) ---
+  // This is the user's *personal* palette — it should feel like THEM, not
+  // a generic seed tier. Priority order:
+  //   1. Equipment rarity colour (if equipped)  — in-game status
+  //   2. Profile theme_color                    — personal identity
+  //   3. Sparks tier colour                     — merit fallback
+  const identityColor = useMemo(() => {
+    if (profileColor) { try { return new THREE.Color(profileColor); } catch { /* invalid hex */ } }
+    return tierColor;
+  }, [profileColor, tierColor]);
+
+  // --- Equipment-driven palette (Metabolic Mirror) ---
   const bodyGear  = equipment?.armor || equipment?.body  || equipment?.chest || null;
   const headGear  = equipment?.helm  || equipment?.head  || equipment?.crown || null;
   const trinket   = equipment?.trinket || equipment?.accessory || null;
 
-  // Body color falls back to tier color if no body gear equipped.
   const bodyColor = useMemo(() => {
     const c = rarityToColor(bodyGear);
-    return c ? new THREE.Color(c) : tierColor;
-  }, [bodyGear, tierColor]);
+    return c ? new THREE.Color(c) : identityColor;
+  }, [bodyGear, identityColor]);
 
-  // Head/crown color overrides the halo ring, else tier color.
   const crownColor = useMemo(() => {
     const c = rarityToColor(headGear);
-    return c ? new THREE.Color(c) : tierColor;
-  }, [headGear, tierColor]);
+    return c ? new THREE.Color(c) : identityColor;
+  }, [headGear, identityColor]);
 
   const trinketColor = useMemo(() => {
     const c = rarityToColor(trinket);
-    return c ? new THREE.Color(c) : tierColor;
-  }, [trinket, tierColor]);
+    return c ? new THREE.Color(c) : identityColor;
+  }, [trinket, identityColor]);
+
+  // --- Portrait texture from /api/ai-visuals/my-avatar (real AI portrait) ---
+  const portraitTexture = useMemo(() => {
+    if (!avatarB64) return null;
+    try {
+      const img = new Image();
+      img.src = avatarB64.startsWith('data:') ? avatarB64 : `data:image/png;base64,${avatarB64}`;
+      const tex = new THREE.Texture(img);
+      img.onload = () => { tex.needsUpdate = true; };
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    } catch { return null; }
+  }, [avatarB64]);
 
   const auraRadius = useMemo(() => 1.3 + Math.min(1.6, Math.log10(Math.max(s, 1)) * 0.28), [s]);
   const eyeGlow    = useMemo(() => Math.min(1.0, 0.35 + d / 30000), [d]);
@@ -266,7 +290,12 @@ function CrystallineSilhouette({ sparks, dust, equipment = null }) {
       }
       coreRef.current.material.emissiveIntensity = coreIntensity;
     }
-    // Eyes — Dust-reactive glow, tier boosts intensity
+    // Billboard the portrait plane so the face always looks at the camera
+    // regardless of the group's rotation or the camera's fly-to position.
+    if (portraitRef.current) {
+      portraitRef.current.lookAt(camera.position);
+    }
+    // Eyes — Dust-reactive glow, tier boosts intensity (only when no portrait)
     if (eyeLeftRef.current && eyeRightRef.current) {
       const wobble = Math.sin(t * 0.7) * 0.04;
       const tierBoost = haloIntensity * 0.3;
@@ -276,7 +305,14 @@ function CrystallineSilhouette({ sparks, dust, equipment = null }) {
   });
 
   return (
-    <group ref={groupRef} position={[0, -0.4, 0]} frustumCulled={false}>
+    <group
+      ref={groupRef}
+      position={[0, -0.4, 0]}
+      frustumCulled={false}
+      onClick={onClick ? (e) => { e.stopPropagation(); onClick(); } : undefined}
+      onPointerOver={onClick ? () => { document.body.style.cursor = 'pointer'; } : undefined}
+      onPointerOut={onClick ? () => { document.body.style.cursor = 'auto'; } : undefined}
+    >
       {/* Outer aura sphere — merit halo (Sparks tier colour) */}
       <mesh ref={auraRef} frustumCulled={false}>
         <sphereGeometry args={[auraRadius, 24, 24]} />
@@ -301,20 +337,50 @@ function CrystallineSilhouette({ sparks, dust, equipment = null }) {
         <meshStandardMaterial color="#ffffff" emissive={bodyColor} emissiveIntensity={0.7} toneMapped={false} />
       </mesh>
 
-      {/* Head — subtle crystal (crown colour if headgear, else tier colour) */}
-      <mesh position={[0, 0.85, 0]} frustumCulled={false}>
-        <icosahedronGeometry args={[0.28, 1]} />
-        <meshStandardMaterial color={crownColor} wireframe transparent opacity={0.65} emissive={crownColor} emissiveIntensity={0.35} />
-      </mesh>
-      {/* Head solid inner */}
-      <mesh position={[0, 0.85, 0]} frustumCulled={false}>
-        <sphereGeometry args={[0.2, 18, 18]} />
-        <meshStandardMaterial color={crownColor} transparent opacity={0.42} emissive={crownColor} emissiveIntensity={0.2} />
-      </mesh>
+      {/* HEAD — real AI portrait (billboarded) OR abstract crystal head when no portrait */}
+      {portraitTexture ? (
+        <>
+          {/* Framing ring around the portrait — identity halo */}
+          <mesh position={[0, 0.9, 0]} rotation={[0, 0, 0]} frustumCulled={false}>
+            <torusGeometry args={[0.42, 0.02, 10, 48]} />
+            <meshStandardMaterial color={crownColor} emissive={crownColor} emissiveIntensity={0.55} toneMapped={false} />
+          </mesh>
+          {/* The portrait itself — billboarded plane, double-sided, rendered on top */}
+          <mesh ref={portraitRef} position={[0, 0.9, 0]} frustumCulled={false} renderOrder={10}>
+            <circleGeometry args={[0.38, 48]} />
+            <meshBasicMaterial
+              map={portraitTexture}
+              transparent
+              toneMapped={false}
+              side={THREE.DoubleSide}
+              depthTest={false}
+            />
+          </mesh>
+        </>
+      ) : (
+        <>
+          <mesh position={[0, 0.85, 0]} frustumCulled={false}>
+            <icosahedronGeometry args={[0.28, 1]} />
+            <meshStandardMaterial color={crownColor} wireframe transparent opacity={0.65} emissive={crownColor} emissiveIntensity={0.35} />
+          </mesh>
+          <mesh position={[0, 0.85, 0]} frustumCulled={false}>
+            <sphereGeometry args={[0.2, 18, 18]} />
+            <meshStandardMaterial color={crownColor} transparent opacity={0.42} emissive={crownColor} emissiveIntensity={0.2} />
+          </mesh>
+          <mesh ref={eyeLeftRef} position={[-0.07, 0.88, 0.18]} frustumCulled={false}>
+            <sphereGeometry args={[0.025, 8, 8]} />
+            <meshStandardMaterial color="#ffffff" emissive="#00ffcc" emissiveIntensity={eyeGlow} toneMapped={false} />
+          </mesh>
+          <mesh ref={eyeRightRef} position={[0.07, 0.88, 0.18]} frustumCulled={false}>
+            <sphereGeometry args={[0.025, 8, 8]} />
+            <meshStandardMaterial color="#ffffff" emissive="#00ffcc" emissiveIntensity={eyeGlow} toneMapped={false} />
+          </mesh>
+        </>
+      )}
 
-      {/* Saturn-halo crown — only if headGear equipped */}
+      {/* Saturn-halo crown — only if headGear equipped (layers above the portrait ring) */}
       {headGear && (
-        <mesh ref={crownHaloRef} position={[0, 1.15, 0]} rotation={[Math.PI / 2.4, 0, 0]} frustumCulled={false}>
+        <mesh ref={crownHaloRef} position={[0, 1.35, 0]} rotation={[Math.PI / 2.4, 0, 0]} frustumCulled={false}>
           <torusGeometry args={[0.36, 0.02, 10, 48]} />
           <meshStandardMaterial color={crownColor} emissive={crownColor} emissiveIntensity={0.8 + haloIntensity} transparent opacity={0.85} toneMapped={false} />
         </mesh>
@@ -327,16 +393,6 @@ function CrystallineSilhouette({ sparks, dust, equipment = null }) {
           <meshStandardMaterial color={trinketColor} emissive={trinketColor} emissiveIntensity={0.6} transparent opacity={0.7} toneMapped={false} />
         </mesh>
       )}
-
-      {/* Eyes — Dust-reactive glow */}
-      <mesh ref={eyeLeftRef} position={[-0.07, 0.88, 0.18]} frustumCulled={false}>
-        <sphereGeometry args={[0.025, 8, 8]} />
-        <meshStandardMaterial color="#ffffff" emissive="#00ffcc" emissiveIntensity={eyeGlow} toneMapped={false} />
-      </mesh>
-      <mesh ref={eyeRightRef} position={[0.07, 0.88, 0.18]} frustumCulled={false}>
-        <sphereGeometry args={[0.025, 8, 8]} />
-        <meshStandardMaterial color="#ffffff" emissive="#00ffcc" emissiveIntensity={eyeGlow} toneMapped={false} />
-      </mesh>
     </group>
   );
 }
@@ -407,10 +463,13 @@ export default function FractalEngine() {
   const [soundOn, setSoundOn] = useState(true);
   const [avatarStats, setAvatarStats] = useState({ sparks: 0, dust: 0 });
   const [equipment, setEquipment] = useState(null);
+  const [avatarB64, setAvatarB64] = useState(null);
+  const [profile, setProfile] = useState(null);
   const audioCtxRef = useRef(null);
   const lastHoverToneRef = useRef(0);
 
-  const displayName = user?.name || user?.email?.split('@')[0] || 'SOVEREIGN';
+  const displayName = profile?.display_name || user?.name || user?.email?.split('@')[0] || 'SOVEREIGN';
+  const profileColor = profile?.theme_color || null;
 
   // Immersion tracking — pings /api/sparks/immersion every 60s and emits
   // a DOM event the SovereignStageHUD listens for to flash its accrual ring.
@@ -479,6 +538,27 @@ export default function FractalEngine() {
     return () => window.removeEventListener('sovereign:gear-change', onGearChange);
   }, []);
 
+  // Fetch the user's real AI portrait + profile (identity anchors the silhouette)
+  useEffect(() => {
+    const token = localStorage.getItem('zen_token');
+    if (!token || token === 'guest_token') return;
+    const h = { Authorization: `Bearer ${token}` };
+    const loadIdentity = async () => {
+      const [p, a] = await Promise.allSettled([
+        axios.get(`${API}/profile/me`, { headers: h }),
+        axios.get(`${API}/ai-visuals/my-avatar`, { headers: h }),
+      ]);
+      if (p.status === 'fulfilled') setProfile(p.value.data || null);
+      if (a.status === 'fulfilled' && a.value.data?.status === 'active' && a.value.data?.image_b64) {
+        setAvatarB64(a.value.data.image_b64);
+      }
+    };
+    loadIdentity();
+    const onProfileChange = () => loadIdentity();
+    window.addEventListener('sovereign:profile-change', onProfileChange);
+    return () => window.removeEventListener('sovereign:profile-change', onProfileChange);
+  }, []);
+
   // Merge positions with pillar data (preserves declared order)
   const pillarNodes = useMemo(() => {
     return PILLAR_POSITIONS.map((pp) => {
@@ -545,9 +625,12 @@ export default function FractalEngine() {
         position: 'absolute', bottom: 140, left: '50%', transform: 'translateX(-50%)',
         color: 'rgba(0,255,204,0.55)', fontFamily: 'monospace', fontSize: 10,
         letterSpacing: '3px', zIndex: 5, pointerEvents: 'none',
-        whiteSpace: 'nowrap',
+        whiteSpace: 'nowrap', textAlign: 'center',
       }}>
-        CLICK A PILLAR · YOUR SOVEREIGN FORM ANCHORS THE LATTICE
+        <div style={{ color: profileColor || '#D4AF37', fontSize: 11, letterSpacing: '4px', marginBottom: 3, fontWeight: 700 }}>
+          {displayName.toUpperCase()}
+        </div>
+        <div>TAP YOUR FORM TO OPEN YOUR SANCTUARY · CLICK A PILLAR TO ENTER</div>
       </div>
 
       {/* Inline Pillar Readout Card (expands when a node is activated) */}
@@ -587,7 +670,14 @@ export default function FractalEngine() {
 
         <Suspense fallback={null}>
           <Starfield count={2000} />
-          <CrystallineSilhouette sparks={avatarStats.sparks} dust={avatarStats.dust} equipment={equipment} />
+          <CrystallineSilhouette
+            sparks={avatarStats.sparks}
+            dust={avatarStats.dust}
+            equipment={equipment}
+            avatarB64={avatarB64}
+            profileColor={profileColor}
+            onClick={() => navigate('/profile')}
+          />
           {pillarNodes.map((p) => (
             <PillarNode
               key={p.id}
