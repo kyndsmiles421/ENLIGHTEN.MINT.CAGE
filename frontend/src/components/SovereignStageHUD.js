@@ -209,29 +209,34 @@ export default function SovereignStageHUD({ anchor = 'top-right', compact = fals
             <span style={{ fontWeight: 700 }}>{Number(dust).toLocaleString()}</span>
           </div>
         )}
-        {/* Top-Up pill — always opens external web checkout (TWA-safe) */}
+        {/* Top-Up DUST pill — always opens external web checkout (TWA-safe).
+            Critical: labeled DUST (spendable currency), NOT sparks — per
+            CREDIT_SYSTEM.md Sparks are earned-only rank/merit and can
+            never be purchased. Top-up only credits Dust. */}
         <a
           href={TOPUP_URL}
           target="_blank"
           rel="noopener noreferrer"
           data-testid="stage-hud-topup"
-          title="Top up credits on the web"
+          title="Top up Dust (spendable currency) on the web — Sparks cannot be purchased"
           style={{
             background: 'rgba(0,0,0,0.55)',
             backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(0,255,204,0.35)',
+            border: '1px solid rgba(251,146,60,0.45)',
             borderRadius: 999,
             padding: '6px 10px',
             display: 'inline-flex',
             alignItems: 'center',
             gap: 4,
-            fontSize: 11,
-            color: '#00ffcc',
+            fontSize: 10,
+            color: '#FB923C',
             textDecoration: 'none',
             cursor: 'pointer',
+            letterSpacing: '1px',
+            fontWeight: 700,
           }}
         >
-          <Plus size={12} />
+          <Plus size={10} /> DUST
         </a>
       </div>
 

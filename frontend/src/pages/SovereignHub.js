@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
-import { ChevronDown, Share2, LogOut, LogIn, User } from 'lucide-react';
+import { ChevronDown, Share2, LogOut, LogIn, User, Swords } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { useSovereignUniverse } from '../context/SovereignUniverseContext';
@@ -333,6 +333,20 @@ export default function SovereignHub() {
         >
           <Share2 size={14} /> Share
         </button>
+        <Link
+          to="/realms"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold transition-all active:scale-95"
+          style={{
+            background: 'linear-gradient(135deg, rgba(168,85,247,0.2), rgba(236,72,153,0.15))',
+            border: '1px solid rgba(168,85,247,0.5)',
+            color: '#C084FC',
+            boxShadow: '0 0 18px rgba(168,85,247,0.25)',
+            letterSpacing: '1px',
+          }}
+          data-testid="hub-realms"
+        >
+          <Swords size={14} /> REALMS
+        </Link>
         {user && (
           <Link
             to="/profile"

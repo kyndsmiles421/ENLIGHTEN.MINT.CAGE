@@ -1,28 +1,30 @@
 """
 cosmetic_bundles.py — Sovereign Cosmetic Store (v1)
 
-Curated, credit-purchasable cosmetic bundles that drop equipped RPG gear
-into the user's wardrobe. Because the Metabolic Mirror binds equipped gear
-to the 3D CrystallineSilhouette at the center of the Fractal Engine, a
-purchase here creates an INSTANT, VISCERAL, VISUAL change in the main 3D
-stage — the single highest-conversion surface in the app.
+Curated, **DUST**-purchasable cosmetic bundles that drop equipped RPG gear
+into the user's wardrobe. The Fractal Engine's Metabolic Mirror binds
+equipped gear to the 3D CrystallineSilhouette at the center of the lattice,
+so a purchase here creates an INSTANT, VISCERAL, VISUAL change in the
+main 3D stage.
 
-Currency: Credits / Sparks (the unified closed-loop economy).
-  - 10 credits/hr earned via presence (free)
-  - Acquired credits via Stripe top-up on the web (full revenue → you)
+Currency rules (per CREDIT_SYSTEM.md — DO NOT DEVIATE):
+  • **Sparks ✨** are RANK / MERIT / XP — earned only, NEVER spent.
+    Flying through orbs, completing quests, and logging presence all
+    grant Sparks. They display tier, unlock Council Stacking, and pay
+    out in bragging rights — never in access.
+  • **Dust ✦** is the SPENDABLE currency — acquired via Stripe top-up
+    on the web (never inside the Android TWA) OR earned via quests &
+    presence rewards. Cosmetic bundles cost Dust.
+  • There is NO path to convert either currency back to USD.
 
-Initial 3 tiers (edit live in Mongo without redeploy):
-  • SOVEREIGN_GOLD       — 2,500 credits — Celestial Mantle (legendary body),
-                           Crown of Awareness (rare head), Eye of the Cosmos (legendary trinket)
-  • ORACLE_VIOLET        — 1,200 credits — Veil of the Oracle (epic head),
-                           Robe of Tranquility (uncommon body)
-  • ARTISAN_OBSIDIAN     — 450 credits  — Monk's Hood (uncommon head),
-                           Obsidian Amulet (common trinket)
+Initial 3 bundles (price in Dust, editable live via Mongo):
+  • SOVEREIGN_GOLD    — 2,500 ✦  (legendary body + rare head + legendary trinket)
+  • ORACLE_VIOLET     — 1,200 ✦  (epic head + uncommon body)
+  • ARTISAN_OBSIDIAN  —   450 ✦  (uncommon head + common trinket)
 
 API:
-  GET  /api/cosmetic-bundles                 → list bundles + owned/price info
-  POST /api/cosmetic-bundles/purchase        → spend credits, auto-equip gear,
-                                               fire sovereign:gear-change event
+  GET  /api/cosmetic-bundles           → list bundles + owned/price/can_afford
+  POST /api/cosmetic-bundles/purchase  → spend Dust, auto-equip gear
 """
 import uuid
 from datetime import datetime, timezone
@@ -38,7 +40,7 @@ DEFAULT_BUNDLES = [
         "id": "sovereign_gold",
         "name": "Sovereign Gold",
         "tagline": "The vestments of a completed sovereign",
-        "price_credits": 2500,
+        "price_dust": 2500,
         "accent_color": "#D4AF37",
         "items": [
             {"slot": "body",    "template_name": "Celestial Mantle",     "rarity": "legendary", "rarity_color": "#F59E0B"},
@@ -51,7 +53,7 @@ DEFAULT_BUNDLES = [
         "id": "oracle_violet",
         "name": "Oracle Violet",
         "tagline": "For the seer who reads the lattice",
-        "price_credits": 1200,
+        "price_dust": 1200,
         "accent_color": "#A855F7",
         "items": [
             {"slot": "head", "template_name": "Veil of the Oracle",  "rarity": "epic",     "rarity_color": "#A855F7"},
@@ -63,7 +65,7 @@ DEFAULT_BUNDLES = [
         "id": "artisan_obsidian",
         "name": "Artisan Obsidian",
         "tagline": "Quiet focus, deep work",
-        "price_credits": 450,
+        "price_dust": 450,
         "accent_color": "#6D28D9",
         "items": [
             {"slot": "head",    "template_name": "Monk's Hood",     "rarity": "uncommon", "rarity_color": "#22C55E"},
@@ -75,43 +77,50 @@ DEFAULT_BUNDLES = [
 
 
 async def _ensure_seed():
-    """Seed the bundle catalog once — idempotent."""
+    """Seed the bundle catalog once — idempotent.
+
+    Also migrates any legacy `price_credits` field to the canonical
+    `price_dust` field so older seeded docs show the right currency.
+    """
     count = await db.cosmetic_bundles.count_documents({})
     if count == 0:
         for b in DEFAULT_BUNDLES:
             await db.cosmetic_bundles.insert_one({**b, "seeded_at": datetime.now(timezone.utc).isoformat()})
+        return
+    # One-shot migration: mirror price_credits → price_dust where missing.
+    async for legacy in db.cosmetic_bundles.find({"price_credits": {"$exists": True}, "price_dust": {"$exists": False}}, {"_id": 0, "id": 1, "price_credits": 1}):
+        await db.cosmetic_bundles.update_one(
+            {"id": legacy["id"]},
+            {"$set": {"price_dust": int(legacy["price_credits"])}},
+        )
 
 
-async def _get_credit_balance(user_id: str) -> int:
-    """Unified Sparks balance — the closed-loop credit used for all in-app spending."""
-    wallet = await db.spark_wallets.find_one({"user_id": user_id}, {"_id": 0})
-    if wallet:
-        return int(wallet.get("sparks", 0))
-    hub = await db.hub_wallets.find_one({"user_id": user_id}, {"_id": 0})
-    if hub:
-        return int(hub.get("dust", 0))
-    return 0
+async def _get_dust_balance(user_id: str) -> int:
+    """Dust is the ONLY spendable currency in the cosmetic store.
+
+    Per CREDIT_SYSTEM.md §2: Sparks are earned-only rank/merit display —
+    they are NEVER spent on purchases. Dust is the acquired currency
+    (Stripe top-up OR quest/presence rewards) that actually pays for
+    learning modules, workshops, crystalline scenes, and cosmetic skins.
+
+    Do NOT fall back to Sparks here — that would conflate the two
+    currencies and break the closed-loop model disclosed to Google Play.
+    """
+    u = await db.users.find_one({"id": user_id}, {"_id": 0, "user_dust_balance": 1})
+    return int((u or {}).get("user_dust_balance", 0))
 
 
-async def _debit_credits(user_id: str, amount: int) -> int:
-    """Atomically subtract credits from Sparks wallet; falls back to hub_wallets."""
-    res = await db.spark_wallets.find_one_and_update(
-        {"user_id": user_id, "sparks": {"$gte": amount}},
-        {"$inc": {"sparks": -amount, "total_spent": amount}},
+async def _debit_dust(user_id: str, amount: int) -> int:
+    """Atomically subtract Dust from the user document."""
+    res = await db.users.find_one_and_update(
+        {"id": user_id, "user_dust_balance": {"$gte": amount}},
+        {"$inc": {"user_dust_balance": -amount}},
         return_document=True,
-        projection={"_id": 0},
+        projection={"_id": 0, "user_dust_balance": 1},
     )
-    if res is not None:
-        return int(res.get("sparks", 0))
-    res2 = await db.hub_wallets.find_one_and_update(
-        {"user_id": user_id, "dust": {"$gte": amount}},
-        {"$inc": {"dust": -amount}},
-        return_document=True,
-        projection={"_id": 0},
-    )
-    if res2 is not None:
-        return int(res2.get("dust", 0))
-    raise HTTPException(402, "Insufficient credits")
+    if res is None:
+        raise HTTPException(402, "Insufficient Dust — top up on the web (enlighten-mint-cafe.me/economy) or earn more via quests")
+    return int(res.get("user_dust_balance", 0))
 
 
 @router.get("")
@@ -122,11 +131,13 @@ async def list_bundles(user=Depends(get_current_user)):
         {"user_id": user["id"]}, {"_id": 0, "bundle_id": 1}
     ).to_list(50)
     owned_ids = {o["bundle_id"] for o in owned}
-    balance = await _get_credit_balance(user["id"])
+    dust_balance = await _get_dust_balance(user["id"])
     for b in bundles:
         b["owned"] = b["id"] in owned_ids
-        b["can_afford"] = balance >= b.get("price_credits", 0)
-    return {"bundles": bundles, "credit_balance": balance}
+        b["can_afford"] = dust_balance >= b.get("price_dust", b.get("price_credits", 0))
+        # Canonical field is price_dust; keep price_credits alias for older clients.
+        b["price_dust"] = b.get("price_dust", b.get("price_credits", 0))
+    return {"bundles": bundles, "dust_balance": dust_balance, "currency": "dust"}
 
 
 @router.post("/purchase")
@@ -144,8 +155,8 @@ async def purchase_bundle(body: dict = Body(...), user=Depends(get_current_user)
     if already:
         return {"status": "already_owned", "bundle_id": bundle_id}
 
-    price = int(bundle.get("price_credits", 0))
-    new_balance = await _debit_credits(user["id"], price)
+    price = int(bundle.get("price_dust", bundle.get("price_credits", 0)))
+    new_balance = await _debit_dust(user["id"], price)
 
     now = datetime.now(timezone.utc).isoformat()
     # Auto-equip each item in the bundle, overwriting the current slot.
@@ -174,7 +185,7 @@ async def purchase_bundle(body: dict = Body(...), user=Depends(get_current_user)
         "id": str(uuid.uuid4()),
         "user_id": user["id"],
         "bundle_id": bundle_id,
-        "price_paid": price,
+        "price_paid_dust": price,
         "purchased_at": now,
     })
 
@@ -182,6 +193,7 @@ async def purchase_bundle(body: dict = Body(...), user=Depends(get_current_user)
         "status": "purchased",
         "bundle_id": bundle_id,
         "items_equipped": bundle.get("items", []),
-        "price_paid": price,
-        "credit_balance": new_balance,
+        "price_paid_dust": price,
+        "dust_balance": new_balance,
+        "currency": "dust",
     }

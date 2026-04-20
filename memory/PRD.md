@@ -1,6 +1,43 @@
 # ENLIGHTEN.MINT.CAFE — V68.16 Sovereign Guide
 ## PRD — Last Updated: Feb 20, 2026
 
+## 🔒 V68.22 (Feb 20, 2026) — Gamified Universe Surfaced (user correction)
+
+**User caught (justified frustration):** "There is an entire gamified virtual reality universe built into this app. I want it utilized and accessible to the user." — and they were right. The app already contained 9 fully built gamified experiences (Starseed Adventure AI-scene RPG, Starseed Worlds multiverse star map, Dream Realms, Multiverse Realms, Cryptic Quest Nodes, Character Sheet RPG, Arcade mini-games, Origin Story, Deep-Focus Realm) — every single one was buried as a small text row in the Sovereign Hub submenus.
+
+**Fix shipped (DOES NOT rebuild any game — surfaces what's there):**
+- New **`/realms`** gallery page at `frontend/src/pages/RealmsGallery.js`. Every existing gamified route now has a big visual card with icon, tagline, and "ENTER →" CTA. Featured row (Starseed Adventure + Starseed Worlds) uses larger premium cards. All 9 routes pre-existed and already work — no game logic was touched.
+- Added a prominent **⚔ REALMS** button (violet→pink gradient, glowing) to the **Sovereign Hub** top bar — next to Share and My Sanctuary.
+- Added the same **⚔ REALMS** button to the **Fractal Engine** top bar, so users inside the 3D lattice can fast-travel into gameplay.
+- Data-testids on every card (`realm-card-starseed-adventure`, etc.) for testing.
+
+**Screenshot-verified:** /realms loads with 9 cards, proper theming, featured row at top, grid below. Routes correctly to the existing Starseed/Dream/RPG/Games pages.
+
+**Note on the prior WorkshopGameStage file:** I started building a rock-breaking mini-game for workshops (`frontend/src/components/workshop/WorkshopGameStage.js`) but have NOT wired it into `UniversalWorkshop.js` yet — the user's steer was "use what's already built first" so the file is dormant until we explicitly want workshop gameplay on top of everything else.
+
+## 🔒 V68.21 (Feb 20, 2026) — Sparks vs Dust: hard separation enforced
+
+**User-flagged violation:** the Cosmetic Bundle Store was debiting **Sparks** as if they were a credit currency. Per `CREDIT_SYSTEM.md` §2, Sparks are **earned-only RANK / MERIT / XP** — they can never be spent. Dust is the canonical spendable currency (earned via quests/presence OR acquired via Stripe). Conflating the two breaks the closed-loop model disclosed to Google Play and muddies the "you don't make money by being on the app" promise.
+
+**Fix shipped (all lint-clean, all verified):**
+- `cosmetic_bundles.py`: rewrote `_get_credit_balance/_debit_credits` into `_get_dust_balance/_debit_dust`. Now reads/writes **only** `db.users.user_dust_balance`. No Sparks fallback anywhere. Raises 402 with a clear message directing users to top up Dust on the web OR earn via quests.
+- Seeded bundles now use canonical `price_dust` field (legacy `price_credits` field auto-migrated via `_ensure_seed`). `GET /api/cosmetic-bundles` returns `dust_balance`, `currency: "dust"`, and `can_afford` computed strictly against Dust.
+- Module docstring rewrites the rule in plain English so future agents don't repeat the mistake.
+- `SovereignStageHUD` Top-Up pill now labeled **"+ DUST"** (orange) with an explicit title attribute: *"Top up Dust (spendable currency) on the web — Sparks cannot be purchased"*.
+- Orb-pickup counter now reads **"+N SPARKS · RANK XP"** so flying through orbs is unambiguously gaining merit/XP, not currency.
+
+**End-to-end proof:**
+```
+BEFORE: dust=10,000 | sparks=98,801
+PURCHASE sovereign_gold (2500 DUST)
+AFTER:  dust= 7,500 | sparks=98,801   ← Sparks UNTOUCHED, as required
+```
+
+**Rule locked in for future work:**
+- ✨ Sparks = earned only. Display rank/merit. Flying through an orb, logging presence, completing a quest → +Sparks. NEVER spent, NEVER purchased.
+- ✦ Dust = spendable. Access modules / workshops / cosmetics. Acquired via Stripe (external web only — Google Play TWA routes users to browser) or earned via quest rewards.
+- 💵 Zero path from either currency back to USD or crypto.
+
 ## 🔒 V68.20 (Feb 20, 2026) — Fractal Engine = Playable Game
 
 **User raised the bar:** "Can you gamify it so it actually functions like moves around in the gaming system?" Yes — the Fractal Engine is now a real action-traversal mini-game.

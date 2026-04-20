@@ -25,7 +25,7 @@ import React, { Suspense, useRef, useState, useMemo, useEffect, useCallback } fr
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Volume2, VolumeX, Swords } from 'lucide-react';
 import * as THREE from 'three';
 import axios from 'axios';
 import SovereignStageHUD from '../components/SovereignStageHUD';
@@ -767,6 +767,29 @@ export default function FractalEngine() {
         <span>FRACTAL ENGINE · {displayName.toUpperCase()}</span>
         <button
           type="button"
+          onClick={() => navigate('/realms')}
+          data-testid="fractal-engine-realms"
+          style={{
+            background: 'linear-gradient(135deg, rgba(168,85,247,0.22), rgba(236,72,153,0.15))',
+            border: '1px solid rgba(168,85,247,0.55)',
+            color: '#C084FC',
+            cursor: 'pointer',
+            padding: '6px 12px',
+            borderRadius: 4,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            fontFamily: 'monospace',
+            fontSize: 11,
+            letterSpacing: '1.5px',
+            fontWeight: 700,
+            boxShadow: '0 0 14px rgba(168,85,247,0.3)',
+          }}
+        >
+          <Swords size={12} /> REALMS
+        </button>
+        <button
+          type="button"
           onClick={() => setSoundOn((s) => !s)}
           data-testid="fractal-engine-sound-toggle"
           title={soundOn ? 'Mute resonance tones' : 'Enable resonance tones'}
@@ -792,7 +815,9 @@ export default function FractalEngine() {
         <div>WASD / ARROWS TO FLY · TAP YOUR FORM FOR SANCTUARY · FLY NEAR A PILLAR TO ENTER</div>
       </div>
 
-      {/* Collected Sparks counter (top-center of the stage) */}
+      {/* Collected Sparks (RANK XP) counter — top-center.
+          Per CREDIT_SYSTEM.md Sparks are earned-only merit / rank display;
+          they are NOT spendable currency. This counter shows XP, not money. */}
       {sparksCollected > 0 && (
         <div
           data-testid="fractal-sparks-collected"
@@ -804,7 +829,7 @@ export default function FractalEngine() {
             backdropFilter: 'blur(10px)', pointerEvents: 'none',
           }}
         >
-          +{sparksCollected} SPARKS COLLECTED
+          +{sparksCollected} SPARKS · RANK XP
         </div>
       )}
 

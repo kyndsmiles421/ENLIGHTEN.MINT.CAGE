@@ -209,6 +209,7 @@ const DimensionalSpace = lazy(() => import('./pages/DimensionalSpace'));
 const MasterViewPage = lazy(() => import('./pages/MasterView'));
 const CollectiveShadowMap = lazy(() => import('./pages/CollectiveShadowMap'));
 const FractalEngine = lazy(() => import('./pages/FractalEngine'));
+const RealmsGallery = lazy(() => import('./pages/RealmsGallery'));
 const CrystallineEngine = lazy(() => import('./components/CrystallineEngine'));
 const SovereignConsole = lazy(() => import('./components/SovereignConsole'));
 const RefractorDemo = lazy(() => import('./pages/RefractorDemo'));
@@ -553,6 +554,7 @@ function AnimatedRoutes() {
         <Route path="/resource-alchemy" element={<ResourceAlchemy />} />
         <Route path="/gravity-well" element={<GravityWellExchange />} />
         <Route path="/cryptic-quest" element={<CrypticQuestNodes />} />
+        <Route path="/realms" element={<RealmsGallery />} />
         <Route path="/crystal-skins" element={<CrystalMarketplace />} />
         {/* V64.1: All workshops use the Dynamic Registry Router */}
         <Route path="/masonry-workbench" element={<Navigate to="/workshop/masonry" replace />} />
