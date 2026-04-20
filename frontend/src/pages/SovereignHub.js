@@ -14,6 +14,7 @@ import { useSovereignUniverse } from '../context/SovereignUniverseContext';
 import Onboarding from '../components/Onboarding';
 import DailyChallenges from '../components/DailyChallenges';
 import OracleSearch from '../components/OracleSearch';
+import SovereignChoicePanel from '../components/SovereignChoicePanel';
 import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
@@ -362,6 +363,11 @@ export default function SovereignHub() {
       {/* V56.1 — Daily Elemental Challenges */}
       <div className="px-4 pb-4">
         <DailyChallenges compact />
+      </div>
+
+      {/* V68.31 — Sovereign Choice Protocol Panel (audio frequency + visual skin) */}
+      <div className="px-4 pb-4">
+        <SovereignChoicePanel />
       </div>
 
       {/* V64.1 — Oracle: Intent-Based Neural Search */}

@@ -125,6 +125,52 @@ html.qr-sheet-open .chamber-prop-portal {
   visibility: hidden !important;
 }
 
+/* ═════════════════════════════════════════════════════════════════════
+   V68.31 — SOVEREIGN CHOICE PROTOCOL · VISUAL SKINS
+   One of two skins is active at any time, chosen by the user and stored
+   in SovereignPreferences. `data-sov-skin` is written on <html> at boot
+   and on every change, so every component adapts globally without a
+   single prop drill.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* Default — Neo-Kyoto Neon (magenta × cyan, cinematic depth) */
+html[data-sov-skin="neo-kyoto"] {
+  --sov-skin-primary: #F0ABFC;
+  --sov-skin-accent:  #38BDF8;
+  --sov-skin-glow:    rgba(240, 171, 252, 0.45);
+  --sov-skin-wash:    linear-gradient(135deg, rgba(192,132,252,0.08), rgba(56,189,248,0.08));
+}
+
+/* Refracted Crystal — gold × white high-vibration geometry */
+html[data-sov-skin="refracted-crystal"] {
+  --sov-skin-primary: #FBBF24;
+  --sov-skin-accent:  #FFFFFF;
+  --sov-skin-glow:    rgba(251, 191, 36, 0.55);
+  --sov-skin-wash:    linear-gradient(135deg, rgba(251,191,36,0.10), rgba(255,255,255,0.06));
+}
+
+/* Apply the skin to the ChannelingStage so the 5–8s wait reflects the
+   Sovereign's chosen aesthetic — not a developer default. */
+[data-testid="channeling-stage"] {
+  background: var(--sov-skin-wash);
+  border-radius: 21px;
+}
+html[data-sov-skin="refracted-crystal"] [data-testid="channeling-stage"]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(45deg, transparent 0 22px, rgba(251,191,36,0.05) 22px 23px),
+    repeating-linear-gradient(-45deg, transparent 0 22px, rgba(255,255,255,0.04) 22px 23px);
+  mix-blend-mode: screen;
+  opacity: 0.65;
+  border-radius: inherit;
+}
+html[data-sov-skin="refracted-crystal"] [data-testid="channeling-stage"] {
+  position: relative;
+}
+
 /* V68.31 — SOVEREIGN ENTITY ICON TREATMENT (Hybrid Neo-Kyoto × Crystalline)
    Magenta + cyan neon rim × gold/violet refracted bloom, pulsing at a
    528Hz sub-harmonic (528/1024 ≈ 515ms). Applied to any icon with the

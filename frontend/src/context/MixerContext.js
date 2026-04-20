@@ -210,6 +210,56 @@ export function MixerProvider({ children }) {
     if (masterGainRef.current) masterGainRef.current.gain.value = muted ? 0 : phiVolumeCurve(masterVol);
   }, [masterVol, muted]);
 
+  // V68.31 — 528Hz Starseed Transition Lock (SOVEREIGN CHOICE-GATED).
+  // When the Sovereign Kernel broadcasts `sovereign:audio-lock { frequency:528 }`,
+  // we ONLY duck the master gain if BOTH conditions hold:
+  //   1. The user has explicitly opted into audio (master not muted).
+  //   2. The user's persisted Sovereign Preference audio.frequency === '528hz'.
+  // This guarantees the Silence Shield + Sovereign Choice Protocol: the
+  // system NEVER overrides a user's choice. If they chose Silence or 432Hz,
+  // the lock is a no-op — as it must be.
+  const audioLockRef = useRef(null);
+  useEffect(() => {
+    const readPrefFreq = () => {
+      try {
+        const raw = localStorage.getItem('sovereign_preferences_v1');
+        if (!raw) return 'silence';
+        return (JSON.parse(raw)?.audio?.frequency) || 'silence';
+      } catch { return 'silence'; }
+    };
+    const onLock = (e) => {
+      const pref = readPrefFreq();
+      // Choice-gate: only honor the lock when the Sovereign chose 528Hz.
+      if (pref !== '528hz') return;
+      audioLockRef.current = { frequency: e.detail?.frequency ?? 528 };
+      if (masterGainRef.current && !muted) {
+        masterGainRef.current.gain.cancelScheduledValues(ctxRef.current?.currentTime || 0);
+        masterGainRef.current.gain.linearRampToValueAtTime(
+          phiVolumeCurve(masterVol) * 0.5,
+          (ctxRef.current?.currentTime || 0) + 0.618
+        );
+      }
+    };
+    const onUnlock = () => {
+      if (!audioLockRef.current) return;
+      audioLockRef.current = null;
+      if (masterGainRef.current && !muted) {
+        masterGainRef.current.gain.cancelScheduledValues(ctxRef.current?.currentTime || 0);
+        masterGainRef.current.gain.linearRampToValueAtTime(
+          phiVolumeCurve(masterVol),
+          (ctxRef.current?.currentTime || 0) + 0.618
+        );
+      }
+    };
+    window.addEventListener('sovereign:audio-lock', onLock);
+    window.addEventListener('sovereign:audio-unlock', onUnlock);
+    return () => {
+      window.removeEventListener('sovereign:audio-lock', onLock);
+      window.removeEventListener('sovereign:audio-unlock', onUnlock);
+    };
+  }, [masterVol, muted]);
+
+
   // Battery & Performance Optimization: Suspend/resume AudioContext on visibility change
   useEffect(() => {
     const handleVisibility = () => {

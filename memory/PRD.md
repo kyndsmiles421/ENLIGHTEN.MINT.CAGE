@@ -13,13 +13,16 @@ Architectural contract every new feature MUST honor:
 ## Core Rules
 - **Flatland Rule**, **Metabolic Seal** (<800KB), **Closed-Loop Economy** (Sparks earn-only), **System-wide Gamification**, **Epilepsy Safety**, **Silence Shield** (opt-in audio only), **Spotify Loophole**.
 
-## V68.31 — Starseed "Dead Screen" Eliminated + QR Fix + 401 Race Gone (Feb 2026)
-1. ✅ **Starseed "Begin Adventure" ghost button KILLED** — root cause: the button called `create-character` (0.4s) + `generate-scene` (6–8s LLM). `GameScene` rendered `null` while scene was channeling, leaving a blank page. Users bailed before GPT-5.2 finished.
-    - Fix A: `StarseedAdventure.js.startNewAdventure/resumeAdventure` now flips `setView('game')` OPTIMISTICALLY the moment the user clicks, so the game canvas appears instantly.
-    - Fix B: `GameScene.js` now renders a new `ChannelingStage` component while `scene` is null — cinematic origin-themed pulsing rings, live phase copy ("Aligning your Mintakan resonance… → Pulling threads of memory… → Composing with GPT-5.2… → Weaving gem resonance… → Almost there…"), progress bar with `Ns ELAPSED / GPT-5.2 CHANNELING…`, always-visible Exit button. Zero dead screens possible.
-    - Verified live: channeling stage at t=1.2s, full narrative "RESONANCE WITH THE RELIC" + 3 choice buttons at t=5.6s.
-2. ✅ **QR code scannability FIXED** — the previous custom 400-line byte-mode encoder wrote invalid format-info bits; zbar refused to decode even the raw output. Replaced with battle-tested `qrcode` npm library at ECC-H (30% recovery), kept identical public API and Om emblem overlay. Verified: pyzbar decodes the live-generated QR+Om back to the exact target URL. Also fixed hardcoded `enlighten-mint-cafe.me` → now uses `window.location.origin` so QR always points to the active host.
-3. ✅ **401 hydration race ELIMINATED** (84–99 errors → 0) — `axiosInterceptor.js` now always overwrites Authorization with fresh localStorage token; expanded guest-abort list (sovereign-mastery, starseed/my-, sparks, quests, profile/me, auth/me). `AuthContext.js` reads live token inside `authHeaders` memo. `Treasury/Modality/ClassContext` gated on `hasAuth = token && token !== 'guest_token'`.
+## V68.31 — Sovereign Choice Protocol + Bridge Rule Hard-Wire + Starseed Fix (Feb 2026)
+1. ✅ **Starseed "Begin Adventure" ghost button KILLED** — optimistic `setView('game')` + new `ChannelingStage` (cinematic origin-themed rings, live phase copy, honest progress bar, always-visible Exit). Verified live: channeling at t=1.2s → full narrative at t=5.6s.
+2. ✅ **QR code scannability FIXED** — replaced broken custom encoder with `qrcode` lib at ECC-H; `window.location.origin` replaces hardcoded domain. Verified: pyzbar decodes live QR+Om back to exact target URL.
+3. ✅ **401 hydration race ELIMINATED** (84–99 → 0) — axiosInterceptor always overwrites Authorization with fresh localStorage; guest_token is treated as a sentinel in `AuthContext` + `Treasury/Modality/Class` contexts.
+4. ✅ **SovereignBridge registry + Bridge Rule** (`kernel/SovereignBridge.js`, `kernel/toolRegistry.js`) — every tool MUST be registered with {id, layer, domain, unlocks, requires, sparks, purpose}. Seeded with 21 tools (Layer 2/3/4). `SovereignKernel.interact(toolId)` throws in dev on unregistered tool → "random dumping" is physically detectable.
+5. ✅ **SovereignKernel event bus** (`kernel/SovereignKernel.js`) — single entry point for Layer-2/3 interactions. Fires `sovereign:interact` for Hub consumption. Exposes `lockAudioTo528()` / `unlockAudio()` for Starseed transitions.
+6. ✅ **528Hz Starseed transition lock — CHOICE-GATED** — MixerContext ducks non-528 tones by 50% via PHI-ramp ONLY when the user's Sovereign Preference `audio.frequency === '528hz'`. Silence/432 = no-op. Silence Shield + Sovereign Choice both preserved.
+7. ✅ **Sovereign Preference Ledger** (`kernel/SovereignPreferences.js`) — localStorage-backed, subscriber API, broadcasts `sovereign:preferences` events, reflects `data-sov-skin` on <html> at boot and on change.
+8. ✅ **SovereignChoicePanel** (`components/SovereignChoicePanel.js`) — mounted in Hub between Daily Challenges and Oracle. Three frequency options (Silence/432/528) and two skins (Neo-Kyoto/Refracted Crystal). Default ships in Silence — nothing plays until the Sovereign taps.
+9. ✅ **Refracted Crystal CSS skin** — gold × white high-vibration wash + diagonal prismatic grid overlay on `[data-testid="channeling-stage"]` when `html[data-sov-skin="refracted-crystal"]`.
 
 ## Code Architecture (active files this release)
 - `/app/frontend/src/pages/StarseedAdventure.js` — optimistic view-switch, direct-localStorage auth headers

@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { Sparkles, Star } from 'lucide-react';
 import { CosmicCanvas, CharacterSelect, GameScene } from '../components/starseed';
 import ProgressGate from '../components/ProgressGate';
+import SovereignKernel from '../kernel/SovereignKernel';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -77,6 +78,14 @@ export default function StarseedAdventure() {
   const startNewAdventure = useCallback(async (originId, characterName) => {
     setLoading(true);
     setSceneImage(null);
+    // V68.31: fire the Sovereign Kernel interact event (Layer 4) AND lock
+    // the audio bus to 528Hz so the opt-in solfeggio is the only tone
+    // allowed during the channelling transition.
+    SovereignKernel.interact('starseed.begin-adventure', {
+      resonance: 'starseed',
+      context: `origin:${originId}`,
+    });
+    SovereignKernel.lockAudioTo528();
     // V68.31: optimistic view switch — flip to the game canvas IMMEDIATELY so
     // the player sees motion, a title and a channeling indicator instead of
     // staring at a "Channeling…" button for 8s that looks broken.
@@ -102,6 +111,7 @@ export default function StarseedAdventure() {
       setActiveOrigin(null);
     } finally {
       setLoading(false);
+      SovereignKernel.unlockAudio();
     }
   }, [buildHeaders, origins, generateSceneImage]);
 
@@ -138,6 +148,10 @@ export default function StarseedAdventure() {
     if (!activeOrigin || loading) return;
     setLoading(true);
     setSceneImage(null);
+    SovereignKernel.interact('starseed.make-choice', {
+      resonance: 'starseed',
+      context: `origin:${activeOrigin.id};choice:${choiceIndex}`,
+    });
     try {
       const res = await axios.post(`${API}/starseed/generate-scene`, {
         origin_id: activeOrigin.id, choice_index: choiceIndex,
