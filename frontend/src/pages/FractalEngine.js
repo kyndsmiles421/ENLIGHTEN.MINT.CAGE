@@ -25,7 +25,7 @@ import React, { Suspense, useRef, useState, useMemo, useEffect, useCallback } fr
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUp, ArrowDown, Volume2, VolumeX } from 'lucide-react';
 import * as THREE from 'three';
 import axios from 'axios';
 import SovereignStageHUD from '../components/SovereignStageHUD';
@@ -456,6 +456,160 @@ function CameraFlyController({ targetPos }) {
   return null;
 }
 
+// ── Spark Orb (collectable floating credit) ──────────────────────────
+function SparkOrb({ position, color = '#00ffcc' }) {
+  const ref = useRef();
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    if (ref.current) {
+      // Gentle vertical bob + pulse
+      ref.current.position.y = position[1] + Math.sin(t * 1.5 + position[0]) * 0.08;
+      const s = 1 + Math.sin(t * 3 + position[0] * 2) * 0.15;
+      ref.current.scale.set(s, s, s);
+    }
+  });
+  return (
+    <group ref={ref} position={position}>
+      <mesh>
+        <sphereGeometry args={[0.1, 12, 12]} />
+        <meshBasicMaterial color={color} transparent opacity={0.9} toneMapped={false} />
+      </mesh>
+      <mesh>
+        <sphereGeometry args={[0.18, 12, 12]} />
+        <meshBasicMaterial color={color} transparent opacity={0.22} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+}
+
+// ── GameController — lifts the hologram into a playable character ────
+// Handles: WASD/arrow movement, on-screen D-pad via moveDirRef, clamped
+// to lattice bounds, proximity auto-activation of pillars, collision
+// with collectable Spark orbs (+1 credit each).
+function GameController({
+  pillars,
+  equipment,
+  avatarB64,
+  profileColor,
+  sparks,
+  dust,
+  onActivate,
+  onSparkCollect,
+  onAvatarClick,
+  moveDirRef,
+}) {
+  const posRef = useRef({ x: 0, y: 0, z: 0 });
+  const keysRef = useRef({});
+  const outerRef = useRef();
+  const [orbs, setOrbs] = useState(() => seedOrbs(24));
+  const lastActivateRef = useRef({ ts: 0, id: null });
+
+  useEffect(() => {
+    const down = (e) => {
+      const k = (e.key || '').toLowerCase();
+      keysRef.current[k] = true;
+    };
+    const up = (e) => { keysRef.current[(e.key || '').toLowerCase()] = false; };
+    window.addEventListener('keydown', down);
+    window.addEventListener('keyup', up);
+    return () => {
+      window.removeEventListener('keydown', down);
+      window.removeEventListener('keyup', up);
+    };
+  }, []);
+
+  useFrame((_, rawDelta) => {
+    // Cap delta to avoid tunnelling through orbs on pause/resume
+    const delta = Math.min(rawDelta || 0.016, 0.05);
+    const k = keysRef.current;
+    const md = moveDirRef?.current || { x: 0, y: 0 };
+    const speed = 3.4 * delta;
+    let dx = 0, dy = 0, dz = 0;
+    if (k.w || k.arrowup)    dy += 1;
+    if (k.s || k.arrowdown)  dy -= 1;
+    if (k.a || k.arrowleft)  dx -= 1;
+    if (k.d || k.arrowright) dx += 1;
+    if (k.q) dz -= 1;
+    if (k.e) dz += 1;
+    dx += md.x;
+    dy += md.y;
+    const len = Math.hypot(dx, dy);
+    if (len > 1) { dx /= len; dy /= len; }
+    posRef.current.x += dx * speed;
+    posRef.current.y += dy * speed;
+    posRef.current.z += dz * speed;
+    // Clamp to lattice bounds (horizontal radius, vertical range)
+    const maxR = 3.2;
+    const r = Math.hypot(posRef.current.x, posRef.current.y);
+    if (r > maxR) {
+      posRef.current.x *= maxR / r;
+      posRef.current.y *= maxR / r;
+    }
+    posRef.current.z = Math.max(-1.5, Math.min(2, posRef.current.z));
+    if (outerRef.current) {
+      outerRef.current.position.set(posRef.current.x, posRef.current.y, posRef.current.z);
+    }
+    // Proximity pillar activation (debounced — same pillar won't refire for 1.8s)
+    const now = performance.now();
+    for (const p of pillars) {
+      const [px, py, pz] = p.position;
+      const d = Math.hypot(posRef.current.x - px, posRef.current.y - py, posRef.current.z - pz);
+      if (d < 0.65 && (lastActivateRef.current.id !== p.id || now - lastActivateRef.current.ts > 1800)) {
+        lastActivateRef.current = { ts: now, id: p.id };
+        onActivate(p);
+        break;
+      }
+    }
+    // Orb collection
+    const collected = [];
+    for (const o of orbs) {
+      const d = Math.hypot(posRef.current.x - o.x, posRef.current.y - o.y, posRef.current.z - o.z);
+      if (d < 0.38) collected.push(o);
+    }
+    if (collected.length > 0) {
+      const ids = new Set(collected.map((c) => c.id));
+      setOrbs((prev) => prev.filter((o) => !ids.has(o.id)));
+      collected.forEach(() => onSparkCollect && onSparkCollect(1));
+    }
+  });
+
+  return (
+    <>
+      <group ref={outerRef}>
+        <CrystallineSilhouette
+          sparks={sparks}
+          dust={dust}
+          equipment={equipment}
+          avatarB64={avatarB64}
+          profileColor={profileColor}
+          onClick={onAvatarClick}
+        />
+      </group>
+      {orbs.map((o) => (
+        <SparkOrb key={o.id} position={[o.x, o.y, o.z]} />
+      ))}
+    </>
+  );
+}
+
+// Random orb positions inside the lattice volume (avoiding dead-center where
+// the hologram spawns). 24 orbs, respawn happens on page reload.
+function seedOrbs(count) {
+  const arr = [];
+  for (let i = 0; i < count; i++) {
+    // Random in the lattice shell (radius 1.0 → 3.0, z ∈ -1 → 1.5)
+    const theta = Math.random() * Math.PI * 2;
+    const rr = 1.2 + Math.random() * 1.8;
+    arr.push({
+      id: `orb-${i}`,
+      x: Math.cos(theta) * rr,
+      y: Math.sin(theta) * rr,
+      z: -0.8 + Math.random() * 2.0,
+    });
+  }
+  return arr;
+}
+
 // ─────────────────────────────────────────────────────────────────────
 export default function FractalEngine() {
   const { user } = useAuth();
@@ -468,6 +622,8 @@ export default function FractalEngine() {
   const [equipment, setEquipment] = useState(null);
   const [avatarB64, setAvatarB64] = useState(null);
   const [profile, setProfile] = useState(null);
+  const [sparksCollected, setSparksCollected] = useState(0);
+  const moveDirRef = useRef({ x: 0, y: 0 });
   const audioCtxRef = useRef(null);
   const lastHoverToneRef = useRef(0);
 
@@ -633,8 +789,27 @@ export default function FractalEngine() {
         <div style={{ color: profileColor || '#D4AF37', fontSize: 11, letterSpacing: '4px', marginBottom: 3, fontWeight: 700 }}>
           {displayName.toUpperCase()}
         </div>
-        <div>TAP YOUR FORM TO OPEN YOUR SANCTUARY · CLICK A PILLAR TO ENTER</div>
+        <div>WASD / ARROWS TO FLY · TAP YOUR FORM FOR SANCTUARY · FLY NEAR A PILLAR TO ENTER</div>
       </div>
+
+      {/* Collected Sparks counter (top-center of the stage) */}
+      {sparksCollected > 0 && (
+        <div
+          data-testid="fractal-sparks-collected"
+          style={{
+            position: 'absolute', top: 80, left: '50%', transform: 'translateX(-50%)',
+            background: 'rgba(0,255,204,0.12)', border: '1px solid rgba(0,255,204,0.5)',
+            borderRadius: 999, padding: '6px 14px', zIndex: 5,
+            color: '#00ffcc', fontFamily: 'monospace', fontSize: 11, letterSpacing: '2px',
+            backdropFilter: 'blur(10px)', pointerEvents: 'none',
+          }}
+        >
+          +{sparksCollected} SPARKS COLLECTED
+        </div>
+      )}
+
+      {/* Virtual D-pad (mobile + desktop convenience) */}
+      <DPad moveDirRef={moveDirRef} />
 
       {/* Inline Pillar Readout Card (expands when a node is activated) */}
       {active && (
@@ -673,13 +848,29 @@ export default function FractalEngine() {
 
         <Suspense fallback={null}>
           <Starfield count={2000} />
-          <CrystallineSilhouette
-            sparks={avatarStats.sparks}
-            dust={avatarStats.dust}
+          <GameController
+            pillars={pillarNodes}
             equipment={equipment}
             avatarB64={avatarB64}
             profileColor={profileColor}
-            onClick={() => navigate('/profile')}
+            sparks={avatarStats.sparks}
+            dust={avatarStats.dust}
+            onActivate={onActivate}
+            onSparkCollect={(n) => {
+              setSparksCollected((s) => s + n);
+              // Optimistic client-side counter; background-credit it server-side
+              const token = localStorage.getItem('zen_token');
+              if (token && token !== 'guest_token') {
+                axios.post(
+                  `${API}/sparks/immersion`,
+                  { seconds: 6 * n, zone: 'fractal_engine_orb' },
+                  { headers: { Authorization: `Bearer ${token}` } },
+                ).catch(() => {});
+              }
+              window.dispatchEvent(new CustomEvent('sovereign:immersion-tick'));
+            }}
+            onAvatarClick={() => navigate('/profile')}
+            moveDirRef={moveDirRef}
           />
           {pillarNodes.map((p) => (
             <PillarNode
@@ -778,3 +969,63 @@ function PillarReadout({ pillar, onClose, onEnter }) {
     </div>
   );
 }
+
+// ── Virtual D-pad — writes to moveDirRef so GameController picks it up ─
+function DPad({ moveDirRef }) {
+  const set = (x, y) => { if (moveDirRef.current) moveDirRef.current = { x, y }; };
+  const clear = () => set(0, 0);
+  const btn = (dx, dy, Icon, testid, style = {}) => (
+    <button
+      type="button"
+      data-testid={testid}
+      onPointerDown={(e) => { e.preventDefault(); set(dx, dy); }}
+      onPointerUp={clear}
+      onPointerCancel={clear}
+      onPointerLeave={clear}
+      onTouchStart={(e) => { e.preventDefault(); set(dx, dy); }}
+      onTouchEnd={clear}
+      style={{
+        width: 46, height: 46,
+        background: 'rgba(0,0,0,0.5)',
+        backdropFilter: 'blur(8px)',
+        border: '1px solid rgba(0,255,204,0.35)',
+        borderRadius: 8,
+        color: '#00ffcc',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        padding: 0,
+        userSelect: 'none',
+        touchAction: 'none',
+        ...style,
+      }}
+    >
+      <Icon size={16} />
+    </button>
+  );
+  return (
+    <div
+      data-testid="fractal-dpad"
+      style={{
+        position: 'fixed', bottom: 280, left: 20, zIndex: 999,
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 46px)',
+        gridTemplateRows: 'repeat(3, 46px)',
+        gap: 4,
+        pointerEvents: 'auto',
+      }}
+    >
+      <span />
+      {btn(0,  1, ArrowUp,    'fractal-dpad-up')}
+      <span />
+      {btn(-1, 0, ArrowLeft,  'fractal-dpad-left')}
+      <span />
+      {btn( 1, 0, ArrowRight, 'fractal-dpad-right')}
+      <span />
+      {btn(0, -1, ArrowDown,  'fractal-dpad-down')}
+      <span />
+    </div>
+  );
+}
+

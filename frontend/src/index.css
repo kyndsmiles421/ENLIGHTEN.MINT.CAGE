@@ -5017,7 +5017,7 @@ body.cafe-parchment.cafe-light div:not([class*="bg-"]) {
 .fixed.bottom-5.left-5,
 .fixed.bottom-6.left-0,
 .fixed.bottom-8.left-0,
-[style*="bottom:"][style*="left:"]:not(.shambhala-toolbar):not([class*="ShambhalaToolbar"]):not([data-testid="sovereign-mixer"]):not([data-testid="mixer-strip"]):not([data-testid="mixer-nav"]):not([data-sovereign-mixer]):not([data-testid^="proximity-item-"]),
+[style*="bottom:"][style*="left:"]:not(.shambhala-toolbar):not([class*="ShambhalaToolbar"]):not([data-testid="sovereign-mixer"]):not([data-testid="mixer-strip"]):not([data-testid="mixer-nav"]):not([data-sovereign-mixer]):not([data-testid^="proximity-item-"]):not([data-testid="fractal-dpad"]),
 .green-dot,
 [class*="nebula-toggle"],
 [class*="crystal-badge"],

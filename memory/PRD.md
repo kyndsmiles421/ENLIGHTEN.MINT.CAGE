@@ -1,6 +1,23 @@
 # ENLIGHTEN.MINT.CAFE — V68.16 Sovereign Guide
 ## PRD — Last Updated: Feb 20, 2026
 
+## 🔒 V68.20 (Feb 20, 2026) — Fractal Engine = Playable Game
+
+**User raised the bar:** "Can you gamify it so it actually functions like moves around in the gaming system?" Yes — the Fractal Engine is now a real action-traversal mini-game.
+
+**What shipped:**
+- New `GameController` scene component (inside the R3F Canvas) that owns avatar position state, keyboard/touch input, proximity pillar activation, and orb pickup collisions.
+- **Keyboard controls:** WASD + arrow keys translate the holographic avatar within the lattice bounds (radius 3.2, z ∈ [-1.5, 2]). Q/E optionally for depth.
+- **On-screen D-pad** (`data-testid="fractal-dpad"`) — 4 directional buttons fixed bottom-left at z-index 999, pointer + touch-safe for mobile. Writes to a shared `moveDirRef` so keyboard and touch compose additively.
+- **Spark-orb pickups:** 24 cyan collectable orbs (`SparkOrb` component) seeded randomly in a lattice shell at page load. Flying within 0.38 units collects the orb, fires `+1 SPARK` counter + optimistic HUD event + background `/api/sparks/immersion` credit (6s per orb).
+- **Proximity pillar activation:** when the avatar gets within 0.65 units of any of the 7 pillars, it auto-triggers `onActivate` (same handler as a click) — the pillar readout card expands and the user can ENTER DOMAIN. 1.8s debounce prevents re-firing on the same pillar.
+- **Stopped the group rotation** so the hologram stays facing the camera (true projection feel); only the crown halo + trinket ring orbit independently.
+- Bottom hint updated: `WASD / ARROWS TO FLY · TAP YOUR FORM FOR SANCTUARY · FLY NEAR A PILLAR TO ENTER`.
+
+**Policy CSS ambush disarmed:** a global rule at `index.css:5020` was nuking any element with inline `bottom: + left:` styles via `display:none !important`. Added `:not([data-testid="fractal-dpad"])` to the selector's whitelist so the D-pad actually renders.
+
+**Screenshot-verified end-to-end:** D-pad visible bottom-left, 14+ Spark orbs floating in view, "+1 SPARKS COLLECTED" counter live, avatar hologram preserved with equipment halos. Playwright keyboard sweep moved the avatar and collected orbs successfully.
+
 ## 🔒 V68.19 (Feb 20, 2026) — True Holographic Avatar (not cone-with-face)
 
 **User caught, round 2:** "3D version of some shapes put together." The tapered cone body + tiny circular portrait head felt like a 3D model with a photo glued on, not a holographic being. Users wanted the full AI-generated character projected as a floating hologram — the way the original AvatarCreator displayed it.
