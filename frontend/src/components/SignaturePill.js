@@ -56,7 +56,7 @@ export default function SignaturePill() {
         >
           {sig.title}
         </p>
-        <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+        <p className="text-[10px] mt-0.5 sov-telemetry" style={{ color: 'var(--text-muted)' }}>
           {sig.subtitle}
         </p>
       </div>

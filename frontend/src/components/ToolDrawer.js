@@ -89,13 +89,13 @@ function CrystalBlade({ tool, unlocked, accent, onClick }) {
         <Lock size={11} className="absolute top-2 left-2" style={{ color: '#5a5a65' }} />
       )}
 
-      <div className="mt-6 text-[11px] font-bold leading-tight" style={{ color: unlocked ? '#fff' : '#9097a6' }}>
+      <div className="mt-6 text-[11px] font-bold leading-tight sov-telemetry" style={{ color: unlocked ? '#fff' : '#9097a6' }}>
         {tool.id.split('.')[1]?.replace(/-/g, ' ') || tool.id}
       </div>
       <div className="text-[9px] uppercase tracking-[0.2em] mt-1" style={{ color: unlocked ? accent : '#52525b' }}>
         {tool.domain}
       </div>
-      <div className="text-[9px] mt-1.5" style={{ color: unlocked ? '#cbd5e1' : '#71717a' }}>
+      <div className="text-[9px] mt-1.5 sov-telemetry" style={{ color: unlocked ? '#cbd5e1' : '#71717a' }}>
         +{tool.sparks}◆
       </div>
     </motion.button>
@@ -167,7 +167,7 @@ export default function ToolDrawer({ open, onClose }) {
             <h2 className="text-2xl font-light mt-0.5" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#fff' }}>
               The Swiss Army Knife
             </h2>
-            <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+            <p className="text-[11px] sov-telemetry" style={{ color: 'var(--text-muted)' }}>
               {unlockedCount} of {totalCount} blades earned · {Math.round((unlockedCount / totalCount) * 100)}% of the knife forged
             </p>
           </div>

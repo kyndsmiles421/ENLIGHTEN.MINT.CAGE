@@ -132,7 +132,7 @@ export default function CalibrationLens({ open, onClose }) {
                         {axis.subtitle}
                       </span>
                     </p>
-                    <span className="text-[11px] tabular-nums" style={{ color: 'var(--text-muted)' }}>
+                    <span className="text-[11px] tabular-nums sov-telemetry" style={{ color: 'var(--text-muted)' }}>
                       {Math.round(val * 100)}%
                     </span>
                   </div>

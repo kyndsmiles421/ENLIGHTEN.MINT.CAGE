@@ -1,4 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Manrope:wght@400;500;700&family=Cinzel:wght@400;600&family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Manrope:wght@400;500;700&family=Cinzel:wght@400;600&family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+/* V68.33 — Engineer-Poet dual voice.
+   Cormorant for the soul (titles, narratives). JetBrains Mono for the
+   gears (numbers, IDs, PHI-math, sparks, telemetry). Apply via the
+   `.sov-telemetry` class on any numeric-only span. */
+.sov-telemetry {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+/* Auto-apply tabular-nums on any element the app already marked. */
+.tabular-nums {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+}
 @import './styles/Sanctuary.css';
 
 @tailwind base;

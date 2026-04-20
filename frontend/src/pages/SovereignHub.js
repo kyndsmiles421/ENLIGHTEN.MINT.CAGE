@@ -479,7 +479,7 @@ export default function SovereignHub() {
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-[10px] uppercase tracking-[0.32em]" style={{ color: `${pillar.color}cc` }}>
+                      <p className="text-[10px] uppercase tracking-[0.32em] sov-telemetry" style={{ color: `${pillar.color}cc` }}>
                         Pillar · {pillar.items.length} blades
                       </p>
                       <p
