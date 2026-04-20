@@ -21,8 +21,28 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { ChevronDown, ChevronUp, Layers, Gem, Zap } from 'lucide-react';
 import axios from 'axios';
+import HolographicChamber from './HolographicChamber';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// Map workshop moduleId → holographic chamber backdrop. Trades that share
+// a vibe reuse the same backdrop. Unknown modules fall back to "academy".
+const MODULE_TO_CHAMBER = {
+  masonry: 'masonry',
+  carpentry: 'carpentry',
+  culinary: 'culinary',
+  cooking: 'culinary',
+  baking: 'culinary',
+  nursing: 'academy',
+  childcare: 'academy',
+  eldercare: 'academy',
+  bible: 'academy',
+  electrical: 'physics',
+  plumbing: 'carpentry',
+  landscaping: 'herbology',
+  gardening: 'herbology',
+  herbalism: 'herbology',
+};
 
 function CenterBlock({ material, isActive, onTap, accentColor }) {
   if (!material) return null;
@@ -222,6 +242,12 @@ export default function UniversalWorkshop({ moduleId, title, subtitle, icon: Ico
   }, [actions, accentColor]);
 
   return (
+    <HolographicChamber
+      chamberId={MODULE_TO_CHAMBER[moduleId] || 'academy'}
+      title={title}
+      subtitle={subtitle || 'Holographic Workbench'}
+      fullBleed
+    >
     <div className="min-h-screen px-4 py-6 sm:px-8" data-testid={`${moduleId}-workbench-page`}>
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
@@ -317,5 +343,6 @@ export default function UniversalWorkshop({ moduleId, title, subtitle, icon: Ico
         </AnimatePresence>
       </div>
     </div>
+    </HolographicChamber>
   );
 }

@@ -26,6 +26,27 @@ import NarrationPlayer from './NarrationPlayer';
 import { ProximityItem } from './SpatialRoom';
 import OmniBridge from './OmniBridge';
 import TraditionLens from './TraditionLens';
+import HolographicChamber from './HolographicChamber';
+
+// V68.25 — System-wide gamification plug-in point.
+// Every catalog module using InteractiveModule (Crystals, Herbology,
+// Aromatherapy, Elixirs, Mudras, Nourishment, Reiki, Acupressure, Botany
+// and any future addition) inherits the holographic chamber shell from
+// this one map. Unknown categories fall back to "default".
+const CATEGORY_CHAMBER_MAP = {
+  crystals: 'geology',
+  herbology: 'herbology',
+  apothecary: 'apothecary',
+  aromatherapy: 'aromatherapy',
+  elixirs: 'apothecary',
+  mudras: 'meditation',
+  nourishment: 'culinary',
+  reiki: 'meditation',
+  acupressure: 'meditation',
+  botany: 'herbology',
+  knowledge: 'academy',
+  academy: 'academy',
+};
 
 const PHI = 1.618033988749895;
 
@@ -762,6 +783,12 @@ export default function InteractiveModule({
   category = 'knowledge', items = [],
   filters, filterFn, searchFn,
   children, headerExtra,
+  // V68.25 — holographic chamber integration. Every catalog module
+  // auto-wraps with its themed cinematic backdrop. Pass an explicit
+  // chamberId to override the map or holographic={false} to opt out
+  // (e.g. when already nested inside another HolographicChamber).
+  chamberId = null,
+  holographic = true,
 }) {
   const [mode, setMode] = useState('discover'); // discover | challenge
   const [filter, setFilter] = useState(filters?.[0]?.key || 'all');
@@ -819,7 +846,7 @@ export default function InteractiveModule({
     );
   }
 
-  return (
+  const body = (
     <div className="min-h-screen pb-24 max-w-4xl mx-auto" data-testid={`${category}-page`}>
       {/* V56.2 — IMMERSIVE SCENE HEADER */}
       {(() => {
@@ -950,6 +977,19 @@ export default function InteractiveModule({
         {children}
       </motion.div>
     </div>
+  );
+
+  const resolvedChamberId = chamberId || CATEGORY_CHAMBER_MAP[category] || 'default';
+  if (!holographic) return body;
+  return (
+    <HolographicChamber
+      chamberId={resolvedChamberId}
+      title={title}
+      subtitle={subtitle || ''}
+      fullBleed
+    >
+      {body}
+    </HolographicChamber>
   );
 }
 

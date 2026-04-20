@@ -1,5 +1,44 @@
 import React, { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import HolographicChamber from '../HolographicChamber';
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+//  MODULE → CHAMBER BACKDROP MAP
+//  Any new game module automatically gets a holographic backdrop by
+//  name. Unknown modules fall back to "default" (a generic sovereign
+//  chamber). Extend this map instead of wrapping pages individually.
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const MODULE_CHAMBER_MAP = {
+  rock_hounding: 'geology',
+  geology: 'geology',
+  evolution_lab: 'physics',
+  refinement_lab: 'physics',
+  sovereign_lab: 'physics',
+  physics: 'physics',
+  forgotten_languages: 'academy',
+  academy: 'academy',
+  smart_dock: 'physics',
+  cosmic_store: 'default',
+  meditation: 'meditation',
+  herbology: 'herbology',
+  apothecary: 'apothecary',
+  aromatherapy: 'aromatherapy',
+  masonry: 'masonry',
+  carpentry: 'carpentry',
+  culinary: 'culinary',
+  cooking: 'culinary',
+  baking: 'culinary',
+};
+
+const MODULE_CHAMBER_TITLE = {
+  rock_hounding: 'Rock Hounding',
+  evolution_lab: 'Evolution Lab',
+  refinement_lab: 'Refinement Lab',
+  sovereign_lab: 'Sovereign Physics Lab',
+  forgotten_languages: 'Forgotten Languages',
+  smart_dock: 'Smart Dock',
+  cosmic_store: 'Cosmic Store',
+};
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  UNIVERSAL GAME MODULE WRAPPER
@@ -216,6 +255,14 @@ export default function GameModuleWrapper({
   clearVisionActive = false,
   premiumTheme = null,
   auraGlow = null,
+  // Holographic chamber integration (V68.25 — system-wide immersion).
+  // Any game module using this wrapper automatically renders inside
+  // the holographic chamber shell. Pass `holographic={false}` to opt
+  // out (e.g. a tiny embed panel that should not take full screen).
+  chamberId = null,
+  chamberTitle = null,
+  chamberSubtitle = null,
+  holographic = true,
 }) {
   // Compute avg freshness from decay activity
   const avgFreshness = useMemo(() => {
@@ -254,9 +301,16 @@ export default function GameModuleWrapper({
     };
   }, [premiumTheme]);
 
-  return (
+  // Resolve the holographic chamber backdrop. Any module name in the
+  // map gets a themed cinematic backdrop; unknown modules fall back to
+  // the generic sovereign chamber. Explicit `chamberId` prop wins.
+  const resolvedChamberId = chamberId || MODULE_CHAMBER_MAP[moduleName] || 'default';
+  const resolvedChamberTitle = chamberTitle || MODULE_CHAMBER_TITLE[moduleName] || '';
+  const resolvedChamberSubtitle = chamberSubtitle || 'Holographic Module';
+
+  const core = (
     <div className="relative min-h-screen overflow-hidden"
-      style={{ background: premiumTheme?.colors?.bg || 'var(--bg-primary)', ...themeStyle }}
+      style={{ background: premiumTheme?.colors?.bg || 'transparent', ...themeStyle }}
       data-testid={`game-module-${moduleName}`}>
 
       {/* Layer 0: Harmony Glow */}
@@ -323,5 +377,19 @@ export default function GameModuleWrapper({
         />
       )}
     </div>
+  );
+
+  // Opt-out escape hatch: pass holographic={false} to render the raw
+  // distortion compositor without the chamber shell (rarely needed).
+  if (holographic === false) return core;
+  return (
+    <HolographicChamber
+      chamberId={resolvedChamberId}
+      title={resolvedChamberTitle}
+      subtitle={resolvedChamberSubtitle}
+      fullBleed
+    >
+      {core}
+    </HolographicChamber>
   );
 }

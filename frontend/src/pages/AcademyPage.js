@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { useModality } from '../context/ModalityContext';
 import { ProximityItem } from '../components/SpatialRoom';
 import InteractiveMasonry from '../components/InteractiveMasonry';
+import HolographicChamber from '../components/HolographicChamber';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -655,6 +656,7 @@ export default function AcademyPage() {
   const filteredPrograms = activeZone ? programs.filter(p => p.zone === activeZone) : programs;
 
   return (
+    <HolographicChamber chamberId="academy" title="Sovereign Academy" subtitle="Holographic Lecture Hall" fullBleed>
     <div className="min-h-screen pt-20 pb-40 px-5 max-w-3xl mx-auto" style={{ background: 'transparent' }}>
       <ImmersiveOverlay active={intensity === 'immersive'} />
 
@@ -886,5 +888,6 @@ export default function AcademyPage() {
           onClose={closeModals} onComplete={completeForge} completing={completing} result={forgeResult} />}
       </AnimatePresence>
     </div>
+    </HolographicChamber>
   );
 }

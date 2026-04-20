@@ -11,6 +11,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ShambhalaToolbar from '../components/ShambhalaToolbar';
+import HolographicChamber from '../components/HolographicChamber';
 
 export default function SovereignLab() {
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('sovereign_lab', 8); }, []);
@@ -79,6 +80,7 @@ export default function SovereignLab() {
   }, []);
 
   return (
+    <HolographicChamber chamberId="physics" title="Sovereign Physics Lab" subtitle="Holographic Experiment Bench" fullBleed>
     <div className="sovereign-lab" data-testid="sovereign-lab">
       {/* Shambhala Master Mixer Toolbar */}
       <ShambhalaToolbar 
@@ -378,5 +380,6 @@ export default function SovereignLab() {
         }
       `}</style>
     </div>
+    </HolographicChamber>
   );
 }
