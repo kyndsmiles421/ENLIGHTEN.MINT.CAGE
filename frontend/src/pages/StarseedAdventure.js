@@ -77,22 +77,29 @@ export default function StarseedAdventure() {
   const startNewAdventure = useCallback(async (originId, characterName) => {
     setLoading(true);
     setSceneImage(null);
+    // V68.31: optimistic view switch — flip to the game canvas IMMEDIATELY so
+    // the player sees motion, a title and a channeling indicator instead of
+    // staring at a "Channeling…" button for 8s that looks broken.
+    const origin = origins.find(o => o.id === originId);
+    setActiveOrigin(origin);
+    setCurrentScene(null); // GameScene renders its channeling skeleton
+    setView('game');
     try {
       await axios.post(`${API}/starseed/create-character`, {
         origin_id: originId, character_name: characterName,
       }, { headers: buildHeaders() });
-      const origin = origins.find(o => o.id === originId);
-      setActiveOrigin(origin);
       const sceneRes = await axios.post(`${API}/starseed/generate-scene`, {
         origin_id: originId, choice_index: null,
       }, { headers: buildHeaders() });
       setCurrentScene(sceneRes.data.scene);
       setCharacterState(sceneRes.data.character);
-      setView('game');
       toast.success(`${origin.name} adventure begins!`);
       generateSceneImage(sceneRes.data.scene.image_prompt, originId);
     } catch {
       toast.error('Could not start adventure');
+      // Roll back to select on failure
+      setView('select');
+      setActiveOrigin(null);
     } finally {
       setLoading(false);
     }
@@ -101,9 +108,12 @@ export default function StarseedAdventure() {
   const resumeAdventure = useCallback(async (originId) => {
     setLoading(true);
     setSceneImage(null);
+    // V68.31: optimistic view switch for resume too.
+    const origin = origins.find(o => o.id === originId);
+    setActiveOrigin(origin);
+    setCurrentScene(null);
+    setView('game');
     try {
-      const origin = origins.find(o => o.id === originId);
-      setActiveOrigin(origin);
       const charRes = await axios.get(`${API}/starseed/character/${originId}`, { headers: buildHeaders() });
       setCharacterState(charRes.data);
       const sceneRes = await axios.post(`${API}/starseed/generate-scene`, {
@@ -111,13 +121,14 @@ export default function StarseedAdventure() {
       }, { headers: buildHeaders() });
       setCurrentScene(sceneRes.data.scene);
       setCharacterState(sceneRes.data.character);
-      setView('game');
       generateSceneImage(sceneRes.data.scene.image_prompt, originId);
     } catch (err) {
       const msg = err?.response?.status === 401
         ? 'Your session expired — please sign in again.'
         : (err?.response?.data?.detail || 'Could not resume adventure. Try again.');
       toast.error(msg);
+      setView('select');
+      setActiveOrigin(null);
     } finally {
       setLoading(false);
     }

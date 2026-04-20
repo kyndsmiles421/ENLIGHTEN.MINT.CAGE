@@ -31,7 +31,10 @@ export function GameScene({ scene, character, origin, onChoice, loading, onBack,
     }
   }, [character?.stats]);
 
-  if (!scene) return null;
+  // V68.31 — While the scene is being channeled by GPT-5.2 (takes 5–10s),
+  // render a cinematic progress screen instead of a blank page. This is
+  // what the user sees immediately after tapping "Begin Adventure".
+  if (!scene) return <ChannelingStage origin={origin} onBack={onBack} />;
 
   const stats = character?.stats || {};
 
@@ -274,3 +277,122 @@ export function GameScene({ scene, character, origin, onChoice, loading, onBack,
     </div>
   );
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ChannelingStage — V68.31
+   Shown while the GPT-5.2 narrative is being generated (5–10s). Gives the
+   user cinematic, obviously-alive feedback so "Begin Adventure" never
+   looks dead again. Uses pure Motion + origin color theming. No 3D deps.
+   ───────────────────────────────────────────────────────────────────── */
+function ChannelingStage({ origin, onBack }) {
+  const color = origin?.color || '#C084FC';
+  const name = origin?.name || 'Starseed';
+  const [elapsed, setElapsed] = useState(0);
+  const [phase, setPhase] = useState(0);
+
+  const phases = [
+    `Aligning your ${name} resonance…`,
+    `Pulling threads of memory from ${origin?.home_system || 'your home constellation'}…`,
+    'Composing the opening scene with GPT-5.2…',
+    'Weaving your choices and gem resonance into the narrative…',
+    'Almost there — the cosmos is finding its voice…',
+  ];
+
+  useEffect(() => {
+    const t = setInterval(() => setElapsed(e => e + 1), 1000);
+    return () => clearInterval(t);
+  }, []);
+  useEffect(() => {
+    setPhase(Math.min(phases.length - 1, Math.floor(elapsed / 2.2)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [elapsed]);
+
+  return (
+    <div
+      className="relative z-10 min-h-[70vh] flex flex-col items-center justify-center px-6"
+      data-testid="channeling-stage"
+    >
+      {/* Exit always reachable so the button is never a trap */}
+      <button
+        onClick={onBack}
+        className="absolute top-2 left-2 flex items-center gap-1.5 text-xs transition-all hover:gap-2.5 group"
+        style={{ color: 'var(--text-muted)' }}
+        data-testid="channeling-back-btn"
+      >
+        <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" /> Exit
+      </button>
+
+      {/* Pulsing concentric rings, themed by origin color */}
+      <div className="relative flex items-center justify-center mb-10" style={{ width: 180, height: 180 }}>
+        {[0, 1, 2].map(i => (
+          <motion.div
+            key={i}
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: [0.6, 1.3, 0.6], opacity: [0, 0.45, 0] }}
+            transition={{ duration: 2.618, repeat: Infinity, delay: i * 0.618, ease: 'easeInOut' }}
+            className="absolute inset-0 rounded-full"
+            style={{ border: `2px solid ${color}`, boxShadow: `0 0 42px ${color}80 inset, 0 0 60px ${color}55` }}
+          />
+        ))}
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+          className="relative flex items-center justify-center rounded-full"
+          style={{
+            width: 120, height: 120,
+            background: `radial-gradient(circle at center, ${color}33 0%, ${color}11 45%, transparent 70%)`,
+            border: `1px solid ${color}66`,
+          }}
+        >
+          <Sparkles size={40} style={{ color }} />
+        </motion.div>
+      </div>
+
+      <p className="text-[11px] font-bold uppercase tracking-[0.32em] mb-3" style={{ color }}>
+        Channeling {name}
+      </p>
+      <h2
+        className="text-3xl sm:text-4xl font-light tracking-tight mb-5 text-center"
+        style={{
+          fontFamily: 'Cormorant Garamond, serif',
+          background: `linear-gradient(135deg, #fff, ${color})`,
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+        }}
+      >
+        The stars are composing your opening scene
+      </h2>
+
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={phase}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.45 }}
+          className="text-sm text-center max-w-md"
+          style={{ color: 'var(--text-secondary)', fontFamily: 'Cormorant Garamond, serif', fontSize: 17 }}
+        >
+          {phases[phase]}
+        </motion.p>
+      </AnimatePresence>
+
+      {/* Progress — honest numbers, not a lie. Scales 0→100 across ~12s.  */}
+      <div className="mt-8 w-full max-w-sm">
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          <motion.div
+            initial={{ width: '0%' }}
+            animate={{ width: `${Math.min(96, (elapsed / 12) * 96)}%` }}
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            style={{ height: '100%', background: `linear-gradient(90deg, ${color}, #fff)` }}
+          />
+        </div>
+        <div className="mt-2 flex justify-between text-[10px] uppercase tracking-[0.3em]" style={{ color: 'var(--text-muted)' }}>
+          <span>{elapsed}s elapsed</span>
+          <span>gpt-5.2 channeling…</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+

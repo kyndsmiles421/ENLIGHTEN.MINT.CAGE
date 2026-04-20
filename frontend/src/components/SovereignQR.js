@@ -1,280 +1,91 @@
 /**
- * SovereignQR.js — Pure-SVG QR code generator + inline sheet.
+ * SovereignQR.js — QR code generator + inline sheet.
  *
- * Zero external dependencies (no qrcode.react install) — respects the
- * Metabolic Seal. Uses the standard QR Code reference implementation
- * condensed into a single file. Supports QR up to Version 10, ECC-L/M.
+ * V68.30 — Replaced the custom SVG encoder (which produced invalid format-
+ * info bits, causing scanners to reject the code) with the battle-tested
+ * `qrcode` library. Keeps the same public API, same Om emblem, same
+ * Metabolic-Seal footprint (<40KB gzipped).
  *
  * API:
  *   <QRSvg value="..." size={240} fg="#A78BFA" bg="transparent" />
- *   <MyQRSheet open={bool} onClose={fn} />   — fetches share URL & renders.
- *
- * MyQRSheet fetches GET /api/share/pattern and renders a QR for
- * <origin>/<share_path>. Any phone camera can scan it and open the
- * Resonance Share page.
+ *   <MyQRSheet open={bool} onClose={fn} />
  */
 
 import React, { useEffect, useMemo, useState } from 'react';
+import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import QRCode from 'qrcode';
 import { X, Copy, Check, Share2 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-/* ─── Tiny QR encoder (byte mode, ECC-M, auto-version up to 10) ─── */
-// Based on the standard QR algorithm. Only the parts we actually need.
-/* eslint-disable no-bitwise */
-
-// Galois field tables for Reed–Solomon over GF(256)
-const GF_EXP = new Uint8Array(512);
-const GF_LOG = new Uint8Array(256);
-(function buildTables() {
-  let x = 1;
-  for (let i = 0; i < 255; i++) {
-    GF_EXP[i] = x;
-    GF_LOG[x] = i;
-    x <<= 1;
-    if (x & 0x100) x ^= 0x11d;
-  }
-  for (let i = 255; i < 512; i++) GF_EXP[i] = GF_EXP[i - 255];
-})();
-
-function rsGenPoly(n) {
-  let poly = new Uint8Array([1]);
-  for (let i = 0; i < n; i++) {
-    const next = new Uint8Array(poly.length + 1);
-    for (let j = 0; j < poly.length; j++) {
-      next[j] ^= poly[j];
-      const t = (GF_LOG[poly[j]] + i) % 255;
-      next[j + 1] ^= GF_EXP[t];
-    }
-    poly = next;
-  }
-  return poly;
-}
-
-function rsEncode(data, ecLen) {
-  const gen = rsGenPoly(ecLen);
-  const buf = new Uint8Array(data.length + ecLen);
-  buf.set(data, 0);
-  for (let i = 0; i < data.length; i++) {
-    const lead = buf[i];
-    if (!lead) continue;
-    const logLead = GF_LOG[lead];
-    for (let j = 0; j < gen.length; j++) {
-      buf[i + j] ^= GF_EXP[(GF_LOG[gen[j]] + logLead) % 255];
-    }
-  }
-  return buf.slice(data.length);
-}
-
-// Capacity table (version, ECC-M byte-mode data bytes)
-const CAP_M = [0, 14, 26, 42, 62, 84, 106, 122, 152, 180, 213]; // v1..v10
-
-function pickVersion(len) {
-  for (let v = 1; v <= 10; v++) if (CAP_M[v] >= len + 2) return v;
-  return 10;
-}
-
-// Block structure per (version, ecc=M): [blocks, dataBytesPerBlock, ecBytesPerBlock]
-const BLOCK_M = {
-  1:  [[1, 16, 10]],
-  2:  [[1, 28, 16]],
-  3:  [[1, 44, 26]],
-  4:  [[2, 32, 18]],
-  5:  [[2, 43, 24]],
-  6:  [[4, 27, 16]],
-  7:  [[4, 31, 18]],
-  8:  [[2, 38, 22], [2, 39, 22]],
-  9:  [[3, 36, 22], [2, 37, 22]],
-  10: [[4, 43, 26], [1, 44, 26]],
-};
-
-function bits(arr, val, count) {
-  for (let i = count - 1; i >= 0; i--) arr.push((val >> i) & 1);
-}
-
-function encodeByteData(text, version) {
-  // Byte mode indicator (4 bits = 0100), char-count (8 bits for v1-9, 16 for v10+)
-  const bytes = new TextEncoder().encode(text);
-  const bitArr = [];
-  bits(bitArr, 0b0100, 4);
-  bits(bitArr, bytes.length, version < 10 ? 8 : 16);
-  for (let i = 0; i < bytes.length; i++) bits(bitArr, bytes[i], 8);
-  // Terminator
-  const totalBits = CAP_M[version] * 8;
-  for (let i = 0; i < 4 && bitArr.length < totalBits; i++) bitArr.push(0);
-  while (bitArr.length % 8 !== 0) bitArr.push(0);
-  // Pad bytes 0xEC, 0x11 alternating
-  const pads = [0xEC, 0x11];
-  let p = 0;
-  while (bitArr.length < totalBits) { bits(bitArr, pads[p % 2], 8); p++; }
-  // To bytes
-  const data = new Uint8Array(bitArr.length / 8);
-  for (let i = 0; i < data.length; i++) {
-    let b = 0;
-    for (let j = 0; j < 8; j++) b = (b << 1) | bitArr[i * 8 + j];
-    data[i] = b;
-  }
-  return data;
-}
-
-function interleaveCodewords(data, version) {
-  const groups = BLOCK_M[version];
-  // Expand to full [dataBlocks, ecBlocks]
-  const dataBlocks = [];
-  const ecBlocks = [];
-  let off = 0;
-  let ecLen = 0;
-  for (const [nBlocks, dLen, eLen] of groups) {
-    for (let i = 0; i < nBlocks; i++) {
-      const block = data.slice(off, off + dLen);
-      off += dLen;
-      dataBlocks.push(block);
-      ecBlocks.push(rsEncode(block, eLen));
-      ecLen = eLen;
-    }
-  }
-  // Interleave data
-  const out = [];
-  const maxDLen = Math.max(...dataBlocks.map(b => b.length));
-  for (let i = 0; i < maxDLen; i++) {
-    for (const b of dataBlocks) if (i < b.length) out.push(b[i]);
-  }
-  for (let i = 0; i < ecLen; i++) {
-    for (const b of ecBlocks) out.push(b[i]);
-  }
-  return new Uint8Array(out);
-}
-
-// Module plotting
-function buildMatrix(version, codewords) {
-  const size = 17 + version * 4;
-  const m = Array.from({ length: size }, () => new Int8Array(size).fill(-1));
-  // Finder patterns (3 corners)
-  function finder(r, c) {
-    for (let i = -1; i <= 7; i++) for (let j = -1; j <= 7; j++) {
-      const y = r + i, x = c + j;
-      if (y < 0 || y >= size || x < 0 || x >= size) continue;
-      const edge = (i === 0 || i === 6 || j === 0 || j === 6);
-      const inner = (i >= 2 && i <= 4 && j >= 2 && j <= 4);
-      m[y][x] = (edge || inner) ? 1 : 0;
-    }
-  }
-  finder(0, 0); finder(0, size - 7); finder(size - 7, 0);
-  // Timing
-  for (let i = 8; i < size - 8; i++) {
-    if (m[6][i] === -1) m[6][i] = (i % 2 === 0) ? 1 : 0;
-    if (m[i][6] === -1) m[i][6] = (i % 2 === 0) ? 1 : 0;
-  }
-  // Dark module
-  m[size - 8][8] = 1;
-  // Reserve format info areas (set to 0 temp)
-  for (let i = 0; i < 9; i++) if (m[8][i] === -1) m[8][i] = 0;
-  for (let i = 0; i < 8; i++) if (m[i][8] === -1) m[i][8] = 0;
-  for (let i = size - 8; i < size; i++) m[i][8] = m[8][i] = (i === size - 8) ? 1 : 0;
-
-  // Place data in zig-zag, skipping reserved modules
-  let bitIdx = 0;
-  const totalBits = codewords.length * 8;
-  let col = size - 1, upward = true;
-  while (col > 0) {
-    if (col === 6) col--;
-    for (let i = 0; i < size; i++) {
-      const row = upward ? size - 1 - i : i;
-      for (let x = 0; x < 2; x++) {
-        const c = col - x;
-        if (m[row][c] === -1) {
-          let bit = 0;
-          if (bitIdx < totalBits) {
-            const b = codewords[bitIdx >> 3];
-            bit = (b >> (7 - (bitIdx & 7))) & 1;
-            bitIdx++;
-          }
-          m[row][c] = bit;
-        }
-      }
-    }
-    col -= 2; upward = !upward;
-  }
-
-  // Mask (pattern 0: (i+j)%2 === 0)
-  for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) {
-    // Don't mask reserved (finder/timing/format)
-    const inFinder = (r < 9 && c < 9) || (r < 9 && c >= size - 8) || (r >= size - 8 && c < 9);
-    const inTiming = (r === 6 || c === 6);
-    if (inFinder || inTiming) continue;
-    if ((r + c) % 2 === 0) m[r][c] ^= 1;
-  }
-
-  // Format info (ECC M, mask 0 = 0b00101011110101)
-  const fmt = 0b101010000010010;
-  for (let i = 0; i < 15; i++) {
-    const bit = (fmt >> (14 - i)) & 1;
-    if (i < 6) m[8][i] = bit;
-    else if (i < 8) m[8][i + 1] = bit;
-    else if (i === 8) m[7][8] = bit;
-    else m[14 - i][8] = bit;
-    if (i < 7) m[size - 1 - i][8] = bit;
-    else m[8][size - 15 + i] = bit;
-  }
-
-  return m;
-}
-
-export function encodeQR(text) {
-  const v = pickVersion(new TextEncoder().encode(text).length);
-  const data = encodeByteData(text, v);
-  const codewords = interleaveCodewords(data, v);
-  return buildMatrix(v, codewords);
-}
-
 /* ─── React components ─── */
 
-export function QRSvg({ value, size = 240, fg = '#FFFFFF', bg = 'transparent', centerGlyph = 'ॐ', centerColor = '#C084FC', centerBg = '#FFFFFF', centerSize = 0.22 }) {
-  const matrix = useMemo(() => {
-    try { return encodeQR(value || ''); } catch { return null; }
-  }, [value]);
-  if (!matrix) return null;
-  const n = matrix.length;
-  const cell = size / n;
-  const rects = [];
-  // Mask out the center cells so the logo sits on clean white (safer
-  // for scanners). ECC-M tolerates ~15% occlusion; we cover ~18% which
-  // is still inside the safety band for typical URL-length payloads.
-  const cov = centerGlyph ? centerSize : 0;
-  const innerHalf = (n * cov) / 2;
-  const mid = n / 2;
-  for (let r = 0; r < n; r++) {
-    for (let c = 0; c < n; c++) {
-      if (matrix[r][c] !== 1) continue;
-      if (cov && Math.abs(r + 0.5 - mid) < innerHalf && Math.abs(c + 0.5 - mid) < innerHalf) continue;
-      rects.push(<rect key={`${r}-${c}`} x={c * cell} y={r * cell} width={cell + 0.5} height={cell + 0.5} fill={fg} />);
-    }
+export function QRSvg({ value, size = 240, fg = '#100018', bg = 'transparent', centerGlyph = 'ॐ', centerColor = '#C084FC', centerBg = '#FFFFFF', centerSize = 0.18 }) {
+  const [svgMarkup, setSvgMarkup] = useState(null);
+
+  useEffect(() => {
+    if (!value) { setSvgMarkup(null); return; }
+    let cancelled = false;
+    // ECC-H (30% recovery) — comfortably accommodates the Om emblem and
+    // any optical print/screen degradation. The qrcode lib returns a
+    // compact SVG string we directly embed.
+    QRCode.toString(value, {
+      type: 'svg',
+      errorCorrectionLevel: 'H',
+      margin: 1,
+      color: { dark: fg, light: '#00000000' },
+    })
+      .then(svg => { if (!cancelled) setSvgMarkup(svg); })
+      .catch(() => { if (!cancelled) setSvgMarkup(null); });
+    return () => { cancelled = true; };
+  }, [value, fg]);
+
+  const emblemPx = useMemo(() => size * centerSize, [size, centerSize]);
+
+  if (!svgMarkup) {
+    return (
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} xmlns="http://www.w3.org/2000/svg" data-testid="qr-svg">
+        <rect width={size} height={size} fill={bg} />
+      </svg>
+    );
   }
-  const emblemPx = size * centerSize * 1.05;
+
+  // Extract the inner content of the library SVG and wrap with our own
+  // viewBox so we can overlay the emblem.
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} xmlns="http://www.w3.org/2000/svg" data-testid="qr-svg">
-      <rect width={size} height={size} fill={bg} />
-      {rects}
+    <div
+      data-testid="qr-svg"
+      style={{ width: size, height: size, position: 'relative', background: bg }}
+    >
+      <div
+        style={{ width: '100%', height: '100%' }}
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: svgMarkup.replace('<svg ', `<svg width="${size}" height="${size}" style="display:block" `) }}
+      />
       {centerGlyph && (
-        <g>
-          <circle cx={size / 2} cy={size / 2} r={emblemPx / 2} fill={centerBg} />
-          <text
-            x={size / 2}
-            y={size / 2 + emblemPx * 0.12}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fontSize={emblemPx * 0.8}
-            fontWeight="600"
-            fill={centerColor}
-            style={{ fontFamily: "'Noto Sans Devanagari', 'Noto Sans', system-ui, sans-serif" }}
-          >
-            {centerGlyph}
-          </text>
-        </g>
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%', left: '50%',
+            width: emblemPx, height: emblemPx,
+            transform: 'translate(-50%, -50%)',
+            background: centerBg,
+            borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: "'Noto Sans Devanagari', 'Noto Sans', system-ui, sans-serif",
+            fontSize: emblemPx * 0.72,
+            fontWeight: 600,
+            color: centerColor,
+            lineHeight: 1,
+            userSelect: 'none',
+          }}
+        >
+          {centerGlyph}
+        </div>
       )}
-    </svg>
+    </div>
   );
 }
 
@@ -296,8 +107,18 @@ export default function MyQRSheet({ open, onClose }) {
       .catch(() => setErr('Could not load your share pattern. Try again.'));
   }, [open]);
 
+  // V68.30: While the QR sheet is open, mark <html> with `qr-sheet-open` so
+  // any portaled ChamberProp (BREATHE / RING BELL / MANDALA) hides behind
+  // the backdrop and can't corrupt the QR's finder patterns.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (open) document.documentElement.classList.add('qr-sheet-open');
+    else document.documentElement.classList.remove('qr-sheet-open');
+    return () => document.documentElement.classList.remove('qr-sheet-open');
+  }, [open]);
+
   const absoluteUrl = share
-    ? `${(process.env.REACT_APP_PUBLIC_URL || 'https://enlighten-mint-cafe.me').replace(/\/$/, '')}${share.share_path}`
+    ? `${(process.env.REACT_APP_PUBLIC_URL || (typeof window !== 'undefined' && window.location.origin) || 'https://enlighten-mint-cafe.me').replace(/\/$/, '')}${share.share_path}`
     : '';
 
   const copyUrl = async () => {
@@ -317,13 +138,14 @@ export default function MyQRSheet({ open, onClose }) {
   };
 
   if (!open) return null;
-  return (
+  if (typeof document === 'undefined') return null;
+  return ReactDOM.createPortal(
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         style={{
-          position: 'fixed', inset: 0, zIndex: 70,
-          background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)',
+          position: 'fixed', inset: 0, zIndex: 9999,
+          background: 'rgba(0,0,0,0.92)', backdropFilter: 'blur(16px)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           padding: 20,
         }}
@@ -416,6 +238,7 @@ export default function MyQRSheet({ open, onClose }) {
           )}
         </motion.div>
       </motion.div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

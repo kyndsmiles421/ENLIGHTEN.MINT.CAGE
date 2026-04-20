@@ -115,6 +115,16 @@ body.scene-active .min-h-screen {
   --sigfield-glow: rgba(168, 85, 247, 0.4);
 }
 
+/* V68.30 — While the MyQRSheet overlay is open, hide every portaled
+   chamber prop so the scanner-critical QR code can never be occluded
+   by BREATHE / RING BELL / MANDALA / etc. Restored automatically on
+   close. */
+html.qr-sheet-open .chamber-prop-portal {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 /* V68.31 — SOVEREIGN ENTITY ICON TREATMENT (Hybrid Neo-Kyoto × Crystalline)
    Magenta + cyan neon rim × gold/violet refracted bloom, pulsing at a
    528Hz sub-harmonic (528/1024 ≈ 515ms). Applied to any icon with the
