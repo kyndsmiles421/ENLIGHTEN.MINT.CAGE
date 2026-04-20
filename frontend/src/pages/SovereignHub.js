@@ -18,6 +18,7 @@ import SovereignChoicePanel from '../components/SovereignChoicePanel';
 import ToolDrawer from '../components/ToolDrawer';
 import CalibrationLens from '../components/CalibrationLens';
 import SignaturePill from '../components/SignaturePill';
+import BuyTimePanel from '../components/BuyTimePanel';
 import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
@@ -231,6 +232,7 @@ export default function SovereignHub() {
   const [glowDomains, setGlowDomains] = useState([]);
   const [toolDrawerOpen, setToolDrawerOpen] = useState(false);
   const [lensOpen, setLensOpen] = useState(false);
+  const [buyTimeOpen, setBuyTimeOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 5);
@@ -408,9 +410,23 @@ export default function SovereignHub() {
         >
           ✧ Living Lens · Calibrate
         </button>
+        <button
+          onClick={() => setBuyTimeOpen(true)}
+          data-testid="open-buy-time"
+          className="group px-5 py-2.5 rounded-full text-[11px] uppercase tracking-[0.28em] font-bold transition-all"
+          style={{
+            background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(234, 179, 8, 0.12))',
+            border: '1px solid rgba(251, 191, 36, 0.55)',
+            color: '#FEF3C7',
+            boxShadow: '0 0 28px rgba(251, 191, 36, 0.22)',
+          }}
+        >
+          ⌂ Gilded Path · Buy Time
+        </button>
       </div>
       <ToolDrawer open={toolDrawerOpen} onClose={() => setToolDrawerOpen(false)} />
       <CalibrationLens open={lensOpen} onClose={() => setLensOpen(false)} />
+      <BuyTimePanel open={buyTimeOpen} onClose={() => setBuyTimeOpen(false)} />
 
       {/* V64.1 — Oracle: Intent-Based Neural Search */}
       <div className="px-4 pb-4">

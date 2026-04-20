@@ -70,4 +70,14 @@ export function playStreak(n = 1) {
   }
 }
 
-export default { playSuccess, playFail, playStreak };
+export function playGilded() {
+  if (allowedFrequency() === 'silence') return;
+  // Gilded Unlock — 432Hz + 864Hz (octave stack, NOT 528Hz).
+  // Distinctly luxurious, but audibly different from the Resonance Click
+  // so the Sovereign's ear can tell earned work from bought time.
+  tone({ freq: 432, dur: 0.38, gain: 0.14 });
+  tone({ freq: 864, dur: 0.30, gain: 0.08, delay: 0.08 });
+  tone({ freq: 1296, dur: 0.22, gain: 0.04, delay: 0.18 }); // triple-octave shimmer
+}
+
+export default { playSuccess, playFail, playStreak, playGilded };
