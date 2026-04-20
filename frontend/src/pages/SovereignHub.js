@@ -17,6 +17,7 @@ import OracleSearch from '../components/OracleSearch';
 import SovereignChoicePanel from '../components/SovereignChoicePanel';
 import ToolDrawer from '../components/ToolDrawer';
 import CalibrationLens from '../components/CalibrationLens';
+import SignaturePill from '../components/SignaturePill';
 import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
@@ -372,6 +373,11 @@ export default function SovereignHub() {
       {/* V68.31 — Sovereign Choice Protocol Panel (audio frequency + visual skin) */}
       <div className="px-4 pb-4">
         <SovereignChoicePanel />
+      </div>
+
+      {/* V68.32 — Blade Signature pill (live truth or pinned) */}
+      <div className="px-4 pb-3 flex justify-center">
+        <SignaturePill />
       </div>
 
       {/* V68.31 — Sovereign Arsenal (Swiss Army Knife) opener */}

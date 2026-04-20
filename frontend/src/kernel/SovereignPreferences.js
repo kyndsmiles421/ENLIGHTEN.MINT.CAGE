@@ -37,6 +37,9 @@ const DEFAULTS = Object.freeze({
   //   oil   → culinary/health (nutrition, biochem)
   //   gold  → sovereign/economy (ledger, trade, leadership)
   calibration: { metal: 0.5, glass: 0.5, oil: 0.5, gold: 0.5, updatedAt: null },
+  // V68.32 — Sovereign identity. `pinnedSignature` locks the auto-derived
+  // title from BladeSignature; null means "show the live truth."
+  identity: { pinnedSignature: null },
 });
 
 const listeners = new Set();
@@ -56,6 +59,7 @@ function readRaw() {
       motion:      { ...DEFAULTS.motion,      ...(parsed.motion      || {}) },
       learning:    { ...DEFAULTS.learning,    ...(parsed.learning    || {}) },
       calibration: { ...DEFAULTS.calibration, ...(parsed.calibration || {}) },
+      identity:    { ...DEFAULTS.identity,    ...(parsed.identity    || {}) },
     };
   } catch {
     return clone(DEFAULTS);
