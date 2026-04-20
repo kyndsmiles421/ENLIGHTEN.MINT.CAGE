@@ -1,7 +1,28 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.31)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.35)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as a Wellness / Mental Acuity app.
+
+## V68.35 — NATIVE .AAB MINTED · PLAY-STORE READY (20 Feb 2026)
+1. ✅ **Signed Android App Bundle forged** — `/app/build_artifacts/enlighten-mint-cafe-v1.0.0.aab` (33 MB, 968 files). Package `cafe.mint.enlighten` v1.0.0 / versionCode 1. MinSDK 24, TargetSDK 36.
+2. ✅ **Upload keystore** — RSA 4096, SHA384withRSA, 30-year validity.
+   - Path: `/app/build_artifacts/enlighten-mint-cafe-UPLOAD-KEY.keystore`
+   - Alias: `enlightenmintcafe`  · store+key password: `Sovereign2026!`
+   - SHA-1: `C3:A5:5D:38:...:3D:19` · SHA-256: `3F:E1:E1:E2:...:4D:07`
+3. ✅ **Obsidian Void adaptive icons** — pure #000000 background + gold Om foreground at all 5 mipmap densities (mdpi→xxxhdpi) + round variants. 512×512 Play Store listing icon at `/app/frontend/resources/play-store-icon-512.png`.
+4. ✅ **Unified appId** — scrubbed `com.cosmiccollective.app` and `com.infinitysovereign.app` drift; everything now `cafe.mint.enlighten` (Manifest, `build.gradle`, both capacitor configs, Java source tree, strings.xml, test classes).
+5. ✅ **Build pipeline repro** — Java 21 (Temurin @ `/opt/jdk21`), Android SDK cmdline-tools + platform-tools + build-tools 36.0.0 + platforms;android-36 at `/opt/android-sdk`. AAPT2/zipalign/aapt wrapped with `qemu-x86_64-static` via `libc6:amd64` multi-arch (container is aarch64, Google only ships x86_64 AAPT2). Override pinned in `gradle.properties` via `android.aapt2FromMavenOverride`.
+6. ✅ **Easter egg** — first-DevTools greeting in `src/index.js`: gold Cormorant "ENLIGHTEN.MINT.CAFE — Sovereign v1.0.0" + JetBrains Mono whisper "to the first hundred — you are the Sovereigns. 528Hz is the heartbeat. Forge, do not spend." Verified inside shipped `main.9bd0df22.js`.
+7. ✅ **SovereignHub stray JSX fix** — removed dangling `</div></div>)}` tail that was blocking the web build.
+8. ✅ **Gitignore tightened** — `*.keystore`, `app/keystore.properties` now ignored.
+
+## Next Tasks (V68.36)
+- **P1 — Real Stripe wire** for Gilded Path (Seed/Artisan/Sovereign/Gilded tiers) replacing localStorage mock in `BuyTimePanel.js`.
+- **P1 — WebP compression** on `/api/ai-visuals/chamber` (currently 1.8–2.5 MB per image, violates Metabolic Seal).
+- **P2 — Sage AI Coach "AI TIME" gauge** pillar.
+- **P2 — Gradle 9.0 compat** — migrate `capacitor-cordova-android-plugins` off deprecated APIs.
+- **P2 — R8 minification** + ABI splits (once native libs enter).
+- **P2 — Quad-Pane SplitScreen Refactor**, Real GLB Avatar Generator (RPM/Meshy AI), Time Capsules via Resend.
 
 ## Sovereign Flow Map (V68.31 — Systematic Law)
 Architectural contract every new feature MUST honor:

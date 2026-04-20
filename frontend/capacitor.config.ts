@@ -1,9 +1,10 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.infinitysovereign.app',
-  appName: 'INFINITY SOVEREIGN',
+  appId: 'cafe.mint.enlighten',
+  appName: 'Enlighten Mint Cafe',
   webDir: 'build',
+  bundledWebRuntime: false,
   server: {
     androidScheme: 'https',
     iosScheme: 'https',
@@ -12,7 +13,7 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchShowDuration: 2500,
       launchAutoHide: true,
-      backgroundColor: '#0B0C15',
+      backgroundColor: '#000000',
       androidScaleType: 'CENTER_CROP',
       showSpinner: false,
       splashFullScreen: true,
@@ -22,7 +23,7 @@ const config: CapacitorConfig = {
     },
     StatusBar: {
       style: 'DARK',
-      backgroundColor: '#0B0C15',
+      backgroundColor: '#000000',
     },
     Keyboard: {
       resize: 'body',
@@ -38,11 +39,11 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: 'automatic',
     preferredContentMode: 'mobile',
-    backgroundColor: '#0B0C15',
-    scheme: 'CosmicCollective',
+    backgroundColor: '#000000',
+    scheme: 'EnlightenMintCafe',
   },
   android: {
-    backgroundColor: '#0B0C15',
+    backgroundColor: '#000000',
     allowMixedContent: true,
     captureInput: true,
     webContentsDebuggingEnabled: false,

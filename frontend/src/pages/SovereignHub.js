@@ -610,7 +610,3 @@ export default function SovereignHub() {
     </div>
   );
 }
-   </div>
-    </div>
-  );
-}
