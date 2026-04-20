@@ -12,7 +12,7 @@ export default function MixerNavBar({ activePanel, togglePanel, isRecording, set
   const effectiveTier = isPrivileged ? 4 : userTierNum;
 
   return (
-    <div data-testid="mixer-nav"
+    <div data-testid="mixer-nav" className="sovereign-icons"
       style={{ height: 52, minHeight: 52, background: '#060610', borderTop: '1px solid rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center' }}>
       {TOOL_TABS.map(tab => {
         const isLocked = effectiveTier < tab.minTier;

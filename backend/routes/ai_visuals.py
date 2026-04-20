@@ -725,6 +725,22 @@ AVATAR_STYLES = {
     "abstract": "abstract energy form made of pure light and color, sacred geometry patterns, chakra energy visualization, cosmic spiral form",
 }
 
+# ─── V68.31 — SOVEREIGN ENTITY MASTER STYLE (single source of truth) ──
+# Locked cinematic directive used everywhere an avatar/portrait/asset
+# is rendered. "Hybrid: Cyberpunk/Neon Neo-Kyoto × Crystalline/Cathedral."
+# Any new visual must import this so the whole app feels like it was
+# carved from the same refracted crystal and lit by the same neon sun.
+SOVEREIGN_ENTITY_STYLE = (
+    "Sovereign Entity of the ENLIGHTEN.MINT.CAFE 9x9 crystalline lattice: "
+    "cinematic 3D ultra-high-end digital art, photoreal rendering, "
+    "sharp magenta and cyan Neo-Kyoto rim-lighting sculpting the silhouette, "
+    "volumetric haze and neon fog behind, deep obsidian background with cathedral-scale crystalline geometry, "
+    "refracted gold and violet bloom on the core form, holographic HUD lines and subtle data rain motifs, "
+    "high-contrast dynamic range, shallow depth-of-field, 85mm lens look, 8K composition, "
+    "Observatory universe — not cartoon, not generic stock, not anime. "
+    "The figure should feel inhabited, not illustrated — like a citizen of a sovereign dimension."
+)
+
 
 @router.post("/ai-visuals/generate-avatar")
 async def generate_avatar(
@@ -756,6 +772,8 @@ async def generate_avatar(
         prompt_parts.append(f"Sacred geometry: {extras['sacred_geometry']} pattern integrated into the background.")
 
     prompt_parts.append("High quality digital art, rich detail, mystical atmosphere, dark cosmic background with stars. Square format portrait, centered composition.")
+    # V68.31 — Lock every avatar render to the Sovereign Entity style.
+    prompt_parts.append(SOVEREIGN_ENTITY_STYLE)
     full_prompt = " ".join(prompt_parts)
 
     try:

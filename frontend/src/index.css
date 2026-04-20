@@ -115,6 +115,66 @@ body.scene-active .min-h-screen {
   --sigfield-glow: rgba(168, 85, 247, 0.4);
 }
 
+/* V68.31 — SOVEREIGN ENTITY ICON TREATMENT (Hybrid Neo-Kyoto × Crystalline)
+   Magenta + cyan neon rim × gold/violet refracted bloom, pulsing at a
+   528Hz sub-harmonic (528/1024 ≈ 515ms). Applied to any icon with the
+   .sovereign-icon class and cascaded inside .sovereign-icons containers
+   and every ChamberProp portal. Zero extra API calls, zero bundle bloat.
+   Respects prefers-reduced-motion and `.silence-shield` opt-out. */
+:root {
+  --sov-magenta: #C084FC;
+  --sov-cyan: #38BDF8;
+  --sov-gold: #FBBF24;
+  --sov-violet: #8B5CF6;
+  --sov-528-period: 515ms;
+}
+.sovereign-icon,
+.sovereign-icons svg {
+  filter:
+    drop-shadow(0 0 1px var(--sov-cyan))
+    drop-shadow(0 0 4px var(--sov-magenta))
+    drop-shadow(0 0 14px rgba(139, 92, 246, 0.45));
+  transition: filter 360ms var(--phi-ease, cubic-bezier(0.4, 0, 0.2, 1)),
+              transform 360ms var(--phi-ease, cubic-bezier(0.4, 0, 0.2, 1));
+  will-change: filter, transform;
+  animation: sovereign-pulse-528 var(--sov-528-period, 515ms) ease-in-out infinite alternate;
+}
+.sovereign-icon:hover,
+.sovereign-icons svg:hover {
+  filter:
+    drop-shadow(0 0 2px var(--sov-cyan))
+    drop-shadow(0 0 10px var(--sov-magenta))
+    drop-shadow(0 0 22px var(--sov-gold));
+  transform: scale(1.05);
+}
+@keyframes sovereign-pulse-528 {
+  0%   { filter:
+    drop-shadow(0 0 1px var(--sov-cyan))
+    drop-shadow(0 0 4px var(--sov-magenta))
+    drop-shadow(0 0 14px rgba(139, 92, 246, 0.45)); }
+  100% { filter:
+    drop-shadow(0 0 2px var(--sov-cyan))
+    drop-shadow(0 0 7px var(--sov-magenta))
+    drop-shadow(0 0 18px rgba(251, 191, 36, 0.55)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sovereign-icon, .sovereign-icons svg,
+  .chamber-prop-portal svg { animation: none; }
+}
+.silence-shield .sovereign-icon,
+.silence-shield .sovereign-icons svg,
+.silence-shield .chamber-prop-portal svg { animation: none; }
+
+/* Chamber props inherit the Sovereign Entity treatment automatically. */
+.chamber-prop-portal svg {
+  filter:
+    drop-shadow(0 0 2px var(--sov-cyan))
+    drop-shadow(0 0 8px var(--sov-magenta))
+    drop-shadow(0 0 18px rgba(251, 191, 36, 0.5));
+  animation: sovereign-pulse-528 var(--sov-528-period) ease-in-out infinite alternate;
+}
+
+
 /* ═══════════════════════════════════════════════════════════════════════════
    FREQUENCY ENGINE — Perspective-Based Theming
    INTENSE (Red) | CALM (Cyan) | ZENITH (Gold) | VOID (White)
