@@ -545,6 +545,7 @@ function AnimatedRoutes() {
         <Route path="/theory" element={<MusicTheory />} />
         <Route path="/workshop" element={<Workshop />} />
         <Route path="/hub" element={<OrbitalHub />} />
+        <Route path="/orbital-hub" element={<OrbitalHub />} />
         <Route path="/sovereign-hub" element={<SovereignHub />} />
         <Route path="/ether-hub" element={<EnlightenMintHub />} />
         <Route path="/lattice-view" element={<LatticeView />} />

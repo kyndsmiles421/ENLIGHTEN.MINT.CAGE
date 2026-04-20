@@ -68,8 +68,8 @@ export default function MiniLattice() {
   if (!typeGrid) return null;
 
   const size = typeGrid.size;
-  const cellSize = 20;
-  const padding = 8;
+  const cellSize = 28;
+  const padding = 10;
   const viewBox = size * cellSize + padding * 2;
 
   const userFlat = data?.flat;
@@ -161,8 +161,8 @@ export default function MiniLattice() {
           const distance = Math.sqrt(dx * dx + dy * dy);
           const phi = 1.618033988;
           const proximity = 1 / (1 + distance / phi); // 1.0 at center → ~0.28 at corners
-          const r = isCenter ? 3.5 : (visited ? 2.2 + proximity * 1.2 : 1.4 + proximity * 0.6);
-          const baseOpacity = visited ? (0.55 + proximity * 0.45) : 0.15 + proximity * 0.12;
+          const r = isCenter ? 5 : (visited ? 3.2 + proximity * 1.4 : 2.2 + proximity * 0.9);
+          const baseOpacity = visited ? (0.75 + proximity * 0.25) : 0.45 + proximity * 0.22;
           const clickable = Boolean(visited?.path);
           return (
             <g key={`node-${x}-${y}`}
@@ -182,7 +182,7 @@ export default function MiniLattice() {
                   </circle>
                 </>
               )}
-              <circle cx={cx} cy={cy} r={r} fill={color} opacity={baseOpacity}>
+              <circle cx={cx} cy={cy} r={r} fill={color} opacity={baseOpacity} data-node-type={type || 'VAULT'}>
                 {visited && (
                   <title>{visited.path} · {type} · {visited.count}x</title>
                 )}
