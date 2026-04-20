@@ -15,6 +15,24 @@
 
 import { isRegistered, registerMany } from './SovereignBridge';
 
+// Domain → material mapping (Metal / Glass / Oil / Gold).
+// Any domain not listed defaults to 'glass' (aesthetic fallback).
+const DOMAIN_MATERIAL = {
+  // Metal — technical, structural, engineering
+  geology: 'metal', masonry: 'metal', carpentry: 'metal', physics: 'metal',
+  astronomy: 'metal', observatory: 'metal', numerology: 'metal', academy: 'metal',
+  // Glass — aesthetic, sacred geometry, arts
+  music: 'glass', 'sacred-texts': 'glass', cardology: 'glass', meditation: 'glass',
+  mudras: 'glass', yoga: 'glass', biorhythm: 'glass',
+  // Oil — culinary, health, biochem
+  herbology: 'oil', aromatherapy: 'oil', culinary: 'oil', anatomy: 'oil',
+  acupressure: 'oil', breathwork: 'oil', elixirs: 'oil', reiki: 'oil',
+  botany: 'oil', forestry: 'oil', alchemy: 'oil',
+  // Gold — economy, sovereign, trade, leadership
+  'cosmic-ledger': 'gold', starseed: 'gold', dome: 'gold',
+};
+function materialFor(domain) { return DOMAIN_MATERIAL[domain] || 'glass'; }
+
 // 27 canonical workshops — the full Sovereign Flow Map Layer 2 catalogue.
 // Each gets a layer assignment and a baseline resonance/purpose template.
 const WORKSHOPS = [
@@ -65,10 +83,11 @@ for (const ws of WORKSHOPS) {
       domain: ws.domain,
       unlocks,
       requires,
-      sparks: 2 + Math.floor(i / 2),       // 2→6 as the blade sharpens
+      sparks: 2 + Math.floor(i / 2),
       purpose: `${ws.domain} · blade ${i + 1} of ${ws.tools.length} — ${ws.tools[i]} (scaffold).`,
-      scaffold: true,                       // marks "not yet implemented"
-      blade: ws.blade,                      // entertainment | educational | utility
+      scaffold: true,
+      blade: ws.blade,
+      material: materialFor(ws.domain),       // V68.32 cross-domain resonance tag
     });
   }
 }
@@ -83,6 +102,6 @@ const L4 = [
   { id: 'vr.starseed-orion',     domain: 'starseed',    requires: ['starseed_active'],    unlocks: ['orion_realm'],       sparks: 12, purpose: 'Enter the Orion VR realm — shadow alchemy.' },
   { id: 'vr.starseed-pleiadian', domain: 'starseed',    requires: ['starseed_active'],    unlocks: ['pleiadian_realm'],   sparks: 12, purpose: 'Enter the Pleiadian VR realm — healing choir.' },
   { id: 'vr.starseed-venusian',  domain: 'starseed',    requires: ['starseed_active'],    unlocks: ['venusian_realm'],    sparks: 12, purpose: 'Enter the Venusian VR realm — divine beauty.' },
-].map(t => ({ ...t, layer: 4, blade: 'entertainment', scaffold: true }));
+].map(t => ({ ...t, layer: 4, blade: 'entertainment', scaffold: true, material: 'gold' }));
 
 registerMany([...stubs, ...L4]);

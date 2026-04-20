@@ -16,6 +16,7 @@ import DailyChallenges from '../components/DailyChallenges';
 import OracleSearch from '../components/OracleSearch';
 import SovereignChoicePanel from '../components/SovereignChoicePanel';
 import ToolDrawer from '../components/ToolDrawer';
+import CalibrationLens from '../components/CalibrationLens';
 import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
@@ -228,6 +229,7 @@ export default function SovereignHub() {
   const [expanded, setExpanded] = useState(null);
   const [glowDomains, setGlowDomains] = useState([]);
   const [toolDrawerOpen, setToolDrawerOpen] = useState(false);
+  const [lensOpen, setLensOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 5);
@@ -373,7 +375,7 @@ export default function SovereignHub() {
       </div>
 
       {/* V68.31 — Sovereign Arsenal (Swiss Army Knife) opener */}
-      <div className="px-4 pb-4 flex justify-center">
+      <div className="px-4 pb-4 flex flex-wrap gap-3 justify-center">
         <button
           onClick={() => setToolDrawerOpen(true)}
           data-testid="open-tool-drawer"
@@ -387,8 +389,22 @@ export default function SovereignHub() {
         >
           ⌁ Open the Sovereign Arsenal
         </button>
+        <button
+          onClick={() => setLensOpen(true)}
+          data-testid="open-calibration-lens"
+          className="group px-5 py-2.5 rounded-full text-[11px] uppercase tracking-[0.28em] font-bold transition-all"
+          style={{
+            background: 'rgba(251, 191, 36, 0.10)',
+            border: '1px solid rgba(251, 191, 36, 0.35)',
+            color: '#FDE68A',
+            boxShadow: '0 0 24px rgba(251, 191, 36, 0.12)',
+          }}
+        >
+          ✧ Living Lens · Calibrate
+        </button>
       </div>
       <ToolDrawer open={toolDrawerOpen} onClose={() => setToolDrawerOpen(false)} />
+      <CalibrationLens open={lensOpen} onClose={() => setLensOpen(false)} />
 
       {/* V64.1 — Oracle: Intent-Based Neural Search */}
       <div className="px-4 pb-4">

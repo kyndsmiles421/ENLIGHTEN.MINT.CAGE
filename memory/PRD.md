@@ -13,6 +13,11 @@ Architectural contract every new feature MUST honor:
 ## Core Rules
 - **Flatland Rule**, **Metabolic Seal** (<800KB), **Closed-Loop Economy** (Sparks earn-only), **System-wide Gamification**, **Epilepsy Safety**, **Silence Shield** (opt-in audio only), **Spotify Loophole**.
 
+## V68.32 — Living Calibration Lens + 4-Material Cross-Domain Tags (Feb 2026)
+1. ✅ **Living Lens** (`components/CalibrationLens.js`) — portal, re-openable anywhere. Four material axes (Metal · Glass · Oil · Gold), each with a probe question and a 0..1 slider. Persists to `SovereignPreferences.calibration` with `updatedAt`. Opener button mounted on the Hub ("✧ Living Lens · Calibrate").
+2. ✅ **Material tags on every blade** — `toolScaffold.js` adds `material` field via `DOMAIN_MATERIAL` mapping. Geology/Masonry/Carpentry/Physics/Astronomy/Academy → Metal. Music/Sacred-Texts/Cardology/Meditation/Mudras/Yoga/Biorhythm → Glass. Herbology/Aromatherapy/Culinary/Anatomy/Acupressure/Breathwork/Elixirs/Reiki/Botany/Forestry/Alchemy → Oil. Cosmic-Ledger/Starseed/Dome → Gold. Enables cross-domain resonance unlocks in future Quest Bridge logic.
+3. ✅ **SovereignPreferences.calibration** — `{metal, glass, oil, gold, updatedAt}` clamped 0..1. `setCalibration(partial)` accepts any subset; touching any axis refreshes updatedAt.
+
 ## V68.31 — Sovereign Choice + Bridge Rule + Swiss Army Arsenal (Feb 2026)
 1. ✅ **Starseed dead screen KILLED** — optimistic `setView('game')` + cinematic `ChannelingStage` (origin-themed rings, live phase copy, honest ETA, always-visible Exit). Verified: channeling at t=1.2s → narrative at t=5.6s.
 2. ✅ **QR code scannable** — replaced broken custom encoder with `qrcode` lib at ECC-H; pyzbar decodes live. Domain is now `window.location.origin`.
