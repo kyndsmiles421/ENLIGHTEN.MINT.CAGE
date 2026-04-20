@@ -100,6 +100,15 @@ export function SovereignUniverseProvider({ children }) {
           reward_card: a.reward_card || null,
         }));
         setToastQueue(prev => [...prev, ...toasts]);
+        // V68.28 — fire a light-surge for each milestone; any component
+        // can listen and radiate a color-shifted wave from the center.
+        try {
+          toasts.forEach(t => {
+            window.dispatchEvent(new CustomEvent('sovereign:light-surge', {
+              detail: { color: t.color || '#A78BFA', quest_complete: t.quest_complete, reward_sparks: t.reward_sparks },
+            }));
+          });
+        } catch { /* noop */ }
         // Refresh to sync sparks / new cards
         refreshGlobalUI();
       }
@@ -135,6 +144,29 @@ export function SovereignUniverseProvider({ children }) {
   // ─── Initial load + reload on auth change ───
   useEffect(() => {
     if (user) refreshGlobalUI();
+  }, [user, refreshGlobalUI]);
+
+  // ─── V68.28 Sovereign Quest Pulse ───
+  // Every 1.618 seconds the engine heartbeat fires: a lightweight
+  // window event any component can hook into (light-surge animations,
+  // AuraCap/HUD ticks, etc). Every 10 beats (~16.18s) the quest/wallet
+  // state is refreshed from the server so milestones land in the UI
+  // without waiting for a page change. Skipped when the page is
+  // hidden so the tab does not drain battery in the background.
+  useEffect(() => {
+    if (!user) return;
+    let beat = 0;
+    const id = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
+      beat += 1;
+      try {
+        window.dispatchEvent(new CustomEvent('sovereign:pulse', { detail: { beat } }));
+      } catch { /* noop */ }
+      if (beat % 10 === 0) {
+        refreshGlobalUI();
+      }
+    }, 1618);
+    return () => clearInterval(id);
   }, [user, refreshGlobalUI]);
 
   // ─── Expose a vanilla JS bridge on window ───

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { performanceManager } from '../engines/PerformanceManager';
+import { phiVolumeCurve } from '../utils/SovereignMath';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -201,12 +202,12 @@ export function MixerProvider({ children }) {
       compressor.connect(ctx.destination);
     }
     if (ctxRef.current.state === 'suspended') await ctxRef.current.resume();
-    masterGainRef.current.gain.value = muted ? 0 : masterVol / 100;
+    masterGainRef.current.gain.value = muted ? 0 : phiVolumeCurve(masterVol);
     return ctxRef.current;
   }, [masterVol, muted]);
 
   useEffect(() => {
-    if (masterGainRef.current) masterGainRef.current.gain.value = muted ? 0 : masterVol / 100;
+    if (masterGainRef.current) masterGainRef.current.gain.value = muted ? 0 : phiVolumeCurve(masterVol);
   }, [masterVol, muted]);
 
   // Battery & Performance Optimization: Suspend/resume AudioContext on visibility change
@@ -252,7 +253,7 @@ export function MixerProvider({ children }) {
     }
     const ctx = await getCtx();
     const waveform = options.waveform || 'sine';
-    const vol = (channelVols[`freq-${freq.hz}`] ?? 75) / 100;
+    const vol = phiVolumeCurve(channelVols[`freq-${freq.hz}`] ?? 75);
     const channelGain = ctx.createGain();
     channelGain.gain.value = vol * 0.15;
     channelGain.connect(masterGainRef.current);
@@ -314,7 +315,7 @@ export function MixerProvider({ children }) {
       return;
     }
     const ctx = await getCtx();
-    const vol = (channelVols[`sound-${sound.id}`] ?? 75) / 100;
+    const vol = phiVolumeCurve(channelVols[`sound-${sound.id}`] ?? 75);
     const channelGain = ctx.createGain();
     channelGain.gain.value = vol * 0.15;
     soundGainMapRef.current[sound.id] = channelGain;
@@ -342,7 +343,7 @@ export function MixerProvider({ children }) {
       return;
     }
     const ctx = await getCtx();
-    const vol = (channelVols[`drone-${drone.id}`] ?? 75) / 100;
+    const vol = phiVolumeCurve(channelVols[`drone-${drone.id}`] ?? 75);
     const channelGain = ctx.createGain();
     channelGain.gain.value = vol * 0.15;
     droneGainMapRef.current[drone.id] = channelGain;
@@ -507,9 +508,9 @@ export function MixerProvider({ children }) {
     setChannelVols(v => ({...v, [key]: val}));
     const [type, ...rest] = key.split('-');
     const id = rest.join('-');
-    if (type === 'freq' && freqGainMapRef.current[id]) freqGainMapRef.current[id].gain.value = (val / 100) * 0.15;
-    else if (type === 'sound' && soundGainMapRef.current[id]) soundGainMapRef.current[id].gain.value = (val / 100) * 0.15;
-    else if (type === 'drone' && droneGainMapRef.current[id]) droneGainMapRef.current[id].gain.value = (val / 100) * 0.15;
+    if (type === 'freq' && freqGainMapRef.current[id]) freqGainMapRef.current[id].gain.value = phiVolumeCurve(val) * 0.15;
+    else if (type === 'sound' && soundGainMapRef.current[id]) soundGainMapRef.current[id].gain.value = phiVolumeCurve(val) * 0.15;
+    else if (type === 'drone' && droneGainMapRef.current[id]) droneGainMapRef.current[id].gain.value = phiVolumeCurve(val) * 0.15;
   }, []);
 
   const stopAll = useCallback(() => {
@@ -557,6 +558,18 @@ export function MixerProvider({ children }) {
   }, [stopAll, toggleFreq, toggleSound, toggleDrone, toggleMantra]);
 
   const totalActive = activeFreqs.size + activeSounds.size + activeDrones.size + (activeMantra ? 1 : 0);
+
+  // V68.28 — Haptic Resonance source-of-truth. The dominant active
+  // frequency (lowest Hz if multiple) becomes the device vibration
+  // period so every chamber tap feels like the trade's resonant tone.
+  // Fallback: 40ms default pulse.
+  const currentResonanceHz = useMemo(() => {
+    if (!activeFreqs.size) return null;
+    return Math.min(...Array.from(activeFreqs));
+  }, [activeFreqs]);
+  useEffect(() => {
+    try { window.__sovereignHz = currentResonanceHz || null; } catch { /* noop */ }
+  }, [currentResonanceHz]);
 
   // ─── V68.27 Resonance Preset application ─────────────────────────
   // Any chamber can call applyResonancePreset('masonry') to activate

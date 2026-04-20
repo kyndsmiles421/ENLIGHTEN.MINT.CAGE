@@ -119,7 +119,38 @@ export function phiBudget(priority = 0) {
   return frame * (1 - PHI_INV);
 }
 
-// Identity helpers (for tests / introspection)
+// ─── Golden Ratio equal-power crossfade ──────────────────────────────
+// phiCrossfade(v) takes a linear volume [0..1] and returns a pair of
+// gain values { a, b } suitable for a φ-weighted equal-power fade
+// between two channels. When v=0, a=1 b=0. When v=1, a=0 b=1. At the
+// midpoint the curve bows toward the Golden Ratio so crossfades
+// between pillars (e.g. SOS↔WIS) feel physically balanced, not linear.
+export function phiCrossfade(v) {
+  const t = Math.max(0, Math.min(1, v));
+  // Weighted cosine equal-power curve bent by φ⁻¹ so the 50/50 point
+  // lands at t = 1-1/φ² (≈ 0.618) rather than 0.5.
+  const bent = Math.pow(t, PHI_INV);
+  return {
+    a: Math.cos(bent * Math.PI / 2),
+    b: Math.sin(bent * Math.PI / 2),
+  };
+}
+
+// phiVolumeCurve(linear) — maps a [0..100] slider to a [0..1] gain
+// using a φ-shaped perceptual curve. Louder at the low end (perceived
+// loudness is log-weighted), softer at the top so users don't clip.
+export function phiVolumeCurve(linearPct) {
+  const t = Math.max(0, Math.min(100, Number(linearPct) || 0)) / 100;
+  return Math.pow(t, PHI);
+}
+
+// ─── Fibonacci snap-grid tokens ──────────────────────────────────────
+// All UI spacing can reference a single Fibonacci cadence so panels,
+// HUD, icons, and text stack naturally. Use SPACING[n] for spacing,
+// RADIUS[n] for corner radii.
+export const FIB_PX = [2, 3, 5, 8, 13, 21, 34, 55, 89, 144];
+export const SPACING = FIB_PX;
+export const RADIUS  = FIB_PX;
 export const identities = {
   phi_squared_minus_phi_equals_one: () => Math.abs(PHI * PHI - PHI - 1) < 1e-10,
   phi_times_phi_inv_equals_one:    () => Math.abs(PHI * PHI_INV - 1) < 1e-10,

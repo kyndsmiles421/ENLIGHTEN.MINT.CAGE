@@ -86,6 +86,19 @@ body.scene-active .min-h-screen {
   --harmonic-color: #c084fc;
   --earth-freq: 7.83;
   --earth-pulse-duration: 127.7ms;
+
+  /* V68.28 Fibonacci Snap-Grid (crystalline spacing kernel) */
+  --fib-1: 2px;
+  --fib-2: 3px;
+  --fib-3: 5px;
+  --fib-4: 8px;
+  --fib-5: 13px;
+  --fib-6: 21px;
+  --fib-7: 34px;
+  --fib-8: 55px;
+  --fib-9: 89px;
+  --fib-10: 144px;
+  --phi-ease: cubic-bezier(0.618, 0, 0.618, 1);
   
   /* Earth-Tuned Iridescence */
   --earth-glow: rgba(34, 211, 238, 0.2);

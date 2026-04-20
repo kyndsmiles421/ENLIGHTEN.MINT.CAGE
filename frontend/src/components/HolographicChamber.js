@@ -162,6 +162,22 @@ export default function HolographicChamber({
     ? (avatarB64.startsWith('data:') ? avatarB64 : `data:image/png;base64,${avatarB64}`)
     : null;
 
+  // V68.28 — Sovereign Light-Surge. Any milestone advancement in the
+  // SovereignUniverse fires `sovereign:light-surge`; the chamber
+  // radiates a ring from centre to edges. Skipped when reduceFlashing
+  // (Silence Shield) is active.
+  const [surge, setSurge] = useState(null);
+  const reduceFlashing = !!prefs.reduceFlashing;
+  useEffect(() => {
+    const on = (ev) => {
+      if (reduceFlashing) return;
+      setSurge({ color: ev?.detail?.color || '#A78BFA', key: Date.now() });
+      setTimeout(() => setSurge(null), 1200);
+    };
+    window.addEventListener('sovereign:light-surge', on);
+    return () => window.removeEventListener('sovereign:light-surge', on);
+  }, [reduceFlashing]);
+
   return (
     <div
       data-testid={`holographic-chamber-${chamberId}`}
@@ -367,6 +383,28 @@ export default function HolographicChamber({
           </div>
         )}
       </motion.div>
+
+      {/* V68.28 Light-Surge: radiates from centre to edges on milestone */}
+      <AnimatePresence>
+        {surge && (
+          <motion.div
+            key={surge.key}
+            initial={{ opacity: 0.9, scale: 0.1 }}
+            animate={{ opacity: 0, scale: 3.4 }}
+            transition={{ duration: 1.1, ease: [0.2, 0.8, 0.4, 1] }}
+            style={{
+              position: 'absolute',
+              top: '50%', left: '50%',
+              width: 320, height: 320, marginLeft: -160, marginTop: -160,
+              borderRadius: '50%', pointerEvents: 'none',
+              background: `radial-gradient(circle, ${surge.color}44 0%, ${surge.color}22 40%, transparent 75%)`,
+              border: `2px solid ${surge.color}`,
+              boxShadow: `0 0 60px ${surge.color}, inset 0 0 40px ${surge.color}66`,
+              zIndex: 25,
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

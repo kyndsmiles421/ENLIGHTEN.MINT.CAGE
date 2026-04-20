@@ -67,7 +67,19 @@ function creditSparks(zone, seconds) {
 
 function haptic() {
   try {
-    if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      // V68.28 Resonance Haptics: vibration duration is tuned to the
+      // active trade-resonance frequency. 1 cycle of the dominant Hz,
+      // capped between 8ms (≥125Hz) and 40ms (≤25Hz). If no mixer tone
+      // is active, falls back to 10ms default.
+      const hz = typeof window !== 'undefined' ? window.__sovereignHz : null;
+      if (hz && hz > 0) {
+        const ms = Math.max(8, Math.min(40, Math.round(1000 / hz)));
+        navigator.vibrate(ms);
+      } else {
+        navigator.vibrate(10);
+      }
+    }
   } catch { /* ignore */ }
 }
 
