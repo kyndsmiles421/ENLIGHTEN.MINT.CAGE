@@ -1349,7 +1349,7 @@ export default function Meditation() {
           testid="meditation-prop-cushion"
         />
         <ChamberProp
-          x={78} y={28} size={58}
+          x={82} y={22} size={58}
           label="RING BELL"
           icon={Bell}
           color="#FCD34D"
@@ -1367,7 +1367,7 @@ export default function Meditation() {
               osc.stop(ctx.currentTime + 2.6);
             } catch { /* audio blocked */ }
             // Visible expanding ripple at the bell's position + XP flyaway
-            spawnRipple(78, 28, '#FCD34D', '+2 SPARKS');
+            spawnRipple(82, 22, '#FCD34D', '+2 SPARKS');
             const token = localStorage.getItem('zen_token');
             if (token && token !== 'guest_token') {
               axios.post(
@@ -1381,12 +1381,12 @@ export default function Meditation() {
           testid="meditation-prop-bell"
         />
         <ChamberProp
-          x={80} y={70} size={58}
+          x={82} y={78} size={58}
           label="MANDALA"
           icon={Flower}
           color="#F472B6"
           onActivate={() => {
-            spawnRipple(80, 70, '#F472B6', 'RITUAL');
+            spawnRipple(82, 78, '#F472B6', 'RITUAL');
             setMandalaOpen(true);
           }}
           testid="meditation-prop-mandala"

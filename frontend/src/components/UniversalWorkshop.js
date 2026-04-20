@@ -473,6 +473,28 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
           const isTool = gameKey && gameKey.startsWith('tool:');
           const gcolor = isTool ? (selTool?.color || accentColor) : (selMat?.color || accentColor);
           const zoneBase = `${moduleId}_${isMat ? 'material' : (selTool?.id || 'tool')}`;
+
+          // V68.29 — Drill-down chain. After the current stage the
+          // user can "CONTINUE DEEPER →" through the remaining tools
+          // of this trade. Each next tool pre-configures its theme
+          // using the same MODULE_GAME_THEME, so carpentry chains
+          // through every saw/chisel/hammer, masonry through every
+          // mallet/chisel, etc. No duplicated components.
+          const currentToolId = isTool ? selTool?.id : null;
+          const remaining = tools.filter(t => t.id !== currentToolId);
+          const nextGame = remaining.slice(0, 4).map((t) => ({
+            mode: theme.mode,
+            color: t.color || accentColor,
+            title: `${String(t.name || '').toUpperCase()} · ${selMat?.name?.toUpperCase() || ''}`,
+            verb: theme.verb,
+            icon: theme.icon,
+            targetCount: theme.mode === 'rhythm' ? 5 : (theme.mode === 'break' ? 5 : 7),
+            hitsPerTarget: 3,
+            zone: `${moduleId}_${t.id}`,
+            completionMsg: theme.msg,
+            completionXP: 12,
+          }));
+
           return (
             <ChamberMiniGame
               open={!!gameKey}
@@ -487,6 +509,12 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
               zone={zoneBase}
               completionMsg={theme.msg}
               completionXP={12}
+              nextGame={nextGame}
+              onGoDeeper={(next) => {
+                // Keep the selected tool in sync with the game title.
+                const matching = tools.find(t => t.id === (next.zone || '').replace(`${moduleId}_`, ''));
+                if (matching) setSelTool(matching);
+              }}
             />
           );
         })()}

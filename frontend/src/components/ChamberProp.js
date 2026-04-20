@@ -18,6 +18,7 @@
  *   disabled    — hide / ignore taps while a mini-game is active
  */
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSensory } from '../context/SensoryContext';
 
@@ -59,11 +60,16 @@ export default function ChamberProp({
   if (disabled) return null;
   const isStringGlyph = typeof icon === 'string';
   const IconComp = !isStringGlyph && icon ? icon : null;
-  return (
+  // V68.29 — Portal the prop out of the chamber's transformed ancestor
+  // so `position: fixed` resolves against the true viewport. Without
+  // this, framer-motion's transform on the chamber wrapper would make
+  // "fixed" behave as "absolute", stacking props into the HUD pane.
+  const node = (
     <motion.button
       type="button"
       onClick={handleActivate}
       data-testid={testid}
+      className="chamber-prop-portal"
       whileHover={{ scale: 1.08 }}
       whileTap={{ scale: 0.94 }}
       style={{
@@ -165,4 +171,6 @@ export default function ChamberProp({
       )}
     </motion.button>
   );
+  if (typeof document === 'undefined') return node;
+  return createPortal(node, document.body);
 }

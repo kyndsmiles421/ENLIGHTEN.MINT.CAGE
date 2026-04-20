@@ -58,6 +58,31 @@ export default function Herbology() {
         zone="herbology_pluck"
         completionMsg="HARVEST COMPLETE"
         completionXP={12}
+        nextGame={[
+          {
+            mode: 'break',
+            color: '#C084FC',
+            title: 'GRIND HERBS INTO ELIXIR',
+            verb: 'GRIND',
+            icon: Flame,
+            targetCount: 4,
+            hitsPerTarget: 4,
+            zone: 'herbology_brew',
+            completionMsg: 'ELIXIR BREWED',
+            completionXP: 14,
+          },
+          {
+            mode: 'rhythm',
+            color: '#FCD34D',
+            title: 'DOSE TO THE GOLDEN RATIO',
+            verb: 'DOSE',
+            icon: FlaskConical,
+            targetCount: 5,
+            zone: 'herbology_dose',
+            completionMsg: 'APOTHECARY MASTERY',
+            completionXP: 18,
+          },
+        ]}
       />
       <ChamberMiniGame
         open={brewOpen}

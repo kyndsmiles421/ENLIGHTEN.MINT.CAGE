@@ -151,6 +151,28 @@ export function phiVolumeCurve(linearPct) {
 export const FIB_PX = [2, 3, 5, 8, 13, 21, 34, 55, 89, 144];
 export const SPACING = FIB_PX;
 export const RADIUS  = FIB_PX;
+
+// ─── Chamber prop layout helper ──────────────────────────────────────
+// Places N interactive props on one side of the chamber without ever
+// overlapping. Returns { x, y } percentages suitable for <ChamberProp>.
+// Guarantees a minimum vertical gap ≥18% between adjacent props so
+// label text never collides with the prop below.
+export function safeChamberLayout(n, opts = {}) {
+  const { arc = 'right', margin = 18, top = 18, bottom = 82 } = opts;
+  const centerX = arc === 'right' ? 84 : 16;
+  if (n <= 0) return [];
+  if (n === 1) return [{ x: centerX, y: 50 }];
+  const count = n;
+  const minGap = 18;
+  const band = Math.max(bottom - top, (count - 1) * minGap);
+  const centerY = (top + bottom) / 2;
+  const lo = centerY - band / 2;
+  const step = band / (count - 1);
+  return Array.from({ length: count }).map((_, i) => ({
+    x: centerX + (i % 2 === 0 ? -1 : 1) * margin * PHI_INV * 0.5,
+    y: Math.max(top, Math.min(bottom, lo + i * step)),
+  }));
+}
 export const identities = {
   phi_squared_minus_phi_equals_one: () => Math.abs(PHI * PHI - PHI - 1) < 1e-10,
   phi_times_phi_inv_equals_one:    () => Math.abs(PHI * PHI_INV - 1) < 1e-10,

@@ -106,14 +106,49 @@ export default function ChamberMiniGame({
   brainSignal = null,     // override; default auto-generated from zone/mode
   progressive = true,      // scale difficulty by completion count
   maxLevel = 9,            // cap scaling
+  // V68.29 — Drill-down chain. After completion, the user can tap
+  // "CONTINUE DEEPER →" to immediately swap this overlay into the next
+  // stage without closing and reopening. Pass either a config object
+  // ({ mode, verb, icon, title, targetCount, zone, completionMsg, … })
+  // or an array of configs to chain automatically.
+  nextGame = null,
+  onGoDeeper = null,       // optional callback when user taps CONTINUE DEEPER
 }) {
   const sensory = useSensory() || {};
   const brain = useSovereignUniverse();
   const reduceFlashing = !!(sensory.prefs && sensory.prefs.reduceFlashing);
   const reduceMotion   = !!(sensory.prefs && sensory.prefs.reduceMotion);
 
+  // V68.29 — Drill-down chain state. If `nextGame` is provided the
+  // completion card shows "CONTINUE DEEPER →" which swaps this overlay
+  // into the next stage without closing. `chain` is the remaining
+  // queue (supports arrays for multi-step drill-downs).
+  const [chain, setChain] = useState(() => {
+    if (!nextGame) return [];
+    return Array.isArray(nextGame) ? [...nextGame] : [nextGame];
+  });
+  const [stageOverride, setStageOverride] = useState(null);
+  useEffect(() => {
+    // Reset the chain whenever the parent re-opens the game machine
+    if (open) {
+      setChain(nextGame ? (Array.isArray(nextGame) ? [...nextGame] : [nextGame]) : []);
+      setStageOverride(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+  const effMode          = stageOverride?.mode          ?? mode;
+  const effColor         = stageOverride?.color         ?? color;
+  const effTitle         = stageOverride?.title         ?? title;
+  const effVerb          = stageOverride?.verb          ?? verb;
+  const effIcon          = stageOverride?.icon          ?? Icon;
+  const effTargetCount   = stageOverride?.targetCount   ?? targetCount;
+  const effHitsPerTarget = stageOverride?.hitsPerTarget ?? hitsPerTarget;
+  const effZone          = stageOverride?.zone          ?? zone;
+  const effCompletionMsg = stageOverride?.completionMsg ?? completionMsg;
+  const effCompletionXP  = stageOverride?.completionXP  ?? completionXP;
+
   // Read the adaptive level for this zone (0 = first run).
-  const levelKey = `emcafe_gamelvl_${zone}`;
+  const levelKey = `emcafe_gamelvl_${effZone}`;
   const readLevel = () => {
     try {
       const v = parseInt(localStorage.getItem(levelKey) || '0', 10);
@@ -121,9 +156,9 @@ export default function ChamberMiniGame({
     } catch { return 0; }
   };
   const [level, setLevel] = useState(readLevel);
-  const scaledTargetCount = progressive ? Math.min(targetCount + level, targetCount + maxLevel) : targetCount;
-  const scaledHits        = progressive ? Math.min(hitsPerTarget + Math.floor(level / 2), hitsPerTarget + 5) : hitsPerTarget;
-  const scaledCompletionXP = progressive ? completionXP + level * 2 : completionXP;
+  const scaledTargetCount = progressive ? Math.min(effTargetCount + level, effTargetCount + maxLevel) : effTargetCount;
+  const scaledHits        = progressive ? Math.min(effHitsPerTarget + Math.floor(level / 2), effHitsPerTarget + 5) : effHitsPerTarget;
+  const scaledCompletionXP = progressive ? effCompletionXP + level * 2 : effCompletionXP;
 
   const [xp, setXp] = useState(0);
   const [cleared, setCleared] = useState(0);
@@ -132,7 +167,7 @@ export default function ChamberMiniGame({
 
   const fireBrain = useCallback((kind, meta = {}) => {
     try {
-      const sig = brainSignal || `${zone}:${mode}:${kind}`;
+      const sig = brainSignal || `${effZone}:${effMode}:${kind}`;
       brain?.checkQuestLogic?.(sig, zone, { level, ...meta });
     } catch { /* brain unavailable — safe no-op */ }
   }, [brain, brainSignal, zone, mode, level]);
@@ -175,7 +210,7 @@ export default function ChamberMiniGame({
       setLevel(readLevel());
       // Announce entry to the brain so quests that require "visit X" fire.
       try {
-        brain?.checkQuestLogic?.(brainSignal || `${zone}:${mode}:enter`, zone);
+        brain?.checkQuestLogic?.(brainSignal || `${effZone}:${effMode}:enter`, zone);
       } catch { /* noop */ }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -208,7 +243,7 @@ export default function ChamberMiniGame({
   return (
     <AnimatePresence>
       <motion.div
-        key={`mini-${mode}-${zone}`}
+        key={`mini-${effMode}-${effZone}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -221,16 +256,16 @@ export default function ChamberMiniGame({
           userSelect: 'none', touchAction: 'manipulation',
           overflow: 'hidden',
         }}
-        data-testid={`chamber-game-${mode}-${zone}`}
+        data-testid={`chamber-game-${effMode}-${effZone}`}
       >
         {/* Close */}
         <button
           type="button"
           onClick={onClose}
-          data-testid={`chamber-game-close-${zone}`}
+          data-testid={`chamber-game-close-${effZone}`}
           style={{
             position: 'absolute', top: 18, right: 18,
-            background: 'rgba(0,0,0,0.5)', border: `1px solid ${color}55`,
+            background: 'rgba(0,0,0,0.5)', border: `1px solid ${effColor}55`,
             color, borderRadius: 999, padding: 6, cursor: 'pointer',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             zIndex: 5,
@@ -246,11 +281,11 @@ export default function ChamberMiniGame({
           fontFamily: 'monospace', color,
         }}>
           <div style={{ fontSize: 11, letterSpacing: 2, opacity: 0.85 }}>
-            {title}{progressive && level > 0 ? ` · TIER ${level + 1}` : ''}
+            {effTitle}{progressive && level > 0 ? ` · TIER ${level + 1}` : ''}
           </div>
           <div style={{ display: 'flex', gap: 14, fontSize: 10, letterSpacing: 1.5, opacity: 0.75 }}>
-            <span data-testid={`chamber-game-xp-${zone}`}>+{xp} SPARKS · XP</span>
-            <span data-testid={`chamber-game-progress-${zone}`}>
+            <span data-testid={`chamber-game-xp-${effZone}`}>+{xp} SPARKS · XP</span>
+            <span data-testid={`chamber-game-progress-${effZone}`}>
               {Math.min(cleared, scaledTargetCount)}/{scaledTargetCount}
             </span>
           </div>
@@ -261,41 +296,41 @@ export default function ChamberMiniGame({
           <BreakStage
             count={scaledTargetCount}
             hits={scaledHits}
-            color={color}
-            verb={verb}
-            Icon={Icon}
+            color={effColor}
+            verb={effVerb}
+            Icon={effIcon}
             onHit={onHit}
             onCleared={onTargetCleared}
             reduceFlashing={reduceFlashing}
             reduceMotion={reduceMotion}
-            zone={zone}
+            zone={effZone}
           />
         )}
         {mode === 'collect' && (
           <CollectStage
             count={scaledTargetCount}
-            color={color}
-            verb={verb}
-            Icon={Icon}
+            color={effColor}
+            verb={effVerb}
+            Icon={effIcon}
             onHit={onHit}
             onCleared={onTargetCleared}
             reduceMotion={reduceMotion}
             reduceFlashing={reduceFlashing}
-            zone={zone}
+            zone={effZone}
           />
         )}
         {mode === 'rhythm' && (
           <RhythmStage
             count={scaledTargetCount}
-            color={color}
-            verb={verb}
-            Icon={Icon}
+            color={effColor}
+            verb={effVerb}
+            Icon={effIcon}
             onHit={onHit}
             onCleared={onTargetCleared}
             onFlash={(x, y) => setFlashAt({ x, y, key: Date.now() })}
             reduceMotion={reduceMotion}
             reduceFlashing={reduceFlashing}
-            zone={zone}
+            zone={effZone}
           />
         )}
 
@@ -311,8 +346,8 @@ export default function ChamberMiniGame({
                 position: 'absolute', left: flashAt.x, top: flashAt.y,
                 width: 80, height: 80, marginLeft: -40, marginTop: -40,
                 borderRadius: '50%', pointerEvents: 'none',
-                background: `radial-gradient(circle, ${color}66 0%, transparent 70%)`,
-                border: `2px solid ${color}`,
+                background: `radial-gradient(circle, ${effColor}66 0%, transparent 70%)`,
+                border: `2px solid ${effColor}`,
               }}
             />
           )}
@@ -329,35 +364,66 @@ export default function ChamberMiniGame({
                 position: 'absolute', bottom: 60, left: '50%', transform: 'translateX(-50%)',
                 padding: '14px 20px',
                 background: 'rgba(0,0,0,0.65)',
-                border: `1px solid ${color}80`,
+                border: `1px solid ${effColor}80`,
                 borderRadius: 14,
                 textAlign: 'center', fontFamily: 'monospace',
-                boxShadow: reduceFlashing ? 'none' : `0 0 40px ${color}66`,
+                boxShadow: reduceFlashing ? 'none' : `0 0 40px ${effColor}66`,
               }}
-              data-testid={`chamber-game-done-${zone}`}
+              data-testid={`chamber-game-done-${effZone}`}
             >
               <div style={{ fontSize: 10, letterSpacing: 3, color, marginBottom: 6 }}>
-                {completionMsg}
+                {effCompletionMsg}
               </div>
               <div style={{ fontSize: 13, color: '#fff', letterSpacing: 2 }}>
                 +{scaledCompletionXP} BONUS SPARKS
               </div>
-              <button
-                type="button"
-                onClick={onClose}
-                data-testid={`chamber-game-finish-${zone}`}
-                style={{
-                  marginTop: 10,
-                  background: `${color}22`,
-                  border: `1px solid ${color}`,
-                  color,
-                  padding: '6px 14px', borderRadius: 999,
-                  fontSize: 10, letterSpacing: 2, cursor: 'pointer',
-                  fontFamily: 'monospace',
-                }}
-              >
-                EXIT CHAMBER
-              </button>
+              <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 10, flexWrap: 'wrap' }}>
+                {chain.length > 0 && (
+                  <button
+                    type="button"
+                    data-testid={`chamber-game-deeper-${effZone}`}
+                    onClick={() => {
+                      const [next, ...rest] = chain;
+                      setChain(rest);
+                      setStageOverride(next);
+                      // Reset in-stage state so the next level starts clean
+                      setXp(0); setCleared(0); setDone(false); setFlashAt(null);
+                      setLevel(() => {
+                        try {
+                          const v = parseInt(localStorage.getItem(`emcafe_gamelvl_${next.zone || effZone}`) || '0', 10);
+                          return Number.isFinite(v) ? v : 0;
+                        } catch { return 0; }
+                      });
+                      try { onGoDeeper?.(next, rest); } catch { /* noop */ }
+                      try { fireBrain('go_deeper', { next_zone: next.zone }); } catch { /* noop */ }
+                    }}
+                    style={{
+                      background: `${effColor}`, border: `1px solid ${effColor}`,
+                      color: '#000', fontWeight: 600,
+                      padding: '6px 14px', borderRadius: 999,
+                      fontSize: 10, letterSpacing: 2, cursor: 'pointer',
+                      fontFamily: 'monospace',
+                    }}
+                  >
+                    CONTINUE DEEPER →
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  data-testid={`chamber-game-finish-${effZone}`}
+                  style={{
+                    background: `${effColor}22`,
+                    border: `1px solid ${effColor}`,
+                    color,
+                    padding: '6px 14px', borderRadius: 999,
+                    fontSize: 10, letterSpacing: 2, cursor: 'pointer',
+                    fontFamily: 'monospace',
+                  }}
+                >
+                  EXIT CHAMBER
+                </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -369,8 +435,8 @@ export default function ChamberMiniGame({
           color: 'rgba(255,255,255,0.45)', fontFamily: 'monospace',
           pointerEvents: 'none',
         }}>
-          {mode === 'break'   && `TAP EACH TARGET ${scaledHits}× TO ${verb}`}
-          {mode === 'collect' && `TAP THE FLOATING ${verb} BEFORE THEY DRIFT OFF`}
+          {mode === 'break'   && `TAP EACH TARGET ${scaledHits}× TO ${effVerb}`}
+          {mode === 'collect' && `TAP THE FLOATING ${effVerb} BEFORE THEY DRIFT OFF`}
           {mode === 'rhythm'  && `TAP WHEN THE MARKER ALIGNS WITH THE GOLDEN BAND`}
         </div>
       </motion.div>
@@ -380,8 +446,7 @@ export default function ChamberMiniGame({
 
 // ────────── BREAK STAGE ──────────
 // N targets sit statically at random positions. Each needs `hits` taps.
-function BreakStage({ count, hits, color, verb, Icon, onHit, onCleared, reduceFlashing, reduceMotion, zone }) {
-  const [targets, setTargets] = useState(() =>
+function BreakStage({ count, hits, color, verb, Icon, onHit, onCleared, reduceFlashing, reduceMotion, zone }) {  const [targets, setTargets] = useState(() =>
     Array.from({ length: count }).map((_, i) => ({
       id: i,
       x: 12 + Math.random() * 70,

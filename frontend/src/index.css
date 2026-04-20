@@ -99,6 +99,15 @@ body.scene-active .min-h-screen {
   --fib-9: 89px;
   --fib-10: 144px;
   --phi-ease: cubic-bezier(0.618, 0, 0.618, 1);
+}
+
+/* V68.29 — ChamberProp portal. When portalled to <body>, some global
+   button/motion styles force position:relative. Pin the prop to the
+   viewport explicitly so left/top % resolve against the viewport and
+   props never stack inside the HUD pane. */
+.chamber-prop-portal {
+  position: fixed !important;
+  z-index: 60 !important;
   
   /* Earth-Tuned Iridescence */
   --earth-glow: rgba(34, 211, 238, 0.2);
