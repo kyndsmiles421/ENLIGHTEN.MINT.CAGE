@@ -137,39 +137,70 @@ function PillarNode({ position, pillar, isActive, isHovered, onActivate, onHover
 // Procedural Three.js figure with Sparks-reactive aura, Dust-reactive eye
 // glow, and an Inner Core that bright-pulses on every immersion tick.
 //
-// State-based presentation:
-//   sparks < 1k   → dim violet silhouette, small aura
-//   1k-25k        → steady violet with subtle cyan halo
-//   25k-99k       → amber-tinted aura (ARTISAN/ORACLE threshold)
-//   ≥100k         → gold SOVEREIGN aura, fully luminous
+// V68.16 "Metabolic Mirror": the user's RPG equipment (from
+// /api/rpg/character `equipped.{slot}`) now binds to the silhouette:
+//   • Body gear rarity color     → overrides the silhouette body palette
+//   • Head gear presence         → spawns a Saturn-halo ring at the crown
+//   • Trinket rarity             → accent ring around the core
 //
-// When the SovereignStageHUD emits `sovereign:immersion-tick`, the core
-// flashes brighter for ~900ms (mirrors the HUD accrual ring).
-function CrystallineSilhouette({ sparks, dust }) {
+// Priority rule: equipment ALWAYS wins for body/aura colour; Sparks tier
+// layers on top as halo/eye-glow intensity (merit shows through without
+// stealing the user's chosen palette).
+function CrystallineSilhouette({ sparks, dust, equipment = null }) {
   const groupRef = useRef();
   const coreRef = useRef();
   const auraRef = useRef();
   const haloRef = useRef();
+  const crownHaloRef = useRef();
+  const trinketRingRef = useRef();
   const eyeLeftRef = useRef();
   const eyeRightRef = useRef();
   const pulseRef = useRef({ active: false, startT: 0 });
 
-  // Derive aesthetic from Sparks/Dust
   const s = Number(sparks) || 0;
   const d = Number(dust) || 0;
-  const auraColor = useMemo(() => {
+
+  // --- Tier aura (Sparks-driven) ---
+  const tierColor = useMemo(() => {
     if (s >= 100000) return new THREE.Color('#D4AF37');     // SOVEREIGN
     if (s >= 25000)  return new THREE.Color('#FBBF24');     // ORACLE / ARTISAN
     if (s >= 1000)   return new THREE.Color('#A78BFA');     // NAVIGATOR
     return new THREE.Color('#6D28D9');                      // SEED / CITIZEN
   }, [s]);
-  const auraRadius = useMemo(() => {
-    // log scale so bigger wallets don't explode the scene
-    return 1.3 + Math.min(1.6, Math.log10(Math.max(s, 1)) * 0.28);
-  }, [s]);
-  const eyeGlow = useMemo(() => Math.min(1.0, 0.35 + d / 30000), [d]);
 
-  // Listen for immersion tick — flash core
+  // --- Equipment-driven palette (Mirror) ---
+  const bodyGear  = equipment?.armor || equipment?.body  || equipment?.chest || null;
+  const headGear  = equipment?.helm  || equipment?.head  || equipment?.crown || null;
+  const trinket   = equipment?.trinket || equipment?.accessory || null;
+
+  // Body color falls back to tier color if no body gear equipped.
+  const bodyColor = useMemo(() => {
+    const c = bodyGear?.rarity_color || bodyGear?.color;
+    return c ? new THREE.Color(c) : tierColor;
+  }, [bodyGear, tierColor]);
+
+  // Head/crown color overrides the halo ring, else tier color.
+  const crownColor = useMemo(() => {
+    const c = headGear?.rarity_color || headGear?.color;
+    return c ? new THREE.Color(c) : tierColor;
+  }, [headGear, tierColor]);
+
+  const trinketColor = useMemo(() => {
+    const c = trinket?.rarity_color || trinket?.color;
+    return c ? new THREE.Color(c) : tierColor;
+  }, [trinket, tierColor]);
+
+  const auraRadius = useMemo(() => 1.3 + Math.min(1.6, Math.log10(Math.max(s, 1)) * 0.28), [s]);
+  const eyeGlow    = useMemo(() => Math.min(1.0, 0.35 + d / 30000), [d]);
+  // Halo intensity grows with tier — merit shows even if user picked a muted body color
+  const haloIntensity = useMemo(() => {
+    if (s >= 100000) return 1.0;
+    if (s >= 25000)  return 0.65;
+    if (s >= 1000)   return 0.4;
+    return 0.2;
+  }, [s]);
+
+  // Immersion tick → flash core
   useEffect(() => {
     const onTick = () => {
       pulseRef.current.active = true;
@@ -195,6 +226,15 @@ function CrystallineSilhouette({ sparks, dust }) {
       haloRef.current.rotation.z = t * 0.35;
       haloRef.current.material.opacity = 0.22 + Math.sin(t * 0.9) * 0.04;
     }
+    // Saturn-halo crown ring — only present if head gear equipped, rotates faster at higher tiers
+    if (crownHaloRef.current) {
+      crownHaloRef.current.rotation.y = t * (0.25 + haloIntensity * 0.6);
+      crownHaloRef.current.rotation.z = Math.sin(t * 0.4) * 0.08;
+    }
+    // Trinket accent ring — slow rotation around the core
+    if (trinketRingRef.current) {
+      trinketRingRef.current.rotation.z = -t * 0.55;
+    }
     // Core pulse on immersion-tick event
     if (coreRef.current) {
       let coreIntensity = 0.7 + Math.sin(t * 2.1) * 0.06;
@@ -202,18 +242,19 @@ function CrystallineSilhouette({ sparks, dust }) {
         const elapsed = performance.now() - pulseRef.current.startT;
         if (elapsed < 900) {
           const p = 1 - elapsed / 900;
-          coreIntensity += p * 0.9; // bright flash that decays
+          coreIntensity += p * 0.9;
         } else {
           pulseRef.current.active = false;
         }
       }
       coreRef.current.material.emissiveIntensity = coreIntensity;
     }
-    // Eyes track viewer ever so slightly
+    // Eyes — Dust-reactive glow, tier boosts intensity
     if (eyeLeftRef.current && eyeRightRef.current) {
       const wobble = Math.sin(t * 0.7) * 0.04;
-      eyeLeftRef.current.material.emissiveIntensity = eyeGlow + wobble;
-      eyeRightRef.current.material.emissiveIntensity = eyeGlow + wobble;
+      const tierBoost = haloIntensity * 0.3;
+      eyeLeftRef.current.material.emissiveIntensity = eyeGlow + wobble + tierBoost;
+      eyeRightRef.current.material.emissiveIntensity = eyeGlow + wobble + tierBoost;
     }
   });
 
