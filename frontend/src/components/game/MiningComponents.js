@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { CosmicInlineLoader } from '../CosmicFeedback';
+import CrystalPortrait from './CrystalPortrait';
 import {
-  Pickaxe, Zap, Star, Gem, ChevronRight,
+  Pickaxe, Zap, Star, Gem, ChevronRight, ChevronDown,
   Flame, Droplets, Mountain, Sprout, Lock,
   TrendingUp, Award, BookOpen, Battery, RefreshCw,
-  Crown, Sparkles, Clock, ShoppingBag, X
+  Crown, Sparkles, Clock, ShoppingBag, X, Info
 } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -91,11 +92,13 @@ export function DepthLayer({ depth, onMine, mining, currentEnergy, biomeColor })
 }
 
 // ── Specimen Discovery Card ──
+// V68.38 — Real crystal portrait + expandable info sheet. No more generic gems.
 export function SpecimenCard({ specimen, rewards, layer }) {
   const rc = RARITY_COLORS[specimen.actual_rarity] || '#9CA3AF';
   const ElIcon = EL_ICONS[specimen.element] || Gem;
   const isMythic = specimen.actual_rarity === 'mythic';
   const isLegendary = specimen.actual_rarity === 'legendary';
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <motion.div
@@ -122,22 +125,22 @@ export function SpecimenCard({ specimen, rewards, layer }) {
           <motion.div
             animate={isMythic ? { rotate: [0, 5, -5, 0] } : {}}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-12 h-12 rounded-xl flex items-center justify-center"
-            style={{ background: `${rc}12`, border: `1px solid ${rc}20` }}>
-            <Gem size={22} style={{ color: rc }} />
+            className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
+            style={{ background: `${rc}10`, border: `1px solid ${rc}22` }}>
+            <CrystalPortrait specimen={specimen} size={52} />
           </motion.div>
-          <div className="flex-1">
-            <div className="flex items-center gap-1.5 mb-0.5">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
               <p className="text-sm font-bold" style={{ color: rc, fontFamily: 'Cormorant Garamond, serif' }}>
                 {specimen.name}
               </p>
-              <span className="text-[6px] px-1.5 py-0.5 rounded-full uppercase font-bold"
+              <span className="text-[6px] px-1.5 py-0.5 rounded-full uppercase font-bold tracking-wider"
                 style={{ background: `${rc}15`, color: rc }}>{specimen.actual_rarity}</span>
             </div>
-            <p className="text-[9px]" style={{ color: 'var(--text-muted)' }}>{specimen.description}</p>
+            <p className="text-[9px] leading-snug" style={{ color: 'var(--text-muted)' }}>{specimen.description}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1.5 mb-2 text-[7px]" style={{ color: 'var(--text-muted)' }}>
+        <div className="flex items-center gap-1.5 mb-2 text-[7px] flex-wrap" style={{ color: 'var(--text-muted)' }}>
           <ElIcon size={8} style={{ color: EL_COLORS[specimen.element] }} />
           <span>{specimen.element}</span>
           <span>|</span>
@@ -152,7 +155,7 @@ export function SpecimenCard({ specimen, rewards, layer }) {
             </>
           )}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <span className="text-[8px] px-2 py-0.5 rounded-lg" style={{ background: 'rgba(252,211,77,0.08)', color: '#FCD34D' }}>
             +{rewards.xp} XP
           </span>
@@ -162,7 +165,62 @@ export function SpecimenCard({ specimen, rewards, layer }) {
           <span className="text-[8px] px-2 py-0.5 rounded-lg" style={{ background: `${EL_COLORS[specimen.element]}08`, color: EL_COLORS[specimen.element] }}>
             +{rewards.stat_delta} {rewards.stat}
           </span>
+          <button
+            type="button"
+            onClick={() => setExpanded(e => !e)}
+            className="ml-auto flex items-center gap-1 text-[8px] px-2 py-0.5 rounded-lg uppercase tracking-wider transition-colors"
+            style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--text-muted)', border: '1px solid rgba(255,255,255,0.06)' }}
+            data-testid="specimen-info-toggle"
+          >
+            <Info size={9} />
+            {expanded ? 'Hide' : 'Learn'}
+            {expanded ? <ChevronDown size={9} /> : <ChevronRight size={9} />}
+          </button>
         </div>
+        <AnimatePresence initial={false}>
+          {expanded && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
+              data-testid="specimen-info-sheet"
+            >
+              <div className="mt-3 pt-3 border-t" style={{ borderColor: `${rc}18` }}>
+                <div className="grid grid-cols-2 gap-2 text-[9px]" style={{ color: 'var(--text-primary)' }}>
+                  <div>
+                    <div className="uppercase tracking-wider text-[7px] mb-0.5" style={{ color: 'var(--text-muted)' }}>Element</div>
+                    <div style={{ color: EL_COLORS[specimen.element] }}>{specimen.element}</div>
+                  </div>
+                  <div>
+                    <div className="uppercase tracking-wider text-[7px] mb-0.5" style={{ color: 'var(--text-muted)' }}>Hardness (Mohs)</div>
+                    <div>{specimen.mohs} / 10</div>
+                  </div>
+                  <div>
+                    <div className="uppercase tracking-wider text-[7px] mb-0.5" style={{ color: 'var(--text-muted)' }}>Stat bonus</div>
+                    <div style={{ color: rc }}>+{specimen.stat_value ?? rewards.stat_delta} {specimen.stat ?? rewards.stat}</div>
+                  </div>
+                  <div>
+                    <div className="uppercase tracking-wider text-[7px] mb-0.5" style={{ color: 'var(--text-muted)' }}>Depth found</div>
+                    <div>Depth {specimen.depth_found}</div>
+                  </div>
+                  <div>
+                    <div className="uppercase tracking-wider text-[7px] mb-0.5" style={{ color: 'var(--text-muted)' }}>Dust value</div>
+                    <div style={{ color: '#A78BFA' }}>{specimen.dust_value ?? rewards.dust}</div>
+                  </div>
+                  <div>
+                    <div className="uppercase tracking-wider text-[7px] mb-0.5" style={{ color: 'var(--text-muted)' }}>Layer</div>
+                    <div style={{ color: '#A855F7' }}>{specimen.layer_name ?? layer?.name ?? 'Terrestrial'}</div>
+                  </div>
+                </div>
+                <p className="mt-3 text-[10px] leading-relaxed" style={{ color: 'var(--text-muted)', fontFamily: 'Cormorant Garamond, serif' }}>
+                  {specimen.description}
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
@@ -172,13 +230,21 @@ export function SpecimenCard({ specimen, rewards, layer }) {
 export function CollectionItem({ item }) {
   const rc = RARITY_COLORS[item.best_rarity] || '#9CA3AF';
   const ElIcon = EL_ICONS[item.element] || Gem;
+  // Build a specimen-shaped payload so CrystalPortrait can render the same
+  // deterministic silhouette used on the discovery card.
+  const specimenShape = {
+    id: item.specimen_id || item.name,
+    name: item.name,
+    element: item.element,
+    actual_rarity: item.best_rarity,
+  };
   return (
     <div className="rounded-xl p-2.5 flex items-center gap-2"
       style={{ background: `${rc}04`, border: `1px solid ${rc}08` }}
       data-testid={`collection-${item.specimen_id}`}>
-      <div className="w-8 h-8 rounded-lg flex items-center justify-center"
-        style={{ background: `${rc}10` }}>
-        <Gem size={14} style={{ color: rc }} />
+      <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+        style={{ background: `${rc}0C`, border: `1px solid ${rc}14` }}>
+        <CrystalPortrait specimen={specimenShape} size={32} />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-[9px] font-semibold truncate" style={{ color: rc }}>{item.name}</p>

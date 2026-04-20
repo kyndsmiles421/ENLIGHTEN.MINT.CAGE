@@ -45,4 +45,5 @@ registerMany([
 // Scaffold the remaining 222+ tools AFTER the real registrations so the
 // scaffold's `isRegistered(id)` check correctly skips real entries. This
 // makes the Tool Drawer render the full 243-blade silhouette from day one.
-import './toolScaffold';
+import registerScaffold from './toolScaffold';
+registerScaffold();

@@ -67,31 +67,6 @@ const WORKSHOPS = [
   { domain: 'cosmic-ledger',layer: 3, blade: 'utility',       tools: ['deposit-sparks','withdraw-dust','trade','audit','broadcast','convert','escrow','refund','freeze'] },
 ];
 
-/* ───────────── Build stubs ───────────── */
-const stubs = [];
-for (const ws of WORKSHOPS) {
-  for (let i = 0; i < ws.tools.length; i++) {
-    const id = `${ws.domain}.${ws.tools[i]}`;
-    if (isRegistered(id)) continue; // don't overwrite real entries
-    // Requires chain: tool n requires the previous tool's unlock, so
-    // the Sovereign must traverse the workshop end-to-end.
-    const requires = i === 0 ? [] : [`${ws.domain}_tier_${i}`];
-    const unlocks = [`${ws.domain}_tier_${i + 1}`];
-    stubs.push({
-      id,
-      layer: ws.layer,
-      domain: ws.domain,
-      unlocks,
-      requires,
-      sparks: 2 + Math.floor(i / 2),
-      purpose: `${ws.domain} · blade ${i + 1} of ${ws.tools.length} — ${ws.tools[i]} (scaffold).`,
-      scaffold: true,
-      blade: ws.blade,
-      material: materialFor(ws.domain),       // V68.32 cross-domain resonance tag
-    });
-  }
-}
-
 // Add Layer-4 Entertainment blades tied to the VR realms (already have starseed.*)
 const L4 = [
   { id: 'vr.starseed-mintakan',  domain: 'starseed',    requires: ['starseed_active'],    unlocks: ['mintakan_realm'],    sparks: 12, purpose: 'Enter the Mintakan VR realm — aquatic crystalline oceans.' },
@@ -104,4 +79,36 @@ const L4 = [
   { id: 'vr.starseed-venusian',  domain: 'starseed',    requires: ['starseed_active'],    unlocks: ['venusian_realm'],    sparks: 12, purpose: 'Enter the Venusian VR realm — divine beauty.' },
 ].map(t => ({ ...t, layer: 4, blade: 'entertainment', scaffold: true, material: 'gold' }));
 
-registerMany([...stubs, ...L4]);
+/* ───────────── Scaffolded registration ─────────────
+ * Exposed as a function so the caller (toolRegistry.js) can invoke it
+ * AFTER the real registrations complete. Otherwise ES module hoisting
+ * would run this file first and every real tool would then duplicate-
+ * overwrite its scaffold, spamming console warnings on boot.
+ */
+export default function registerScaffold() {
+  const stubs = [];
+  for (const ws of WORKSHOPS) {
+    for (let i = 0; i < ws.tools.length; i++) {
+      const id = `${ws.domain}.${ws.tools[i]}`;
+      if (isRegistered(id)) continue; // don't overwrite real entries
+      // Requires chain: tool n requires the previous tool's unlock, so
+      // the Sovereign must traverse the workshop end-to-end.
+      const requires = i === 0 ? [] : [`${ws.domain}_tier_${i}`];
+      const unlocks = [`${ws.domain}_tier_${i + 1}`];
+      stubs.push({
+        id,
+        layer: ws.layer,
+        domain: ws.domain,
+        unlocks,
+        requires,
+        sparks: 2 + Math.floor(i / 2),
+        purpose: `${ws.domain} · blade ${i + 1} of ${ws.tools.length} — ${ws.tools[i]} (scaffold).`,
+        scaffold: true,
+        blade: ws.blade,
+        material: materialFor(ws.domain),       // V68.32 cross-domain resonance tag
+      });
+    }
+  }
+
+  registerMany([...stubs, ...L4.filter(t => !isRegistered(t.id))]);
+}

@@ -41,10 +41,16 @@ export default function MiniLattice() {
   useEffect(() => {
     axios.get(`${API}/main-brain/lattice`)
       .then(r => {
-        const nodes = r.data?.lattice_state?.nodes || r.data?.nodes || [];
-        const size = r.data?.lattice_state?.lattice_size || r.data?.lattice_size || 9;
+        // Backend returns { status, lattice: { lattice_size, nodes:[...] } }
+        const payload = r.data?.lattice || r.data?.lattice_state || r.data || {};
+        const nodes = payload.nodes || [];
+        const size = payload.lattice_size || 9;
         const grid = Array.from({ length: size }, () => Array(size).fill(null));
-        for (const n of nodes) grid[n.y][n.x] = n.type;
+        for (const n of nodes) {
+          if (typeof n?.x === 'number' && typeof n?.y === 'number') {
+            grid[n.y][n.x] = n.type;
+          }
+        }
         setTypeGrid({ grid, size });
       })
       .catch(() => setTypeGrid({ grid: Array.from({ length: 9 }, () => Array(9).fill('VAULT')), size: 9 }));
