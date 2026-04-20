@@ -26,6 +26,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Flame } from 'lucide-react';
+import { useSensory } from '../../context/SensoryContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const INHALE_MS = 4000;
@@ -41,6 +42,9 @@ const phaseOf = (ms) => {
 };
 
 export default function BreathPacerGame({ open, onClose, color = '#D8B4FE' }) {
+  const sensory = useSensory() || {};
+  const reduceFlashing = !!(sensory.prefs && sensory.prefs.reduceFlashing);
+  const reduceMotion   = !!(sensory.prefs && sensory.prefs.reduceMotion);
   const [isHolding, setIsHolding]   = useState(false);
   const [phase, setPhase]           = useState('inhale');
   const [cycleScore, setCycleScore] = useState(0); // 0-100 quality meter for current cycle
@@ -201,11 +205,11 @@ export default function BreathPacerGame({ open, onClose, color = '#D8B4FE' }) {
             width: 320, height: 320, borderRadius: '50%',
             border: `2px solid ${color}`,
             background: `radial-gradient(circle at center, ${color}44 0%, ${color}11 60%, transparent 100%)`,
-            boxShadow: `0 0 60px ${color}88`,
+            boxShadow: reduceFlashing ? 'none' : `0 0 60px ${color}88`,
             color: '#fff', fontFamily: 'Cormorant Garamond, serif',
             fontSize: 24, letterSpacing: 3, fontWeight: 300,
             cursor: 'pointer', touchAction: 'none',
-            transform: `scale(${breathScale})`,
+            transform: reduceMotion ? 'scale(1)' : `scale(${breathScale})`,
             transition: 'transform 120ms ease-out',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             outline: isHolding ? `6px solid ${color}55` : 'none',
@@ -226,7 +230,7 @@ export default function BreathPacerGame({ open, onClose, color = '#D8B4FE' }) {
               style={{
                 height: '100%',
                 background: cycleScore > 70 ? '#22C55E' : cycleScore > 40 ? color : '#F87171',
-                boxShadow: `0 0 12px ${cycleScore > 70 ? '#22C55E' : color}66`,
+                boxShadow: reduceFlashing ? 'none' : `0 0 12px ${cycleScore > 70 ? '#22C55E' : color}66`,
               }}
               data-testid="breath-pacer-sync"
             />

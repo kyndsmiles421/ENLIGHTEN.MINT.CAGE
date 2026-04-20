@@ -1,6 +1,33 @@
 # ENLIGHTEN.MINT.CAFE — V68.16 Sovereign Guide
 ## PRD — Last Updated: Feb 20, 2026
 
+## 🔒 V68.26 (Feb 20, 2026) — Hardening Protocol + Epilepsy Safety (WCAG 2.3.1)
+
+**Three concurrent user directives, all honored in one focused pass:**
+
+### 1. Zero-Misfire Failsafe (chamber backdrop)
+`HolographicChamber` now has a `backdropFailed` state. If `POST /api/ai-visuals/chamber` errors, returns no image, OR the 3.5s safety timeout fires first, the chamber auto-demotes to clean-surface mode (pure dark, no scanlines, no vignette, no presence canvas, no hologram corner) — content + HUD + props stay fully functional. User is never stuck on a half-rendered transformation.
+
+### 2. 100ms Press-Confirm Rule (ChamberProp)
+Every chamber prop (Cushion, Bell, Mandala + all future props) now fires an instant confirmation within 100ms BEFORE the downstream action runs. Two variants:
+- **Default** → quick white luminance ring (0.35s easeOut) + haptic vibration.
+- **`reduceFlashing` ON** → soft non-luminous scale-pulse only, zero luminance spike, zero strobe. Haptic still fires.
+
+### 3. Epilepsy-Safe Gating (WCAG 2.3.1)
+Every flashing/glowing element across the new gameplay layer now respects `prefs.reduceFlashing` + `prefs.reduceMotion` from `SensoryContext`:
+- **`ChamberProp`** press confirm — flash-ring skipped, scale-pulse substituted.
+- **`RippleBurst`** — reduced from 3 staggered rings to 1 slow ring, `boxShadow` glow removed, XP label fade preserved. Full `reduceMotion` skips the scale entirely.
+- **`BreathPacerGame`** — orb `boxShadow` removed, `breathScale` pinned at 1 when `reduceMotion`, sync meter glow disabled.
+- **`MandalaRitual`** — rotating indicator speed reduced 66% on `reduceMotion` (0.018 → 0.006 rad/frame), `drop-shadow` glows on target + target lines disabled on `reduceFlashing`.
+
+### 4. Pointer-Events Final Audit (no stuck presses)
+- Fractal Engine Spark orbs: `raycast={() => null}` (confirmed V68.25).
+- Chamber backdrop + hologram corner: `pointerEvents: 'none'` (confirmed V68.25).
+- ChamberProp button retains interactive surface at z-index 6, above backdrop (0), vignette (1), scanlines/presence (2), content (3), shimmer (4), hologram (5). Top-chrome bar also at z-index 6 — no overlap in real layouts (chrome is y:0-48px, Meditation props at y:252/630/630px).
+
+### Verified via Playwright
+- `immersion=full` + `reduceFlashing=true`: all 3 props render + activate cleanly, bell produces soft non-strobing ripple + "+2 SPARKS" label, sparks credited server-side, zero page errors.
+
 ## 🔒 V68.25 (Feb 20, 2026) — Unified Engine Wiring (not a rebuild — a plug-in)
 
 **User called it out (correctly):** don't rebuild something that already exists. The app already had `SensoryContext` — a full unified prefs engine with `immersionLevel` ('calm' | 'standard' | 'full'), `reduceMotion`, `reduceParticles`, `reduceFlashing`, 5 theme palettes, sovereign mute, 4-tier audio, CSS custom property wiring, derived helpers (`showParticles`, `showAnimations`, `showVisualEffects`, etc.), plus a complete `/settings` page with all toggles. My earlier `SovereignEngine.jsx` + `useSimpleMode.js` were duplicates — deleted both.

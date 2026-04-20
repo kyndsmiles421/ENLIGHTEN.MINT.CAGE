@@ -14,12 +14,24 @@
  */
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSensory } from '../context/SensoryContext';
 
 export default function RippleBurst({ x, y, color = '#FCD34D', xpLabel = '', onDone }) {
+  const sensory = useSensory() || {};
+  const reduceFlashing = !!(sensory.prefs && sensory.prefs.reduceFlashing);
+  const reduceMotion   = !!(sensory.prefs && sensory.prefs.reduceMotion);
   useEffect(() => {
     const t = window.setTimeout(() => onDone?.(), 1800);
     return () => window.clearTimeout(t);
   }, [onDone]);
+  // Epilepsy-safe variants:
+  //   • reduceFlashing → single slow ring, no boxShadow glow spikes, no
+  //                      staggered repeats.
+  //   • reduceMotion   → no scale animation at all, just a brief opacity
+  //                      fade on the label.
+  const ringCount = reduceFlashing ? 1 : 3;
+  const ringStarts = reduceFlashing ? [0] : [0, 0.25, 0.5];
+  const endScale   = reduceMotion ? 1 : 260 / 40;
   return (
     <AnimatePresence>
       <motion.div
@@ -33,13 +45,15 @@ export default function RippleBurst({ x, y, color = '#FCD34D', xpLabel = '', onD
           zIndex: 7,
         }}
       >
-        {[0, 0.25, 0.5].map((delay, i) => (
+        {ringStarts.slice(0, ringCount).map((delay, i) => (
           <motion.div
             key={`r-${i}`}
-            initial={{ width: 40, height: 40, opacity: 0.7, borderWidth: 2 }}
-            animate={{ width: 260, height: 260, opacity: 0, borderWidth: 0.5 }}
+            initial={{ width: 40, height: 40, opacity: reduceFlashing ? 0.3 : 0.7, borderWidth: 2 }}
+            animate={reduceMotion
+              ? { opacity: 0 }
+              : { width: 260, height: 260, opacity: 0, borderWidth: 0.5 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 1.6, delay, ease: 'easeOut' }}
+            transition={{ duration: reduceFlashing ? 2.2 : 1.6, delay, ease: 'easeOut' }}
             style={{
               position: 'absolute',
               left: '50%', top: '50%',
@@ -48,21 +62,28 @@ export default function RippleBurst({ x, y, color = '#FCD34D', xpLabel = '', onD
               borderColor: color,
               borderRadius: '50%',
               background: 'transparent',
-              boxShadow: `0 0 18px ${color}66`,
+              // boxShadow produces a luminance spike → skip for flash-sensitive users
+              boxShadow: reduceFlashing ? 'none' : `0 0 18px ${color}66`,
             }}
           />
         ))}
         {xpLabel && (
           <motion.div
             initial={{ opacity: 0, y: 0, scale: 0.9 }}
-            animate={{ opacity: [0, 1, 1, 0], y: -60, scale: 1 }}
+            animate={reduceMotion
+              ? { opacity: [0, 1, 1, 0], y: 0, scale: 1 }
+              : reduceFlashing
+                ? { opacity: [0, 0.9, 0.9, 0], y: -40, scale: 1 }
+                : { opacity: [0, 1, 1, 0], y: -60, scale: 1 }}
             transition={{ duration: 1.5, ease: 'easeOut' }}
             style={{
               position: 'absolute', left: '50%', top: '50%',
               transform: 'translate(-50%, -50%)',
               fontFamily: 'monospace', fontSize: 11, letterSpacing: 2,
               color,
-              textShadow: `0 0 8px ${color}, 0 2px 4px rgba(0,0,0,0.9)`,
+              textShadow: reduceFlashing
+                ? '0 2px 4px rgba(0,0,0,0.9)'
+                : `0 0 8px ${color}, 0 2px 4px rgba(0,0,0,0.9)`,
               whiteSpace: 'nowrap',
               fontWeight: 700,
             }}

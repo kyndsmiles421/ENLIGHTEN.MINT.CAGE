@@ -17,6 +17,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useSensory } from '../../context/SensoryContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const SESSION_MS = 30000;
@@ -24,6 +25,9 @@ const SEGMENTS = 8;
 const ALIGN_TOLERANCE = (Math.PI * 2) / SEGMENTS * 0.35; // ~40% of segment arc
 
 export default function MandalaRitual({ open, onClose, color = '#F472B6' }) {
+  const sensory = useSensory() || {};
+  const reduceFlashing = !!(sensory.prefs && sensory.prefs.reduceFlashing);
+  const reduceMotion   = !!(sensory.prefs && sensory.prefs.reduceMotion);
   const [angle, setAngle]       = useState(0);
   const [targetIdx, setTargetIdx] = useState(0);
   const [hits, setHits]         = useState(0);
@@ -46,8 +50,8 @@ export default function MandalaRitual({ open, onClose, color = '#F472B6' }) {
       const elapsed = now - startRef.current;
       const left = Math.max(0, SESSION_MS - elapsed);
       setTimeLeft(Math.ceil(left / 1000));
-      // Rotate CCW
-      setAngle((a) => (a + 0.018 * speedRef.current) % (Math.PI * 2));
+      // Rotate CCW — slower for reduceMotion users (no nausea / no strobe)
+      setAngle((a) => (a + (reduceMotion ? 0.006 : 0.018) * speedRef.current) % (Math.PI * 2));
       if (left <= 0) {
         // Close out the session — final XP is the running total
         window.setTimeout(() => onClose?.(), 200);
@@ -162,7 +166,7 @@ export default function MandalaRitual({ open, onClose, color = '#F472B6' }) {
                 x1={x1} y1={y1} x2={x2} y2={y2}
                 stroke={isTarget ? color : `${color}55`}
                 strokeWidth={isTarget ? 3 : 1}
-                style={{ filter: isTarget ? `drop-shadow(0 0 6px ${color})` : 'none' }}
+                style={{ filter: (isTarget && !reduceFlashing) ? `drop-shadow(0 0 6px ${color})` : 'none' }}
               />
             );
           })}
@@ -172,7 +176,7 @@ export default function MandalaRitual({ open, onClose, color = '#F472B6' }) {
             cy={cy + Math.sin(targetIdx * segmentArc) * r}
             r="10"
             fill={color}
-            style={{ filter: `drop-shadow(0 0 10px ${color})` }}
+            style={{ filter: reduceFlashing ? 'none' : `drop-shadow(0 0 10px ${color})` }}
           />
           {/* Rotating indicator */}
           <g transform={`rotate(${(angle * 180) / Math.PI} ${cx} ${cy})`}>

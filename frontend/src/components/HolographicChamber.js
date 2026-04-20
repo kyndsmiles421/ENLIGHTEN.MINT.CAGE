@@ -68,15 +68,22 @@ export default function HolographicChamber({
     prefs = {},
   } = useSensory() || {};
   const simpleMode      = immersion === 'calm';
-  const showBackdrop    = !simpleMode;
-  const showScanlines   = !simpleMode && showVisualEffects && !prefs.reduceFlashing;
-  const showShimmer     = !simpleMode && showAnimations && !prefs.reduceMotion;
-  const doPresenceCanvas = presenceCanvas && !simpleMode && showParticles && immersion === 'full';
-  const showHologramCorner = !simpleMode;
   const [backdrop, setBackdrop] = useState(null);
+  const [backdropFailed, setBackdropFailed] = useState(false);
   const [avatarB64, setAvatarB64] = useState(null);
   const [materialized, setMaterialized] = useState(simpleMode);
   const readyCalledRef = useRef(false);
+  // Failsafe: if simpleMode is on OR the backdrop fetch failed or
+  // timed out, we demote every holographic layer — the chamber renders
+  // as a clean dark surface with only the HUD pane + top-chrome visible.
+  // This is the Zero-Misfire guarantee: users are never stuck staring
+  // at a half-rendered transformation.
+  const failsafe        = simpleMode || backdropFailed;
+  const showBackdrop    = !failsafe;
+  const showScanlines   = !failsafe && showVisualEffects && !prefs.reduceFlashing;
+  const showShimmer     = !failsafe && showAnimations && !prefs.reduceMotion;
+  const doPresenceCanvas = presenceCanvas && !failsafe && showParticles && immersion === 'full';
+  const showHologramCorner = !failsafe;
 
   // Fetch chamber backdrop + user's own hologram portrait (skipped in
   // Simple Mode — the user opted out of the immersive experience).
@@ -107,6 +114,12 @@ export default function HolographicChamber({
       const aRes = results[1];
       if (bRes && bRes.status === 'fulfilled' && bRes.value.data?.image_b64) {
         setBackdrop(bRes.value.data.image_b64);
+        setBackdropFailed(false);
+      } else {
+        // Graceful degrade: chamber still renders, but as a clean surface
+        // (Zero-Misfire Protocol — user never gets an error state).
+        setBackdropFailed(true);
+        setMaterialized(true);
       }
       if (aRes && aRes.status === 'fulfilled' && aRes.value.data?.status === 'active' && aRes.value.data?.image_b64) {
         setAvatarB64(aRes.value.data.image_b64);
@@ -133,6 +146,7 @@ export default function HolographicChamber({
     }
     const safety = setTimeout(() => {
       setMaterialized(true);
+      setBackdropFailed(true); // demote to clean surface if scene never arrived
       if (!readyCalledRef.current) {
         readyCalledRef.current = true;
         onReady?.();
