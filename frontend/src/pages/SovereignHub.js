@@ -417,65 +417,162 @@ export default function SovereignHub() {
         <OracleSearch onActiveDomains={handleActiveDomains} />
       </div>
 
-      {/* 7 Pillars — Accordion */}
-      <div className="px-4 pb-20">
-        {PILLARS.map((pillar, idx) => {
-          const isOpen = expanded === idx;
-          // Oracle glow: pillar glows when its domain has search results
-          const isGlowing = glowDomains.some(d => DOMAIN_TO_PILLAR[d] === pillar.title);
-          return (
-            <div key={pillar.title} className="mb-2" data-testid={`pillar-${pillar.title.toLowerCase().replace(/[\s&]/g, '-')}`}>
-              <button
-                onClick={() => togglePillar(idx)}
-                className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl transition-all active:scale-[0.98]"
+      {/* V68.32 — 7 Pillars · Sacred Geometry Crystalline Grid
+          (killed the flat accordion bars. Each pillar is now a faceted
+          crystal card with refraction, rim-light, and motion depth.
+          Expansion still works — but in situ as a radial unfold, not a
+          stacked accordion.) */}
+      <div className="px-4 pb-24">
+        <div
+          className="grid gap-3"
+          style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}
+        >
+          {PILLARS.map((pillar, idx) => {
+            const isOpen = expanded === idx;
+            const isGlowing = glowDomains.some(d => DOMAIN_TO_PILLAR[d] === pillar.title);
+            return (
+              <motion.div
+                key={pillar.title}
+                layout
+                transition={{ layout: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }}
+                className="relative rounded-2xl overflow-hidden"
                 style={{
-                  background: isOpen ? `${pillar.color}12` : isGlowing ? `${pillar.color}08` : 'rgba(255,255,255,0.02)',
-                  border: `1px solid ${isOpen ? `${pillar.color}30` : isGlowing ? `${pillar.color}20` : 'rgba(255,255,255,0.06)'}`,
-                  boxShadow: isGlowing && !isOpen ? `0 0 12px ${pillar.color}15, inset 0 0 8px ${pillar.color}08` : 'none',
+                  gridColumn: isOpen ? '1 / -1' : 'auto',
+                  background:
+                    `radial-gradient(circle at 20% 0%, ${pillar.color}22 0%, transparent 55%),` +
+                    `radial-gradient(circle at 100% 100%, ${pillar.color}14 0%, transparent 60%),` +
+                    'rgba(10,10,18,0.85)',
+                  border: `1px solid ${isOpen ? `${pillar.color}66` : isGlowing ? `${pillar.color}44` : 'rgba(255,255,255,0.08)'}`,
+                  boxShadow: isOpen || isGlowing
+                    ? `0 20px 60px ${pillar.color}22, inset 0 0 32px ${pillar.color}10`
+                    : '0 10px 30px rgba(0,0,0,0.35)',
                 }}
-                data-testid={`pillar-btn-${pillar.title.toLowerCase().replace(/[\s&]/g, '-')}`}
+                data-testid={`pillar-${pillar.title.toLowerCase().replace(/[\s&]/g, '-')}`}
               >
-                <span className="text-sm font-bold uppercase tracking-[0.15em]" style={{ color: pillar.color }}>
-                  {pillar.title}
-                  <span className="text-[10px] font-normal ml-2 opacity-40">{pillar.items.length}</span>
-                </span>
-                <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                  <ChevronDown size={16} style={{ color: pillar.color, opacity: 0.6 }} />
-                </motion.div>
-              </button>
+                {/* Refracted prismatic grid (Refracted Crystal skin lights this more) */}
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-40"
+                  style={{
+                    background:
+                      `repeating-linear-gradient(45deg, transparent 0 28px, ${pillar.color}0A 28px 29px),` +
+                      `repeating-linear-gradient(-45deg, transparent 0 28px, rgba(255,255,255,0.03) 28px 29px)`,
+                    mixBlendMode: 'screen',
+                  }}
+                />
+                {/* Rim light sweep */}
+                <motion.div
+                  className="absolute inset-0 pointer-events-none"
+                  animate={{ backgroundPositionX: ['0%', '200%'] }}
+                  transition={{ duration: 11, repeat: Infinity, ease: 'linear' }}
+                  style={{
+                    backgroundImage: `linear-gradient(110deg, transparent 40%, ${pillar.color}28 50%, transparent 60%)`,
+                    backgroundSize: '200% 100%',
+                    mixBlendMode: 'screen',
+                    opacity: isOpen || isGlowing ? 0.55 : 0.22,
+                  }}
+                />
 
-              <AnimatePresence>
-                {isOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="overflow-hidden"
-                  >
-                    <div className="grid grid-cols-2 gap-1.5 px-1 pt-2 pb-1">
-                      {pillar.items.map((item) => (
-                        <button
-                          key={item.label}
-                          onClick={() => navigate(item.route)}
-                          className="py-3 px-3 rounded-lg text-left transition-all active:scale-95"
-                          style={{
-                            background: `${pillar.color}08`,
-                            border: `1px solid ${pillar.color}15`,
-                            color: 'rgba(248,250,252,0.8)',
-                          }}
-                          data-testid={`nav-${item.label.toLowerCase().replace(/[\s&]/g, '-')}`}
-                        >
-                          <span className="text-xs">{item.label}</span>
-                        </button>
-                      ))}
+                <button
+                  onClick={() => togglePillar(idx)}
+                  className="relative w-full text-left px-5 py-4"
+                  data-testid={`pillar-btn-${pillar.title.toLowerCase().replace(/[\s&]/g, '-')}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.32em]" style={{ color: `${pillar.color}cc` }}>
+                        Pillar · {pillar.items.length} blades
+                      </p>
+                      <p
+                        className="text-2xl font-light leading-tight"
+                        style={{
+                          fontFamily: 'Cormorant Garamond, serif',
+                          background: `linear-gradient(135deg, #fff, ${pillar.color})`,
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                        }}
+                      >
+                        {pillar.title}
+                      </p>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          );
-        })}
+                    {/* Hexagonal crystal indicator */}
+                    <motion.svg
+                      width="44" height="44" viewBox="0 0 48 48"
+                      animate={{ rotate: isOpen ? 60 : 0 }}
+                      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      <defs>
+                        <linearGradient id={`hex-${idx}`} x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stopColor="#fff" stopOpacity="0.9" />
+                          <stop offset="100%" stopColor={pillar.color} stopOpacity="0.6" />
+                        </linearGradient>
+                      </defs>
+                      <polygon
+                        points="24,4 42,14 42,34 24,44 6,34 6,14"
+                        fill={`url(#hex-${idx})`}
+                        stroke={pillar.color}
+                        strokeWidth="1.2"
+                        opacity="0.92"
+                      />
+                      <polygon points="24,4 42,14 24,24" fill="#fff" opacity="0.18" />
+                      <polygon points="24,24 42,14 42,34" fill={pillar.color} opacity="0.2" />
+                    </motion.svg>
+                  </div>
+
+                  {!isOpen && (
+                    <p className="text-[11px] mt-2" style={{ color: 'rgba(203,213,225,0.65)' }}>
+                      Tap to unfold — {pillar.items.slice(0, 3).map(i => i.label).join(' · ')} …
+                    </p>
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.35 }}
+                      className="relative px-5 pb-5"
+                    >
+                      <div
+                        className="grid gap-2"
+                        style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))' }}
+                      >
+                        {pillar.items.map((item, i) => (
+                          <motion.button
+                            key={item.label}
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.03 * i, duration: 0.3 }}
+                            whileHover={{ y: -2, scale: 1.02 }}
+                            whileTap={{ scale: 0.97 }}
+                            onClick={() => navigate(item.route)}
+                            className="relative rounded-xl px-3 py-3 text-left overflow-hidden group"
+                            style={{
+                              background: `linear-gradient(135deg, ${pillar.color}18 0%, rgba(10,10,18,0.5) 100%)`,
+                              border: `1px solid ${pillar.color}33`,
+                              color: '#F1F5F9',
+                            }}
+                            data-testid={`nav-${item.label.toLowerCase().replace(/[\s&]/g, '-')}`}
+                          >
+                            {/* Mini crystal facet */}
+                            <svg className="absolute top-1 right-1 opacity-70" width="14" height="14" viewBox="0 0 16 16" aria-hidden>
+                              <polygon points="8,1 14,6 12,14 4,14 2,6" fill={pillar.color} opacity="0.5" />
+                            </svg>
+                            <span className="block text-[12px] font-semibold leading-tight">{item.label}</span>
+                            <span className="block text-[9px] uppercase tracking-[0.2em] mt-1 opacity-60" style={{ color: pillar.color }}>
+                              Enter
+                            </span>
+                          </motion.button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

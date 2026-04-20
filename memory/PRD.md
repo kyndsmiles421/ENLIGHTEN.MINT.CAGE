@@ -13,12 +13,13 @@ Architectural contract every new feature MUST honor:
 ## Core Rules
 - **Flatland Rule**, **Metabolic Seal** (<800KB), **Closed-Loop Economy** (Sparks earn-only), **System-wide Gamification**, **Epilepsy Safety**, **Silence Shield** (opt-in audio only), **Spotify Loophole**.
 
-## V68.32 — Living Lens + Cross-Domain Tags + Blade Signature (Feb 2026)
-1. ✅ **Living Lens** — portal, re-openable. Four material axes with probe questions. Persists to `SovereignPreferences.calibration`.
-2. ✅ **Material tags on every blade** — Metal/Glass/Oil/Gold mapped across all 27 workshops + VR realms. Cross-domain resonance scaffolding in place.
-3. ✅ **SovereignPreferences.calibration + identity** — added calibration{metal,glass,oil,gold,updatedAt} and identity{pinnedSignature}.
-4. ✅ **BladeSignature derivation** — pure function `getSignature()` reads calibration+mastery+pin → returns {title, subtitle, materials, dominantDomain, pinned}. Title map covers 16 duo/solo grips (Celestial Architect, Forge Alchemist, Sovereign Engineer, Sacred Geometrician, Refracted Artisan, Resonance Composer, Precision Chef, Elemental Healer, Elixir Merchant, Council Strategist, Sovereign Curator, Trade Apothecary, Forge Engineer, Crystalline Poet, Sovereign Chef, Council Elder, Sovereign-in-Training).
-5. ✅ **SignaturePill** — live-updating pill mounted on the Hub header. Shows current title + subtitle + Pin/Unpin toggle. Pin locks the auto-derived title; Unpin returns to truth.
+## V68.32 — Living Lens + Cross-Domain Tags + Blade Signature + Crystalline Pillar Grid (Feb 2026)
+1. ✅ **Accordion bars KILLED** — Hub's 7 pillars rebuilt as a responsive crystalline hex-card grid. Each pillar renders as a faceted crystal card with: (a) radial color-matched gradient wash, (b) diagonal prismatic refraction overlay, (c) 11s rim-light sweep animation, (d) rotating SVG hexagonal crystal indicator with specular facets, (e) Cormorant Garamond gradient title, (f) 10px-tracked "PILLAR · N BLADES" meta, (g) cryptic 3-module preview when collapsed. Expansion unfolds in-place with stagger-entrance mini-crystal cards (no stacked accordion). Pure CSS/SVG — Metabolic Seal intact.
+2. ✅ **Living Lens** — portal, re-openable. Four material axes.
+3. ✅ **Material tags on every blade** — Metal/Glass/Oil/Gold across all 27 workshops + VR realms.
+4. ✅ **SovereignPreferences.calibration + identity** — `setCalibration(partial)` + `identity.pinnedSignature`.
+5. ✅ **BladeSignature derivation** — 16 duo/solo/balanced cinematic titles.
+6. ✅ **SignaturePill** — live pill on Hub, Pin/Unpin toggle.
 
 ## V68.31 — Sovereign Choice + Bridge Rule + Swiss Army Arsenal (Feb 2026)
 1. ✅ **Starseed dead screen KILLED** — optimistic `setView('game')` + cinematic `ChannelingStage` (origin-themed rings, live phase copy, honest ETA, always-visible Exit). Verified: channeling at t=1.2s → narrative at t=5.6s.
