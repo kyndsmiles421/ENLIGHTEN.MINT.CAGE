@@ -272,7 +272,9 @@ export default function MyQRSheet({ open, onClose }) {
       .catch(() => setErr('Could not load your share pattern. Try again.'));
   }, [open]);
 
-  const absoluteUrl = share ? `${window.location.origin}${share.share_path}` : '';
+  const absoluteUrl = share
+    ? `${(process.env.REACT_APP_PUBLIC_URL || 'https://enlighten-mint-cafe.me').replace(/\/$/, '')}${share.share_path}`
+    : '';
 
   const copyUrl = async () => {
     if (!absoluteUrl) return;
