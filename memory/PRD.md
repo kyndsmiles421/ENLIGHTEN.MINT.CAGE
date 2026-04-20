@@ -1,6 +1,32 @@
 # ENLIGHTEN.MINT.CAFE — V68.16 Sovereign Guide
 ## PRD — Last Updated: Feb 20, 2026
 
+## 🔒 V68.25 (Feb 20, 2026) — Unified Engine Wiring (not a rebuild — a plug-in)
+
+**User called it out (correctly):** don't rebuild something that already exists. The app already had `SensoryContext` — a full unified prefs engine with `immersionLevel` ('calm' | 'standard' | 'full'), `reduceMotion`, `reduceParticles`, `reduceFlashing`, 5 theme palettes, sovereign mute, 4-tier audio, CSS custom property wiring, derived helpers (`showParticles`, `showAnimations`, `showVisualEffects`, etc.), plus a complete `/settings` page with all toggles. My earlier `SovereignEngine.jsx` + `useSimpleMode.js` were duplicates — deleted both.
+
+**Plugged HolographicChamber into the real engine (`useSensory()`):**
+- `immersion === 'calm'` → **Simple Mode**: no backdrop fetch, no vignette, no scanlines, no shimmer, no presence canvas, no hologram corner, no chamber props, no ripples, no mini-games. Just a clean HUD pane with the page's original content. Zero visual overlays.
+- `immersion === 'standard'` → backdrop + vignette + scanlines + shimmer + hologram corner ON; presence canvas OFF.
+- `immersion === 'full'` (default) → everything on including breathing particle body.
+- `prefs.reduceMotion` → kills shimmer sweep.
+- `prefs.reduceFlashing` → kills scanlines.
+- `showParticles` false → kills presence canvas.
+
+**Meditation.js** additionally gates all 3 chamber props + ripples + mini-games behind `simpleMode === false`. Calm users get a pure textual meditation catalog with zero gamification.
+
+**SovereignStageHUD** gained a tap-to-cycle **immersion pill** (FULL → STANDARD → CALM → FULL) that calls `updatePref('immersionLevel', next)` on SensoryContext so changes propagate instantly to every chamber, no reload. Full settings page (`/settings`) remains the place for granular toggles.
+
+**Pointer-events audit (shipped to prevent any tap-swallowing):**
+- Fractal Engine **Spark orbs** now use `raycast={() => null}` — they never intercept clicks meant for pillars or the avatar. Collection is still distance-based in `GameController`.
+- Spark orbs also **fade out gracefully** (scale-up + opacity-down over 500ms) when collected, instead of popping. Less visually aggressive.
+- Chamber **backdrop div** now carries `pointerEvents: 'none'` (was relying on zIndex alone).
+- Chamber **hologram corner** now carries `pointerEvents: 'none'` — prevented a potential mobile bug where the 120×170 corner patch at `bottom: 84` could have intercepted taps meant for the HUD pane underneath.
+
+**End-to-end verified via Playwright:**
+- Full mode: chamber=1, props=3, hologram=1, AI backdrop renders, particle body visible.
+- Calm mode (`cosmic_prefs.immersionLevel = 'calm'`): chamber=1, props=0, hologram=0, zero backdrop, pure content.
+
 ## 🔒 V68.24 (Feb 20, 2026) — Real Interactive Mini-Games Inside Chambers
 
 **User re-steer (justified):** wallpaper chambers without gameplay don't count. Each chamber needs actual interactive gamified modules — real mechanics, real feedback, real XP rewards.

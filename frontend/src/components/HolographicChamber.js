@@ -39,6 +39,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import HolographicCanvas from './HolographicCanvas';
+import { useSensory } from '../context/SensoryContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -55,13 +56,37 @@ export default function HolographicChamber({
   onReady,
 }) {
   const navigate = useNavigate();
+  // The UNIFIED engine — SensoryContext owns immersion level, reduce-motion,
+  // reduce-particles, reduce-flashing and theme. HolographicChamber reads
+  // from it directly instead of maintaining its own toggles, so every
+  // chamber obeys the /settings page automatically.
+  const {
+    immersion = 'full',
+    showAnimations = true,
+    showParticles = true,
+    showVisualEffects = true,
+    prefs = {},
+  } = useSensory() || {};
+  const simpleMode      = immersion === 'calm';
+  const showBackdrop    = !simpleMode;
+  const showScanlines   = !simpleMode && showVisualEffects && !prefs.reduceFlashing;
+  const showShimmer     = !simpleMode && showAnimations && !prefs.reduceMotion;
+  const doPresenceCanvas = presenceCanvas && !simpleMode && showParticles && immersion === 'full';
+  const showHologramCorner = !simpleMode;
   const [backdrop, setBackdrop] = useState(null);
   const [avatarB64, setAvatarB64] = useState(null);
-  const [materialized, setMaterialized] = useState(false);
+  const [materialized, setMaterialized] = useState(simpleMode);
   const readyCalledRef = useRef(false);
 
-  // Fetch chamber backdrop + user's own hologram portrait
+  // Fetch chamber backdrop + user's own hologram portrait (skipped in
+  // Simple Mode — the user opted out of the immersive experience).
   useEffect(() => {
+    if (simpleMode) {
+      setBackdrop(null);
+      setAvatarB64(null);
+      setMaterialized(true);
+      return;
+    }
     const token = localStorage.getItem('zen_token');
     if (!token || token === 'guest_token') {
       setBackdrop(null);
@@ -70,32 +95,50 @@ export default function HolographicChamber({
     const h = { Authorization: `Bearer ${token}` };
     let alive = true;
     (async () => {
-      const [bRes, aRes] = await Promise.allSettled([
+      const requests = [
         axios.post(`${API}/ai-visuals/chamber`, { chamber_id: chamberId }, { headers: h }),
-        axios.get(`${API}/ai-visuals/my-avatar`, { headers: h }),
-      ]);
+      ];
+      if (showHologramCorner) {
+        requests.push(axios.get(`${API}/ai-visuals/my-avatar`, { headers: h }));
+      }
+      const results = await Promise.allSettled(requests);
       if (!alive) return;
-      if (bRes.status === 'fulfilled' && bRes.value.data?.image_b64) {
+      const bRes = results[0];
+      const aRes = results[1];
+      if (bRes && bRes.status === 'fulfilled' && bRes.value.data?.image_b64) {
         setBackdrop(bRes.value.data.image_b64);
       }
-      if (aRes.status === 'fulfilled' && aRes.value.data?.status === 'active' && aRes.value.data?.image_b64) {
+      if (aRes && aRes.status === 'fulfilled' && aRes.value.data?.status === 'active' && aRes.value.data?.image_b64) {
         setAvatarB64(aRes.value.data.image_b64);
       }
     })();
     return () => { alive = false; };
-  }, [chamberId]);
+  }, [chamberId, simpleMode, showHologramCorner]);
 
-  // Trigger materialization after the scene image has loaded
+  // Trigger materialization after the scene image has loaded — OR after
+  // a 3.5s safety timeout so a slow/failed backdrop fetch never leaves
+  // the user staring at a black screen. The chamber is fully functional
+  // (HUD, props, mini-games) without the scenic photo; it just looks
+  // plainer.
   useEffect(() => {
-    if (!backdrop) return;
-    const t = setTimeout(() => {
+    if (backdrop) {
+      const t = setTimeout(() => {
+        setMaterialized(true);
+        if (!readyCalledRef.current) {
+          readyCalledRef.current = true;
+          onReady?.();
+        }
+      }, 900);
+      return () => clearTimeout(t);
+    }
+    const safety = setTimeout(() => {
       setMaterialized(true);
       if (!readyCalledRef.current) {
         readyCalledRef.current = true;
         onReady?.();
       }
-    }, 900);
-    return () => clearTimeout(t);
+    }, 3500);
+    return () => clearTimeout(safety);
   }, [backdrop, onReady]);
 
   const backdropSrc = backdrop
@@ -116,9 +159,9 @@ export default function HolographicChamber({
         color: '#fff',
       }}
     >
-      {/* Backdrop scene */}
+      {/* Backdrop scene (skipped entirely in Simple Mode) */}
       <AnimatePresence>
-        {backdropSrc && (
+        {showBackdrop && backdropSrc && (
           <motion.div
             key={`backdrop-${chamberId}`}
             initial={{ opacity: 0, scale: 1.04 }}
@@ -130,21 +173,24 @@ export default function HolographicChamber({
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               filter: 'saturate(1.05) contrast(1.05)',
+              pointerEvents: 'none',  // decorative only — never swallow taps
             }}
           />
         )}
       </AnimatePresence>
       {/* Vignette + colour veil for readability */}
-      <div
-        style={{
-          position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0.85) 100%)',
-        }}
-      />
+      {!simpleMode && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none',
+            background: 'radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0.85) 100%)',
+          }}
+        />
+      )}
 
       {/* Shimmer sweep — the "transformation" cue */}
       <AnimatePresence>
-        {!materialized && backdropSrc && (
+        {showShimmer && !materialized && backdropSrc && (
           <motion.div
             key="shimmer"
             initial={{ opacity: 0.0, x: '-120%' }}
@@ -161,21 +207,18 @@ export default function HolographicChamber({
       </AnimatePresence>
 
       {/* Subtle horizontal scanlines (holographic feel) */}
-      <div
-        style={{
-          position: 'fixed', inset: 0, zIndex: 2, pointerEvents: 'none',
-          background: 'repeating-linear-gradient(0deg, rgba(0,255,204,0.03) 0px, rgba(0,255,204,0.03) 1px, transparent 1px, transparent 4px)',
-        }}
-      />
+      {showScanlines && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 2, pointerEvents: 'none',
+            background: 'repeating-linear-gradient(0deg, rgba(0,255,204,0.03) 0px, rgba(0,255,204,0.03) 1px, transparent 1px, transparent 4px)',
+          }}
+        />
+      )}
 
-      {/* Presence canvas — breathing particle avatar body in the room.
-          Uses the same HolographicCanvas that Light Therapy and Guided
-          Experience use, so visual language stays consistent. Render only
-          when the chamber explicitly opts in (e.g. meditation). Uses
-          mix-blend-mode: screen so the canvas's dark background falls
-          away and only the luminous particle avatar composites on the
-          scene. */}
-      {presenceCanvas && (
+      {/* Presence canvas — breathing particle avatar body. Only renders
+          on immersion=full + showParticles=true (SensoryContext gates). */}
+      {doPresenceCanvas && (
         <div
           style={{
             position: 'fixed', inset: 0, zIndex: 2, pointerEvents: 'none',
@@ -229,8 +272,10 @@ export default function HolographicChamber({
         </div>
       </motion.div>
 
-      {/* User hologram — bottom-left corner, scanline flicker */}
-      {avatarSrc && (
+      {/* User hologram — bottom-left corner, scanline flicker.
+          DECORATIVE ONLY: pointerEvents:none so it never steals taps
+          from the HUD pane underneath on small viewports. */}
+      {showHologramCorner && avatarSrc && (
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: materialized ? 0.95 : 0, x: materialized ? 0 : -20 }}
@@ -243,6 +288,7 @@ export default function HolographicChamber({
             border: '1px solid rgba(0,255,204,0.5)',
             boxShadow: '0 0 30px rgba(0,255,204,0.35)',
             background: 'linear-gradient(180deg, rgba(0,255,204,0.15) 0%, transparent 100%)',
+            pointerEvents: 'none',
           }}
         >
           <img

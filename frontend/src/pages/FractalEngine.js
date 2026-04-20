@@ -456,27 +456,45 @@ function CameraFlyController({ targetPos }) {
   return null;
 }
 
-// ── Spark Orb (collectable floating credit) ──────────────────────────
-function SparkOrb({ position, color = '#00ffcc' }) {
+// ── Spark Orb (collectable RANK XP — Sparks are earned, never currency) ──
+// Orbs are VISUAL feedback pickups. They do NOT intercept raycasts (so
+// they never steal a click meant for a pillar / the avatar), and they
+// fade out gracefully when collected rather than popping.
+function SparkOrb({ position, color = '#00ffcc', collecting = false }) {
   const ref = useRef();
+  const innerMatRef = useRef();
+  const outerMatRef = useRef();
+  const collectStartRef = useRef(null);
+
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     if (ref.current) {
       // Gentle vertical bob + pulse
       ref.current.position.y = position[1] + Math.sin(t * 1.5 + position[0]) * 0.08;
-      const s = 1 + Math.sin(t * 3 + position[0] * 2) * 0.15;
-      ref.current.scale.set(s, s, s);
+      if (collecting) {
+        if (collectStartRef.current == null) collectStartRef.current = performance.now();
+        const elapsed = performance.now() - collectStartRef.current;
+        const k = Math.min(1, elapsed / 500);
+        // Scale up + fade out as it's absorbed into the avatar.
+        const s = 1 + k * 1.6;
+        ref.current.scale.set(s, s, s);
+        if (innerMatRef.current) innerMatRef.current.opacity = 0.65 * (1 - k);
+        if (outerMatRef.current) outerMatRef.current.opacity = 0.15 * (1 - k);
+      } else {
+        const s = 1 + Math.sin(t * 3 + position[0] * 2) * 0.1;
+        ref.current.scale.set(s, s, s);
+      }
     }
   });
   return (
-    <group ref={ref} position={position}>
-      <mesh>
-        <sphereGeometry args={[0.1, 12, 12]} />
-        <meshBasicMaterial color={color} transparent opacity={0.9} toneMapped={false} />
+    <group ref={ref} position={position} raycast={() => null}>
+      <mesh raycast={() => null}>
+        <sphereGeometry args={[0.09, 12, 12]} />
+        <meshBasicMaterial ref={innerMatRef} color={color} transparent opacity={0.65} toneMapped={false} depthWrite={false} />
       </mesh>
-      <mesh>
-        <sphereGeometry args={[0.18, 12, 12]} />
-        <meshBasicMaterial color={color} transparent opacity={0.22} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <mesh raycast={() => null}>
+        <sphereGeometry args={[0.16, 12, 12]} />
+        <meshBasicMaterial ref={outerMatRef} color={color} transparent opacity={0.15} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
     </group>
   );
@@ -560,16 +578,23 @@ function GameController({
         break;
       }
     }
-    // Orb collection
+    // Orb collection — mark as "collecting" first, fade out, then remove.
+    // Avoids pop-out and also gives the avatar visible feedback that
+    // something was absorbed.
     const collected = [];
     for (const o of orbs) {
+      if (o.collecting) continue;
       const d = Math.hypot(posRef.current.x - o.x, posRef.current.y - o.y, posRef.current.z - o.z);
       if (d < 0.38) collected.push(o);
     }
     if (collected.length > 0) {
       const ids = new Set(collected.map((c) => c.id));
-      setOrbs((prev) => prev.filter((o) => !ids.has(o.id)));
+      setOrbs((prev) => prev.map((o) => (ids.has(o.id) ? { ...o, collecting: true } : o)));
       collected.forEach(() => onSparkCollect && onSparkCollect(1));
+      // Remove after fade-out animation completes
+      window.setTimeout(() => {
+        setOrbs((prev) => prev.filter((o) => !ids.has(o.id)));
+      }, 520);
     }
   });
 
@@ -586,7 +611,7 @@ function GameController({
         />
       </group>
       {orbs.map((o) => (
-        <SparkOrb key={o.id} position={[o.x, o.y, o.z]} />
+        <SparkOrb key={o.id} position={[o.x, o.y, o.z]} collecting={!!o.collecting} />
       ))}
     </>
   );

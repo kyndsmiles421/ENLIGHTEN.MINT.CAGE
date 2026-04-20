@@ -15,6 +15,8 @@ import { ProximityItem } from '../components/SpatialRoom';
 import HolographicChamber from '../components/HolographicChamber';
 import ChamberProp from '../components/ChamberProp';
 import BreathPacerGame from '../components/games/BreathPacerGame';
+import MandalaRitual from '../components/games/MandalaRitual';
+import RippleBurst from '../components/RippleBurst';
 import { Wind as WindIcon, Bell, Flower } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -1303,6 +1305,21 @@ export default function Meditation() {
   const [filter, setFilter] = useState('all');
   const [activeSession, setActiveSession] = useState(null);
   const [breathGameOpen, setBreathGameOpen] = useState(false);
+  const [mandalaOpen, setMandalaOpen] = useState(false);
+  const [ripples, setRipples] = useState([]); // [{id, x, y, color, xp}]
+  const rippleIdRef = useRef(0);
+  const { immersion = 'full' } = useSensory() || {};
+  const simpleMode = immersion === 'calm';
+
+  // Spawn a ripple at a chamber position with optional XP tag. Ripples
+  // auto-clean themselves via their onDone callback.
+  const spawnRipple = useCallback((x, y, color, xp) => {
+    const id = ++rippleIdRef.current;
+    setRipples((r) => [...r, { id, x, y, color, xp }]);
+  }, []);
+  const clearRipple = useCallback((id) => {
+    setRipples((r) => r.filter((rp) => rp.id !== id));
+  }, []);
 
   const filtered = filter === 'all' ? GUIDED_MEDITATIONS : GUIDED_MEDITATIONS.filter(m => m.category === filter);
 
@@ -1317,8 +1334,11 @@ export default function Meditation() {
       presencePlaying={true}
     >
     {/* Interactive chamber props — tap to enter live mini-games.
-        These sit ABOVE the scene and trigger real gameplay. */}
-    {!activeSession && !breathGameOpen && (
+        Each prop enacts a distinct real action with visible chamber
+        feedback (ripple + XP flyaway), so no prop is "just a button".
+        Entirely hidden in Simple Mode (immersion=calm) — those users
+        just want clean meditation controls without gamification. */}
+    {!simpleMode && !activeSession && !breathGameOpen && !mandalaOpen && (
       <>
         <ChamberProp
           x={22} y={55} size={86}
@@ -1334,7 +1354,7 @@ export default function Meditation() {
           icon={Bell}
           color="#FCD34D"
           onActivate={() => {
-            // Short resonance ping for +2 Sparks XP
+            // 528Hz resonance tone with 2.6s decay
             try {
               const ctx = new (window.AudioContext || window.webkitAudioContext)();
               const osc = ctx.createOscillator();
@@ -1345,7 +1365,9 @@ export default function Meditation() {
               osc.start();
               g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.6);
               osc.stop(ctx.currentTime + 2.6);
-            } catch {}
+            } catch { /* audio blocked */ }
+            // Visible expanding ripple at the bell's position + XP flyaway
+            spawnRipple(78, 28, '#FCD34D', '+2 SPARKS');
             const token = localStorage.getItem('zen_token');
             if (token && token !== 'guest_token') {
               axios.post(
@@ -1355,7 +1377,6 @@ export default function Meditation() {
               ).catch(() => {});
             }
             window.dispatchEvent(new CustomEvent('sovereign:immersion-tick'));
-            toast.success('+2 Sparks · bell resonance', { duration: 1800 });
           }}
           testid="meditation-prop-bell"
         />
@@ -1364,16 +1385,33 @@ export default function Meditation() {
           label="MANDALA"
           icon={Flower}
           color="#F472B6"
-          onActivate={() => setMode('constellation')}
+          onActivate={() => {
+            spawnRipple(80, 70, '#F472B6', 'RITUAL');
+            setMandalaOpen(true);
+          }}
           testid="meditation-prop-mandala"
         />
       </>
     )}
 
+    {/* Ripples (chamber-relative expanding concentric rings + XP tag) */}
+    {ripples.map((r) => (
+      <RippleBurst
+        key={r.id}
+        x={r.x} y={r.y} color={r.color} xpLabel={r.xp}
+        onDone={() => clearRipple(r.id)}
+      />
+    ))}
+
     <BreathPacerGame
       open={breathGameOpen}
       onClose={() => setBreathGameOpen(false)}
       color="#D8B4FE"
+    />
+    <MandalaRitual
+      open={mandalaOpen}
+      onClose={() => setMandalaOpen(false)}
+      color="#F472B6"
     />
 
     <div className="pt-4 pb-2 px-1 max-w-3xl mx-auto" style={{ background: 'transparent' }}>

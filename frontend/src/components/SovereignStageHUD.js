@@ -16,8 +16,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Award, Coins, Compass, Plus, User } from 'lucide-react';
+import { Award, Coins, Compass, Plus, User, SlidersHorizontal } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useSensory } from '../context/SensoryContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 // External top-up URL — ALWAYS opens in the default browser (new tab) so
@@ -29,6 +30,8 @@ const TOPUP_URL = 'https://enlighten-mint-cafe.me/economy?from=hud';
 export default function SovereignStageHUD({ anchor = 'top-right', compact = false }) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const sensory = useSensory() || {};
+  const immersion = sensory.immersion || 'full';
   const [sparks, setSparks] = useState(null);
   const [dust, setDust] = useState(null);
   const [mission, setMission] = useState(null);
@@ -209,6 +212,35 @@ export default function SovereignStageHUD({ anchor = 'top-right', compact = fals
             <span style={{ fontWeight: 700 }}>{Number(dust).toLocaleString()}</span>
           </div>
         )}
+        {/* Experience quick-cycler — tap to cycle immersion (full→standard→calm→full).
+            Unified with SensoryContext so it persists across every page. */}
+        <button
+          type="button"
+          onClick={() => {
+            const next = immersion === 'full' ? 'standard' : immersion === 'standard' ? 'calm' : 'full';
+            sensory.updatePref?.('immersionLevel', next);
+          }}
+          data-testid="stage-hud-immersion"
+          title={`Experience: ${immersion.toUpperCase()} — tap to cycle`}
+          style={{
+            background: 'rgba(0,0,0,0.55)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(192,132,252,0.35)',
+            borderRadius: 999,
+            padding: '6px 10px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 5,
+            fontSize: 9,
+            color: '#C084FC',
+            cursor: 'pointer',
+            letterSpacing: '1px',
+            fontWeight: 700,
+            textTransform: 'uppercase',
+          }}
+        >
+          <SlidersHorizontal size={10} /> {immersion}
+        </button>
         {/* Top-Up DUST pill — always opens external web checkout (TWA-safe).
             Critical: labeled DUST (spendable currency), NOT sparks — per
             CREDIT_SYSTEM.md Sparks are earned-only rank/merit and can
