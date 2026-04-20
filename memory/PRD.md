@@ -1,10 +1,25 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.35)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.38)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as a Wellness / Mental Acuity app.
 
-## V68.35 — NATIVE .AAB MINTED · PLAY-STORE READY (20 Feb 2026)
-1. ✅ **Signed Android App Bundle forged** — `/app/build_artifacts/enlighten-mint-cafe-v1.0.0.aab` (33 MB, 968 files). Package `cafe.mint.enlighten` v1.0.0 / versionCode 1. MinSDK 24, TargetSDK 36.
+## V68.38 — Live Bug Sweep · v1.0.1 AAB (20 Feb 2026)
+1. ✅ **Dead 9×9 lattice fixed** — MiniLattice was reading `r.data.lattice_state.nodes` but backend returns `r.data.lattice.nodes`. All 81 circles now render with 9 distinct node-type colors (gold CORE, purple ORACLE, blue PORTAL, cyan RELAY, green SHIELD, pink MIXER, violet GENERATOR, gold LEDGER, gray VAULT).
+2. ✅ **Rock Hounding — real crystal portraits** — Replaced generic `<Gem>` icon with `CrystalPortrait.js` (deterministic SVG polygon per specimen; facets scale with rarity 6→12; sparkles for epic+; specular highlight, element-color gradient, rarity glow). Added "Learn" expand sheet showing Mohs, stat bonus, depth, dust value, layer, full description. Collection grid uses the same portraits.
+3. ✅ **Duplicate tool registration warnings (11+) eliminated** — Moved `toolScaffold` from top-level import to an explicit `registerScaffold()` export invoked AFTER the real `registerMany([...])` in `toolRegistry.js`.
+4. ✅ **Starseed satellite added to Orbital Hub** — `/orbital-hub` now has a dedicated Starseed node (pink Sparkles icon → `/starseed-adventure`, 528Hz). Games node description corrected.
+5. ✅ **Cosmic Mixer half-screen fixed** — 3× `max-w-2xl` (672px) widened to `max-w-6xl` (1152px) across header, body, and sticky footer.
+6. ✅ **Privacy Policy + Data Safety** — `/app/frontend/public/privacy.html` hosted in-app at `/privacy.html`; also deploy-ready for `https://enlighten-mint-cafe.me/privacy`. `/app/memory/DATA_SAFETY.md` is the canonical Play Console form answers.
+7. ✅ **v1.0.1 AAB signed + production URL baked in** — `REACT_APP_BACKEND_URL=https://enlighten-mint-cafe.me`. `versionCode=2, versionName=1.0.1`. SHA-256: `ddc966e43286f9963a066b44aad39566abd3854c953e77a60cb4696fee17dcb1`.
+
+### .env loading gotcha (for future rebuilds)
+`craco.config.js` calls `require("dotenv").config()` which pins `.env` values into `process.env` BEFORE `.env.production` override kicks in. Always rebuild with inline env:
+```bash
+REACT_APP_BACKEND_URL=https://enlighten-mint-cafe.me yarn build
+```
+
+## V68.35 — Native .AAB minted · Play-Store Ready (20 Feb 2026)
+1. ✅ **Signed Android App Bundle forged** — `/app/build_artifacts/enlighten-mint-cafe-v1.0.0.aab` (33 MB, 968 files). Package `cafe.mint.enlighten`. MinSDK 24, TargetSDK 36.
 2. ✅ **Upload keystore** — RSA 4096, SHA384withRSA, 30-year validity.
    - Path: `/app/build_artifacts/enlighten-mint-cafe-UPLOAD-KEY.keystore`
    - Alias: `enlightenmintcafe`  · store+key password: `Sovereign2026!`

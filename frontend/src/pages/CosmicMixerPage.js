@@ -613,7 +613,7 @@ export default function CosmicMixerPage() {
       {/* Session progress bar */}
       {sessionActive && sessionData && (
         <div className="fixed top-0 left-0 right-0 z-40" style={{ background: 'rgba(0,0,0,0)', backdropFilter: 'none', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <div className="max-w-2xl mx-auto px-4 py-2.5">
+          <div className="max-w-6xl mx-auto px-4 py-2.5">
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-2">
                 <span className="text-sm">{sessionData.icon}</span>
@@ -640,7 +640,7 @@ export default function CosmicMixerPage() {
       {/* ─── Sticky Master Controls Footer ─── */}
       <div className="fixed bottom-0 left-0 right-0 z-50" data-testid="mixer-sticky-footer"
         style={{ background: 'rgba(0,0,0,0)', backdropFilter: 'none', borderTop: `1px solid ${hasActive ? 'rgba(192,132,252,0.15)' : 'rgba(255,255,255,0.05)'}` }}>
-        <div className="max-w-2xl mx-auto px-4 py-3">
+        <div className="max-w-6xl mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
             <button onClick={() => setMuted(m => !m)} className="p-1.5 rounded-lg flex-shrink-0 transition-all active:scale-90"
               style={{ background: muted ? 'rgba(239,68,68,0.1)' : 'transparent' }} data-testid="sticky-mute">
@@ -672,7 +672,7 @@ export default function CosmicMixerPage() {
         </div>
       </div>
 
-      <div className={`max-w-2xl mx-auto px-4 pb-32 relative z-20 ${sessionActive ? 'pt-24' : 'pt-6'}`}>
+      <div className={`max-w-6xl mx-auto px-4 pb-32 relative z-20 ${sessionActive ? 'pt-24' : 'pt-6'}`}>
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <button onClick={() => { stopAll(); stopSession(); navigate(-1); }} className="p-2 rounded-xl transition-all hover:scale-105" style={{ background: 'rgba(248,250,252,0.04)', border: '1px solid rgba(248,250,252,0.06)' }} data-testid="mixer-back">

@@ -1,7 +1,7 @@
 import {
   Music, Map, Triangle, Heart, Wind, Sun, GraduationCap,
   Eye, Star, Telescope, HeartHandshake, Gamepad2, BookOpen,
-  ScrollText, Calculator
+  ScrollText, Calculator, Sparkles
 } from 'lucide-react';
 
 export const ALL_SATELLITES = [
@@ -16,7 +16,8 @@ export const ALL_SATELLITES = [
   { id: 'observatory', label: 'Observatory', icon: Telescope, path: '/observatory', color: '#6366F1', desc: 'Live sky & data sonification' },
   { id: 'trade', label: 'Trade Circle', icon: HeartHandshake, path: '/trade-circle', color: '#FB923C', desc: 'Exchange resonant assets' },
   { id: 'oracle', label: 'Oracle', icon: Eye, path: '/oracle', color: '#C084FC', desc: 'Divination & insight' },
-  { id: 'games', label: 'Games', icon: Gamepad2, path: '/games', color: '#34D399', desc: 'Starseed adventures' },
+  { id: 'starseed', label: 'Starseed', icon: Sparkles, path: '/starseed-adventure', color: '#E879F9', desc: 'Channelled starseed adventure' },
+  { id: 'games', label: 'Games', icon: Gamepad2, path: '/games', color: '#34D399', desc: 'Rock Hounding, RPG, Cryptic Quest' },
   { id: 'journal', label: 'Journal', icon: BookOpen, path: '/journal', color: '#FDA4AF', desc: 'Wisdom journal' },
   { id: 'archives', label: 'Archives', icon: ScrollText, path: '/archives', color: '#F59E0B', desc: 'Deep-dive multi-civilization texts' },
   { id: 'suanpan', label: 'Suanpan', icon: Calculator, path: '/suanpan', color: '#EF4444', desc: 'Ancient abacus frequency mixer' },
@@ -38,6 +39,7 @@ export const ZONE_AUDIO = {
   'journal': { hz: 396, type: 'sine', gain: 0.04 },
   'archives': { hz: 174, type: 'sine', gain: 0.05 },
   'suanpan': { hz: 256, type: 'triangle', gain: 0.05 },
+  'starseed': { hz: 528, type: 'sine', gain: 0.06 },
 };
 
 export const WEATHER_AUDIO_MAP = {
