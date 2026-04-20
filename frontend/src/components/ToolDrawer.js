@@ -5,6 +5,8 @@ import { X, Swords, Lock, Sparkles } from 'lucide-react';
 import SovereignBridge from '../kernel/SovereignBridge';
 import SovereignKernel from '../kernel/SovereignKernel';
 import SovereignPreferences from '../kernel/SovereignPreferences';
+import { getLabFor } from '../kernel/toolLabs';
+import LabStage from './LabStage';
 
 /**
  * ToolDrawer — the Swiss Army Knife silhouette, rendered as SVG crystals.
@@ -106,6 +108,7 @@ export default function ToolDrawer({ open, onClose }) {
   const [ticker, setTicker] = useState(0); // re-render on preference changes
   const [earnedKeys] = useState(() => new Set()); // TODO: wire to quest state
   const [selected, setSelected] = useState(null);
+  const [activeLab, setActiveLab] = useState(null);
 
   useEffect(() => {
     return SovereignPreferences.subscribe(() => setTicker(t => t + 1));
@@ -137,10 +140,17 @@ export default function ToolDrawer({ open, onClose }) {
       setSelected(tool);
       return;
     }
+    // V68.33 — Proof-of-Work gate. If this tool has a lab, open the
+    // LabStage. The LabStage fires SovereignKernel.interact on pass only,
+    // so sparks can never be minted without verified mastery.
+    const lab = getLabFor(tool.id);
+    if (lab) {
+      setActiveLab(lab);
+      return;
+    }
     try {
       SovereignKernel.interact(tool.id, { context: 'tool-drawer', resonance: 'crystal' });
     } catch (e) {
-      /* assertRegistered throws in dev — UI keeps working */
       console.warn(e);
     }
     onClose?.();
@@ -253,6 +263,7 @@ export default function ToolDrawer({ open, onClose }) {
           )}
         </AnimatePresence>
       </motion.div>
+      <LabStage open={!!activeLab} lab={activeLab} onClose={() => setActiveLab(null)} />
     </AnimatePresence>,
     document.body
   );
