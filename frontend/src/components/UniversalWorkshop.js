@@ -224,23 +224,38 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
   const isFullAuth = token && token !== 'guest_token';
   const mixer = useMixer();
 
-  // V68.27 — auto-prime the trade resonance preset once per session.
-  // Each trade's "High-Performance" recipe (528Hz + Singing Bowl +
-  // Sitar Drone for masonry, etc.) becomes the default sonic backdrop
-  // when the user enters the chamber. Stored in sessionStorage so it
-  // only primes once — users retain full control via the Cosmic Mixer.
+  // V68.32 — Resonance presets are OPT-IN only. Auto-prime on chamber
+  // entry was invasive (bombed users with biometric frequencies the
+  // moment they walked in). Now a pill appears offering the preset;
+  // nothing activates unless the user taps it. Decision is remembered
+  // per-chamber-per-session so we never pester them again.
+  const chamberKey = MODULE_TO_CHAMBER[moduleId] || moduleId;
+  const presetKey = `emcafe_resonance_choice_${chamberKey}`;
+  const [resonanceOffer, setResonanceOffer] = useState(null);
   useEffect(() => {
-    if (!mixer?.applyResonancePreset) return;
-    const chamberKey = MODULE_TO_CHAMBER[moduleId] || moduleId;
-    const sessionKey = `emcafe_resonance_primed_${chamberKey}`;
+    if (!mixer?.RESONANCE_PRESETS) return;
     try {
-      if (sessionStorage.getItem(sessionKey)) return;
-      sessionStorage.setItem(sessionKey, '1');
-      // Skip if user has muted — respect Silence Shield.
-      if (mixer.muted) return;
-      mixer.applyResonancePreset(chamberKey);
+      // Clear legacy auto-primed flags from V68.27 so users who already
+      // got bombed don't stay stuck; the choice pill will reappear.
+      const legacyKey = `emcafe_resonance_primed_${chamberKey}`;
+      if (sessionStorage.getItem(legacyKey) && !sessionStorage.getItem(presetKey)) {
+        sessionStorage.removeItem(legacyKey);
+      }
+      if (sessionStorage.getItem(presetKey)) return; // already answered
+      const preset = mixer.RESONANCE_PRESETS[chamberKey];
+      if (!preset) return;
+      setResonanceOffer(preset);
     } catch { /* noop */ }
-  }, [moduleId, mixer]);
+  }, [chamberKey, mixer, presetKey]);
+  const acceptResonance = useCallback(() => {
+    try { sessionStorage.setItem(presetKey, 'accepted'); } catch {}
+    try { mixer?.applyResonancePreset?.(chamberKey); } catch {}
+    setResonanceOffer(null);
+  }, [chamberKey, mixer, presetKey]);
+  const declineResonance = useCallback(() => {
+    try { sessionStorage.setItem(presetKey, 'declined'); } catch {}
+    setResonanceOffer(null);
+  }, [presetKey]);
 
   // Bridge: the bottom Cosmic Mixer nodules broadcast sovereign:mixer-*
   // events. Any chamber mini-game that is currently open listens via
@@ -320,6 +335,60 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
       fullBleed
     >
     <div className="min-h-screen px-4 py-6 sm:px-8" data-testid={`${moduleId}-workbench-page`}>
+      {resonanceOffer && (
+        <div
+          data-testid={`resonance-offer-${chamberKey}`}
+          style={{
+            maxWidth: 360, margin: '0 auto 12px',
+            background: 'rgba(16,12,24,0.72)',
+            border: '1px solid rgba(192,132,252,0.35)',
+            borderRadius: 14, padding: '10px 12px',
+            display: 'flex', alignItems: 'center', gap: 10,
+            backdropFilter: 'blur(10px)',
+          }}
+        >
+          <div style={{
+            width: 8, height: 8, borderRadius: '50%',
+            background: resonanceOffer.color || '#C084FC',
+            flex: '0 0 auto',
+          }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 9, letterSpacing: 2, color: 'rgba(255,255,255,0.55)', fontFamily: 'monospace' }}>
+              RESONANCE RECIPE · OPTIONAL
+            </div>
+            <div style={{ fontSize: 12, color: '#fff', fontFamily: 'monospace', marginTop: 2 }}>
+              {resonanceOffer.label}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={declineResonance}
+            data-testid={`resonance-decline-${chamberKey}`}
+            style={{
+              background: 'transparent', border: '1px solid rgba(255,255,255,0.18)',
+              color: 'rgba(255,255,255,0.55)', fontSize: 9, letterSpacing: 2,
+              padding: '6px 10px', borderRadius: 999, cursor: 'pointer',
+              fontFamily: 'monospace',
+            }}
+          >
+            NO THANKS
+          </button>
+          <button
+            type="button"
+            onClick={acceptResonance}
+            data-testid={`resonance-accept-${chamberKey}`}
+            style={{
+              background: resonanceOffer.color || '#C084FC',
+              border: 'none',
+              color: '#000', fontWeight: 700, fontSize: 9, letterSpacing: 2,
+              padding: '6px 12px', borderRadius: 999, cursor: 'pointer',
+              fontFamily: 'monospace',
+            }}
+          >
+            PLAY
+          </button>
+        </div>
+      )}
       <div className="max-w-2xl mx-auto">
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">
