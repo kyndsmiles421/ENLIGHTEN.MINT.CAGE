@@ -40,3 +40,9 @@ registerMany([
   { id: 'vr.observatory',               layer: 4, domain: 'observatory', unlocks: ['celestial_nav'],       requires: ['tesseract_access'],      sparks: 10, purpose: 'Enter the Observatory VR realm with celestial navigation.' },
   { id: 'vr.crystalline-dome',          layer: 4, domain: 'dome',        unlocks: ['dome_synthesis'],      requires: ['dome_access'],           sparks: 10, purpose: 'Enter the Crystalline Dome VR realm for synthesis.' },
 ]);
+
+
+// Scaffold the remaining 222+ tools AFTER the real registrations so the
+// scaffold's `isRegistered(id)` check correctly skips real entries. This
+// makes the Tool Drawer render the full 243-blade silhouette from day one.
+import './toolScaffold';

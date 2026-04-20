@@ -22,9 +22,13 @@
 const LS_KEY = 'sovereign_preferences_v1';
 
 const DEFAULTS = Object.freeze({
-  audio: { frequency: 'silence' },       // Silence Shield default — user must choose
-  visual: { skin: 'neo-kyoto' },          // current shipped aesthetic is baseline
-  motion: { reduce: false },
+  audio:    { frequency: 'silence' },       // Silence Shield default — user must choose
+  visual:   { skin: 'neo-kyoto', crystalFidelity: '2d' },  // 2d = lean SVG, 3d = R3F (opt-in)
+  motion:   { reduce: false },
+  learning: {
+    difficulty: 'adaptive',                  // 'easy' | 'medium' | 'hard' | 'adaptive'
+    weighting:  'precision',                 // 'precision' | 'speed' (70/30 vs 30/70)
+  },
 });
 
 const listeners = new Set();
@@ -39,9 +43,10 @@ function readRaw() {
     const parsed = JSON.parse(raw);
     // Deep merge with defaults so new fields don't throw
     return {
-      audio: { ...DEFAULTS.audio, ...(parsed.audio || {}) },
-      visual: { ...DEFAULTS.visual, ...(parsed.visual || {}) },
-      motion: { ...DEFAULTS.motion, ...(parsed.motion || {}) },
+      audio:    { ...DEFAULTS.audio,    ...(parsed.audio    || {}) },
+      visual:   { ...DEFAULTS.visual,   ...(parsed.visual   || {}) },
+      motion:   { ...DEFAULTS.motion,   ...(parsed.motion   || {}) },
+      learning: { ...DEFAULTS.learning, ...(parsed.learning || {}) },
     };
   } catch {
     return clone(DEFAULTS);
@@ -86,6 +91,27 @@ function setReduceMotion(value) {
   writeRaw({ ...cache, motion: { ...cache.motion, reduce: !!value } });
 }
 
+function setDifficulty(value) {
+  if (!['easy', 'medium', 'hard', 'adaptive'].includes(value)) {
+    throw new Error(`[SovereignPreferences] invalid learning.difficulty: ${value}`);
+  }
+  writeRaw({ ...cache, learning: { ...cache.learning, difficulty: value } });
+}
+
+function setLearningWeighting(value) {
+  if (!['precision', 'speed'].includes(value)) {
+    throw new Error(`[SovereignPreferences] invalid learning.weighting: ${value}`);
+  }
+  writeRaw({ ...cache, learning: { ...cache.learning, weighting: value } });
+}
+
+function setCrystalFidelity(value) {
+  if (!['2d', '3d'].includes(value)) {
+    throw new Error(`[SovereignPreferences] invalid visual.crystalFidelity: ${value}`);
+  }
+  writeRaw({ ...cache, visual: { ...cache.visual, crystalFidelity: value } });
+}
+
 function subscribe(fn) {
   listeners.add(fn);
   return () => listeners.delete(fn);
@@ -102,6 +128,7 @@ if (typeof window !== 'undefined') {
 export const SovereignPreferences = {
   get, getAudioFrequency, getVisualSkin, getReduceMotion,
   setAudioFrequency, setVisualSkin, setReduceMotion,
+  setDifficulty, setLearningWeighting, setCrystalFidelity,
   subscribe,
 };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Radio, Gem, Sparkles } from 'lucide-react';
+import { Radio, Gem, Sparkles, Brain, Gauge, Layers } from 'lucide-react';
 import SovereignPreferences from '../kernel/SovereignPreferences';
 
 /**
@@ -21,6 +21,20 @@ export default function SovereignChoicePanel() {
   const SKIN = [
     { id: 'neo-kyoto',         label: 'Neo-Kyoto Neon',     hint: 'Magenta × cyan cinematic depth', color: '#F0ABFC' },
     { id: 'refracted-crystal', label: 'Refracted Crystal',  hint: 'Gold × white high-vibration geometry', color: '#FBBF24' },
+  ];
+  const DIFF = [
+    { id: 'easy',     label: 'Easy',     hint: 'Guided · conceptual',            color: '#86EFAC' },
+    { id: 'medium',   label: 'Medium',   hint: 'Manual tools · domain bridges',  color: '#FCD34D' },
+    { id: 'hard',     label: 'Hard',     hint: 'No hints · frequency precision', color: '#F87171' },
+    { id: 'adaptive', label: 'Adaptive', hint: 'System reads your mastery curve', color: '#C084FC' },
+  ];
+  const WEIGHT = [
+    { id: 'precision', label: 'Precision-Weighted', hint: 'Mastery = 70% precision · 30% speed', color: '#38BDF8' },
+    { id: 'speed',     label: 'Speed-Weighted',     hint: 'Mastery = 30% precision · 70% speed', color: '#FBBF24' },
+  ];
+  const FIDEL = [
+    { id: '2d', label: '2D · Lean',       hint: 'Refracted Crystal SVG · fast', color: '#94a3b8' },
+    { id: '3d', label: '3D · Full Depth', hint: 'R3F specular crystals (opt-in)', color: '#C084FC' },
   ];
 
   return (
@@ -81,7 +95,7 @@ export default function SovereignChoicePanel() {
       </div>
 
       {/* Visual skin row */}
-      <div>
+      <div className="mb-4">
         <div className="flex items-center gap-1.5 mb-2">
           <Gem size={12} style={{ color: 'var(--text-muted)' }} />
           <p className="text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--text-muted)' }}>
@@ -98,6 +112,117 @@ export default function SovereignChoicePanel() {
                 whileTap={{ scale: 0.97 }}
                 onClick={() => SovereignPreferences.setVisualSkin(opt.id)}
                 data-testid={`skin-${opt.id}`}
+                className="px-3 py-2.5 rounded-xl text-left transition-all"
+                style={{
+                  background: active ? `${opt.color}18` : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${active ? opt.color + '66' : 'rgba(255,255,255,0.08)'}`,
+                  boxShadow: active ? `0 0 24px ${opt.color}33` : 'none',
+                }}
+              >
+                <div className="text-[12px] font-bold" style={{ color: active ? opt.color : 'var(--text-primary)' }}>
+                  {opt.label}
+                </div>
+                <div className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  {opt.hint}
+                </div>
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Crystal fidelity row */}
+      <div className="mb-4">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Layers size={12} style={{ color: 'var(--text-muted)' }} />
+          <p className="text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--text-muted)' }}>
+            Crystal Fidelity
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {FIDEL.map(opt => {
+            const active = prefs.visual.crystalFidelity === opt.id;
+            return (
+              <motion.button
+                key={opt.id}
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => SovereignPreferences.setCrystalFidelity(opt.id)}
+                data-testid={`fidelity-${opt.id}`}
+                className="px-3 py-2.5 rounded-xl text-left transition-all"
+                style={{
+                  background: active ? `${opt.color}18` : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${active ? opt.color + '66' : 'rgba(255,255,255,0.08)'}`,
+                  boxShadow: active ? `0 0 24px ${opt.color}33` : 'none',
+                }}
+              >
+                <div className="text-[12px] font-bold" style={{ color: active ? opt.color : 'var(--text-primary)' }}>
+                  {opt.label}
+                </div>
+                <div className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  {opt.hint}
+                </div>
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Difficulty row */}
+      <div className="mb-4">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Brain size={12} style={{ color: 'var(--text-muted)' }} />
+          <p className="text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--text-muted)' }}>
+            Difficulty
+          </p>
+        </div>
+        <div className="grid grid-cols-4 gap-2">
+          {DIFF.map(opt => {
+            const active = prefs.learning.difficulty === opt.id;
+            return (
+              <motion.button
+                key={opt.id}
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => SovereignPreferences.setDifficulty(opt.id)}
+                data-testid={`difficulty-${opt.id}`}
+                className="px-2 py-2 rounded-xl text-left transition-all"
+                style={{
+                  background: active ? `${opt.color}18` : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${active ? opt.color + '66' : 'rgba(255,255,255,0.08)'}`,
+                  boxShadow: active ? `0 0 18px ${opt.color}33` : 'none',
+                }}
+              >
+                <div className="text-[11px] font-bold" style={{ color: active ? opt.color : 'var(--text-primary)' }}>
+                  {opt.label}
+                </div>
+                <div className="text-[9px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  {opt.hint}
+                </div>
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Adaptive weighting row */}
+      <div>
+        <div className="flex items-center gap-1.5 mb-2">
+          <Gauge size={12} style={{ color: 'var(--text-muted)' }} />
+          <p className="text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--text-muted)' }}>
+            Adaptive Weighting
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {WEIGHT.map(opt => {
+            const active = prefs.learning.weighting === opt.id;
+            return (
+              <motion.button
+                key={opt.id}
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => SovereignPreferences.setLearningWeighting(opt.id)}
+                data-testid={`weighting-${opt.id}`}
                 className="px-3 py-2.5 rounded-xl text-left transition-all"
                 style={{
                   background: active ? `${opt.color}18` : 'rgba(255,255,255,0.03)',

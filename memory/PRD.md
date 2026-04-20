@@ -13,16 +13,35 @@ Architectural contract every new feature MUST honor:
 ## Core Rules
 - **Flatland Rule**, **Metabolic Seal** (<800KB), **Closed-Loop Economy** (Sparks earn-only), **System-wide Gamification**, **Epilepsy Safety**, **Silence Shield** (opt-in audio only), **Spotify Loophole**.
 
-## V68.31 — Sovereign Choice Protocol + Bridge Rule Hard-Wire + Starseed Fix (Feb 2026)
-1. ✅ **Starseed "Begin Adventure" ghost button KILLED** — optimistic `setView('game')` + new `ChannelingStage` (cinematic origin-themed rings, live phase copy, honest progress bar, always-visible Exit). Verified live: channeling at t=1.2s → full narrative at t=5.6s.
-2. ✅ **QR code scannability FIXED** — replaced broken custom encoder with `qrcode` lib at ECC-H; `window.location.origin` replaces hardcoded domain. Verified: pyzbar decodes live QR+Om back to exact target URL.
-3. ✅ **401 hydration race ELIMINATED** (84–99 → 0) — axiosInterceptor always overwrites Authorization with fresh localStorage; guest_token is treated as a sentinel in `AuthContext` + `Treasury/Modality/Class` contexts.
-4. ✅ **SovereignBridge registry + Bridge Rule** (`kernel/SovereignBridge.js`, `kernel/toolRegistry.js`) — every tool MUST be registered with {id, layer, domain, unlocks, requires, sparks, purpose}. Seeded with 21 tools (Layer 2/3/4). `SovereignKernel.interact(toolId)` throws in dev on unregistered tool → "random dumping" is physically detectable.
-5. ✅ **SovereignKernel event bus** (`kernel/SovereignKernel.js`) — single entry point for Layer-2/3 interactions. Fires `sovereign:interact` for Hub consumption. Exposes `lockAudioTo528()` / `unlockAudio()` for Starseed transitions.
-6. ✅ **528Hz Starseed transition lock — CHOICE-GATED** — MixerContext ducks non-528 tones by 50% via PHI-ramp ONLY when the user's Sovereign Preference `audio.frequency === '528hz'`. Silence/432 = no-op. Silence Shield + Sovereign Choice both preserved.
-7. ✅ **Sovereign Preference Ledger** (`kernel/SovereignPreferences.js`) — localStorage-backed, subscriber API, broadcasts `sovereign:preferences` events, reflects `data-sov-skin` on <html> at boot and on change.
-8. ✅ **SovereignChoicePanel** (`components/SovereignChoicePanel.js`) — mounted in Hub between Daily Challenges and Oracle. Three frequency options (Silence/432/528) and two skins (Neo-Kyoto/Refracted Crystal). Default ships in Silence — nothing plays until the Sovereign taps.
-9. ✅ **Refracted Crystal CSS skin** — gold × white high-vibration wash + diagonal prismatic grid overlay on `[data-testid="channeling-stage"]` when `html[data-sov-skin="refracted-crystal"]`.
+## V68.31 — Sovereign Choice + Bridge Rule + Swiss Army Arsenal (Feb 2026)
+1. ✅ **Starseed dead screen KILLED** — optimistic `setView('game')` + cinematic `ChannelingStage` (origin-themed rings, live phase copy, honest ETA, always-visible Exit). Verified: channeling at t=1.2s → narrative at t=5.6s.
+2. ✅ **QR code scannable** — replaced broken custom encoder with `qrcode` lib at ECC-H; pyzbar decodes live. Domain is now `window.location.origin`.
+3. ✅ **401 hydration race ELIMINATED** (84–99 → 0) — axiosInterceptor always overrides Authorization with fresh localStorage; guest_token sentinel in all contexts.
+4. ✅ **SovereignBridge + SovereignKernel + toolRegistry + toolScaffold** — 261 tools registered (27 workshops × 9 blades + VR realms + bridges). `assertRegistered` throws in dev. "Random dumping" is physically detectable.
+5. ✅ **Sovereign Preference Ledger** — persists audio.frequency, visual.skin, visual.crystalFidelity, motion.reduce, learning.difficulty, learning.weighting to localStorage. Broadcasts `sovereign:preferences`. Reflects `data-sov-skin` on `<html>`.
+6. ✅ **SovereignChoicePanel** — mounted in Hub. Audio (Silence/432/528) · Visual (Neo-Kyoto/Refracted Crystal) · Crystal Fidelity (2D/3D) · Difficulty (Easy/Medium/Hard/Adaptive) · Weighting (Precision 70/30 or Speed 30/70). Default ships in Silence + Adaptive + Precision.
+7. ✅ **528Hz Starseed lock — CHOICE-GATED** — MixerContext only ducks non-528 tones when user chose 528Hz. Silence/432 = no-op.
+8. ✅ **Refracted Crystal skin** — gold × white prismatic wash on ChannelingStage when selected.
+9. ✅ **Swiss Army Arsenal · ToolDrawer** — portal drawer listing all 261 blades in 3 sections (Entertainment/Educational/Utility). SVG crystal facets, unlocked glow in active skin, locked in dark charcoal. Cryptic hint on locked tap ("A key from {domain} — the frequency is still closed to you"). Click unlocked → `SovereignKernel.interact(toolId)` fires `sovereign:interact` for Hub HUD ripple.
+10. ✅ **Adaptive Mastery Ledger** — `kernel/MasteryLedger.js` auto-subscribes to `sovereign:interact` and records precision/speed per domain. `score = 0.7·precision + 0.3·speed` (inverted when weighting=speed). `effectiveDifficulty(domain)` honors manual override; else maps score<0.35→easy, <0.70→medium, ≥0.70→hard. Persisted to `sovereign_mastery_v1` localStorage.
+
+## Code Architecture (active files this release)
+- `/app/frontend/src/kernel/SovereignBridge.js` — registry + Bridge Rule enforcer
+- `/app/frontend/src/kernel/SovereignKernel.js` — event bus
+- `/app/frontend/src/kernel/SovereignPreferences.js` — Preference Ledger
+- `/app/frontend/src/kernel/MasteryLedger.js` — Adaptive Mastery Ledger
+- `/app/frontend/src/kernel/toolRegistry.js` + `toolScaffold.js` — 261 blades
+- `/app/frontend/src/components/SovereignChoicePanel.js` — 5-row choice UI
+- `/app/frontend/src/components/ToolDrawer.js` — Swiss Army Arsenal
+- `/app/frontend/src/components/starseed/GameScene.js` — ChannelingStage
+- `/app/frontend/src/components/SovereignQR.js` — qrcode lib + portal + Om emblem
+- `/app/frontend/src/pages/StarseedAdventure.js` — Kernel calls + optimistic view switch
+- `/app/frontend/src/pages/SovereignHub.js` — ChoicePanel + Arsenal opener mounted
+- `/app/frontend/src/context/MixerContext.js` — choice-gated 528Hz lock
+- `/app/frontend/src/context/AuthContext.js` — live authHeaders
+- `/app/frontend/src/utils/axiosInterceptor.js` — fresh-token override
+- `/app/frontend/src/index.css` — skin CSS vars, Refracted Crystal wash, QR portal hide
+- `/app/frontend/src/index.js` — registry + mastery ledger boot imports
 
 ## Code Architecture (active files this release)
 - `/app/frontend/src/pages/StarseedAdventure.js` — optimistic view-switch, direct-localStorage auth headers

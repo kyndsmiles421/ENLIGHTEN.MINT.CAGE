@@ -15,6 +15,7 @@ import Onboarding from '../components/Onboarding';
 import DailyChallenges from '../components/DailyChallenges';
 import OracleSearch from '../components/OracleSearch';
 import SovereignChoicePanel from '../components/SovereignChoicePanel';
+import ToolDrawer from '../components/ToolDrawer';
 import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
@@ -223,9 +224,10 @@ const PILLARS = [
 export default function SovereignHub() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  useSovereignUniverse(); // keep wallet re-hydration signal active
+  useSovereignUniverse();
   const [expanded, setExpanded] = useState(null);
   const [glowDomains, setGlowDomains] = useState([]);
+  const [toolDrawerOpen, setToolDrawerOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 5);
@@ -369,6 +371,24 @@ export default function SovereignHub() {
       <div className="px-4 pb-4">
         <SovereignChoicePanel />
       </div>
+
+      {/* V68.31 — Sovereign Arsenal (Swiss Army Knife) opener */}
+      <div className="px-4 pb-4 flex justify-center">
+        <button
+          onClick={() => setToolDrawerOpen(true)}
+          data-testid="open-tool-drawer"
+          className="group px-5 py-2.5 rounded-full text-[11px] uppercase tracking-[0.28em] font-bold transition-all"
+          style={{
+            background: 'rgba(192, 132, 252, 0.12)',
+            border: '1px solid rgba(192, 132, 252, 0.35)',
+            color: '#E9D5FF',
+            boxShadow: '0 0 24px rgba(192,132,252,0.15)',
+          }}
+        >
+          ⌁ Open the Sovereign Arsenal
+        </button>
+      </div>
+      <ToolDrawer open={toolDrawerOpen} onClose={() => setToolDrawerOpen(false)} />
 
       {/* V64.1 — Oracle: Intent-Based Neural Search */}
       <div className="px-4 pb-4">
