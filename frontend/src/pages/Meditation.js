@@ -13,6 +13,9 @@ import FeaturedVideos from '../components/FeaturedVideos';
 import useWorkAccrual from '../hooks/useWorkAccrual';
 import { ProximityItem } from '../components/SpatialRoom';
 import HolographicChamber from '../components/HolographicChamber';
+import ChamberProp from '../components/ChamberProp';
+import BreathPacerGame from '../components/games/BreathPacerGame';
+import { Wind as WindIcon, Bell, Flower } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -1299,6 +1302,7 @@ export default function Meditation() {
   const [mode, setMode] = useState(constellationParam ? 'constellation' : 'guided');
   const [filter, setFilter] = useState('all');
   const [activeSession, setActiveSession] = useState(null);
+  const [breathGameOpen, setBreathGameOpen] = useState(false);
 
   const filtered = filter === 'all' ? GUIDED_MEDITATIONS : GUIDED_MEDITATIONS.filter(m => m.category === filter);
 
@@ -1307,11 +1311,71 @@ export default function Meditation() {
       chamberId="meditation"
       title="The Still Chamber"
       subtitle="Holographic Meditation Sanctuary"
-      presenceCanvas={!activeSession}
+      presenceCanvas={!activeSession && !breathGameOpen}
       presenceColor="#D8B4FE"
       presenceCue="breathe"
       presencePlaying={true}
     >
+    {/* Interactive chamber props — tap to enter live mini-games.
+        These sit ABOVE the scene and trigger real gameplay. */}
+    {!activeSession && !breathGameOpen && (
+      <>
+        <ChamberProp
+          x={22} y={55} size={86}
+          label="BREATHE"
+          icon={WindIcon}
+          color="#D8B4FE"
+          onActivate={() => setBreathGameOpen(true)}
+          testid="meditation-prop-cushion"
+        />
+        <ChamberProp
+          x={78} y={28} size={58}
+          label="RING BELL"
+          icon={Bell}
+          color="#FCD34D"
+          onActivate={() => {
+            // Short resonance ping for +2 Sparks XP
+            try {
+              const ctx = new (window.AudioContext || window.webkitAudioContext)();
+              const osc = ctx.createOscillator();
+              const g = ctx.createGain();
+              osc.frequency.value = 528;
+              g.gain.value = 0.08;
+              osc.connect(g).connect(ctx.destination);
+              osc.start();
+              g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.6);
+              osc.stop(ctx.currentTime + 2.6);
+            } catch {}
+            const token = localStorage.getItem('zen_token');
+            if (token && token !== 'guest_token') {
+              axios.post(
+                `${API}/sparks/immersion`,
+                { seconds: 6, zone: 'bell_ring' },
+                { headers: { Authorization: `Bearer ${token}` } },
+              ).catch(() => {});
+            }
+            window.dispatchEvent(new CustomEvent('sovereign:immersion-tick'));
+            toast.success('+2 Sparks · bell resonance', { duration: 1800 });
+          }}
+          testid="meditation-prop-bell"
+        />
+        <ChamberProp
+          x={80} y={70} size={58}
+          label="MANDALA"
+          icon={Flower}
+          color="#F472B6"
+          onActivate={() => setMode('constellation')}
+          testid="meditation-prop-mandala"
+        />
+      </>
+    )}
+
+    <BreathPacerGame
+      open={breathGameOpen}
+      onClose={() => setBreathGameOpen(false)}
+      color="#D8B4FE"
+    />
+
     <div className="pt-4 pb-2 px-1 max-w-3xl mx-auto" style={{ background: 'transparent' }}>
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-2 mb-1">

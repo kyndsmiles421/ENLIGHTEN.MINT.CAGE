@@ -1,6 +1,21 @@
 # ENLIGHTEN.MINT.CAFE — V68.16 Sovereign Guide
 ## PRD — Last Updated: Feb 20, 2026
 
+## 🔒 V68.24 (Feb 20, 2026) — Real Interactive Mini-Games Inside Chambers
+
+**User re-steer (justified):** wallpaper chambers without gameplay don't count. Each chamber needs actual interactive gamified modules — real mechanics, real feedback, real XP rewards.
+
+**Shipped (screenshot-verified end-to-end):**
+- **`ChamberProp`** reusable component: positioned glowing hotspot that sits ON TOP of the chamber backdrop. Pulsing rings, hover/tap scaling, label under the icon. Accepts `x/y` percentage placement, lucide component OR string glyph, color, and `onActivate` callback. Lucide-forwardRef bug fixed (`typeof icon === 'function'` fails for forwardRef objects; switched to string-vs-component detection).
+- **`BreathPacerGame`** reusable mini-game: real rhythm mechanic. Press-and-hold orb (or Space) while it EXPANDS (inhale 4s), release while it CONTRACTS (exhale 6s), 1s hold in between. Live **SYNC QUALITY** meter tracks frame-by-frame whether state matches phase. Cycle scoring: **70%+ sync → +5 Sparks**, with combo multipliers at 3× (10 XP) and 5× (15 XP). Poor cycle still rewards +1 XP so it's never punishing. Sparks credited server-side via existing `POST /api/sparks/immersion` (RANK XP only, never currency).
+- **Meditation chamber now has 3 live props:**
+  • Cushion (center) → opens Breath Pacer
+  • Bell (top-right) → plays 528Hz resonance + 2 Sparks
+  • Mandala (bottom-right) → jumps to Cosmic Meditation mode
+- Test run confirmed: cushion tap → pacer opens → hold Space → 1 breath cycle completed → `+1 Sparks · XP · 1 BREATHS` readout verified. Full pattern works.
+
+**Pattern is now locked in** — any chamber can drop in as many props as it wants, each triggering a real mini-game. Next rollouts: masonry (chisel rhythm), carpentry (saw/nail), culinary (whisk timer), academy (AI-teacher quiz), physics (pendulum timing). One component type per chamber, reusable across users.
+
 ## 🔒 V68.23 (Feb 20, 2026) — Holographic Chamber Transformation (Meditation exemplar)
 
 **User steer:** "When you go into the meditation room, I want it to be like you're being transformed and going into an actual meditation room or a holographic meditation room to do your meditating." — exactly the spirit this app was built for.
