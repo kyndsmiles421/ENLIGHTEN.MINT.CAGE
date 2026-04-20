@@ -58,6 +58,11 @@ export default function Herbology() {
         zone="herbology_pluck"
         completionMsg="HARVEST COMPLETE"
         completionXP={12}
+        teach={{
+          topic: 'Sacred Herbalism — the ritual of plucking and honoring plant allies',
+          category: 'herbology',
+          context: 'Weave history, ethics of wildcrafting, and practical identification tips a real user can apply outdoors tomorrow.',
+        }}
         nextGame={[
           {
             mode: 'break',
@@ -70,6 +75,11 @@ export default function Herbology() {
             zone: 'herbology_brew',
             completionMsg: 'ELIXIR BREWED',
             completionXP: 14,
+            teach: {
+              topic: 'Mortar and pestle technique — why grinding releases the plant\u2019s essence',
+              category: 'herbology',
+              context: 'Cover cellular rupture, volatile oils, and the golden-ratio rhythm that classical herbalists use to avoid oxidation.',
+            },
           },
           {
             mode: 'rhythm',
@@ -81,6 +91,11 @@ export default function Herbology() {
             zone: 'herbology_dose',
             completionMsg: 'APOTHECARY MASTERY',
             completionXP: 18,
+            teach: {
+              topic: 'Dose titration and the apothecary\u2019s principle of minimum effective dose',
+              category: 'herbology',
+              context: 'Explain bioavailability, contraindications, and how a modern practitioner builds a weekly tincture protocol.',
+            },
           },
         ]}
       />

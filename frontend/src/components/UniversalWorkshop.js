@@ -493,7 +493,25 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
             zone: `${moduleId}_${t.id}`,
             completionMsg: theme.msg,
             completionXP: 12,
+            teach: {
+              topic: `${t.name} — ${t.action_verb || theme.verb.toLowerCase()} on ${selMat?.name || matLabel}`,
+              category: apiModuleId,
+              context: `Trade: ${moduleId}. Tool description: ${t.description || ''}. Classical technique: ${t.technique || ''}. Teach the user the actual craft concept, safety, and a specific progressive exercise they can do today.`,
+            },
           }));
+
+          // Teach payload for the current stage (material intro or current tool)
+          const currentTeach = isTool && selTool
+            ? {
+                topic: `${selTool.name} — ${selTool.action_verb || theme.verb.toLowerCase()} on ${selMat?.name || matLabel}`,
+                category: apiModuleId,
+                context: `Trade: ${moduleId}. Tool: ${selTool.description || ''}. Technique: ${selTool.technique || ''}. Teach the craft concept and a progressive drill.`,
+              }
+            : (selMat ? {
+                topic: `${selMat.name} — properties and how a ${moduleId} practitioner chooses it`,
+                category: apiModuleId,
+                context: `Material: ${selMat.origin || ''}. Teach geological/botanical/culinary context, grain/structure considerations, and why this material rewards the ${theme.verb.toLowerCase()} action.`,
+              } : null);
 
           return (
             <ChamberMiniGame
@@ -509,9 +527,9 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
               zone={zoneBase}
               completionMsg={theme.msg}
               completionXP={12}
+              teach={currentTeach}
               nextGame={nextGame}
               onGoDeeper={(next) => {
-                // Keep the selected tool in sync with the game title.
                 const matching = tools.find(t => t.id === (next.zone || '').replace(`${moduleId}_`, ''));
                 if (matching) setSelTool(matching);
               }}

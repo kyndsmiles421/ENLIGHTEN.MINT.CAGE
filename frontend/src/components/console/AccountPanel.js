@@ -2,9 +2,10 @@
  * AccountPanel.js — User account, share, profile, and auth controls
  * Extracted from UnifiedCreatorConsole.js
  */
-import React from 'react';
-import { User, Share2, LogOut, LogIn, Globe, ShoppingCart, Lock, Image as ImageIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { User, Share2, LogOut, LogIn, Globe, ShoppingCart, Lock, Image as ImageIcon, QrCode } from 'lucide-react';
 import { useScene } from '../SceneEngine';
+import MyQRSheet from '../SovereignQR';
 
 function SceneButton() {
   const scene = useScene();
@@ -26,6 +27,7 @@ function SceneButton() {
 export default function AccountPanel({ authToken, authUser, tier, handleBroadcast, handleSever, handleNav, loadStore }) {
   const isLoggedIn = !!(authToken && authToken !== 'guest_token');
   const userName = authUser?.name || null;
+  const [qrOpen, setQrOpen] = useState(false);
 
   return (
     <div className="p-3 space-y-2">
@@ -49,6 +51,14 @@ export default function AccountPanel({ authToken, authUser, tier, handleBroadcas
         </button>
 
         <SceneButton />
+
+        <button onClick={() => setQrOpen(true)}
+          className="flex items-center gap-2 p-3 rounded-xl active:scale-95"
+          style={{ background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.25)' }}
+          data-testid="account-qr">
+          <QrCode size={14} style={{ color: '#C084FC' }} />
+          <div><div className="text-[10px] font-bold text-purple-400">My QR</div><div className="text-[7px] text-white/20">Sovereign link</div></div>
+        </button>
 
         <button onClick={() => handleNav('/cosmic-profile')}
           className="flex items-center gap-2 p-3 rounded-xl active:scale-95"
@@ -100,6 +110,7 @@ export default function AccountPanel({ authToken, authUser, tier, handleBroadcas
         <Lock size={12} style={{ color: 'rgba(255,255,255,0.2)' }} />
         <div className="text-[8px] text-white/20">Trust & Compliance</div>
       </button>
+      <MyQRSheet open={qrOpen} onClose={() => setQrOpen(false)} />
     </div>
   );
 }

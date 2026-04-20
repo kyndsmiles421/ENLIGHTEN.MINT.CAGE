@@ -113,6 +113,15 @@ export default function ChamberMiniGame({
   // or an array of configs to chain automatically.
   nextGame = null,
   onGoDeeper = null,       // optional callback when user taps CONTINUE DEEPER
+  // V68.30 — Education wiring. Each game can carry a `teach` payload:
+  //   teach: { topic: "Grinding herbs with mortar and pestle",
+  //            category: "herbology",
+  //            context: "Explain the alchemical principle and real benefits" }
+  // When the user completes the stage they'll see a LEARN button in the
+  // completion card. Tapping it POSTs to /api/knowledge/deep-dive (GPT-5.2,
+  // already live on the backend) and renders the returned markdown
+  // inline — right where the action happened.
+  teach = null,
 }) {
   const sensory = useSensory() || {};
   const brain = useSovereignUniverse();
@@ -146,6 +155,7 @@ export default function ChamberMiniGame({
   const effZone          = stageOverride?.zone          ?? zone;
   const effCompletionMsg = stageOverride?.completionMsg ?? completionMsg;
   const effCompletionXP  = stageOverride?.completionXP  ?? completionXP;
+  const effTeach         = stageOverride?.teach         ?? teach;
 
   // Read the adaptive level for this zone (0 = first run).
   const levelKey = `emcafe_gamelvl_${effZone}`;
@@ -164,6 +174,33 @@ export default function ChamberMiniGame({
   const [cleared, setCleared] = useState(0);
   const [done, setDone] = useState(false);
   const [flashAt, setFlashAt] = useState(null); // {x,y,key}
+  // V68.30 — inline lesson state for the LEARN button
+  const [lessonLoading, setLessonLoading] = useState(false);
+  const [lessonText, setLessonText] = useState(null);
+  const loadLesson = useCallback(async () => {
+    if (!effTeach?.topic) return;
+    setLessonLoading(true);
+    try {
+      const token = localStorage.getItem('zen_token');
+      const headers = token && token !== 'guest_token' ? { Authorization: `Bearer ${token}` } : {};
+      const res = await axios.post(
+        `${API}/knowledge/deep-dive`,
+        {
+          topic: effTeach.topic,
+          category: effTeach.category || 'general',
+          context: effTeach.context || `Teach this in the context of the ${effZone} chamber activity.`,
+        },
+        { headers, timeout: 60000 },
+      );
+      setLessonText(res.data?.content || 'No teaching returned — try again.');
+      try { fireBrain('learn', { topic: effTeach.topic }); } catch { /* noop */ }
+    } catch (err) {
+      setLessonText('The teaching could not load right now. Your progress is safe — try again in a moment.');
+    } finally {
+      setLessonLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effTeach, effZone]);
 
   const fireBrain = useCallback((kind, meta = {}) => {
     try {
@@ -207,6 +244,7 @@ export default function ChamberMiniGame({
   useEffect(() => {
     if (open) {
       setXp(0); setCleared(0); setDone(false); setFlashAt(null);
+      setLessonText(null); setLessonLoading(false);
       setLevel(readLevel());
       // Announce entry to the brain so quests that require "visit X" fire.
       try {
@@ -377,6 +415,49 @@ export default function ChamberMiniGame({
               <div style={{ fontSize: 13, color: '#fff', letterSpacing: 2 }}>
                 +{scaledCompletionXP} BONUS SPARKS
               </div>
+
+              {effTeach?.topic && !lessonText && (
+                <button
+                  type="button"
+                  onClick={loadLesson}
+                  disabled={lessonLoading}
+                  data-testid={`chamber-game-learn-${effZone}`}
+                  style={{
+                    marginTop: 10,
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px dashed rgba(255,255,255,0.35)',
+                    color: '#fff',
+                    padding: '6px 14px', borderRadius: 999,
+                    fontSize: 9, letterSpacing: 3, cursor: 'pointer',
+                    fontFamily: 'monospace', opacity: lessonLoading ? 0.6 : 1,
+                  }}
+                >
+                  {lessonLoading ? 'TEACHING…' : `LEARN · ${effTeach.topic.toUpperCase()}`}
+                </button>
+              )}
+
+              {lessonText && (
+                <div
+                  data-testid={`chamber-game-lesson-${effZone}`}
+                  style={{
+                    marginTop: 10,
+                    maxHeight: 220,
+                    overflowY: 'auto',
+                    textAlign: 'left',
+                    fontSize: 10, lineHeight: 1.55,
+                    color: 'rgba(255,255,255,0.82)',
+                    padding: 10,
+                    background: 'rgba(255,255,255,0.04)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: 8,
+                    whiteSpace: 'pre-wrap',
+                    fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+                  }}
+                >
+                  {lessonText}
+                </div>
+              )}
+
               <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 10, flexWrap: 'wrap' }}>
                 {chain.length > 0 && (
                   <button
@@ -388,6 +469,7 @@ export default function ChamberMiniGame({
                       setStageOverride(next);
                       // Reset in-stage state so the next level starts clean
                       setXp(0); setCleared(0); setDone(false); setFlashAt(null);
+                      setLessonText(null); setLessonLoading(false);
                       setLevel(() => {
                         try {
                           const v = parseInt(localStorage.getItem(`emcafe_gamelvl_${next.zone || effZone}`) || '0', 10);
