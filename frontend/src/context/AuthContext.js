@@ -82,12 +82,17 @@ export function AuthProvider({ children }) {
     return res.data;
   };
 
-  // GATEKEEPER: Memoize authHeaders to prevent object recreation on every render
-  // This is THE ROOT CAUSE of the "Maximum update depth exceeded" cascade
-  const authHeaders = useMemo(() => 
-    token ? { Authorization: `Bearer ${token}` } : {},
-    [token]
-  );
+  // GATEKEEPER V68.29: authHeaders is a live getter that always reads the
+  // current token from localStorage first, falling back to state. This kills
+  // the hydration race where a component captured a stale memoized value
+  // (e.g. Bearer guest_token) and then made an authenticated fetch() after
+  // the real token had been written to localStorage.
+  const authHeaders = useMemo(() => {
+    const liveToken = (typeof window !== 'undefined' && localStorage.getItem('zen_token')) || token;
+    if (!liveToken || liveToken === 'guest_token') return {};
+    return { Authorization: `Bearer ${liveToken}` };
+    // token is intentionally kept as a dep so consumers re-render on login/logout
+  }, [token]);
 
   // GATEKEEPER: Memoize the entire context value
   const value = useMemo(() => ({

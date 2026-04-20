@@ -23,6 +23,8 @@ export const CLASS_COLORS = {
 
 export function ClassProvider({ children }) {
   const { token, authHeaders } = useAuth();
+  // V68.29 Hydration-Race Fix: guest_token is a sentinel, not real auth
+  const hasAuth = !!(token && token !== 'guest_token');
   const [activeClass, setActiveClass] = useState(null);
   const [classData, setClassData] = useState(null);
   const [xp, setXP] = useState(0);
@@ -30,7 +32,7 @@ export function ClassProvider({ children }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!token) { setActiveClass(null); setClassData(null); return; }
+    if (!hasAuth) { setActiveClass(null); setClassData(null); return; }
     fetch(`${API}/api/classes/mine`, { headers: authHeaders })
       .then(r => r.json())
       .then(d => {

@@ -21,6 +21,9 @@ const ModalityContext = createContext({
 
 export function ModalityProvider({ children }) {
   const { token, authHeaders } = useAuth();
+  // V68.29 Hydration-Race Fix: treat 'guest_token' as unauthenticated so we
+  // never fire auth-required fetches without a real Bearer token.
+  const hasAuth = !!(token && token !== 'guest_token');
   const [modality, setModality] = useState('architect');
   const [modalityData, setModalityData] = useState(null);
   const [intensity, setIntensity] = useState('guided');
@@ -32,7 +35,7 @@ export function ModalityProvider({ children }) {
 
   // Fetch modality on mount
   useEffect(() => {
-    if (!token) return;
+    if (!hasAuth) return;
     fetch(`${API}/api/academy/modality`, { headers: authHeaders })
       .then(r => r.json())
       .then(d => {
@@ -44,7 +47,7 @@ export function ModalityProvider({ children }) {
 
   // Fetch intensity on mount
   useEffect(() => {
-    if (!token) return;
+    if (!hasAuth) return;
     fetch(`${API}/api/academy/intensity`, { headers: authHeaders })
       .then(r => r.json())
       .then(d => {
@@ -58,7 +61,7 @@ export function ModalityProvider({ children }) {
 
   // Check auto-scale periodically (every 60s)
   useEffect(() => {
-    if (!token || !autoAdvance) return;
+    if (!hasAuth || !autoAdvance) return;
     const check = () => {
       fetch(`${API}/api/academy/auto-scale`, { headers: authHeaders })
         .then(r => r.json())

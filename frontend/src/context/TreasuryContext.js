@@ -17,6 +17,8 @@ const TreasuryContext = createContext({
 
 export function TreasuryProvider({ children }) {
   const { token, authHeaders } = useAuth();
+  // V68.29 Hydration-Race Fix: guest_token is a sentinel, not a real auth
+  const hasAuth = !!(token && token !== 'guest_token');
   const [balance, setBalance] = useState(0);
   const [dust, setDust] = useState(0);
   const [gems, setGems] = useState(0);
@@ -24,16 +26,16 @@ export function TreasuryProvider({ children }) {
   const [loading, setLoading] = useState(false);
 
   const refreshBalance = useCallback(async () => {
-    if (!token) return;
+    if (!hasAuth) return;
     try {
       const res = await fetch(`${API}/api/treasury/balance`, { headers: authHeaders });
       const data = await res.json();
       setBalance(data.balance || 0);
     } catch {}
-  }, [token, authHeaders]);
+  }, [hasAuth, authHeaders]);
 
   const refreshHubWallet = useCallback(async () => {
-    if (!token) return;
+    if (!hasAuth) return;
     try {
       const res = await fetch(`${API}/api/bank/wallet`, { headers: authHeaders });
       const data = await res.json();

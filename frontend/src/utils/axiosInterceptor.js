@@ -14,11 +14,19 @@ const cosmicToast = (msg, type = 'error') => {
 
 export function setupAxiosInterceptors() {
   // Request interceptor: attach auth token when available
+  // V68.29 Hydration-Race Fix: ALWAYS read token fresh from localStorage at request time
+  // and ALWAYS overwrite a stale `Bearer guest_token` or stale memoized Authorization
+  // that components may have captured from AuthContext before hydration completed.
   axios.interceptors.request.use((config) => {
     const zenToken = localStorage.getItem('zen_token');
     const hasRealToken = zenToken && zenToken !== 'guest_token';
+    const existingAuth = config.headers?.Authorization || '';
+    const existingIsStaleGuest = existingAuth === 'Bearer guest_token' || existingAuth === 'Bearer null' || existingAuth === 'Bearer undefined';
+
     if (hasRealToken) {
-      config.headers.Authorization = config.headers.Authorization || `Bearer ${zenToken}`;
+      // Always prefer the fresh localStorage token. Overwrite any stale
+      // Authorization header captured before hydration completed.
+      config.headers.Authorization = `Bearer ${zenToken}`;
     } else {
       // Guest user — only abort endpoints that explicitly require auth
       // These are user-specific data fetches that will 401 anyway
@@ -29,6 +37,8 @@ export function setupAxiosInterceptors() {
         '/sages/progress', '/academy/', '/activity/track', '/ai-visuals/my-avatar',
         '/atmosphere/gallery', '/atmosphere/save', '/breathing/my-custom',
         '/breathing/save-custom', '/breathing/custom/',
+        '/starseed/my-', '/sparks/wallet', '/sparks/cards', '/quests/', '/profile/me',
+        '/sovereign/status', '/sovereign-mastery/', '/auth/me',
       ];
       const needsAuth = authRequired.some(p => url.includes(p));
       if (needsAuth) {

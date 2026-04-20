@@ -1,4 +1,4 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.29)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.30)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as a Wellness / Mental Acuity app.
@@ -6,43 +6,43 @@ Sovereign Unified Engine / PWA targeting Google Play Store submission as a Welln
 ## Core Rules
 - **Flatland Rule**, **Metabolic Seal** (<800KB), **Closed-Loop Economy** (Sparks earn-only), **System-wide Gamification**, **Epilepsy Safety**, **Silence Shield**, **Spotify Loophole**.
 
-## V68.29 — Drill-Down Chains + Portal Props (Feb 2026)
-1. ✅ **ChamberProp portal fix** — every interactive prop is now rendered through `ReactDOM.createPortal(..., document.body)` with the `.chamber-prop-portal` CSS class forcing `position: fixed !important`. Framer-motion's transform containment no longer collapses props into the HUD pane. Confirmed: Meditation props (BREATHE 22%/55%, RING BELL 82%/22%, MANDALA 82%/78%) render at their true viewport coordinates with **NONE** overlapping.
-2. ✅ **Drill-down chains** — `ChamberMiniGame` accepts `nextGame` prop (single config or array). On completion the user taps **"CONTINUE DEEPER →"** and the same overlay swaps stage without closing. Each stage can override mode/verb/icon/title/target-count/zone/completion-msg/completion-xp. Emits `<zone>:<mode>:go_deeper` brain signal.
-3. ✅ **Herbology drill-down** — PLUCK (collect, 8 herbs) → BREW (break, 4 × 4 hits grinding) → DOSE (rhythm, 5 PHI-aligned pours). User earns 12 + 14 + 18 = 44 completion-sparks plus micro-sparks per tap.
-4. ✅ **UniversalWorkshop drill-down** — every trade workshop auto-chains the current tool's game into up to 4 remaining tools. Masonry chisel → mallet → trowel → rubber float → level, all themed STRIKE with adaptive difficulty. Select-state stays in sync via `onGoDeeper` callback updating `selTool`.
-5. ✅ **SovereignMath.safeChamberLayout(n, opts)** — PHI-weighted collision-safe arc layout helper (unused today, available for future pages that want auto-placed props).
+## V68.30 — Exhaustive "No-Skip Deep Audit" + Hydration-Race Elimination (Feb 2026)
+1. ✅ **Full-system audit** (`/app/test_reports/iteration_362.json`) — Backend 58/60 (97%), Frontend PASS on every Sovereign Hub pillar, Command Console's 11 tabs, Cosmic Mixer, Holographic Chambers (herbology pluck/brew/dose, meditation 22/55·82/22·82/78, masonry drill-down, aromatherapy, geology), Starseed Adventure (Begin Adventure ACTIVE, all narrative opacities correct), QR code with Om symbol, all 10 chamber-backdrop types, Flatland + Silence Shield compliance (0 fixed modals, 0 auto-play).
+2. ✅ **401 Hydration-Race KILLED** — root cause: `authHeaders` memo could be captured as `{}` or `Bearer guest_token` by fetch()-based context providers before token state hydrated; the axios interceptor used `||` fallback that preserved the stale header. Fixes:
+    - `utils/axiosInterceptor.js` — always overwrites Authorization with fresh `localStorage.getItem('zen_token')` when a real token exists; expands the guest-abort list to include `/sovereign/status`, `/sovereign-mastery/`, `/starseed/my-`, `/sparks/wallet`, `/sparks/cards`, `/quests/`, `/profile/me`, `/auth/me`.
+    - `context/AuthContext.js` — `authHeaders` now reads live from localStorage inside the memo, returns `{}` for guest_token sentinel (prevents `Bearer guest_token` headers from ever being sent).
+    - `context/ModalityContext.js`, `context/TreasuryContext.js`, `context/ClassContext.js` — introduce `hasAuth = token && token !== 'guest_token'` and gate all fetch() effects behind it.
+    - Verified: 16-hop rapid stress test → **0 API-level 401 errors** (was 84-99 in iter 361/362).
+
+## V68.29 — Drill-Down Chains + Portal Props (shipped)
+1. ✅ ChamberProp portal fix, drill-down chains, Herbology/Universal drill-down trees, SovereignMath.safeChamberLayout.
 
 ## V68.28 — Sovereign Advancement (shipped)
-- PHI-Fader audio (every mixer gain uses `phiVolumeCurve`)
-- Fibonacci snap-grid CSS vars (`--fib-1..10`, `--phi-ease`)
-- Resonance Haptics (`ChamberMiniGame.haptic()` vibrates at the active mixer tone period)
-- Sovereign Quest Pulse (1.618s heartbeat + light-surge ring on milestone)
+- PHI-Fader audio, Fibonacci snap-grid CSS vars, Resonance Haptics, Sovereign Quest Pulse.
 
 ## V68.27 — Resonance Presets
-19 trade recipes baked into MixerContext (`applyResonancePreset`), auto-primed on workshop entry (Silence Shield respected).
+19 trade recipes baked into MixerContext, auto-primed on workshop entry.
 
 ## V68.26 — System-Wide Gamification
-- `GameModuleWrapper` auto-wraps 6 game modules via `MODULE_CHAMBER_MAP`.
-- `InteractiveModule` auto-wraps 9 catalogs via `CATEGORY_CHAMBER_MAP`.
-- `UniversalWorkshop` themes every trade via `MODULE_GAME_THEME` (STRIKE / SAW / KNEAD / ALIGN / MATCH / PLANT / CARE / VERSE).
-- `ChamberMiniGame` — progressive, adaptive, brain-signal-wired, mixer-tick-listening game machine.
+- GameModuleWrapper auto-wrap, InteractiveModule auto-wrap, UniversalWorkshop themes, ChamberMiniGame machine.
 
 ## Console Tabs
-11 tabs tier-gated (BASE / SEED / ARTISAN / SOVEREIGN). Owner account (kyndsmiles@gmail.com) sees all 11.
+11 tabs tier-gated. Owner (kyndsmiles@gmail.com) sees all 11.
 
 ## Deferred (v1.1)
-- #1 Recursive LOD, #6 Accelerometer shimmer, #8 Space-fold torus, #9 AI TTS resonance, #10 Sovereign Audit export, token refresh polish, backdrop WebP compression.
+- P1: Background token refresh polish (underlying race now eliminated; refresh endpoint not yet wired for long sessions).
+- P1: **Chamber backdrop WebP compression** — `/api/ai-visuals/chamber` still returns 1.8MB+ PNGs; compress to ~400KB WebP for Metabolic Seal.
+- P2: Recursive LOD, accelerometer shimmer, space-fold fast travel, AI TTS resonance, Sovereign Audit export.
+- Minor: GET /api/knowledge/deep-dive currently POST-only (returns 405 on GET); align verb or update frontend callers.
+- Minor: Owner account has role='user' in DB (login auto-upgrades but /profile/me still shows user); optional data cleanup.
 
 ## Key Files
-- `/app/frontend/src/utils/SovereignMath.js` — PHI kernel + snap-grid + safeChamberLayout
-- `/app/frontend/src/components/HolographicChamber.js` — chamber shell + light-surge
-- `/app/frontend/src/components/ChamberProp.js` — portal + fixed-position prop
-- `/app/frontend/src/components/games/ChamberMiniGame.js` — game machine + drill-down
-- `/app/frontend/src/components/UniversalWorkshop.js` — trade drill-down through all tools
-- `/app/frontend/src/context/SovereignUniverseContext.js` — brain + 1.618s pulse + surge fire
-- `/app/frontend/src/context/MixerContext.js` — φ volumes + resonance presets + mixer-tick
-- `/app/frontend/src/index.css` — Fibonacci grid tokens + `.chamber-prop-portal` pin
+- `/app/frontend/src/utils/axiosInterceptor.js` — V68.30 guest-abort + token-refresh
+- `/app/frontend/src/context/AuthContext.js` — V68.30 live authHeaders
+- `/app/frontend/src/context/{Treasury,Modality,Class}Context.js` — hasAuth gating
+- `/app/frontend/src/utils/SovereignMath.js` — PHI kernel
+- `/app/frontend/src/components/HolographicChamber.js` — chamber shell
+- `/app/frontend/src/components/games/ChamberMiniGame.js` — drill-down
 
 ## Credentials
-Owner — `kyndsmiles@gmail.com` / `Sovereign2026!` (role=admin, is_owner=true, tier=creator)
+Owner — `kyndsmiles@gmail.com` / `Sovereign2026!` (see `/app/memory/test_credentials.md`)
