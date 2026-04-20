@@ -186,6 +186,29 @@ html[data-sov-skin="refracted-crystal"] [data-testid="channeling-stage"] {
   position: relative;
 }
 
+/* ═════════════════════════════════════════════════════════════════════
+   V68.33 — GAMER MODE · Stealth Education
+   When enabled, every numeric/technical telemetry surface hides so the
+   Sovereign sees a clean cinematic world — pure Cormorant, no readouts.
+   The LabStage stays OPEN (Sovereign can still opt in), but it doesn't
+   show live stats by default. This honors the Dual-Path Protocol:
+   Casual/Gamer sees a high-fidelity sensory experience; Scholar sees
+   the full instrument.
+   ═════════════════════════════════════════════════════════════════════ */
+html[data-gamer-mode="true"] .sov-telemetry,
+html[data-gamer-mode="true"] [data-telemetry],
+html[data-gamer-mode="true"] [data-testid="signature-pill"] .sov-telemetry {
+  display: none !important;
+}
+html[data-gamer-mode="true"] [data-testid="tool-drawer"] [data-testid*="blade-"] > .mt-6,
+html[data-gamer-mode="true"] [data-testid="tool-drawer"] [data-testid*="blade-"] .sov-telemetry {
+  display: none !important;
+}
+/* Keep only the Cormorant-voiced title-card content visible */
+html[data-gamer-mode="true"] [data-testid="lab-stage"] [data-telemetry-block] {
+  display: none !important;
+}
+
 /* V68.31 — SOVEREIGN ENTITY ICON TREATMENT (Hybrid Neo-Kyoto × Crystalline)
    Magenta + cyan neon rim × gold/violet refracted bloom, pulsing at a
    528Hz sub-harmonic (528/1024 ≈ 515ms). Applied to any icon with the

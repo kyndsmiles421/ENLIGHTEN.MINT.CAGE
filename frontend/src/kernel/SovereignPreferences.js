@@ -23,7 +23,7 @@ const LS_KEY = 'sovereign_preferences_v1';
 
 const DEFAULTS = Object.freeze({
   audio:    { frequency: 'silence' },
-  visual:   { skin: 'neo-kyoto', crystalFidelity: '2d' },
+  visual:   { skin: 'neo-kyoto', crystalFidelity: '2d', gamerMode: false },
   motion:   { reduce: false },
   learning: {
     difficulty: 'adaptive',
@@ -78,6 +78,7 @@ function writeRaw(next) {
   // Reflect visual skin on <html> for global CSS theming
   if (typeof document !== 'undefined') {
     document.documentElement.setAttribute('data-sov-skin', next.visual.skin);
+    document.documentElement.setAttribute('data-gamer-mode', next.visual.gamerMode ? 'true' : 'false');
   }
 }
 
@@ -142,6 +143,10 @@ function setCalibration(partial) {
 
 function getCalibration() { return { ...cache.calibration }; }
 
+function setGamerMode(value) {
+  writeRaw({ ...cache, visual: { ...cache.visual, gamerMode: !!value } });
+}
+
 function subscribe(fn) {
   listeners.add(fn);
   return () => listeners.delete(fn);
@@ -150,6 +155,7 @@ function subscribe(fn) {
 // Initial <html> skin reflection so CSS applies at first paint
 if (typeof document !== 'undefined') {
   document.documentElement.setAttribute('data-sov-skin', cache.visual.skin);
+  document.documentElement.setAttribute('data-gamer-mode', cache.visual.gamerMode ? 'true' : 'false');
 }
 if (typeof window !== 'undefined') {
   window.__sovereignPreferences = { get, setAudioFrequency, setVisualSkin, setReduceMotion, subscribe };
@@ -159,6 +165,7 @@ export const SovereignPreferences = {
   get, getAudioFrequency, getVisualSkin, getReduceMotion, getCalibration,
   setAudioFrequency, setVisualSkin, setReduceMotion,
   setDifficulty, setLearningWeighting, setCrystalFidelity, setCalibration,
+  setGamerMode,
   subscribe,
 };
 

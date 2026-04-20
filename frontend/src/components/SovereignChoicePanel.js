@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Radio, Gem, Sparkles, Brain, Gauge, Layers } from 'lucide-react';
+import { Radio, Gem, Sparkles, Brain, Gauge, Layers, Gamepad2 } from 'lucide-react';
 import SovereignPreferences from '../kernel/SovereignPreferences';
 
 /**
@@ -149,6 +149,46 @@ export default function SovereignChoicePanel() {
                 whileTap={{ scale: 0.97 }}
                 onClick={() => SovereignPreferences.setCrystalFidelity(opt.id)}
                 data-testid={`fidelity-${opt.id}`}
+                className="px-3 py-2.5 rounded-xl text-left transition-all"
+                style={{
+                  background: active ? `${opt.color}18` : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${active ? opt.color + '66' : 'rgba(255,255,255,0.08)'}`,
+                  boxShadow: active ? `0 0 24px ${opt.color}33` : 'none',
+                }}
+              >
+                <div className="text-[12px] font-bold" style={{ color: active ? opt.color : 'var(--text-primary)' }}>
+                  {opt.label}
+                </div>
+                <div className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  {opt.hint}
+                </div>
+              </motion.button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Gamer Mode toggle — stealth education */}
+      <div className="mb-4">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Gamepad2 size={12} style={{ color: 'var(--text-muted)' }} />
+          <p className="text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--text-muted)' }}>
+            Interface Mode
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { id: false, label: 'Scholar Mode', hint: 'Full telemetry · JetBrains Mono readouts', color: '#38BDF8' },
+            { id: true,  label: 'Gamer Mode',   hint: 'Cinematic only · numbers hidden',         color: '#F472B6' },
+          ].map(opt => {
+            const active = prefs.visual.gamerMode === opt.id;
+            return (
+              <motion.button
+                key={String(opt.id)}
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => SovereignPreferences.setGamerMode(opt.id)}
+                data-testid={`mode-${opt.id ? 'gamer' : 'scholar'}`}
                 className="px-3 py-2.5 rounded-xl text-left transition-all"
                 style={{
                   background: active ? `${opt.color}18` : 'rgba(255,255,255,0.03)',
