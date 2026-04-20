@@ -20,6 +20,7 @@ import CalibrationLens from '../components/CalibrationLens';
 import SignaturePill from '../components/SignaturePill';
 import BuyTimePanel from '../components/BuyTimePanel';
 import TrialCountdown from '../components/TrialCountdown';
+import VisitorModeShield from '../components/VisitorModeShield';
 import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
@@ -234,6 +235,7 @@ export default function SovereignHub() {
   const [toolDrawerOpen, setToolDrawerOpen] = useState(false);
   const [lensOpen, setLensOpen] = useState(false);
   const [buyTimeOpen, setBuyTimeOpen] = useState(false);
+  const [visitorOpen, setVisitorOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 5);
@@ -425,6 +427,19 @@ export default function SovereignHub() {
         >
           ⌂ Gilded Path · Buy Time
         </button>
+        <button
+          onClick={() => setVisitorOpen(true)}
+          data-testid="open-visitor-shield"
+          className="group px-5 py-2.5 rounded-full text-[11px] uppercase tracking-[0.28em] font-bold transition-all"
+          style={{
+            background: 'rgba(244, 114, 182, 0.08)',
+            border: '1px solid rgba(244, 114, 182, 0.35)',
+            color: '#FBCFE8',
+            boxShadow: '0 0 22px rgba(244, 114, 182, 0.12)',
+          }}
+        >
+          ⌘ Visitor Shield
+        </button>
       </div>
       <ToolDrawer open={toolDrawerOpen} onClose={() => setToolDrawerOpen(false)} />
       <CalibrationLens open={lensOpen} onClose={() => setLensOpen(false)} />
@@ -592,6 +607,10 @@ export default function SovereignHub() {
           })}
         </div>
       </div>
+    </div>
+  );
+}
+   </div>
     </div>
   );
 }
