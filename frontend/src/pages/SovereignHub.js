@@ -19,6 +19,7 @@ import ToolDrawer from '../components/ToolDrawer';
 import CalibrationLens from '../components/CalibrationLens';
 import SignaturePill from '../components/SignaturePill';
 import BuyTimePanel from '../components/BuyTimePanel';
+import TrialCountdown from '../components/TrialCountdown';
 import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
@@ -378,7 +379,8 @@ export default function SovereignHub() {
       </div>
 
       {/* V68.32 — Blade Signature pill (live truth or pinned) */}
-      <div className="px-4 pb-3 flex justify-center">
+      <div className="px-4 pb-3 flex flex-col items-center gap-1">
+        <TrialCountdown />
         <SignaturePill />
       </div>
 
