@@ -222,6 +222,46 @@ async def generate_meditation_visual(
     return {"image_b64": image_b64, "theme": theme}
 
 
+# ═══════════════════════════════════════════════════════
+# HOLOGRAPHIC CHAMBERS — Full-bleed immersive scene backdrops
+# ═══════════════════════════════════════════════════════
+# A "chamber" is the AI-generated backdrop that wraps an activity page so
+# entering it feels like being transported into a real room / scene rather
+# than a flat UI. One endpoint, one cache per chamber_id, fast and cheap.
+
+CHAMBER_PROMPTS = {
+    "meditation": "Photorealistic holographic meditation chamber interior, circular obsidian platform at center with a single meditation cushion, floating crystalline mandala ring suspended above, soft golden volumetric light beams pouring down through starfield ceiling, ambient floating incense smoke, deep violet and warm-gold palette, ultra-wide cinematic composition, pristine cathedral-like stillness, tilt-shift depth, empty foreground ready for a figure to sit, atmospheric perspective",
+    "masonry": "Photorealistic master mason's workshop, golden-hour sunlight beaming through tall arched windows onto stacked limestone blocks and a large granite slab on a heavy oak workbench, chisels mallets and mason's square laid out, half-built stone arch in background, fine stone dust in the air, warm stone and iron palette, ultra-wide cinematic, documentary lighting, no people",
+    "carpentry": "Photorealistic timber-framer's workshop, wide-plank wooden floor, a half-built wooden house frame rising in the center with exposed rafters, sawdust drifting in shafts of late-afternoon sunlight, a workbench in the foreground covered with hand planes saws chisels and a framing hammer, warm amber and cedar tones, ultra-wide cinematic, documentary lighting, no people",
+    "culinary": "Photorealistic warm artisan bakery kitchen at dawn, marble counter dusted with flour in the foreground, a wooden rolling pin and ceramic bowl ready for dough, copper pots hanging above, a wood-fired stone hearth oven glowing in the background with fresh loaves, steam rising, golden-hour light through tall windows, cinematic wide composition, no people",
+    "academy": "Photorealistic grand sovereign academy hall, long oak lecture table with brass reading lamps, tall stained-glass windows letting in shafts of coloured light, walls lined with floor-to-ceiling bookshelves and astronomical charts, a large blackboard covered in elegant chalk equations at back, warm amber and teal palette, cinematic wide establishing shot, empty but alive with intellectual presence, no people",
+    "physics": "Photorealistic cinematic physics laboratory at night, polished stone counter with brass experimental apparatus — a pendulum, van-de-graaff generator, crystal optics bench with laser beams visible in fog, oscilloscope glowing cyan, ceiling painted with constellations, warm bronze and electric-blue palette, wide establishing shot, documentary lighting, no people",
+    "geology": "Photorealistic geologist's research cave, crystalline formations growing from the walls in amethyst emerald and gold, a central stone table holding geode samples and a rock hammer, soft bioluminescent glow from luminescent minerals, shafts of daylight filtering from a skylight above, warm earth and violet palette, ultra-wide cinematic, documentary lighting, no people",
+    "default": "Photorealistic holographic sovereign chamber, circular obsidian stage, suspended crystalline lattice ceiling projecting soft beams of light, deep violet and gold palette, ultra-wide cinematic establishing shot, peaceful and empowering atmosphere, no people",
+}
+
+
+@router.post("/ai-visuals/chamber")
+async def generate_chamber_backdrop(
+    data: dict = Body(...),
+    user=Depends(get_current_user),
+):
+    """Generate (or return cached) cinematic backdrop for a holographic chamber.
+
+    Body: { "chamber_id": "meditation" | "masonry" | "carpentry" | "culinary" | "academy" | "physics" | "geology" }
+
+    The image is cached by (chamber_id) so subsequent loads are instant and
+    the same user sees the same room every time they enter it — reinforcing
+    the "I'm in a real place" immersion the app is going for.
+    """
+    chamber_id = (data.get("chamber_id") or "default").lower()
+    prompt = CHAMBER_PROMPTS.get(chamber_id, CHAMBER_PROMPTS["default"])
+    image_b64 = await get_or_generate_image(prompt, "chamber", chamber_id)
+    if not image_b64:
+        raise HTTPException(status_code=500, detail="Failed to generate chamber backdrop")
+    return {"chamber_id": chamber_id, "image_b64": image_b64}
+
+
 @router.post("/ai-visuals/forecast")
 async def generate_forecast_visual(
     data: dict = Body(...),
