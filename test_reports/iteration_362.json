@@ -1,0 +1,198 @@
+{
+  "summary": "V68.28 EXHAUSTIVE AUDIT COMPLETE — ENLIGHTEN.MINT.CAFE Sovereign Unified Engine PWA. Backend: 58/60 tests passed (97%). Frontend: All core features functional. CRITICAL: 84-99 401 errors during rapid navigation indicate auth race condition. All 11 console tabs unlocked for owner. Starseed Adventure 'Begin Adventure' button ACTIVE (regression fixed). No auto-playing audio (SILENCE SHIELD compliant). Chamber backdrops rendering correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "GET /api/profile/me",
+        "issue": "Owner account (kyndsmiles@gmail.com) has role='user' instead of expected 'admin'. Login auto-upgrades to admin but profile/me still shows 'user'.",
+        "priority": "LOW"
+      },
+      {
+        "endpoint": "GET /api/knowledge/deep-dive",
+        "issue": "Returns 405 Method Not Allowed - endpoint expects POST not GET",
+        "priority": "LOW"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Auth token persistence during navigation",
+        "issue": "84-99 401 errors in console during rapid navigation between pages. Token exists in localStorage but AuthContext may have race condition during hydration.",
+        "affected_selectors": [],
+        "priority": "HIGH"
+      }
+    ],
+    "design_issues": [
+      {
+        "screen": "Chamber backdrops",
+        "issues": ["Asset size ~1.8MB+ per chamber (WebP compression pending - documented but not blocking)"]
+      }
+    ]
+  },
+  "pass_fail_table": {
+    "AUTH_FLOWS": {
+      "login_with_owner_credentials": "PASS",
+      "zen_token_persists_to_localStorage": "PASS",
+      "api_auth_me_returns_owner": "PASS",
+      "logout_clears_token": "PASS",
+      "guest_mode_reaches_hub": "PASS",
+      "401_race_during_navigation": "FAIL - 84-99 errors detected"
+    },
+    "SOVEREIGN_HUB": {
+      "9x9_crystalline_lattice_renders": "PASS",
+      "7_pillars_expand_collapse": "PASS",
+      "pillar_module_counts_visible": "PASS",
+      "module_links_route_successfully": "PASS",
+      "oracle_search_input_accepts_text": "PASS",
+      "realms_button_fires": "PASS",
+      "my_sanctuary_button_fires": "PASS",
+      "share_button_fires": "PASS",
+      "sign_out_button_fires": "PASS",
+      "daily_elemental_challenges_clickable": "PASS"
+    },
+    "COMMAND_CONSOLE_MIXER": {
+      "all_11_tabs_clickable": "PASS",
+      "orbit_tab": "PASS - UNLOCKED",
+      "mix_tab": "PASS - UNLOCKED",
+      "culture_tab": "PASS - UNLOCKED",
+      "audio_tab": "PASS - UNLOCKED",
+      "text_tab": "PASS - UNLOCKED",
+      "layer_tab": "PASS - UNLOCKED",
+      "rec_tab": "PASS - UNLOCKED",
+      "fx_tab": "PASS - UNLOCKED",
+      "ai_tab": "PASS - UNLOCKED",
+      "out_tab": "PASS - UNLOCKED",
+      "me_tab": "PASS - UNLOCKED",
+      "cosmic_mixer_solfeggio_frequencies": "PASS - 15 frequencies visible",
+      "master_slider_present": "PASS"
+    },
+    "HOLOGRAPHIC_CHAMBERS": {
+      "herbology_chamber_loads": "PASS",
+      "herbology_pluck_herbs_prop": "PASS",
+      "herbology_brew_elixir_prop": "PASS",
+      "meditation_chamber_loads": "PASS",
+      "masonry_workshop_loads": "PASS",
+      "aromatherapy_chamber_loads": "PASS",
+      "geology_rock_hounding_loads": "PASS",
+      "no_auto_audio_on_mount": "PASS"
+    },
+    "STARSEED_ADVENTURE": {
+      "begin_adventure_button_active": "PASS - NOT DEAD",
+      "lyran_character_selection": "PASS",
+      "andromedan_character_selection": "PASS",
+      "venusian_character_selection": "PASS",
+      "narrative_text_visible": "PASS - opacity: 1",
+      "api_starseed_my_characters_200": "PASS"
+    },
+    "QR_CODE": {
+      "qr_renders_on_profile": "PASS",
+      "share_edit_profile_buttons": "PASS"
+    },
+    "BACKEND_API": {
+      "POST_api_auth_login": "PASS - 200",
+      "GET_api_auth_me": "PASS - 200",
+      "POST_api_ai_visuals_chamber_geology": "PASS - 200",
+      "POST_api_ai_visuals_chamber_masonry": "PASS - 200",
+      "POST_api_ai_visuals_chamber_carpentry": "PASS - 200",
+      "POST_api_ai_visuals_chamber_culinary": "PASS - 200",
+      "POST_api_ai_visuals_chamber_herbology": "PASS - 200",
+      "POST_api_ai_visuals_chamber_aromatherapy": "PASS - 200",
+      "POST_api_ai_visuals_chamber_physics": "PASS - 200",
+      "POST_api_ai_visuals_chamber_academy": "PASS - 200",
+      "POST_api_ai_visuals_chamber_meditation": "PASS - 200",
+      "POST_api_ai_visuals_chamber_default": "PASS - 200",
+      "GET_api_sparks_wallet": "PASS - 200",
+      "POST_api_sparks_immersion": "PASS - 200",
+      "GET_api_sparks_cards": "PASS - 200",
+      "GET_api_quests_available": "PASS - 200",
+      "POST_api_quests_auto_detect": "PASS - 200",
+      "GET_api_starseed_my_characters": "PASS - 200",
+      "GET_api_starseed_origins": "PASS - 200",
+      "GET_api_profile_me": "PASS - 200"
+    },
+    "GAMIFICATION_INTEGRITY": {
+      "sparks_counter_increments": "PASS",
+      "sparks_never_decrements": "PASS - earn-only closed-loop"
+    },
+    "FLATLAND_SILENCE_SHIELD_COMPLIANCE": {
+      "no_fixed_position_modals": "PASS - 0 found",
+      "no_auto_play_audio": "PASS",
+      "opt_in_audio_only": "PASS"
+    },
+    "NAVIGATION_STRESS": {
+      "rapid_navigation_no_white_screen": "PASS",
+      "token_persists_across_navigation": "PASS",
+      "401_storm_count": "FAIL - 84-99 errors (>10 threshold)"
+    }
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v68_27_comprehensive.py",
+    "/app/backend/tests/test_v68_28_exhaustive_audit.py",
+    "/app/test_reports/pytest/pytest_v68_28_exhaustive.xml"
+  ],
+  "screenshot_gallery": [
+    "/app/test_reports/screenshots/iter_362/01_initial_load.jpg",
+    "/app/test_reports/screenshots/iter_362/02_pillar_expanded.jpg",
+    "/app/test_reports/screenshots/iter_362/03_auth_page.jpg",
+    "/app/test_reports/screenshots/iter_362/04_post_login.jpg",
+    "/app/test_reports/screenshots/iter_362/05_sovereign_hub.jpg",
+    "/app/test_reports/screenshots/iter_362/06_console.jpg",
+    "/app/test_reports/screenshots/iter_362/07_starseed.jpg",
+    "/app/test_reports/screenshots/iter_362/08_meditation.jpg",
+    "/app/test_reports/screenshots/iter_362/09_profile.jpg",
+    "/app/test_reports/screenshots/iter_362/10_settings.jpg",
+    "/app/test_reports/screenshots/iter_362/11_final_state.jpg",
+    "/app/test_reports/screenshots/iter_362/12_console_tabs.jpg",
+    "/app/test_reports/screenshots/iter_362/13_cosmic_mixer.jpg",
+    "/app/test_reports/screenshots/iter_362/14_herbology.jpg",
+    "/app/test_reports/screenshots/iter_362/15_herbology_pluck.jpg",
+    "/app/test_reports/screenshots/iter_362/16_masonry.jpg",
+    "/app/test_reports/screenshots/iter_362/17_aromatherapy.jpg",
+    "/app/test_reports/screenshots/iter_362/18_geology.jpg",
+    "/app/test_reports/screenshots/iter_362/19_starseed_characters.jpg",
+    "/app/test_reports/screenshots/iter_362/20_profile_qr.jpg"
+  ],
+  "action_items": [
+    "CRITICAL: Fix 401 race condition during rapid navigation - AuthContext hydration issue. Token exists in localStorage but not consistently passed during page transitions.",
+    "LOW: Update owner account role from 'user' to 'admin' in database or fix login auto-upgrade to persist",
+    "LOW: Fix GET /api/knowledge/deep-dive to accept GET method or update documentation"
+  ],
+  "critical_code_review_comments": [
+    "AUTH RACE CONDITION: StarseedAdventure.js has buildHeaders() workaround reading directly from localStorage - this pattern should be applied to AuthContext globally",
+    "CONSOLE TABS: All 11 tabs functional for owner - Orbit, Mix, Culture, Audio, Text, Layer, Rec, FX, AI, Out, Me",
+    "CHAMBER BACKDROPS: All 10 chamber types return valid images via POST /api/ai-visuals/chamber",
+    "STARSEED ADVENTURE: Begin Adventure button is ACTIVE - regression fixed",
+    "SILENCE SHIELD: No auto-playing audio detected - compliant",
+    "FLATLAND: No fixed-position modals detected - compliant"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_v68_28_exhaustive_audit.py"
+  ],
+  "success_rate": {
+    "backend": "97% (58/60 tests passed)",
+    "frontend": "95% (all core features working, 401 race condition during navigation)"
+  },
+  "test_credentials": "Owner: kyndsmiles@gmail.com / Sovereign2026!",
+  "seed_data_creation": "None - used existing owner account",
+  "retest_needed": true,
+  "main_agent_can_self_test": false,
+  "context_for_next_testing_agent": "V68.28 exhaustive audit complete. CRITICAL ISSUE: 84-99 401 errors during rapid navigation indicate auth race condition in AuthContext. The StarseedAdventure.js has a workaround (buildHeaders() reading directly from localStorage) that should be applied globally. All 11 console tabs verified unlocked for owner. Chamber mini-games (herbology pluck/brew, masonry, meditation) all functional. Starseed Adventure 'Begin Adventure' button is ACTIVE (not dead). No auto-playing audio. All chamber backdrops rendering correctly.",
+  "rca_of_issue": {
+    "issue": "401 errors during rapid navigation",
+    "root_cause": "AuthContext's memoized authHeaders can briefly be {} during hydration. When components mount and immediately make API calls, the token may not be available yet.",
+    "reproduction_steps": [
+      "1. Login with owner credentials",
+      "2. Rapidly navigate between /sovereign-hub → /meditation → /herbology → /starseed-adventure → /profile → /console → /sovereign-hub",
+      "3. Observe console for 401 errors"
+    ],
+    "mitigation": "StarseedAdventure.js implements buildHeaders() that reads directly from localStorage. This pattern should be applied to AuthContext or all components making authenticated requests should use a similar direct localStorage read."
+  },
+  "console_error_log": {
+    "401_errors_count": 84,
+    "threshold": 10,
+    "status": "EXCEEDED - auth race condition confirmed"
+  }
+}
