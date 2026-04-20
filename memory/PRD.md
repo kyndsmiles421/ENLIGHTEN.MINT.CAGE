@@ -1,5 +1,23 @@
-# ENLIGHTEN.MINT.CAFE — V68.4 Sovereign Guide
+# ENLIGHTEN.MINT.CAFE — V68.16 Sovereign Guide
 ## PRD — Last Updated: Feb 20, 2026
+
+## 🔒 V68.16 (Feb 20, 2026) — Metabolic Mirror + Stripe Android Gatekeeper
+
+**Door C — Metabolic Mirror (LIVE, visually verified):** the user's 2D RPG equipment from `GET /api/rpg/character` now binds to the 3D `CrystallineSilhouette` at the center of the Fractal Engine:
+- `equipped.body` → tapered pillar + inner core colour (via `rarity_color`, fall-back to Sparks tier colour)
+- `equipped.head` → spawns a rotating Saturn-halo ring above the crystal head; rotation speed scales with Sparks tier
+- `equipped.trinket` → spawns an orbiting accent ring around the heart core
+- Dust still drives eye-glow; immersion-tick still pulses the core
+- Listens to `sovereign:gear-change` custom event so the RPG loadout screen can force a refresh without a full reload
+- Client-side rarity→hex map (`common #9CA3AF`, `uncommon #22C55E`, `rare #3B82F6`, `epic #A855F7`, `legendary #F59E0B`, `mythic #EC4899`) as a safety net when the backend omits `rarity_color`
+
+**Screenshot proof:** owner (100k Sparks → SOVEREIGN gold body) wearing Lotus Headband (common) + Obsidian Amulet (common) renders as a gold pillar with a silver Saturn-halo crown and a silver orbiting trinket ring. Zero page errors.
+
+**Door D — Stripe × Google Play "Multi-Platform Loophole" (scaffold shipped, 14 call sites pending):**
+- New `frontend/src/hooks/useIsAndroidTWA.js` — detects Google Play TWA via `document.referrer = android-app://...`, standalone + Android UA, `?twa=1`, or `localStorage.force_twa=1`
+- New `frontend/src/components/PaymentGate.js` — drop-in wrapper; off-TWA = pass-through, on-TWA = "Manage credits on web" link to `enlighten-mint-cafe.me/economy?from=android`
+- New `/app/STRIPE_ANDROID_POLICY.md` — full policy doc + list of 14 checkout surfaces to wrap before final Play submit
+- Revenue preserved: Android TWA users buy on web browser → existing `/api/webhook/stripe` credits by `user_id` → credits appear in-app within seconds. Google takes $0.
 
 ## 🔒 V68.13 (Feb 20, 2026) — Mobile Tap Audit + Seven Pillars Sprint
 

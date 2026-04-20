@@ -32,6 +32,23 @@ import SovereignStageHUD from '../components/SovereignStageHUD';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// ── Rarity → hex color map (mirrors standard MMO palettes) ────────────
+const RARITY_COLOR = {
+  common:    '#9CA3AF',
+  uncommon:  '#22C55E',
+  rare:      '#3B82F6',
+  epic:      '#A855F7',
+  legendary: '#F59E0B',
+  mythic:    '#EC4899',
+};
+const rarityToColor = (item) => {
+  if (!item) return null;
+  if (item.rarity_color) return item.rarity_color;
+  if (item.color)        return item.color;
+  const r = (item.rarity || item.base_rarity || '').toLowerCase();
+  return RARITY_COLOR[r] || null;
+};
+
 // ── Solfeggio resonance tones per pillar (Hz) ─────────────────────────
 const RESONANCE_TONE = {
   wellness:  528,  // Love / cell repair
@@ -175,18 +192,18 @@ function CrystallineSilhouette({ sparks, dust, equipment = null }) {
 
   // Body color falls back to tier color if no body gear equipped.
   const bodyColor = useMemo(() => {
-    const c = bodyGear?.rarity_color || bodyGear?.color;
+    const c = rarityToColor(bodyGear);
     return c ? new THREE.Color(c) : tierColor;
   }, [bodyGear, tierColor]);
 
   // Head/crown color overrides the halo ring, else tier color.
   const crownColor = useMemo(() => {
-    const c = headGear?.rarity_color || headGear?.color;
+    const c = rarityToColor(headGear);
     return c ? new THREE.Color(c) : tierColor;
   }, [headGear, tierColor]);
 
   const trinketColor = useMemo(() => {
-    const c = trinket?.rarity_color || trinket?.color;
+    const c = rarityToColor(trinket);
     return c ? new THREE.Color(c) : tierColor;
   }, [trinket, tierColor]);
 
@@ -260,40 +277,56 @@ function CrystallineSilhouette({ sparks, dust, equipment = null }) {
 
   return (
     <group ref={groupRef} position={[0, -0.4, 0]} frustumCulled={false}>
-      {/* Outer aura sphere */}
+      {/* Outer aura sphere — merit halo (Sparks tier colour) */}
       <mesh ref={auraRef} frustumCulled={false}>
         <sphereGeometry args={[auraRadius, 24, 24]} />
-        <meshBasicMaterial color={auraColor} transparent opacity={0.08} side={THREE.BackSide} depthWrite={false} blending={THREE.AdditiveBlending} />
+        <meshBasicMaterial color={tierColor} transparent opacity={0.08} side={THREE.BackSide} depthWrite={false} blending={THREE.AdditiveBlending} />
       </mesh>
 
-      {/* Thin crystalline halo ring — tilted */}
+      {/* Thin crystalline halo ring — tilted, tier colour */}
       <mesh ref={haloRef} rotation={[Math.PI / 2.2, 0, 0]} frustumCulled={false}>
         <torusGeometry args={[auraRadius * 0.78, 0.015, 8, 64]} />
-        <meshBasicMaterial color={auraColor} transparent opacity={0.25} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color={tierColor} transparent opacity={0.25 + haloIntensity * 0.2} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
 
-      {/* Body — tapered pillar */}
+      {/* Body — tapered pillar (equipment-driven) */}
       <mesh position={[0, -0.3, 0]} frustumCulled={false}>
         <cylinderGeometry args={[0.22, 0.42, 1.6, 20, 1, true]} />
-        <meshStandardMaterial color={auraColor} transparent opacity={0.55} emissive={auraColor} emissiveIntensity={0.22} side={THREE.DoubleSide} depthWrite={false} />
+        <meshStandardMaterial color={bodyColor} transparent opacity={0.55} emissive={bodyColor} emissiveIntensity={0.22} side={THREE.DoubleSide} depthWrite={false} />
       </mesh>
 
       {/* Inner core (bright luminous node where the heart sits) */}
       <mesh ref={coreRef} position={[0, 0.1, 0]} frustumCulled={false}>
         <sphereGeometry args={[0.16, 16, 16]} />
-        <meshStandardMaterial color="#ffffff" emissive={auraColor} emissiveIntensity={0.7} toneMapped={false} />
+        <meshStandardMaterial color="#ffffff" emissive={bodyColor} emissiveIntensity={0.7} toneMapped={false} />
       </mesh>
 
-      {/* Head — subtle crystal */}
+      {/* Head — subtle crystal (crown colour if headgear, else tier colour) */}
       <mesh position={[0, 0.85, 0]} frustumCulled={false}>
         <icosahedronGeometry args={[0.28, 1]} />
-        <meshStandardMaterial color={auraColor} wireframe transparent opacity={0.65} emissive={auraColor} emissiveIntensity={0.35} />
+        <meshStandardMaterial color={crownColor} wireframe transparent opacity={0.65} emissive={crownColor} emissiveIntensity={0.35} />
       </mesh>
       {/* Head solid inner */}
       <mesh position={[0, 0.85, 0]} frustumCulled={false}>
         <sphereGeometry args={[0.2, 18, 18]} />
-        <meshStandardMaterial color={auraColor} transparent opacity={0.42} emissive={auraColor} emissiveIntensity={0.2} />
+        <meshStandardMaterial color={crownColor} transparent opacity={0.42} emissive={crownColor} emissiveIntensity={0.2} />
       </mesh>
+
+      {/* Saturn-halo crown — only if headGear equipped */}
+      {headGear && (
+        <mesh ref={crownHaloRef} position={[0, 1.15, 0]} rotation={[Math.PI / 2.4, 0, 0]} frustumCulled={false}>
+          <torusGeometry args={[0.36, 0.02, 10, 48]} />
+          <meshStandardMaterial color={crownColor} emissive={crownColor} emissiveIntensity={0.8 + haloIntensity} transparent opacity={0.85} toneMapped={false} />
+        </mesh>
+      )}
+
+      {/* Trinket accent ring — orbits the core */}
+      {trinket && (
+        <mesh ref={trinketRingRef} position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]} frustumCulled={false}>
+          <torusGeometry args={[0.28, 0.012, 8, 40]} />
+          <meshStandardMaterial color={trinketColor} emissive={trinketColor} emissiveIntensity={0.6} transparent opacity={0.7} toneMapped={false} />
+        </mesh>
+      )}
 
       {/* Eyes — Dust-reactive glow */}
       <mesh ref={eyeLeftRef} position={[-0.07, 0.88, 0.18]} frustumCulled={false}>
@@ -373,6 +406,7 @@ export default function FractalEngine() {
   const [hoveredId, setHoveredId] = useState(null);
   const [soundOn, setSoundOn] = useState(true);
   const [avatarStats, setAvatarStats] = useState({ sparks: 0, dust: 0 });
+  const [equipment, setEquipment] = useState(null);
   const audioCtxRef = useRef(null);
   const lastHoverToneRef = useRef(0);
 
@@ -425,6 +459,24 @@ export default function FractalEngine() {
     load();
     const t = setInterval(load, 30000);
     return () => clearInterval(t);
+  }, []);
+
+  // Fetch RPG character equipment — Metabolic Mirror (binds gear → silhouette)
+  useEffect(() => {
+    const token = localStorage.getItem('zen_token');
+    if (!token || token === 'guest_token') return;
+    const h = { Authorization: `Bearer ${token}` };
+    const loadGear = async () => {
+      try {
+        const r = await axios.get(`${API}/rpg/character`, { headers: h });
+        setEquipment(r.data?.equipped || r.data?.equipment || null);
+      } catch { /* silent — procedural defaults kick in */ }
+    };
+    loadGear();
+    // Refresh on a custom event so other pages (RPG loadout screen) can trigger
+    const onGearChange = () => loadGear();
+    window.addEventListener('sovereign:gear-change', onGearChange);
+    return () => window.removeEventListener('sovereign:gear-change', onGearChange);
   }, []);
 
   // Merge positions with pillar data (preserves declared order)
@@ -535,7 +587,7 @@ export default function FractalEngine() {
 
         <Suspense fallback={null}>
           <Starfield count={2000} />
-          <CrystallineSilhouette sparks={avatarStats.sparks} dust={avatarStats.dust} />
+          <CrystallineSilhouette sparks={avatarStats.sparks} dust={avatarStats.dust} equipment={equipment} />
           {pillarNodes.map((p) => (
             <PillarNode
               key={p.id}
