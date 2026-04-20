@@ -91,7 +91,7 @@ export function CharacterSelect({ origins, existingCharacters, onSelect, onResum
                   <div
                     onClick={() => setExpandedChar(isExpanded ? null : ch.origin_id)}
                     className="w-full p-4 text-left flex items-center gap-3 cursor-pointer"
-                    data-testid={`continue-${ch.origin_id}`}>
+                    data-testid={`character-row-${ch.origin_id}`}>
                     <AvatarBadge originId={ch.origin_id} authHeaders={authHeaders} size={40} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium" style={{ color: origin.color }}>{ch.character_name}</p>
@@ -109,9 +109,12 @@ export function CharacterSelect({ origins, existingCharacters, onSelect, onResum
                       </div>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <button onClick={(e) => { e.stopPropagation(); onResume(ch.origin_id); }}
-                        className="text-[9px] px-3 py-1.5 rounded-lg font-medium transition-all hover:scale-105"
-                        style={{ background: `${origin.color}15`, color: origin.color, border: `1px solid ${origin.color}25` }}>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); onResume(ch.origin_id); }}
+                        data-testid={`continue-${ch.origin_id}`}
+                        className="text-[9px] px-3 py-1.5 rounded-lg font-medium transition-all hover:scale-105 active:scale-95"
+                        style={{ background: `${origin.color}15`, color: origin.color, border: `1px solid ${origin.color}25`, cursor: 'pointer', position: 'relative', zIndex: 2 }}>
                         Play
                       </button>
                       <ChevronDown size={14} style={{ color: origin.color, opacity: 0.5, transform: isExpanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />

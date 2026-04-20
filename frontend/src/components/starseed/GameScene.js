@@ -12,16 +12,17 @@ import { SceneImage } from './SceneImage';
 
 export function GameScene({ scene, character, origin, onChoice, loading, onBack, sceneImage, imageLoading }) {
   const { reduceMotion } = useSensory();
-  const [revealed, setRevealed] = useState(false);
+  // V68.34 — Start revealed to guarantee the narrative and choices are
+  // always visible the moment the scene arrives. Users reported "dead
+  // scene" because a 800ms opacity fade + opacity:0.15 pre-reveal hid
+  // the text and choices while the scene was already fully loaded.
+  const [revealed, setRevealed] = useState(true);
   const [choiceHover, setChoiceHover] = useState(null);
   const [prevStats, setPrevStats] = useState(null);
   const theme = ATMOSPHERE_THEMES[scene?.atmosphere] || ATMOSPHERE_THEMES.mystical;
 
-  useEffect(() => {
-    setRevealed(false);
-    const t = setTimeout(() => setRevealed(true), reduceMotion ? 0 : 800);
-    return () => clearTimeout(t);
-  }, [scene?.narrative, reduceMotion]);
+  // Ensure revealed is true on every scene change (no hidden reveal timer)
+  useEffect(() => { setRevealed(true); }, [scene?.narrative]);
 
   useEffect(() => {
     if (character?.stats) {
@@ -73,19 +74,19 @@ export function GameScene({ scene, character, origin, onChoice, loading, onBack,
         <SceneImage imageUrl={sceneImage} loading={imageLoading} atmosphere={scene.atmosphere} originColor={origin.color} />
       </motion.div>
 
-      {/* Scene Title */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: revealed ? 1 : 0 }} transition={{ duration: 0.6 }}
+      {/* Scene Title — always visible */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}
         className="text-center mb-3">
         <p className="text-xs font-bold uppercase tracking-[0.3em]" style={{ color: theme.glow }}>
-          {scene.scene_title}
+          {scene.scene_title || scene.title || `Chapter ${character.chapter} · Scene ${character.scene_num}`}
         </p>
       </motion.div>
 
-      {/* Narrative */}
+      {/* Narrative — always visible, no opacity tricks */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: revealed ? 1 : 0.15, y: 0 }}
-        transition={{ duration: 1 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
         className="relative rounded-2xl p-6 md:p-8 mb-8 overflow-hidden"
         style={{ background: 'rgba(0,0,0,0.25)', border: `1px solid ${theme.glow}12`, backdropFilter: 'blur(12px)' }}
         data-testid="scene-narrative">
@@ -100,15 +101,15 @@ export function GameScene({ scene, character, origin, onChoice, loading, onBack,
             fontSize: '18px',
             lineHeight: '2',
           }}>
-            {scene.narrative}
+            {scene.narrative || 'The cosmos reshapes around you…'}
           </p>
         </div>
       </motion.div>
 
-      {/* Choices */}
+      {/* Choices — always render if present, no reveal gate */}
       <AnimatePresence>
-        {revealed && !loading && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+        {!loading && Array.isArray(scene.choices) && scene.choices.length > 0 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
             className="space-y-3 mb-8" data-testid="scene-choices">
             <div className="flex items-center justify-center gap-2 mb-4">
               <div className="h-px flex-1" style={{ background: `linear-gradient(90deg, transparent, ${theme.glow}30, transparent)` }} />

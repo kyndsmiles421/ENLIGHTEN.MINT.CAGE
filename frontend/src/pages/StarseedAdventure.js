@@ -27,14 +27,28 @@ export default function StarseedAdventure() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [view, setView] = useState('select');
 
+  // V68.33 — Read auth token freshly from localStorage for every
+  // authenticated call on this page. The AuthContext's memoized
+  // `authHeaders` can briefly be `{}` during hydration, which caused
+  // /api/starseed/my-characters and the Continue/Play button to 401
+  // and fail silently ("dead button" reported by real users). Reading
+  // the token directly guarantees the header is always set when the
+  // request fires.
+  const buildHeaders = useCallback(() => {
+    try {
+      const t = localStorage.getItem('zen_token');
+      return t && t !== 'guest_token' ? { Authorization: `Bearer ${t}` } : {};
+    } catch { return {}; }
+  }, []);
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) { navigate('/auth'); return; }
     Promise.all([
       axios.get(`${API}/starseed/origins`).then(r => setOrigins(r.data.origins)).catch(() => {}),
-      axios.get(`${API}/starseed/my-characters`, { headers: authHeaders }).then(r => setCharacters(r.data.characters)).catch(() => {}),
+      axios.get(`${API}/starseed/my-characters`, { headers: buildHeaders() }).then(r => setCharacters(r.data.characters)).catch(() => {}),
     ]).finally(() => setInitialLoading(false));
-  }, [user, authLoading, authHeaders, navigate]);
+  }, [user, authLoading, buildHeaders, navigate]);
 
   const generateSceneImage = useCallback(async (imagePrompt, originId) => {
     if (!imagePrompt) return;
@@ -42,7 +56,7 @@ export default function StarseedAdventure() {
     try {
       const res = await axios.post(`${API}/starseed/generate-scene-image`, {
         image_prompt: imagePrompt, origin_id: originId,
-      }, { headers: authHeaders });
+      }, { headers: buildHeaders() });
       if (res.data.image_base64) {
         setSceneImage(`data:image/png;base64,${res.data.image_base64}`);
       } else if (res.data.image_url) {
@@ -58,7 +72,7 @@ export default function StarseedAdventure() {
     } finally {
       setImageLoading(false);
     }
-  }, [authHeaders]);
+  }, [buildHeaders]);
 
   const startNewAdventure = useCallback(async (originId, characterName) => {
     setLoading(true);
@@ -66,12 +80,12 @@ export default function StarseedAdventure() {
     try {
       await axios.post(`${API}/starseed/create-character`, {
         origin_id: originId, character_name: characterName,
-      }, { headers: authHeaders });
+      }, { headers: buildHeaders() });
       const origin = origins.find(o => o.id === originId);
       setActiveOrigin(origin);
       const sceneRes = await axios.post(`${API}/starseed/generate-scene`, {
         origin_id: originId, choice_index: null,
-      }, { headers: authHeaders });
+      }, { headers: buildHeaders() });
       setCurrentScene(sceneRes.data.scene);
       setCharacterState(sceneRes.data.character);
       setView('game');
@@ -82,7 +96,7 @@ export default function StarseedAdventure() {
     } finally {
       setLoading(false);
     }
-  }, [authHeaders, origins, generateSceneImage]);
+  }, [buildHeaders, origins, generateSceneImage]);
 
   const resumeAdventure = useCallback(async (originId) => {
     setLoading(true);
@@ -90,21 +104,24 @@ export default function StarseedAdventure() {
     try {
       const origin = origins.find(o => o.id === originId);
       setActiveOrigin(origin);
-      const charRes = await axios.get(`${API}/starseed/character/${originId}`, { headers: authHeaders });
+      const charRes = await axios.get(`${API}/starseed/character/${originId}`, { headers: buildHeaders() });
       setCharacterState(charRes.data);
       const sceneRes = await axios.post(`${API}/starseed/generate-scene`, {
         origin_id: originId, choice_index: null,
-      }, { headers: authHeaders });
+      }, { headers: buildHeaders() });
       setCurrentScene(sceneRes.data.scene);
       setCharacterState(sceneRes.data.character);
       setView('game');
       generateSceneImage(sceneRes.data.scene.image_prompt, originId);
-    } catch {
-      toast.error('Could not resume adventure');
+    } catch (err) {
+      const msg = err?.response?.status === 401
+        ? 'Your session expired — please sign in again.'
+        : (err?.response?.data?.detail || 'Could not resume adventure. Try again.');
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
-  }, [authHeaders, origins, generateSceneImage]);
+  }, [buildHeaders, origins, generateSceneImage]);
 
   const makeChoice = useCallback(async (choiceIndex) => {
     if (!activeOrigin || loading) return;
@@ -113,7 +130,7 @@ export default function StarseedAdventure() {
     try {
       const res = await axios.post(`${API}/starseed/generate-scene`, {
         origin_id: activeOrigin.id, choice_index: choiceIndex,
-      }, { headers: authHeaders });
+      }, { headers: buildHeaders() });
       setCurrentScene(res.data.scene);
       setCharacterState(res.data.character);
       generateSceneImage(res.data.scene.image_prompt, activeOrigin.id);
@@ -122,7 +139,7 @@ export default function StarseedAdventure() {
     } finally {
       setLoading(false);
     }
-  }, [activeOrigin, authHeaders, loading, generateSceneImage]);
+  }, [activeOrigin, buildHeaders, loading, generateSceneImage]);
 
   const goBack = () => {
     setView('select');
@@ -130,7 +147,7 @@ export default function StarseedAdventure() {
     setCharacterState(null);
     setActiveOrigin(null);
     setSceneImage(null);
-    axios.get(`${API}/starseed/my-characters`, { headers: authHeaders })
+    axios.get(`${API}/starseed/my-characters`, { headers: buildHeaders() })
       .then(r => setCharacters(r.data.characters)).catch(() => {});
   };
 
