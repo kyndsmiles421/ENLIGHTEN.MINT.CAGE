@@ -40,6 +40,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles } from 'lucide-react';
 import HolographicCanvas from './HolographicCanvas';
 import { useSensory } from '../context/SensoryContext';
+import { PHI_EASE_BEZIER } from '../utils/SovereignMath';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -179,7 +180,7 @@ export default function HolographicChamber({
             key={`backdrop-${chamberId}`}
             initial={{ opacity: 0, scale: 1.04 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.4, ease: 'easeOut' }}
+            transition={{ duration: 1.4, ease: PHI_EASE_BEZIER }}
             style={{
               position: 'fixed', inset: 0, zIndex: 0,
               backgroundImage: `url(${backdropSrc})`,
@@ -335,7 +336,7 @@ export default function HolographicChamber({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: materialized ? 1 : 0, y: materialized ? 0 : 20 }}
-        transition={{ duration: 0.7, delay: 0.35 }}
+        transition={{ duration: 0.7, delay: 0.35, ease: PHI_EASE_BEZIER }}
         style={{
           position: 'relative', zIndex: 3,
           paddingTop: fullBleed ? 0 : 72,

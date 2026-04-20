@@ -81,8 +81,35 @@ export const MANTRAS = [
 ];
 
 /* ═══════════════════════════════════════════════
-   GLOBAL MIXER CONTEXT — audio persists across pages
+   V68.27 — TRADE RESONANCE PRESETS
+   Baked-in "High-Performance" recipes per chamber. Each preset lists
+   the nodules that together form the mastery tincture for that trade.
+   A chamber can call applyResonancePreset('masonry') and the mixer
+   will activate the correct frequencies/sounds/drones in one shot.
+   The user's existing mixer state is preserved — these are additive.
    ═══════════════════════════════════════════════ */
+export const RESONANCE_PRESETS = {
+  masonry:      { label: 'Masonry Mastery',   freqs: [528],       sounds: ['singing-bowl'], drones: ['sitar-drone'],    color: '#F59E0B' },
+  carpentry:    { label: 'Grain Attunement',  freqs: [432],       sounds: ['forest'],       drones: ['flute-drone'],    color: '#D97706' },
+  culinary:     { label: 'Hearth Resonance',  freqs: [396],       sounds: ['fire'],         drones: ['hang-drum-drone'],color: '#FB923C' },
+  cooking:      { label: 'Hearth Resonance',  freqs: [396],       sounds: ['fire'],         drones: ['hang-drum-drone'],color: '#FB923C' },
+  baking:       { label: 'Dough Harmony',     freqs: [528],       sounds: ['fire'],         drones: ['harmonium-drone'],color: '#FBBF24' },
+  electrical:   { label: 'Current Alignment', freqs: [40, 111],   sounds: ['thunder'],      drones: ['cello-drone'],    color: '#6366F1' },
+  plumbing:     { label: 'Flow Balance',      freqs: [417],       sounds: ['stream'],       drones: ['shakuhachi-drone'],color:'#06B6D4' },
+  nursing:      { label: 'Healing Presence',  freqs: [528, 741],  sounds: ['ocean'],        drones: ['harp-drone'],     color: '#EC4899' },
+  childcare:    { label: 'Lullaby Rhythm',    freqs: [432],       sounds: ['rain'],         drones: ['kalimba-drone'],  color: '#A78BFA' },
+  eldercare:    { label: 'Dignity Circle',    freqs: [639],       sounds: ['singing-bowl'], drones: ['cello-drone'],    color: '#D8B4FE' },
+  landscaping:  { label: 'Root Tending',      freqs: [174, 285],  sounds: ['forest'],       drones: ['didgeridoo-drone'],color:'#22C55E' },
+  gardening:    { label: 'Root Tending',      freqs: [174, 285],  sounds: ['forest'],       drones: ['didgeridoo-drone'],color:'#22C55E' },
+  herbalism:    { label: 'Herb Bloom',        freqs: [528],       sounds: ['forest'],       drones: ['flute-drone'],    color: '#84CC16' },
+  bible:        { label: 'Sacred Study',      freqs: [639, 852],  sounds: ['cave'],         drones: ['harp-drone'],     color: '#FCD34D' },
+  meditation:   { label: 'Still Chamber',     freqs: [7.83, 528], sounds: ['singing-bowl'], drones: ['bowl-drone'],     color: '#D8B4FE' },
+  geology:      { label: 'Crystal Lattice',   freqs: [111, 528],  sounds: ['cave'],         drones: ['bowl-drone'],     color: '#F59E0B' },
+  physics:      { label: 'Resonance Lab',     freqs: [40, 963],   sounds: ['night'],        drones: ['cello-drone'],    color: '#3B82F6' },
+  academy:      { label: 'Scholar\'s Calm',   freqs: [432, 852],  sounds: ['forest'],       drones: ['harmonium-drone'],color: '#818CF8' },
+  herbology:    { label: 'Apothecary Bloom',  freqs: [528],       sounds: ['forest'],       drones: ['flute-drone'],    color: '#84CC16' },
+  aromatherapy: { label: 'Essence Weave',     freqs: [639, 741],  sounds: ['stream'],       drones: ['oud-drone'],      color: '#C084FC' },
+};
 
 const MixerContext = createContext(null);
 
@@ -531,6 +558,30 @@ export function MixerProvider({ children }) {
 
   const totalActive = activeFreqs.size + activeSounds.size + activeDrones.size + (activeMantra ? 1 : 0);
 
+  // ─── V68.27 Resonance Preset application ─────────────────────────
+  // Any chamber can call applyResonancePreset('masonry') to activate
+  // the baked-in High-Performance recipe for that trade. Nodules that
+  // are already active are skipped (additive, not destructive).
+  const applyResonancePreset = useCallback(async (presetKey) => {
+    const preset = RESONANCE_PRESETS[presetKey];
+    if (!preset) return null;
+    // Turn ON freqs that aren't already active
+    for (const hz of preset.freqs || []) {
+      const f = FREQUENCIES.find(x => x.hz === hz);
+      if (f && !activeFreqs.has(hz)) { try { await toggleFreq(f); } catch {} }
+    }
+    for (const sid of preset.sounds || []) {
+      const s = SOUNDS.find(x => x.id === sid);
+      if (s && !activeSounds.has(sid)) { try { await toggleSound(s); } catch {} }
+    }
+    for (const did of preset.drones || []) {
+      const d = INSTRUMENT_DRONES.find(x => x.id === did);
+      if (d && !activeDrones.has(did)) { try { await toggleDrone(d); } catch {} }
+    }
+    try { window.dispatchEvent(new CustomEvent('sovereign:resonance-preset', { detail: { preset: presetKey, label: preset.label } })); } catch {}
+    return preset;
+  }, [activeFreqs, activeSounds, activeDrones, toggleFreq, toggleSound, toggleDrone]);
+
   // GATEKEEPER: Memoize the context value to prevent cascading re-renders
   // This is critical - without this, every consumer re-renders on every tick
   const value = useMemo(() => ({
@@ -541,6 +592,7 @@ export function MixerProvider({ children }) {
     voiceMorph, setVoiceMorph,
     getCtx, toggleFreq, toggleSound, toggleDrone, toggleMantra,
     stopAll, getSnapshot, restoreSnapshot,
+    applyResonancePreset, RESONANCE_PRESETS,
     analyserRef, masterGainRef, ctxRef,
     freqNodesMapRef, freqGainMapRef,
     soundNodesMapRef, soundGainMapRef, soundFilterMapRef,
@@ -552,6 +604,7 @@ export function MixerProvider({ children }) {
     channelVols, isPlaying, totalActive, mantraLoading, voiceMorph,
     getCtx, toggleFreq, toggleSound, toggleDrone, toggleMantra,
     stopAll, getSnapshot, restoreSnapshot, setChannelVolume,
+    applyResonancePreset,
   ]);
 
   return <MixerContext.Provider value={value}>{children}</MixerContext.Provider>;

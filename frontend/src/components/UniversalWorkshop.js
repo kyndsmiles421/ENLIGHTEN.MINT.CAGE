@@ -19,6 +19,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { useMixer } from '../context/MixerContext';
 import {
   ChevronDown, ChevronUp, Layers, Gem, Zap,
   Hammer, Axe, Flame, Wrench, Droplets, Leaf, BookOpen, Heart, Sparkles,
@@ -27,6 +28,7 @@ import axios from 'axios';
 import HolographicChamber from './HolographicChamber';
 import ChamberProp from './ChamberProp';
 import ChamberMiniGame from './games/ChamberMiniGame';
+import { phiStaggerDelay, PHI_EASE_BEZIER } from '../utils/SovereignMath';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -202,7 +204,8 @@ function DivePanel({ material, isOpen, onClose, accentColor, moduleId }) {
   );
 }
 
-export default function UniversalWorkshop({ moduleId, title, subtitle, icon: Icon, accentColor, skillKey, matLabel = 'Material', storageKey }) {
+export default function UniversalWorkshop({ moduleId, dataModuleId, title, subtitle, icon: Icon, accentColor, skillKey, matLabel = 'Material', storageKey }) {
+  const apiModuleId = dataModuleId || moduleId;
   const { authHeaders, token } = useAuth();
   const [materials, setMaterials] = useState([]);
   const [tools, setTools] = useState([]);
@@ -219,6 +222,25 @@ export default function UniversalWorkshop({ moduleId, title, subtitle, icon: Ico
   // current flow, etc.) instead of the old flat letter-circle tap.
   const [gameKey, setGameKey] = useState(null); // null | "material" | "tool:<id>"
   const isFullAuth = token && token !== 'guest_token';
+  const mixer = useMixer();
+
+  // V68.27 — auto-prime the trade resonance preset once per session.
+  // Each trade's "High-Performance" recipe (528Hz + Singing Bowl +
+  // Sitar Drone for masonry, etc.) becomes the default sonic backdrop
+  // when the user enters the chamber. Stored in sessionStorage so it
+  // only primes once — users retain full control via the Cosmic Mixer.
+  useEffect(() => {
+    if (!mixer?.applyResonancePreset) return;
+    const chamberKey = MODULE_TO_CHAMBER[moduleId] || moduleId;
+    const sessionKey = `emcafe_resonance_primed_${chamberKey}`;
+    try {
+      if (sessionStorage.getItem(sessionKey)) return;
+      sessionStorage.setItem(sessionKey, '1');
+      // Skip if user has muted — respect Silence Shield.
+      if (mixer.muted) return;
+      mixer.applyResonancePreset(chamberKey);
+    } catch { /* noop */ }
+  }, [moduleId, mixer]);
 
   // Bridge: the bottom Cosmic Mixer nodules broadcast sovereign:mixer-*
   // events. Any chamber mini-game that is currently open listens via
@@ -237,13 +259,13 @@ export default function UniversalWorkshop({ moduleId, title, subtitle, icon: Ico
   useEffect(() => {
     const h = isFullAuth ? { headers: authHeaders } : {};
     Promise.all([
-      axios.get(`${API}/workshop/${moduleId}/materials`, h).catch(() => null),
-      axios.get(`${API}/workshop/${moduleId}/tools`, h).catch(() => null),
+      axios.get(`${API}/workshop/${apiModuleId}/materials`, h).catch(() => null),
+      axios.get(`${API}/workshop/${apiModuleId}/tools`, h).catch(() => null),
     ]).then(([mRes, tRes]) => {
       if (mRes?.data) { const vals = Object.values(mRes.data).find(v => Array.isArray(v)) || []; setMaterials(vals); if (vals.length) setSelMat(vals[0]); }
       if (tRes?.data?.tools) setTools(tRes.data.tools);
     });
-  }, [moduleId, authHeaders, token, isFullAuth]);
+  }, [apiModuleId, authHeaders, token, isFullAuth]);
 
   useEffect(() => { try { localStorage.setItem(storageKey, String(actions)); } catch {} }, [actions, storageKey]);
 
@@ -267,7 +289,7 @@ export default function UniversalWorkshop({ moduleId, title, subtitle, icon: Ico
     try {
       setTutLoading(true);
       const h = isFullAuth ? { headers: authHeaders } : {};
-      const res = await axios.post(`${API}/workshop/${moduleId}/tool-action`, { tool_id: tool.id, material_id: selMat.id }, h);
+      const res = await axios.post(`${API}/workshop/${apiModuleId}/tool-action`, { tool_id: tool.id, material_id: selMat.id }, h);
       const ctx = res.data?.tutorial_context;
       if (isFullAuth && ctx) {
         try {

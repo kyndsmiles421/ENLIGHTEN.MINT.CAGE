@@ -26,17 +26,39 @@ export default function DynamicWorkshop() {
   const [config, setConfig] = useState(null);
   const [error, setError] = useState(false);
 
+  // V68.27 — Slug aliases keep friendlier URLs working without forcing
+  // the backend registry to grow duplicates. Culinary / cooking /
+  // baking all resolve to the Nutrition module (food + biochemistry),
+  // which the UniversalWorkshop then themes with the KNEAD / STIR /
+  // SHAPE mini-game via MODULE_GAME_THEME.
+  const MODULE_ALIAS = {
+    culinary: 'nutrition',
+    cooking: 'nutrition',
+    baking: 'nutrition',
+    gardening: 'landscaping',
+    herbalism: 'landscaping',
+  };
+  const effectiveId = MODULE_ALIAS[moduleId] || moduleId;
+
   useEffect(() => {
     setConfig(null);
     setError(false);
     axios.get(`${API}/workshop/registry`)
       .then(res => {
-        const mod = res.data?.modules?.find(m => m.id === moduleId);
-        if (mod) setConfig(mod);
-        else setError(true);
+        const mod = res.data?.modules?.find(m => m.id === effectiveId);
+        if (mod) {
+          // Preserve the user's typed slug on the displayed title when
+          // aliased, so "Culinary" reads as Culinary not Nutrition.
+          const displayTitle = moduleId !== effectiveId
+            ? `${moduleId.charAt(0).toUpperCase()}${moduleId.slice(1)} Workshop`
+            : mod.title;
+          setConfig({ ...mod, title: displayTitle, _themeId: moduleId });
+        } else {
+          setError(true);
+        }
       })
       .catch(() => setError(true));
-  }, [moduleId]);
+  }, [moduleId, effectiveId]);
 
   if (error) {
     return (
@@ -66,6 +88,7 @@ export default function DynamicWorkshop() {
   return (
     <UniversalWorkshop
       moduleId={moduleId}
+      dataModuleId={effectiveId}
       title={config.title}
       subtitle={config.subtitle}
       icon={IconComp}
