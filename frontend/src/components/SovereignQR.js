@@ -231,7 +231,7 @@ export function encodeQR(text) {
 
 /* ─── React components ─── */
 
-export function QRSvg({ value, size = 240, fg = '#FFFFFF', bg = 'transparent' }) {
+export function QRSvg({ value, size = 240, fg = '#FFFFFF', bg = 'transparent', centerGlyph = 'ॐ', centerColor = '#C084FC', centerBg = '#FFFFFF', centerSize = 0.22 }) {
   const matrix = useMemo(() => {
     try { return encodeQR(value || ''); } catch { return null; }
   }, [value]);
@@ -239,17 +239,41 @@ export function QRSvg({ value, size = 240, fg = '#FFFFFF', bg = 'transparent' })
   const n = matrix.length;
   const cell = size / n;
   const rects = [];
+  // Mask out the center cells so the logo sits on clean white (safer
+  // for scanners). ECC-M tolerates ~15% occlusion; we cover ~18% which
+  // is still inside the safety band for typical URL-length payloads.
+  const cov = centerGlyph ? centerSize : 0;
+  const innerHalf = (n * cov) / 2;
+  const mid = n / 2;
   for (let r = 0; r < n; r++) {
     for (let c = 0; c < n; c++) {
-      if (matrix[r][c] === 1) {
-        rects.push(<rect key={`${r}-${c}`} x={c * cell} y={r * cell} width={cell + 0.5} height={cell + 0.5} fill={fg} />);
-      }
+      if (matrix[r][c] !== 1) continue;
+      if (cov && Math.abs(r + 0.5 - mid) < innerHalf && Math.abs(c + 0.5 - mid) < innerHalf) continue;
+      rects.push(<rect key={`${r}-${c}`} x={c * cell} y={r * cell} width={cell + 0.5} height={cell + 0.5} fill={fg} />);
     }
   }
+  const emblemPx = size * centerSize * 1.05;
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} xmlns="http://www.w3.org/2000/svg" data-testid="qr-svg">
       <rect width={size} height={size} fill={bg} />
       {rects}
+      {centerGlyph && (
+        <g>
+          <circle cx={size / 2} cy={size / 2} r={emblemPx / 2} fill={centerBg} />
+          <text
+            x={size / 2}
+            y={size / 2 + emblemPx * 0.12}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fontSize={emblemPx * 0.8}
+            fontWeight="600"
+            fill={centerColor}
+            style={{ fontFamily: "'Noto Sans Devanagari', 'Noto Sans', system-ui, sans-serif" }}
+          >
+            {centerGlyph}
+          </text>
+        </g>
+      )}
     </svg>
   );
 }
