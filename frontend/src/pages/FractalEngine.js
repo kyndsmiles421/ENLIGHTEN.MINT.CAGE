@@ -171,8 +171,6 @@ function CrystallineSilhouette({ sparks, dust, equipment = null, avatarB64 = nul
   const crownHaloRef = useRef();
   const trinketRingRef = useRef();
   const portraitRef = useRef();
-  const eyeLeftRef = useRef();
-  const eyeRightRef = useRef();
   const pulseRef = useRef({ active: false, startT: 0 });
   const { camera } = useThree();
 
@@ -251,10 +249,14 @@ function CrystallineSilhouette({ sparks, dust, equipment = null, avatarB64 = nul
     return () => window.removeEventListener('sovereign:immersion-tick', onTick);
   }, []);
 
+  // Second ref for the holo-tint overlay (same image, additive theme-colour glow)
+  const holoTintRef = useRef();
+
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     if (groupRef.current) {
-      groupRef.current.rotation.y = t * 0.15;
+      // Gentle float only — no rotation, so the hologram reads as a stationary
+      // projection the user is facing (true "sovereign form" presence).
       groupRef.current.position.y = Math.sin(t * 0.6) * 0.12;
     }
     // Continuous gentle aura breath
@@ -272,13 +274,13 @@ function CrystallineSilhouette({ sparks, dust, equipment = null, avatarB64 = nul
       crownHaloRef.current.rotation.y = t * (0.25 + haloIntensity * 0.6);
       crownHaloRef.current.rotation.z = Math.sin(t * 0.4) * 0.08;
     }
-    // Trinket accent ring — slow rotation around the core
+    // Trinket accent ring — slow rotation around the heart
     if (trinketRingRef.current) {
       trinketRingRef.current.rotation.z = -t * 0.55;
     }
-    // Core pulse on immersion-tick event
+    // Core pulse on immersion-tick event (still shows as a faint heart light)
     if (coreRef.current) {
-      let coreIntensity = 0.7 + Math.sin(t * 2.1) * 0.06;
+      let coreIntensity = 0.5 + Math.sin(t * 2.1) * 0.06;
       if (pulseRef.current.active) {
         const elapsed = performance.now() - pulseRef.current.startT;
         if (elapsed < 900) {
@@ -290,24 +292,22 @@ function CrystallineSilhouette({ sparks, dust, equipment = null, avatarB64 = nul
       }
       coreRef.current.material.emissiveIntensity = coreIntensity;
     }
-    // Billboard the portrait plane so the face always looks at the camera
-    // regardless of the group's rotation or the camera's fly-to position.
-    if (portraitRef.current) {
-      portraitRef.current.lookAt(camera.position);
-    }
-    // Eyes — Dust-reactive glow, tier boosts intensity (only when no portrait)
-    if (eyeLeftRef.current && eyeRightRef.current) {
-      const wobble = Math.sin(t * 0.7) * 0.04;
-      const tierBoost = haloIntensity * 0.3;
-      eyeLeftRef.current.material.emissiveIntensity = eyeGlow + wobble + tierBoost;
-      eyeRightRef.current.material.emissiveIntensity = eyeGlow + wobble + tierBoost;
+    // Billboard both the hologram plane AND the additive tint overlay so the
+    // full figure always faces the camera — this is what makes it feel like
+    // a true holographic projection of the user rather than a 3D model.
+    if (portraitRef.current) portraitRef.current.lookAt(camera.position);
+    if (holoTintRef.current) {
+      holoTintRef.current.lookAt(camera.position);
+      // Subtle hologram flicker — opacity wobble tied to sin waves at different frequencies
+      const flicker = 0.28 + Math.sin(t * 3.1) * 0.06 + Math.sin(t * 11.7) * 0.03;
+      holoTintRef.current.material.opacity = flicker;
     }
   });
 
   return (
     <group
       ref={groupRef}
-      position={[0, -0.4, 0]}
+      position={[0, 0, 0]}
       frustumCulled={false}
       onClick={onClick ? (e) => { e.stopPropagation(); onClick(); } : undefined}
       onPointerOver={onClick ? () => { document.body.style.cursor = 'pointer'; } : undefined}
@@ -315,82 +315,85 @@ function CrystallineSilhouette({ sparks, dust, equipment = null, avatarB64 = nul
     >
       {/* Outer aura sphere — merit halo (Sparks tier colour) */}
       <mesh ref={auraRef} frustumCulled={false}>
-        <sphereGeometry args={[auraRadius, 24, 24]} />
-        <meshBasicMaterial color={tierColor} transparent opacity={0.08} side={THREE.BackSide} depthWrite={false} blending={THREE.AdditiveBlending} />
+        <sphereGeometry args={[auraRadius * 1.2, 24, 24]} />
+        <meshBasicMaterial color={identityColor} transparent opacity={0.08} side={THREE.BackSide} depthWrite={false} blending={THREE.AdditiveBlending} />
       </mesh>
 
-      {/* Thin crystalline halo ring — tilted, tier colour */}
+      {/* Outer crystalline halo ring — tilted, tier colour, encircles the hologram */}
       <mesh ref={haloRef} rotation={[Math.PI / 2.2, 0, 0]} frustumCulled={false}>
-        <torusGeometry args={[auraRadius * 0.78, 0.015, 8, 64]} />
+        <torusGeometry args={[auraRadius * 1.05, 0.015, 8, 64]} />
         <meshBasicMaterial color={tierColor} transparent opacity={0.25 + haloIntensity * 0.2} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
 
-      {/* Body — tapered pillar (equipment-driven) */}
-      <mesh position={[0, -0.3, 0]} frustumCulled={false}>
-        <cylinderGeometry args={[0.22, 0.42, 1.6, 20, 1, true]} />
-        <meshStandardMaterial color={bodyColor} transparent opacity={0.55} emissive={bodyColor} emissiveIntensity={0.22} side={THREE.DoubleSide} depthWrite={false} />
-      </mesh>
-
-      {/* Inner core (bright luminous node where the heart sits) */}
-      <mesh ref={coreRef} position={[0, 0.1, 0]} frustumCulled={false}>
-        <sphereGeometry args={[0.16, 16, 16]} />
-        <meshStandardMaterial color="#ffffff" emissive={bodyColor} emissiveIntensity={0.7} toneMapped={false} />
-      </mesh>
-
-      {/* HEAD — real AI portrait (billboarded) OR abstract crystal head when no portrait */}
       {portraitTexture ? (
         <>
-          {/* Framing ring around the portrait — identity halo */}
-          <mesh position={[0, 0.9, 0]} rotation={[0, 0, 0]} frustumCulled={false}>
-            <torusGeometry args={[0.42, 0.02, 10, 48]} />
-            <meshStandardMaterial color={crownColor} emissive={crownColor} emissiveIntensity={0.55} toneMapped={false} />
-          </mesh>
-          {/* The portrait itself — billboarded plane, double-sided, rendered on top */}
-          <mesh ref={portraitRef} position={[0, 0.9, 0]} frustumCulled={false} renderOrder={10}>
-            <circleGeometry args={[0.38, 48]} />
+          {/* HOLOGRAM — full AI avatar, billboarded, rendered twice:
+              1) base image (sharp portrait)
+              2) additive theme-tinted overlay (the "holo" glow) */}
+          <mesh ref={portraitRef} position={[0, 0, 0]} frustumCulled={false} renderOrder={10}>
+            <planeGeometry args={[2.0, 2.6]} />
             <meshBasicMaterial
               map={portraitTexture}
               transparent
               toneMapped={false}
               side={THREE.DoubleSide}
               depthTest={false}
+              opacity={0.92}
             />
+          </mesh>
+          <mesh ref={holoTintRef} position={[0, 0, 0.001]} frustumCulled={false} renderOrder={11}>
+            <planeGeometry args={[2.0, 2.6]} />
+            <meshBasicMaterial
+              map={portraitTexture}
+              color={bodyGear ? bodyColor : identityColor}
+              transparent
+              toneMapped={false}
+              side={THREE.DoubleSide}
+              depthTest={false}
+              blending={THREE.AdditiveBlending}
+              opacity={0.28}
+            />
+          </mesh>
+
+          {/* Containment field — faint wireframe icosahedron wrapping the hologram */}
+          <mesh frustumCulled={false}>
+            <icosahedronGeometry args={[1.55, 1]} />
+            <meshBasicMaterial color={identityColor} wireframe transparent opacity={0.18} depthWrite={false} />
+          </mesh>
+
+          {/* Heart core — faint light pulse behind the hologram */}
+          <mesh ref={coreRef} position={[0, -0.1, -0.4]} frustumCulled={false}>
+            <sphereGeometry args={[0.14, 16, 16]} />
+            <meshStandardMaterial color="#ffffff" emissive={identityColor} emissiveIntensity={0.5} toneMapped={false} transparent opacity={0.6} />
           </mesh>
         </>
       ) : (
+        // No AI avatar yet — show a prompt glyph + hint.
         <>
-          <mesh position={[0, 0.85, 0]} frustumCulled={false}>
-            <icosahedronGeometry args={[0.28, 1]} />
-            <meshStandardMaterial color={crownColor} wireframe transparent opacity={0.65} emissive={crownColor} emissiveIntensity={0.35} />
+          <mesh position={[0, 0, 0]} frustumCulled={false}>
+            <icosahedronGeometry args={[0.55, 1]} />
+            <meshStandardMaterial color={identityColor} wireframe emissive={identityColor} emissiveIntensity={0.45} transparent opacity={0.7} />
           </mesh>
-          <mesh position={[0, 0.85, 0]} frustumCulled={false}>
-            <sphereGeometry args={[0.2, 18, 18]} />
-            <meshStandardMaterial color={crownColor} transparent opacity={0.42} emissive={crownColor} emissiveIntensity={0.2} />
-          </mesh>
-          <mesh ref={eyeLeftRef} position={[-0.07, 0.88, 0.18]} frustumCulled={false}>
-            <sphereGeometry args={[0.025, 8, 8]} />
-            <meshStandardMaterial color="#ffffff" emissive="#00ffcc" emissiveIntensity={eyeGlow} toneMapped={false} />
-          </mesh>
-          <mesh ref={eyeRightRef} position={[0.07, 0.88, 0.18]} frustumCulled={false}>
-            <sphereGeometry args={[0.025, 8, 8]} />
-            <meshStandardMaterial color="#ffffff" emissive="#00ffcc" emissiveIntensity={eyeGlow} toneMapped={false} />
+          <mesh ref={coreRef} position={[0, 0, 0]} frustumCulled={false}>
+            <sphereGeometry args={[0.24, 18, 18]} />
+            <meshStandardMaterial color="#ffffff" emissive={identityColor} emissiveIntensity={0.8} toneMapped={false} />
           </mesh>
         </>
       )}
 
-      {/* Saturn-halo crown — only if headGear equipped (layers above the portrait ring) */}
+      {/* Saturn-halo crown — only if headGear equipped; rides above the hologram */}
       {headGear && (
-        <mesh ref={crownHaloRef} position={[0, 1.35, 0]} rotation={[Math.PI / 2.4, 0, 0]} frustumCulled={false}>
-          <torusGeometry args={[0.36, 0.02, 10, 48]} />
+        <mesh ref={crownHaloRef} position={[0, 1.55, 0]} rotation={[Math.PI / 2.4, 0, 0]} frustumCulled={false}>
+          <torusGeometry args={[0.5, 0.02, 10, 48]} />
           <meshStandardMaterial color={crownColor} emissive={crownColor} emissiveIntensity={0.8 + haloIntensity} transparent opacity={0.85} toneMapped={false} />
         </mesh>
       )}
 
-      {/* Trinket accent ring — orbits the core */}
+      {/* Trinket ring — orbits the heart of the hologram */}
       {trinket && (
-        <mesh ref={trinketRingRef} position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]} frustumCulled={false}>
-          <torusGeometry args={[0.28, 0.012, 8, 40]} />
-          <meshStandardMaterial color={trinketColor} emissive={trinketColor} emissiveIntensity={0.6} transparent opacity={0.7} toneMapped={false} />
+        <mesh ref={trinketRingRef} position={[0, -0.1, 0]} rotation={[Math.PI / 2, 0, 0]} frustumCulled={false}>
+          <torusGeometry args={[0.58, 0.015, 8, 48]} />
+          <meshStandardMaterial color={trinketColor} emissive={trinketColor} emissiveIntensity={0.6} transparent opacity={0.65} toneMapped={false} />
         </mesh>
       )}
     </group>

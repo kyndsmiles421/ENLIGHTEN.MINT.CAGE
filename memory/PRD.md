@@ -1,6 +1,21 @@
 # ENLIGHTEN.MINT.CAFE — V68.16 Sovereign Guide
 ## PRD — Last Updated: Feb 20, 2026
 
+## 🔒 V68.19 (Feb 20, 2026) — True Holographic Avatar (not cone-with-face)
+
+**User caught, round 2:** "3D version of some shapes put together." The tapered cone body + tiny circular portrait head felt like a 3D model with a photo glued on, not a holographic being. Users wanted the full AI-generated character projected as a floating hologram — the way the original AvatarCreator displayed it.
+
+**Fix shipped:**
+- Removed the procedural cone body, icosahedron crystal head, circular framing ring, and abstract eye spheres from `CrystallineSilhouette` entirely.
+- The 3D centerpiece is now a **large billboarded holographic plane (2.0 × 2.6 units)** rendering the full AI avatar image, double-sided, depth-test off so it always reads clearly against the starfield.
+- A second additive-blended plane at the same position tints the hologram with the user's identity color (profile `theme_color` → equipment body rarity if gear equipped → Sparks tier fallback). This creates the signature "holo glow" rim without a custom shader.
+- Hologram **flickers** via opacity wobble (sin wave 3.1Hz + 11.7Hz) in `useFrame` — subtle, alive, never distracting.
+- A faint **wireframe icosahedron containment field** (opacity 0.18, identity color) wraps the hologram, giving it dimensional anchor without competing with the face.
+- Removed the group.rotation.y spin — the hologram now stays facing the user (stationary projection) with only a gentle vertical float. Crown halo + trinket ring still rotate independently.
+- Body-gear rarity color now tints the additive hologram glow (rather than rendering a separate bar), so equipping a Legendary body bathes the whole being in gold.
+
+**Screenshot-verified:** the Fractal Engine centerpiece now shows the ethereal humanoid + lion familiar (the user's real AI avatar) floating inside a violet wireframe field, with gold trinket orbit + violet crown halo and amethyst glow edging the figure. All 7 pillars orbit around it undisturbed.
+
 ## 🔒 V68.18 (Feb 20, 2026) — Identity Restored + Profile Discoverability
 
 **User caught:** the 3D silhouette looked "generic" compared to the Dashboard's real AI-generated portrait. And there was no obvious way to find or share your own profile page.
