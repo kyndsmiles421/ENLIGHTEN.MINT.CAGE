@@ -169,6 +169,28 @@ export default function ChamberMiniGame({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
+  // V68.26 — Cosmic Mixer integration. When the user toggles a mixer
+  // nodule (freq / sound / drone / mantra), every OPEN chamber game
+  // receives a "mixer-tick" — it counts as a micro-assist: credits 1
+  // Spark, flashes the stage, and signals the brain. This gives the
+  // mixer nodules a real FUNCTION inside each gamified module instead
+  // of being decorative.
+  useEffect(() => {
+    if (!open) return;
+    const onMix = (ev) => {
+      setXp((v) => v + MICRO_SPARKS);
+      creditSparks(zone, 1);
+      setFlashAt({
+        x: (typeof window !== 'undefined' ? window.innerWidth : 400) * 0.5,
+        y: (typeof window !== 'undefined' ? window.innerHeight : 800) * 0.5,
+        key: Date.now(),
+      });
+      fireBrain('mixer_assist', { mixer: ev?.detail || null });
+    };
+    window.addEventListener('sovereign:mixer-tick', onMix);
+    return () => window.removeEventListener('sovereign:mixer-tick', onMix);
+  }, [open, zone, fireBrain]);
+
   if (!open) return null;
 
   return (

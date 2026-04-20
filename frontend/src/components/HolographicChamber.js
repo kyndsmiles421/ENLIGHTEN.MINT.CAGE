@@ -95,17 +95,16 @@ export default function HolographicChamber({
       return;
     }
     const token = localStorage.getItem('zen_token');
-    if (!token || token === 'guest_token') {
-      setBackdrop(null);
-      return;
-    }
-    const h = { Authorization: `Bearer ${token}` };
+    const h = (token && token !== 'guest_token') ? { Authorization: `Bearer ${token}` } : {};
     let alive = true;
     (async () => {
+      // Chamber backdrop is PUBLIC (guests included) — it's just a room
+      // photograph, not private data. The user's personal hologram is
+      // only fetched for authenticated users.
       const requests = [
         axios.post(`${API}/ai-visuals/chamber`, { chamber_id: chamberId }, { headers: h }),
       ];
-      if (showHologramCorner) {
+      if (showHologramCorner && token && token !== 'guest_token') {
         requests.push(axios.get(`${API}/ai-visuals/my-avatar`, { headers: h }));
       }
       const results = await Promise.allSettled(requests);

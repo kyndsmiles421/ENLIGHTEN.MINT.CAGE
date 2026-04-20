@@ -19,9 +19,14 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { ChevronDown, ChevronUp, Layers, Gem, Zap } from 'lucide-react';
+import {
+  ChevronDown, ChevronUp, Layers, Gem, Zap,
+  Hammer, Axe, Flame, Wrench, Droplets, Leaf, BookOpen, Heart, Sparkles,
+} from 'lucide-react';
 import axios from 'axios';
 import HolographicChamber from './HolographicChamber';
+import ChamberProp from './ChamberProp';
+import ChamberMiniGame from './games/ChamberMiniGame';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -43,6 +48,33 @@ const MODULE_TO_CHAMBER = {
   gardening: 'herbology',
   herbalism: 'herbology',
 };
+
+// Gameplay theme per module: which verb, which icon, which mode. This
+// turns the generic "tap the SVG" loop into a real themed action —
+// masonry = strike stone, carpentry = saw wood, culinary = knead dough,
+// electrical = align the current, plumbing = match the flow, and so on.
+const MODULE_GAME_THEME = {
+  masonry:      { mode: 'break',   verb: 'STRIKE',  icon: Hammer,   title: 'STRIKE THE STONE',    msg: 'STONE SHAPED' },
+  carpentry:    { mode: 'break',   verb: 'SAW',     icon: Axe,      title: 'SAW THE TIMBER',      msg: 'BEAM CUT' },
+  culinary:     { mode: 'break',   verb: 'KNEAD',   icon: Flame,    title: 'KNEAD THE DOUGH',     msg: 'DOUGH READY' },
+  cooking:      { mode: 'break',   verb: 'STIR',    icon: Flame,    title: 'STIR THE POT',        msg: 'MEAL READY' },
+  baking:       { mode: 'break',   verb: 'KNEAD',   icon: Flame,    title: 'SHAPE THE LOAF',      msg: 'LOAF BAKED' },
+  electrical:   { mode: 'rhythm',  verb: 'ALIGN',   icon: Zap,      title: 'ALIGN THE CURRENT',   msg: 'CIRCUIT SET' },
+  plumbing:     { mode: 'rhythm',  verb: 'MATCH',   icon: Droplets, title: 'MATCH THE FLOW',      msg: 'FLOW BALANCED' },
+  landscaping:  { mode: 'collect', verb: 'PLANT',   icon: Leaf,     title: 'PLANT THE SEEDLINGS', msg: 'GARDEN GROWN' },
+  gardening:    { mode: 'collect', verb: 'PLANT',   icon: Leaf,     title: 'PLANT THE SEEDLINGS', msg: 'GARDEN GROWN' },
+  herbalism:    { mode: 'collect', verb: 'HARVEST', icon: Leaf,     title: 'HARVEST THE HERBS',   msg: 'HARVEST COMPLETE' },
+  nursing:      { mode: 'rhythm',  verb: 'CARE',    icon: Heart,    title: 'PULSE · STEADY CARE', msg: 'CARE DELIVERED' },
+  childcare:    { mode: 'rhythm',  verb: 'SOOTHE',  icon: Heart,    title: 'MATCH THE RHYTHM',    msg: 'CHILD SOOTHED' },
+  eldercare:    { mode: 'rhythm',  verb: 'TEND',    icon: Heart,    title: 'STEADY PRESENCE',    msg: 'DIGNITY HELD' },
+  bible:        { mode: 'collect', verb: 'VERSE',   icon: BookOpen, title: 'GATHER THE VERSES',   msg: 'VERSES SEALED' },
+};
+
+// Tool symbol → themed icon glyph. Many backend tool rows ship with a
+// short `icon_symbol` character; this maps typical masonry/carpentry/
+// electrical tool glyphs onto a real lucide icon so the prop looks like
+// a tool, not a letter. Unknown glyphs fall back to Wrench.
+const TOOL_ICON_FALLBACK = Wrench;
 
 function CenterBlock({ material, isActive, onTap, accentColor }) {
   if (!material) return null;
@@ -182,7 +214,23 @@ export default function UniversalWorkshop({ moduleId, title, subtitle, icon: Ico
   const [actions, setActions] = useState(() => {
     try { return parseInt(localStorage.getItem(storageKey) || '0'); } catch { return 0; }
   });
+  // V68.26 — Chamber mini-game state. Tapping the material or a tool
+  // opens a themed game (strike stone, saw beam, knead dough, match
+  // current flow, etc.) instead of the old flat letter-circle tap.
+  const [gameKey, setGameKey] = useState(null); // null | "material" | "tool:<id>"
   const isFullAuth = token && token !== 'guest_token';
+
+  // Bridge: the bottom Cosmic Mixer nodules broadcast sovereign:mixer-*
+  // events. Any chamber mini-game that is currently open listens via
+  // ChamberMiniGame; here we surface the most recent mixer intensity so
+  // the workshop prop glow reacts too (mixer integration the user asked
+  // for: nodules have a FUNCTION inside the module, not decoration).
+  const [mixerPulse, setMixerPulse] = useState(0);
+  useEffect(() => {
+    const onMix = () => setMixerPulse((k) => k + 1);
+    window.addEventListener('sovereign:mixer-tick', onMix);
+    return () => window.removeEventListener('sovereign:mixer-tick', onMix);
+  }, []);
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 12); }, []);
 
@@ -200,18 +248,19 @@ export default function UniversalWorkshop({ moduleId, title, subtitle, icon: Ico
   useEffect(() => { try { localStorage.setItem(storageKey, String(actions)); } catch {} }, [actions, storageKey]);
 
   const handleMatTap = useCallback(() => {
-    if (diveOpen) setDiveOpen(false);
-    else { setDiveOpen(true); setTutorial(null); setSelTool(null);
-      if (typeof window.__workAccrue === 'function') window.__workAccrue(`${moduleId}_inspect`, 5);
-      // V68.4: Fire Sovereign Universe signal — material identify
-      try { if (selMat) window.SovereignUniverse?.checkQuestLogic(`${moduleId}:material:${selMat.id}`, moduleId); } catch {}
-    }
-  }, [diveOpen, moduleId, selMat]);
+    if (!selMat) return;
+    // V68.26: tapping the material now opens a real themed chamber game.
+    setGameKey('material');
+    if (typeof window.__workAccrue === 'function') window.__workAccrue(`${moduleId}_inspect`, 5);
+    try { if (selMat) window.SovereignUniverse?.checkQuestLogic(`${moduleId}:material:${selMat.id}`, moduleId); } catch {}
+  }, [moduleId, selMat]);
 
   const handleToolSelect = useCallback(async (tool) => {
     if (!selMat) return;
     setSelTool(tool); setDiveOpen(false); setTutorial(null); setActions(c => c + 1);
     if (typeof window.__workAccrue === 'function') window.__workAccrue(skillKey, 12);
+    // Open the tool's themed chamber mini-game (strike/saw/knead/etc).
+    setGameKey(`tool:${tool.id}`);
     // Earn Sparks for tool use
     const t = localStorage.getItem('zen_token');
     if (t && t !== 'guest_token') axios.post(`${API}/sparks/earn`, { action: 'workshop_tool_use', context: `${moduleId}_${tool.id}` }, { headers: { Authorization: `Bearer ${t}` } }).catch(() => {});
@@ -289,11 +338,136 @@ export default function UniversalWorkshop({ moduleId, title, subtitle, icon: Ico
             <circle cx="180" cy="180" r="155" fill="none" stroke={`${accentColor}15`} strokeWidth="1" strokeDasharray="4,4" />
             <circle cx="180" cy="180" r="90" fill="none" stroke={`${accentColor}08`} strokeWidth="0.5" />
           </svg>
-          <div className="absolute" style={{ left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
-            <CenterBlock material={selMat} isActive={diveOpen} onTap={handleMatTap} accentColor={accentColor} />
-          </div>
-          {tools.length > 0 && <ToolRing tools={tools} selectedTool={selTool} onSelectTool={handleToolSelect} />}
+          {/* Center holographic material prop — tap to open the themed
+              break-game (strike stone / saw beam / knead dough / etc.).
+              No more flat SVG cube with a letter. */}
+          {selMat && (() => {
+            const theme = MODULE_GAME_THEME[moduleId] || MODULE_GAME_THEME.masonry;
+            const matColor = selMat.color || accentColor;
+            const MatIcon = theme.icon || Gem;
+            return (
+              <motion.button
+                type="button"
+                onClick={handleMatTap}
+                data-testid="center-block"
+                whileTap={{ scale: 0.94 }}
+                animate={{ scale: mixerPulse % 2 === 1 ? 1.06 : 1 }}
+                transition={{ type: 'spring', stiffness: 220, damping: 16 }}
+                style={{
+                  position: 'absolute',
+                  left: '50%', top: '50%', transform: 'translate(-50%, -50%)',
+                  width: 170, height: 170, borderRadius: '50%',
+                  border: `2px solid ${matColor}`,
+                  background: `radial-gradient(circle at 35% 30%, ${matColor}66 0%, ${matColor}22 45%, rgba(0,0,0,0.35) 95%)`,
+                  boxShadow: `0 0 42px ${matColor}66, inset 0 0 28px ${matColor}55`,
+                  color: '#fff', cursor: 'pointer',
+                  display: 'flex', flexDirection: 'column',
+                  alignItems: 'center', justifyContent: 'center',
+                  padding: 0,
+                }}
+              >
+                <MatIcon size={54} style={{ color: matColor, filter: `drop-shadow(0 0 18px ${matColor})` }} />
+                <span style={{
+                  marginTop: 8, fontSize: 10, letterSpacing: 3,
+                  fontFamily: 'monospace', color: matColor,
+                }}>
+                  {selMat.name?.toUpperCase()}
+                </span>
+                <span style={{
+                  fontSize: 8, letterSpacing: 2,
+                  fontFamily: 'monospace', color: 'rgba(255,255,255,0.55)', marginTop: 2,
+                }}>
+                  TAP TO {theme.verb}
+                </span>
+              </motion.button>
+            );
+          })()}
+          {/* Tool ring — each tool is a ChamberProp-style hotspot.
+              Tapping a tool opens its themed mini-game in the chamber. */}
+          {tools.length > 0 && (
+            <div className="absolute inset-0" data-testid="tool-ring">
+              {tools.map((tool, i) => {
+                const count = tools.length;
+                const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
+                const ringRadius = 150;
+                const x = Math.cos(angle) * ringRadius, y = Math.sin(angle) * ringRadius;
+                const sel = selTool?.id === tool.id;
+                const c = tool.color || accentColor;
+                const glyph = tool.icon_symbol;
+                return (
+                  <motion.button
+                    key={tool.id}
+                    type="button"
+                    onClick={() => handleToolSelect(tool)}
+                    whileTap={{ scale: 0.9 }}
+                    whileHover={{ scale: 1.15 }}
+                    animate={{ scale: sel ? 1.2 : 1 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                    data-testid={`wtool-${tool.id}`}
+                    style={{
+                      position: 'absolute',
+                      left: `calc(50% + ${x}px - 28px)`,
+                      top: `calc(50% + ${y}px - 28px)`,
+                      width: 56, height: 56, borderRadius: '50%',
+                      border: `2px solid ${c}`,
+                      background: `radial-gradient(circle, ${c}44 0%, ${c}11 55%, transparent 90%)`,
+                      boxShadow: `0 0 22px ${c}66, inset 0 0 10px ${c}55`,
+                      color: c, cursor: 'pointer', padding: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                  >
+                    <TOOL_ICON_FALLBACK size={22} style={{ color: c }} />
+                    {/* Glyph watermark under the icon */}
+                    {glyph && (
+                      <span style={{
+                        position: 'absolute', top: -4, right: -4,
+                        fontSize: 9, fontFamily: 'monospace',
+                        color: c, background: 'rgba(0,0,0,0.6)',
+                        padding: '1px 4px', borderRadius: 6,
+                      }}>{glyph}</span>
+                    )}
+                    <span style={{
+                      position: 'absolute', bottom: -14, left: '50%', transform: 'translateX(-50%)',
+                      fontSize: 7, letterSpacing: 2, fontFamily: 'monospace',
+                      color: sel ? c : 'rgba(255,255,255,0.45)', whiteSpace: 'nowrap',
+                      textShadow: '0 2px 6px rgba(0,0,0,0.8)',
+                    }}>
+                      {String(tool.name || '').split(' ')[0]?.toUpperCase()}
+                    </span>
+                  </motion.button>
+                );
+              })}
+            </div>
+          )}
         </div>
+
+        {/* V68.26 Chamber mini-game — opens when a tool or the material
+            is tapped. Mode / verb / icon are themed per module. The game
+            machine is progressive (scales with each completion) and
+            signals the SovereignUniverse brain. */}
+        {(() => {
+          const theme = MODULE_GAME_THEME[moduleId] || MODULE_GAME_THEME.masonry;
+          const isMat = gameKey === 'material';
+          const isTool = gameKey && gameKey.startsWith('tool:');
+          const gcolor = isTool ? (selTool?.color || accentColor) : (selMat?.color || accentColor);
+          const zoneBase = `${moduleId}_${isMat ? 'material' : (selTool?.id || 'tool')}`;
+          return (
+            <ChamberMiniGame
+              open={!!gameKey}
+              onClose={() => setGameKey(null)}
+              mode={theme.mode}
+              color={gcolor}
+              title={isTool && selTool ? `${String(selTool.name || '').toUpperCase()} · ${selMat?.name?.toUpperCase() || ''}` : theme.title}
+              verb={theme.verb}
+              icon={theme.icon}
+              targetCount={theme.mode === 'rhythm' ? 5 : (theme.mode === 'break' ? 5 : 7)}
+              hitsPerTarget={3}
+              zone={zoneBase}
+              completionMsg={theme.msg}
+              completionXP={12}
+            />
+          );
+        })()}
 
         {selTool && !diveOpen && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}

@@ -272,6 +272,10 @@ export function MixerProvider({ children }) {
     freqNodesMapRef.current[freq.hz] = nodes;
     if (!channelVols[`freq-${freq.hz}`]) setChannelVols(v => ({...v, [`freq-${freq.hz}`]: 75}));
     setActiveFreqs(prev => new Set(prev).add(freq.hz));
+    // V68.26 — broadcast to any open HolographicChamber / ChamberMiniGame
+    // so mixer nodules have a FUNCTION inside the current module (pulse
+    // the prop, bias the rhythm band, etc.).
+    try { window.dispatchEvent(new CustomEvent('sovereign:mixer-tick', { detail: { kind: 'freq', id: freq.hz, color: freq.color } })); } catch {}
   }, [activeFreqs, getCtx, channelVols, stopNodesForKey]);
 
   const toggleSound = useCallback(async (sound, options = {}) => {
@@ -299,6 +303,7 @@ export function MixerProvider({ children }) {
     soundNodesMapRef.current[sound.id] = nodes;
     if (!channelVols[`sound-${sound.id}`]) setChannelVols(v => ({...v, [`sound-${sound.id}`]: 75}));
     setActiveSounds(prev => new Set(prev).add(sound.id));
+    try { window.dispatchEvent(new CustomEvent('sovereign:mixer-tick', { detail: { kind: 'sound', id: sound.id, color: sound.color } })); } catch {}
   }, [activeSounds, getCtx, channelVols, stopNodesForKey]);
 
   const toggleDrone = useCallback(async (drone, options = {}) => {

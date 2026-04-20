@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
-from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
+from deps import db, get_current_user, get_current_user_optional, EMERGENT_LLM_KEY, logger
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
 from emergentintegrations.llm.openai.video_generation import OpenAIVideoGeneration
 from engines.crystal_seal import secure_hash_short
@@ -247,15 +247,16 @@ CHAMBER_PROMPTS = {
 @router.post("/ai-visuals/chamber")
 async def generate_chamber_backdrop(
     data: dict = Body(...),
-    user=Depends(get_current_user),
+    user=Depends(get_current_user_optional),
 ):
     """Generate (or return cached) cinematic backdrop for a holographic chamber.
 
-    Body: { "chamber_id": "meditation" | "masonry" | "carpentry" | "culinary" | "academy" | "physics" | "geology" }
+    Body: { "chamber_id": "meditation" | "masonry" | "carpentry" | "culinary" | "academy" | "physics" | "geology" | "herbology" | "apothecary" | "aromatherapy" | "default" }
 
     The image is cached by (chamber_id) so subsequent loads are instant and
-    the same user sees the same room every time they enter it — reinforcing
-    the "I'm in a real place" immersion the app is going for.
+    every visitor (including guests) sees the same room every time they
+    enter it — reinforcing the "I'm in a real place" immersion the app is
+    going for. Public: no auth required.
     """
     chamber_id = (data.get("chamber_id") or "default").lower()
     prompt = CHAMBER_PROMPTS.get(chamber_id, CHAMBER_PROMPTS["default"])
