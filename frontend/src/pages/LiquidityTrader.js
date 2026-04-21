@@ -490,7 +490,7 @@ export default function LiquidityTrader() {
 
   const fetchStatus = useCallback(async () => {
     try {
-      const { data } = await axios.get(`${API}/transmuter/status`, { headers: authHeaders() });
+      const { data } = await axios.get(`${API}/transmuter/status`, { headers: authHeaders });
       setStatus(data);
     } catch (err) {
       toast.error('Failed to load Transmuter status');
@@ -504,7 +504,7 @@ export default function LiquidityTrader() {
   const handleTrade = async (dustAmount) => {
     setTrading(true);
     try {
-      const { data } = await axios.post(`${API}/transmuter/trade-dust-to-fans`, { dust_amount: dustAmount }, { headers: authHeaders() });
+      const { data } = await axios.post(`${API}/transmuter/trade-dust-to-fans`, { dust_amount: dustAmount }, { headers: authHeaders });
       toast.success(`Transmuted ${data.dust_consumed.toLocaleString()} Dust into ${data.fans_earned} Fan${data.fans_earned > 1 ? 's' : ''}`);
       fetchStatus();
     } catch (err) {
@@ -517,7 +517,7 @@ export default function LiquidityTrader() {
   const handleGenerateBlueprint = async (length, width, tradeType) => {
     setGenerating(true);
     try {
-      const { data } = await axios.post(`${API}/transmuter/generate-blueprint`, { length, width, trade_type: tradeType }, { headers: authHeaders() });
+      const { data } = await axios.post(`${API}/transmuter/generate-blueprint`, { length, width, trade_type: tradeType }, { headers: authHeaders });
       setLastBlueprint(data);
       toast.success(`Sacred Blueprint generated! +${data.dust_rewarded} Dust`);
       fetchStatus();
@@ -531,7 +531,7 @@ export default function LiquidityTrader() {
   const handleTransmute = async (inputAmount) => {
     setTransmuting(true);
     try {
-      const { data } = await axios.post(`${API}/transmuter/transmute`, { input_amount: inputAmount }, { headers: authHeaders() });
+      const { data } = await axios.post(`${API}/transmuter/transmute`, { input_amount: inputAmount }, { headers: authHeaders });
       setLastAlchemy(data);
       toast.success(`Alchemy complete! Net: ${data.net_result} Dust (${data.tier_name} @ ${(data.tier_ratio * 100).toFixed(1)}%)`);
       fetchStatus();

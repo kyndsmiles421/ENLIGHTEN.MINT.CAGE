@@ -24,7 +24,7 @@ export default function VitalityBar({ accent = '#FBBF24' }) {
   const fetchStats = useCallback(async () => {
     if (!user) return;
     try {
-      const res = await axios.get(`${API}/rpg/character`, { headers: authHeaders() });
+      const res = await axios.get(`${API}/rpg/character`, { headers: authHeaders });
       setStats({
         level: res.data.level || 1,
         xpCurrent: res.data.xp_current || 0,

@@ -553,7 +553,7 @@ function ThreeStarChart({ data, containerRef, onSelectConstellation, onSelectCul
         source_ra: srcRA, source_dec: srcDec,
         target_ra: journeyTarget.ra, target_dec: journeyTarget.dec,
         radius: 50, steps: 30,
-      }, { headers: typeof authHeaders === 'function' ? authHeaders() : authHeaders }).then(res => {
+      }, { headers: typeof authHeaders === 'function' ? authHeaders() : (authHeaders || {}) }).then(res => {
         matrixKeyframesRef.current = { frames: res.data.keyframes, idx: 0 };
       }).catch(() => {});
     } else {

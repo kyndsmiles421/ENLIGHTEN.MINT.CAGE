@@ -65,7 +65,7 @@ export default function useWorkAccrual() {
     try {
       // 1. Dust accrual via Transmuter
       const dustRes = await axios.post(`${API}/transmuter/work-submit`, payload, {
-        headers: authHeaders(),
+        headers: authHeaders,
       });
       const earned = dustRes.data?.earned || 0;
       const dustBalance = dustRes.data?.dust_balance || 0;
@@ -81,7 +81,7 @@ export default function useWorkAccrual() {
         const xpRes = await axios.post(`${API}/rpg/character/gain-xp`, {
           amount: xpAmount,
           source: currentSource,
-        }, { headers: authHeaders() });
+        }, { headers: authHeaders });
         rpgResult = xpRes.data;
       } catch {
         // RPG bridge failure is non-fatal

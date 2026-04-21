@@ -173,7 +173,7 @@ export default function DailyChallenges({ compact = false }) {
   const fetchChallenges = useCallback(async () => {
     if (!user) return;
     try {
-      const res = await axios.get(`${API}/challenges/daily-cross-module`, { headers: authHeaders() });
+      const res = await axios.get(`${API}/challenges/daily-cross-module`, { headers: authHeaders });
       setChallenges(res.data?.challenges || []);
     } catch (e) {
       // Non-critical - challenges are optional
@@ -188,7 +188,7 @@ export default function DailyChallenges({ compact = false }) {
     try {
       const res = await axios.post(`${API}/challenges/daily-cross-module/claim`, {
         challenge_id: challengeId,
-      }, { headers: authHeaders() });
+      }, { headers: authHeaders });
       if (res.data?.claimed) {
         toast.success(`Challenge complete! +${res.data.xp_earned} XP earned`);
         fetchChallenges();

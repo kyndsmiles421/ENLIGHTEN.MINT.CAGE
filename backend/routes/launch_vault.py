@@ -27,7 +27,8 @@ WHITELIST = {
     # v1.0.2 kept
     "enlighten-v1.0.2.apk":                ("application/vnd.android.package-archive", "enlighten-v1.0.2.apk"),
     "enlighten-mint-cafe-v1.0.2.aab":      ("application/octet-stream",                 "enlighten-mint-cafe-v1.0.2.aab"),
-    "enlighten-mint-cafe-UPLOAD-KEY.keystore": ("application/octet-stream",             "enlighten-mint-cafe-UPLOAD-KEY.keystore"),
+    # Keystore REMOVED from public whitelist — V68.42 security hardening.
+    # If you need it, copy it manually from /app/build_artifacts/enlighten-mint-cafe-UPLOAD-KEY.keystore
     # Play Store listing assets
     "playstore/feature_graphic_1024x500.png": ("image/png", "feature_graphic_1024x500.png"),
     "playstore/phone_00_landing.jpeg":        ("image/jpeg", "phone_00_landing.jpg"),

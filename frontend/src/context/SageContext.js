@@ -110,6 +110,8 @@ export function SageProvider({ children }) {
       });
       setProgress(res.data);
     } catch (err) {
+      // Cancelled (guest mode) is expected — don't pollute the console.
+      if (err?.code === 'ERR_CANCELED') return;
       console.error('Failed to fetch progress:', err);
     }
   }, [token]);
@@ -123,6 +125,7 @@ export function SageProvider({ children }) {
       });
       setActiveQuests(res.data.quests || []);
     } catch (err) {
+      if (err?.code === 'ERR_CANCELED') return;
       console.error('Failed to fetch quests:', err);
     }
   }, [token]);

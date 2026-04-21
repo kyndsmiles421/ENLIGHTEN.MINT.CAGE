@@ -34,7 +34,7 @@ export default function ProgressGate({ gateId, children, color = '#A78BFA' }) {
     
     const checkGate = async () => {
       try {
-        const res = await axios.get(`${API}/rpg/milestones`, { headers: authHeaders() });
+        const res = await axios.get(`${API}/rpg/milestones`, { headers: authHeaders });
         const milestones = res.data?.milestones || [];
         const m = milestones.find(ms => ms.id === gate.milestone);
         if (m) {
