@@ -92,6 +92,7 @@ function CosmicMeshWrapper() {
 
 // Eager load: Landing + Auth (first screens users see)
 import Landing from './pages/Landing';
+import RootGate from './components/RootGate';
 import Auth from './pages/Auth';
 import CinematicIntro from './pages/CinematicIntro';
 
@@ -418,8 +419,12 @@ function AnimatedRoutes() {
     <CosmicErrorBoundary>
     <Suspense fallback={<PageLoader />}>
       <Routes location={location}>
-        {/* V9999.3 HARVEST GROUNDING: Redirect root to Sovereign Hub Singularity */}
-        <Route path="/" element={<Navigate to="/sovereign-hub" replace />} />
+        {/* V68.41 Front Door: logged-out → /landing.html; logged-in → /sovereign-hub */}
+        <Route path="/" element={
+          <RootGate>
+            <Navigate to="/sovereign-hub" replace />
+          </RootGate>
+        } />
         <Route path="/landing" element={<Landing />} />
         <Route path="/intro" element={<CinematicIntro />} />
         <Route path="/auth" element={<Auth />} />

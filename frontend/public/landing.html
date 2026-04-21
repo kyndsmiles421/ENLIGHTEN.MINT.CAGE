@@ -12,128 +12,195 @@
   :root {
     color-scheme: dark;
     --bg: #000;
-    --panel: rgba(255,255,255,0.03);
-    --border: rgba(255,255,255,0.08);
     --text: #E6E9F2;
     --muted: #94a3b8;
     --gold-1: #F4D58D;
     --gold-2: #D4AF37;
     --gold-3: #9C6A2E;
   }
-  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: "Cormorant Garamond", Georgia, serif; min-height: 100vh; }
-  body { -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  html, body { margin: 0; padding: 0; background: #000; color: var(--text); font-family: "Cormorant Garamond", Georgia, serif; min-height: 100vh; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+  /* ── Un-Boxer: ambient radial auras instead of flat panel backgrounds ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 55% 40% at 20% 12%, rgba(244,213,141,0.10), transparent 65%),
+      radial-gradient(ellipse 45% 35% at 85% 30%, rgba(167,139,250,0.08), transparent 70%),
+      radial-gradient(ellipse 70% 50% at 50% 95%, rgba(59,130,246,0.05), transparent 75%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
   a { color: var(--gold-1); text-decoration: none; }
-  a:hover { text-decoration: underline; text-decoration-color: rgba(244,213,141,0.5); }
+  a:hover { color: #fff; }
 
-  .wrap { max-width: 760px; margin: 0 auto; padding: 56px 20px 96px; }
+  .wrap { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 64px 22px 96px; }
 
-  .telemetry { font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; font-size: 10px; letter-spacing: 0.32em; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
+  .telemetry { font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; font-size: 10px; letter-spacing: 0.34em; color: var(--muted); text-transform: uppercase; margin-bottom: 18px; }
 
   h1 {
     font-weight: 400;
-    font-size: clamp(42px, 9vw, 76px);
-    line-height: 0.98;
-    letter-spacing: -0.02em;
-    margin: 0 0 20px;
+    font-size: clamp(44px, 10vw, 82px);
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    margin: 0 0 22px;
     background: linear-gradient(135deg, var(--gold-1) 0%, var(--gold-2) 55%, var(--gold-3) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    text-shadow: 0 0 36px rgba(244,213,141,0.08);
   }
-  .brand-dot { color: var(--gold-2); opacity: 0.55; padding: 0 0.08em; }
+  .brand-dot { color: rgba(212,175,55,0.45); padding: 0 0.06em; }
 
-  .tagline-italic {
-    font-style: italic;
-    font-size: 18px;
-    color: rgba(230,233,242,0.7);
-    margin: 0 0 8px;
+  .tagline-italic { font-style: italic; font-size: 19px; color: rgba(230,233,242,0.75); margin: 0 0 10px; }
+  .engine-note { font-family: "JetBrains Mono", monospace; font-size: 9.5px; letter-spacing: 0.24em; color: rgba(148,163,184,0.55); text-transform: uppercase; margin: 0 0 36px; }
+  .lede { font-size: 19px; line-height: 1.58; color: rgba(203,213,225,0.92); margin: 0 0 42px; max-width: 620px; }
+
+  /* ── Refraction CTAs (procedural glass, no rectangle feel) ── */
+  .cta-row {
+    display: flex; flex-direction: column; gap: 14px; margin-bottom: 64px;
+    perspective: 900px;
   }
-
-  .engine-note {
-    font-family: "JetBrains Mono", monospace;
-    font-size: 9.5px;
-    letter-spacing: 0.22em;
-    color: rgba(148,163,184,0.55);
-    text-transform: uppercase;
-    margin: 0 0 32px;
-  }
-
-  .lede {
-    font-size: 19px;
-    line-height: 1.55;
-    color: rgba(203,213,225,0.92);
-    margin: 0 0 36px;
-    max-width: 620px;
+  @media (min-width: 560px) {
+    .cta-row { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; }
+    /* Gentle 5° curve — the buttons look like they're wrapping a lens */
+    .cta-row > .refract:nth-child(1) { transform: rotate(-1.5deg); }
+    .cta-row > .refract:nth-child(2) { transform: rotate(0deg) translateY(-2px); }
+    .cta-row > .refract:nth-child(3) { transform: rotate(1.5deg); }
   }
 
-  .cta-row { display: flex; flex-direction: column; gap: 12px; margin-bottom: 56px; }
-  @media (min-width: 520px) { .cta-row { flex-direction: row; flex-wrap: wrap; } }
+  .refract {
+    position: relative;
+    display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; min-height: 64px; padding: 16px 26px;
+    font-family: "Cormorant Garamond", serif; font-size: 17px; font-weight: 500;
+    color: #F5F3EC; text-decoration: none;
+    background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+    border: 1px solid var(--ring, rgba(244,213,141,0.55));
+    border-radius: 16px;
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 26px -8px var(--glow, rgba(244,213,141,0.35)), inset 0 1px 0 rgba(255,255,255,0.06);
+    /* Phi-based damped release: the button "resonates" on hover-off like a struck tuning fork.
+       cubic-bezier(0.22, 1.618, 0.36, 1) slightly overshoots, then settles — the PHI overshoot
+       gives the recursive pulse Gemini described without any JS. */
+    transition:
+      transform 0.32s cubic-bezier(0.22, 1.618, 0.36, 1),
+      box-shadow 0.28s ease,
+      background 0.28s ease;
+    letter-spacing: 0.04em;
+    flex: 1 1 180px;
+    overflow: hidden;
+    isolation: isolate;
+  }
 
-  .btn {
-    display: inline-flex; align-items: center; justify-content: space-between; gap: 14px;
-    padding: 18px 22px; border-radius: 14px; font-size: 17px; font-weight: 500;
-    font-family: "Cormorant Garamond", serif;
-    transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
-    cursor: pointer; border: 1px solid; text-decoration: none;
-    min-height: 58px;
+  /* Inverse-square light spill — a radial gradient tied to each hue that pulses on :active.
+     The keyframes mimic a damped oscillator: big compression → smaller → smaller → settle. */
+  .refract::after {
+    content: '';
+    position: absolute;
+    inset: -30%;
+    background: radial-gradient(circle at 50% 50%, var(--ring, rgba(244,213,141,0.55)) 0%, transparent 55%);
+    opacity: 0;
+    z-index: -1;
+    pointer-events: none;
+    transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .btn:active { transform: scale(0.98); }
-  .btn .meta { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
-  .btn.gold {
-    background: linear-gradient(135deg, rgba(244,213,141,0.18), rgba(156,106,46,0.12));
-    border-color: rgba(244,213,141,0.55);
-    color: #fff;
-    flex: 1;
-  }
-  .btn.gold:hover { background: linear-gradient(135deg, rgba(244,213,141,0.28), rgba(156,106,46,0.2)); }
-  .btn.ghost {
-    background: rgba(255,255,255,0.02);
-    border-color: rgba(255,255,255,0.12);
-    color: var(--text);
-  }
-  .btn.ghost:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.22); }
 
-  h2 {
-    font-weight: 500;
-    font-size: 28px;
-    color: var(--gold-1);
-    margin: 48px 0 14px;
-    letter-spacing: -0.005em;
+  .refract:hover::after, .refract:focus-visible::after { opacity: 0.32; }
+  .refract:active::after { animation: refract-pulse 0.618s cubic-bezier(0.22, 1, 0.36, 1); }
+  .refract:active {
+    transform: translateY(1px) scale(0.985) rotate(0deg) !important;
+    transition-duration: 0.08s;
   }
-  h2 .h2-sub { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; vertical-align: middle; margin-left: 12px; }
 
-  .pillar-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-  @media (min-width: 520px) { .pillar-grid { grid-template-columns: 1fr 1fr; } }
+  @keyframes refract-pulse {
+    0%   { opacity: 0.95; transform: scale(0.85); }
+    38%  { opacity: 0.55; transform: scale(1.08); }  /* 1/φ^2 damping */
+    62%  { opacity: 0.32; transform: scale(0.96); }  /* 1/φ */
+    100% { opacity: 0.20; transform: scale(1.00); }
+  }
+
+  .refract:hover, .refract:focus-visible {
+    transform: translateY(-3px) rotate(0deg) !important;
+    background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+    box-shadow: 0 0 36px var(--ring, rgba(244,213,141,0.55)), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .refract .label { text-shadow: 0 0 14px var(--text-glow, rgba(244,213,141,0.9)); }
+  .refract .sub { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.62; }
+
+  /* Hue-shift per button (Gemini's frequency→hue logic, expressed as CSS vars) */
+  .refract.hz-528 { --ring: hsla(80, 78%, 62%, 0.55);  --glow: hsla(80, 88%, 54%, 0.35);  --text-glow: hsla(80, 90%, 80%, 0.9); }  /* Gold-green, Transformation */
+  .refract.hz-639 { --ring: hsla(120, 78%, 62%, 0.55); --glow: hsla(120, 88%, 54%, 0.35); --text-glow: hsla(120, 90%, 80%, 0.9); } /* Green, Connection */
+  .refract.hz-963 { --ring: hsla(280, 78%, 62%, 0.55); --glow: hsla(280, 88%, 54%, 0.35); --text-glow: hsla(280, 90%, 80%, 0.9); } /* Violet, Return */
+
+  /* ── Pillar cells: no hard borders, just a soft aura behind each ── */
+  h2 { font-weight: 500; font-size: 30px; color: var(--gold-1); margin: 60px 0 22px; letter-spacing: -0.005em; }
+  h2 .h2-sub { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; vertical-align: middle; margin-left: 14px; font-weight: 400; }
+
+  .pillars { display: grid; grid-template-columns: 1fr; gap: 4px; }
+  @media (min-width: 560px) { .pillars { grid-template-columns: 1fr 1fr; gap: 4px 20px; } }
 
   .pillar {
-    padding: 16px 18px; border-radius: 12px;
-    background: var(--panel); border: 1px solid var(--border);
+    position: relative;
+    padding: 18px 22px 20px;
+    border-radius: 18px;
+    background: transparent;
+    border: none;
+    overflow: hidden;
+    transition: background 0.3s ease;
   }
-  .pillar-name { font-size: 17px; font-weight: 500; margin-bottom: 4px; }
-  .pillar-desc { font-size: 13px; color: rgba(203,213,225,0.72); line-height: 1.45; }
+  .pillar::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 0% 50%, var(--aura, rgba(244,213,141,0.06)), transparent 75%);
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  .pillar:hover::before { opacity: 1.6; }
+  .pillar-name { position: relative; font-size: 18px; font-weight: 500; margin-bottom: 5px; letter-spacing: 0.005em; }
+  .pillar-desc { position: relative; font-size: 14px; color: rgba(203,213,225,0.72); line-height: 1.55; }
 
-  .law-list { list-style: none; padding: 0; margin: 0; }
+  /* Un-boxer: thin glowing SVG dividers between the pillar halves */
+  .pillar-divider {
+    grid-column: 1 / -1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(244,213,141,0.18), transparent);
+    margin: 6px 0 2px;
+    border: none;
+  }
+
+  /* ── Law of the House: curved left-accent glow instead of a box ── */
+  .law-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 4px; }
   .law-list li {
-    padding: 14px 18px;
-    border-left: 2px solid rgba(244,213,141,0.3);
-    margin-bottom: 8px;
-    background: rgba(244,213,141,0.03);
-    border-radius: 0 10px 10px 0;
+    position: relative;
+    padding: 16px 20px 16px 28px;
+    background: transparent;
+    border-left: 1px solid rgba(244,213,141,0.22);
+    border-radius: 0 14px 14px 0;
+    overflow: hidden;
   }
-  .law-list strong { color: var(--gold-1); font-weight: 600; display: block; margin-bottom: 2px; font-size: 15px; }
-  .law-list span { font-size: 14px; color: rgba(203,213,225,0.78); line-height: 1.5; }
-
-  .not-list {
-    display: grid; grid-template-columns: 1fr; gap: 6px;
-    font-size: 14px; color: rgba(203,213,225,0.82);
+  .law-list li::before {
+    content: '';
+    position: absolute; left: 0; top: 50%;
+    width: 180px; height: 54px;
+    background: radial-gradient(ellipse 100% 100% at 0% 50%, rgba(244,213,141,0.10), transparent 70%);
+    transform: translateY(-50%);
+    pointer-events: none;
   }
-  @media (min-width: 520px) { .not-list { grid-template-columns: 1fr 1fr; } }
-  .not-list li { list-style: none; padding: 6px 0; }
-  .not-list li::before { content: "✕  "; color: rgba(244,213,141,0.45); font-family: "JetBrains Mono", monospace; font-size: 12px; }
+  .law-list strong { position: relative; color: var(--gold-1); font-weight: 600; display: block; margin-bottom: 3px; font-size: 16px; }
+  .law-list span { position: relative; font-size: 14px; color: rgba(203,213,225,0.8); line-height: 1.55; }
 
-  footer { margin-top: 80px; padding-top: 28px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; text-align: center; }
+  /* ── Not-list with soft-ellipse bullets, no row backgrounds ── */
+  .not-list { display: grid; grid-template-columns: 1fr; gap: 4px; font-size: 14.5px; color: rgba(203,213,225,0.82); list-style: none; padding: 0; margin: 0; }
+  @media (min-width: 560px) { .not-list { grid-template-columns: 1fr 1fr; gap: 4px 32px; } }
+  .not-list li { padding: 7px 0; position: relative; padding-left: 22px; }
+  .not-list li::before { content: '✕'; position: absolute; left: 0; top: 7px; color: rgba(244,213,141,0.5); font-family: "JetBrains Mono", monospace; font-size: 12px; text-shadow: 0 0 8px rgba(244,213,141,0.3); }
+
+  footer { margin-top: 88px; padding-top: 32px; color: var(--muted); font-size: 13px; text-align: center; position: relative; }
+  footer::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60%; height: 1px; background: linear-gradient(90deg, transparent, rgba(244,213,141,0.25), transparent); }
   footer p { margin: 4px 0; }
-  footer .seal { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; margin-top: 16px; opacity: 0.6; }
+  footer .seal { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; margin-top: 18px; opacity: 0.55; }
 </style>
 </head>
 <body>
@@ -149,35 +216,84 @@
     A quieter, more intentional relationship with your phone. Breathwork, meditation, reflexology, crystal work, sacred geometry, dream work — 261 blades across 27 workshops. Earn-to-learn, not pay-to-win. No ads, ever.
   </p>
 
+  <!-- REFRACTION CTAs (Gemini's frequency→hue pattern, arced) -->
   <div class="cta-row">
-    <a class="btn gold" href="/sovereign-hub" data-testid="cta-enter">
-      <span>Enter the Hub</span>
-      <span class="meta">Web app →</span>
+    <a class="refract hz-528" href="/sovereign-hub" data-testid="cta-enter">
+      <span class="label">Enter the Hub</span>
+      <span class="sub">528 Hz · Transform</span>
     </a>
-    <a class="btn ghost" href="/auth" data-testid="cta-signin">
-      <span>Sign in</span>
-      <span class="meta">Account</span>
+    <a class="refract hz-639" href="/auth" data-testid="cta-signin">
+      <span class="label">Sign In</span>
+      <span class="sub">639 Hz · Connection</span>
     </a>
-    <a class="btn ghost" href="/launch.html" data-testid="cta-launch-vault">
-      <span>Launch Vault</span>
-      <span class="meta">APK · AAB</span>
+    <a class="refract hz-963" href="/launch.html" data-testid="cta-launch-vault">
+      <span class="label">Launch Vault</span>
+      <span class="sub">963 Hz · Return</span>
     </a>
   </div>
 
   <!-- PILLARS -->
   <h2>Eleven Pillars <span class="h2-sub">· 261 blades</span></h2>
-  <div class="pillar-grid">
-    <div class="pillar"><div class="pillar-name" style="color:#FBBF24">Trade &amp; Craft</div><div class="pillar-desc">Masonry, carpentry, electrical, plumbing, welding, HVAC, forestry, machining — 10 modules.</div></div>
-    <div class="pillar"><div class="pillar-name" style="color:#22C55E">Healing Arts</div><div class="pillar-desc">Herbology, reflexology, acupressure, aromatherapy, reiki, nutrition, first aid.</div></div>
-    <div class="pillar"><div class="pillar-name" style="color:#F4D58D">Sacred Knowledge</div><div class="pillar-desc">Bible study, hermetics, philosophy, sacred texts, numerology, creation stories.</div></div>
-    <div class="pillar"><div class="pillar-name" style="color:#3B82F6">Science &amp; Physics</div><div class="pillar-desc">Robotics, anatomy, geology, astronomy, rock hounding.</div></div>
-    <div class="pillar"><div class="pillar-name" style="color:#EC4899">Creative Arts</div><div class="pillar-desc">Music theory, cardology, cinematic storytelling, the Cosmic Mixer.</div></div>
-    <div class="pillar"><div class="pillar-name" style="color:#A78BFA">Mind &amp; Spirit</div><div class="pillar-desc">Meditation, breathwork, yoga, mudras, dreamwork, the Sage AI coach.</div></div>
-    <div class="pillar"><div class="pillar-name" style="color:#F97316">Exploration</div><div class="pillar-desc">Public speaking, pedagogy, the Starseed Adventure.</div></div>
-    <div class="pillar"><div class="pillar-name" style="color:#60A5FA">Body</div><div class="pillar-desc">Nourishment, elixirs, reflexology, acupressure, rock hounding.</div></div>
-    <div class="pillar"><div class="pillar-name" style="color:#2DD4BF">Observatory</div><div class="pillar-desc">Star chart, live sky, data sonification, suanpan abacus mixer.</div></div>
-    <div class="pillar"><div class="pillar-name" style="color:#C084FC">Oracle</div><div class="pillar-desc">Divination, Tarot overlays, I-Ching, dream interpretation.</div></div>
-    <div class="pillar"><div class="pillar-name" style="color:#FB923C">Trade Circle</div><div class="pillar-desc">Exchange resonant assets. Volunteer-work Fans. The Gilded Path.</div></div>
+  <div class="pillars">
+    <div class="pillar" style="--aura: rgba(251,191,36,0.08)">
+      <div class="pillar-name" style="color:#FBBF24">Trade &amp; Craft</div>
+      <div class="pillar-desc">Masonry, carpentry, electrical, plumbing, welding, HVAC, forestry, machining.</div>
+    </div>
+    <div class="pillar" style="--aura: rgba(34,197,94,0.08)">
+      <div class="pillar-name" style="color:#22C55E">Healing Arts</div>
+      <div class="pillar-desc">Herbology, reflexology, acupressure, aromatherapy, reiki, nutrition, first aid.</div>
+    </div>
+
+    <hr class="pillar-divider" />
+
+    <div class="pillar" style="--aura: rgba(244,213,141,0.08)">
+      <div class="pillar-name" style="color:#F4D58D">Sacred Knowledge</div>
+      <div class="pillar-desc">Bible study, hermetics, philosophy, sacred texts, numerology, creation stories.</div>
+    </div>
+    <div class="pillar" style="--aura: rgba(59,130,246,0.08)">
+      <div class="pillar-name" style="color:#3B82F6">Science &amp; Physics</div>
+      <div class="pillar-desc">Robotics, anatomy, geology, astronomy, rock hounding.</div>
+    </div>
+
+    <hr class="pillar-divider" />
+
+    <div class="pillar" style="--aura: rgba(236,72,153,0.08)">
+      <div class="pillar-name" style="color:#EC4899">Creative Arts</div>
+      <div class="pillar-desc">Music theory, cardology, cinematic storytelling, the Cosmic Mixer.</div>
+    </div>
+    <div class="pillar" style="--aura: rgba(167,139,250,0.08)">
+      <div class="pillar-name" style="color:#A78BFA">Mind &amp; Spirit</div>
+      <div class="pillar-desc">Meditation, breathwork, yoga, mudras, dreamwork, the Sage AI coach.</div>
+    </div>
+
+    <hr class="pillar-divider" />
+
+    <div class="pillar" style="--aura: rgba(249,115,22,0.08)">
+      <div class="pillar-name" style="color:#F97316">Exploration</div>
+      <div class="pillar-desc">Public speaking, pedagogy, the Starseed Adventure.</div>
+    </div>
+    <div class="pillar" style="--aura: rgba(96,165,250,0.08)">
+      <div class="pillar-name" style="color:#60A5FA">Body</div>
+      <div class="pillar-desc">Nourishment, elixirs, reflexology, acupressure, rock hounding.</div>
+    </div>
+
+    <hr class="pillar-divider" />
+
+    <div class="pillar" style="--aura: rgba(45,212,191,0.08)">
+      <div class="pillar-name" style="color:#2DD4BF">Observatory</div>
+      <div class="pillar-desc">Star chart, live sky, data sonification, suanpan abacus mixer.</div>
+    </div>
+    <div class="pillar" style="--aura: rgba(192,132,252,0.08)">
+      <div class="pillar-name" style="color:#C084FC">Oracle</div>
+      <div class="pillar-desc">Divination, Tarot overlays, I-Ching, dream interpretation.</div>
+    </div>
+
+    <hr class="pillar-divider" />
+
+    <div class="pillar" style="--aura: rgba(251,146,60,0.08); grid-column: 1 / -1;">
+      <div class="pillar-name" style="color:#FB923C">Trade Circle</div>
+      <div class="pillar-desc">Exchange resonant assets. Volunteer-work Fans. The Gilded Path — optional support, never a paywall.</div>
+    </div>
   </div>
 
   <!-- LAW OF THE HOUSE -->
@@ -185,11 +301,11 @@
   <ul class="law-list">
     <li><strong>Sparks are earned, never spent.</strong><span>They are the record of your work, not a currency. You cannot buy them, borrow them, or trade them away.</span></li>
     <li><strong>Dust is the spendable currency.</strong><span>Earn it through daily quests or accept Gilded Path support if you'd rather bypass the grind.</span></li>
-    <li><strong>Fans come from real-world service.</strong><span>10 Fans per hour of volunteering. Use Fans to unlock the same tools the Gilded Path offers.</span></li>
+    <li><strong>Fans come from real-world service.</strong><span>10 Fans per hour of volunteering. Fans unlock the same tools the Gilded Path offers.</span></li>
     <li><strong>Silence is always an option.</strong><span>Every frequency, chime, and haptic can be muted. Nothing plays until you choose it.</span></li>
   </ul>
 
-  <!-- WHAT'S NOT INSIDE -->
+  <!-- NOT INSIDE -->
   <h2>What's not inside</h2>
   <ul class="not-list">
     <li>Advertising IDs</li>

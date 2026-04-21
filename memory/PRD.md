@@ -1,7 +1,22 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.40)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.41)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as a Wellness / Mental Acuity app.
+
+## V68.41 — Front Door + Un-Boxer + Refraction UI (21 Feb 2026)
+
+1. ✅ **Root gate** — logged-out visitors to `/` now land on the new marketing page instead of being punted into an authenticated hub. `RootGate` component detects the AuthContext's guest-mode token (`guest_token`) and calls `window.location.replace('/landing.html')` for guests; authenticated users fall through to `/sovereign-hub`.
+2. ✅ **Landing page rebranded** — killed all "INFINITY SOVEREIGN" leftover text, dead Play Store button pointing at wrong package (`com.infinitysovereign.app`), and old "7 Domains of Mastery" marketing. Replaced with current "ENLIGHTEN·MINT·CAFE" branding. Sovereign Engine demoted to a mono-font subtitle ("Powered by the Sovereign Engine · v1.0.4").
+3. ✅ **Un-Boxer design pass** — ambient radial body-level auras replace panel backgrounds; pillars use soft element-tinted radial gradients with no hard borders; Law-of-the-House items use curved left-accent glows instead of boxes; footer divider is a hairline gradient, not a line.
+4. ✅ **RefractionButton component** (`/src/components/RefractionButton.js`) — procedural glass-morphism CTA that maps Solfeggio frequency → HSL hue (396Hz red → 963Hz violet). Used on landing as three arced CTAs: Enter Hub (528Hz gold-green), Sign In (639Hz green), Launch Vault (963Hz violet).
+5. ✅ **Phi-damped micro-interactions** — press = compression scale 0.985 at 80ms ease-out; release = `cubic-bezier(0.22, 1.618, 0.36, 1)` with φ-ratio overshoot so buttons settle like a struck tuning fork. Touch events supported for mobile.
+6. ✅ **Launch Vault pinned to v1.0.4** — all three critical downloads (APK, AAB, keystore) now point at the newest build; v1.0.3 + v1.0.2 kept in vault for rollback.
+7. ✅ **All buttons on landing verified** — Enter Hub, Sign In, Launch Vault all navigate correctly; v1.0.3's dead-link bug eradicated.
+
+### v1.0.4 binaries
+- `/app/build_artifacts/enlighten-v1.0.4.apk` — SHA-256 `d77b651573b11ef71346e2d30e0a9ec63e6cc5575c1d676a4b2a92eb38dbbc00`
+- `/app/build_artifacts/enlighten-mint-cafe-v1.0.4.aab` — SHA-256 `51ad37e541f4e49028c48fb0e0722dbf625854f1a626dfd59824ef7836030924`
+- versionCode 5, versionName 1.0.4
 
 ## V68.40 — Reflexology Pillar (21 Feb 2026)
 
