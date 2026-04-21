@@ -1,241 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INFINITY SOVEREIGN — Enlighten.Mint.Cafe</title>
-    <meta name="description" content="A Sovereign Wellness Engine. 27 Workshops, 162 Materials, 243 Tools. Master trades, healing, sacred knowledge, and science in one 791KB organism.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #0A0A12;
-            color: #F8FAFC;
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            min-height: 100vh;
-        }
-        .hero {
-            text-align: center;
-            padding: 80px 24px 60px;
-            background: radial-gradient(ellipse at 50% 0%, rgba(139,92,246,0.08) 0%, transparent 60%);
-        }
-        .hero h1 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 3rem;
-            font-weight: 300;
-            letter-spacing: 0.15em;
-            background: linear-gradient(135deg, #E0E7FF, #D4AF37);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
-        }
-        .hero .subtitle {
-            font-size: 0.75rem;
-            letter-spacing: 0.3em;
-            text-transform: uppercase;
-            color: rgba(167,139,250,0.6);
-            margin-bottom: 32px;
-        }
-        .hero p {
-            max-width: 520px;
-            margin: 0 auto 40px;
-            font-size: 0.95rem;
-            color: rgba(248,250,252,0.6);
-        }
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 32px;
-            flex-wrap: wrap;
-            margin-bottom: 48px;
-        }
-        .stat {
-            text-align: center;
-        }
-        .stat .num {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2.5rem;
-            font-weight: 300;
-            color: #D4AF37;
-        }
-        .stat .label {
-            font-size: 0.6rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.25);
-        }
-        .cta {
-            display: inline-block;
-            padding: 14px 40px;
-            border-radius: 50px;
-            background: linear-gradient(135deg, rgba(139,92,246,0.15), rgba(212,175,55,0.15));
-            border: 1px solid rgba(212,175,55,0.3);
-            color: #D4AF37;
-            font-size: 0.85rem;
-            font-weight: 500;
-            letter-spacing: 0.1em;
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-        .cta:hover {
-            background: linear-gradient(135deg, rgba(139,92,246,0.25), rgba(212,175,55,0.25));
-            border-color: rgba(212,175,55,0.5);
-        }
-        .domains {
-            padding: 60px 24px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .domains h2 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.8rem;
-            font-weight: 300;
-            text-align: center;
-            margin-bottom: 32px;
-            color: rgba(248,250,252,0.8);
-        }
-        .domain-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-        }
-        .domain-card {
-            padding: 20px;
-            border-radius: 16px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.06);
-        }
-        .domain-card .name {
-            font-size: 0.8rem;
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-        .domain-card .count {
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.3);
-        }
-        .privacy {
-            padding: 80px 24px;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        .privacy h2 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.8rem;
-            font-weight: 300;
-            margin-bottom: 24px;
-            color: rgba(248,250,252,0.8);
-        }
-        .privacy h3 {
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-top: 24px;
-            margin-bottom: 8px;
-            color: rgba(248,250,252,0.7);
-        }
-        .privacy p, .privacy ul {
-            font-size: 0.85rem;
-            color: rgba(248,250,252,0.45);
-            margin-bottom: 12px;
-        }
-        .privacy ul { padding-left: 20px; }
-        .privacy li { margin-bottom: 4px; }
-        .footer {
-            text-align: center;
-            padding: 40px 24px;
-            border-top: 1px solid rgba(255,255,255,0.04);
-        }
-        .footer p {
-            font-size: 0.65rem;
-            color: rgba(255,255,255,0.15);
-        }
-        #privacy { scroll-margin-top: 40px; }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+<title>ENLIGHTEN.MINT.CAFE — A Sovereign Wellness Instrument</title>
+<meta name="description" content="ENLIGHTEN.MINT.CAFE — a sovereign wellness instrument. Breathwork, meditation, reflexology, crystal work, Solfeggio frequencies. No ads. No data resale." />
+<link rel="canonical" href="https://enlighten-mint-cafe.me/" />
+<link rel="icon" href="/favicon.ico" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    color-scheme: dark;
+    --bg: #000;
+    --panel: rgba(255,255,255,0.03);
+    --border: rgba(255,255,255,0.08);
+    --text: #E6E9F2;
+    --muted: #94a3b8;
+    --gold-1: #F4D58D;
+    --gold-2: #D4AF37;
+    --gold-3: #9C6A2E;
+  }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: "Cormorant Garamond", Georgia, serif; min-height: 100vh; }
+  body { -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  a { color: var(--gold-1); text-decoration: none; }
+  a:hover { text-decoration: underline; text-decoration-color: rgba(244,213,141,0.5); }
+
+  .wrap { max-width: 760px; margin: 0 auto; padding: 56px 20px 96px; }
+
+  .telemetry { font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; font-size: 10px; letter-spacing: 0.32em; color: var(--muted); text-transform: uppercase; margin-bottom: 16px; }
+
+  h1 {
+    font-weight: 400;
+    font-size: clamp(42px, 9vw, 76px);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    margin: 0 0 20px;
+    background: linear-gradient(135deg, var(--gold-1) 0%, var(--gold-2) 55%, var(--gold-3) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .brand-dot { color: var(--gold-2); opacity: 0.55; padding: 0 0.08em; }
+
+  .tagline-italic {
+    font-style: italic;
+    font-size: 18px;
+    color: rgba(230,233,242,0.7);
+    margin: 0 0 8px;
+  }
+
+  .engine-note {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9.5px;
+    letter-spacing: 0.22em;
+    color: rgba(148,163,184,0.55);
+    text-transform: uppercase;
+    margin: 0 0 32px;
+  }
+
+  .lede {
+    font-size: 19px;
+    line-height: 1.55;
+    color: rgba(203,213,225,0.92);
+    margin: 0 0 36px;
+    max-width: 620px;
+  }
+
+  .cta-row { display: flex; flex-direction: column; gap: 12px; margin-bottom: 56px; }
+  @media (min-width: 520px) { .cta-row { flex-direction: row; flex-wrap: wrap; } }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 18px 22px; border-radius: 14px; font-size: 17px; font-weight: 500;
+    font-family: "Cormorant Garamond", serif;
+    transition: transform 0.15s ease, background 0.2s ease, border-color 0.2s ease;
+    cursor: pointer; border: 1px solid; text-decoration: none;
+    min-height: 58px;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn .meta { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
+  .btn.gold {
+    background: linear-gradient(135deg, rgba(244,213,141,0.18), rgba(156,106,46,0.12));
+    border-color: rgba(244,213,141,0.55);
+    color: #fff;
+    flex: 1;
+  }
+  .btn.gold:hover { background: linear-gradient(135deg, rgba(244,213,141,0.28), rgba(156,106,46,0.2)); }
+  .btn.ghost {
+    background: rgba(255,255,255,0.02);
+    border-color: rgba(255,255,255,0.12);
+    color: var(--text);
+  }
+  .btn.ghost:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.22); }
+
+  h2 {
+    font-weight: 500;
+    font-size: 28px;
+    color: var(--gold-1);
+    margin: 48px 0 14px;
+    letter-spacing: -0.005em;
+  }
+  h2 .h2-sub { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; vertical-align: middle; margin-left: 12px; }
+
+  .pillar-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  @media (min-width: 520px) { .pillar-grid { grid-template-columns: 1fr 1fr; } }
+
+  .pillar {
+    padding: 16px 18px; border-radius: 12px;
+    background: var(--panel); border: 1px solid var(--border);
+  }
+  .pillar-name { font-size: 17px; font-weight: 500; margin-bottom: 4px; }
+  .pillar-desc { font-size: 13px; color: rgba(203,213,225,0.72); line-height: 1.45; }
+
+  .law-list { list-style: none; padding: 0; margin: 0; }
+  .law-list li {
+    padding: 14px 18px;
+    border-left: 2px solid rgba(244,213,141,0.3);
+    margin-bottom: 8px;
+    background: rgba(244,213,141,0.03);
+    border-radius: 0 10px 10px 0;
+  }
+  .law-list strong { color: var(--gold-1); font-weight: 600; display: block; margin-bottom: 2px; font-size: 15px; }
+  .law-list span { font-size: 14px; color: rgba(203,213,225,0.78); line-height: 1.5; }
+
+  .not-list {
+    display: grid; grid-template-columns: 1fr; gap: 6px;
+    font-size: 14px; color: rgba(203,213,225,0.82);
+  }
+  @media (min-width: 520px) { .not-list { grid-template-columns: 1fr 1fr; } }
+  .not-list li { list-style: none; padding: 6px 0; }
+  .not-list li::before { content: "✕  "; color: rgba(244,213,141,0.45); font-family: "JetBrains Mono", monospace; font-size: 12px; }
+
+  footer { margin-top: 80px; padding-top: 28px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; text-align: center; }
+  footer p { margin: 4px 0; }
+  footer .seal { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; margin-top: 16px; opacity: 0.6; }
+</style>
 </head>
 <body>
-    <div class="hero">
-        <div class="subtitle">Enlighten.Mint.Cafe presents</div>
-        <h1>INFINITY SOVEREIGN</h1>
-        <p>A Sovereign Wellness Engine. Master trades, healing arts, sacred knowledge, science, and creative arts — all connected by an Oracle that bridges every domain through intent.</p>
-        <div class="stats">
-            <div class="stat"><div class="num">27</div><div class="label">Workshops</div></div>
-            <div class="stat"><div class="num">162</div><div class="label">Materials</div></div>
-            <div class="stat"><div class="num">243</div><div class="label">Tools</div></div>
-            <div class="stat"><div class="num">791</div><div class="label">KB Bundle</div></div>
-        </div>
-        <a href="https://play.google.com/store/apps/details?id=com.infinitysovereign.app" class="cta">Download on Google Play</a>
-    </div>
+<div class="wrap">
 
-    <div class="domains">
-        <h2>7 Domains of Mastery</h2>
-        <div class="domain-grid">
-            <div class="domain-card"><div class="name" style="color:#FBBF24">Trade & Craft</div><div class="count">10 modules — Masonry, Carpentry, Electrical, Plumbing, Landscaping, Welding, Automotive, HVAC, Machining, Forestry</div></div>
-            <div class="domain-card"><div class="name" style="color:#22C55E">Healing Arts</div><div class="count">6 modules — Nursing, Child Care, Elderly Care, First Aid, Nutrition, Permaculture</div></div>
-            <div class="domain-card"><div class="name" style="color:#D4AF37">Sacred Knowledge</div><div class="count">4 modules — Bible Study, Hermetics, Philosophy, Economics</div></div>
-            <div class="domain-card"><div class="name" style="color:#3B82F6">Science & Physics</div><div class="count">3 modules — Robotics, Anatomy, Geology</div></div>
-            <div class="domain-card"><div class="name" style="color:#EC4899">Creative Arts</div><div class="count">1 module — Music Theory</div></div>
-            <div class="domain-card"><div class="name" style="color:#A78BFA">Mind & Spirit</div><div class="count">1 module — Meditation</div></div>
-            <div class="domain-card"><div class="name" style="color:#F97316">Exploration</div><div class="count">2 modules — Public Speaking, Pedagogy</div></div>
-        </div>
-    </div>
+  <!-- HERO -->
+  <p class="telemetry">A Sovereign Wellness Instrument</p>
+  <h1>ENLIGHTEN<span class="brand-dot">·</span>MINT<span class="brand-dot">·</span>CAFE</h1>
+  <p class="tagline-italic">Forge presence. Forge wisdom. Forge sparks.</p>
+  <p class="engine-note">Powered by the Sovereign Engine · v1.0.3</p>
 
-    <div class="privacy" id="privacy">
-        <h2>Privacy Policy</h2>
-        <p><strong>Effective Date:</strong> April 17, 2026</p>
-        <p><strong>App Name:</strong> INFINITY SOVEREIGN (Enlighten.Mint.Cafe)</p>
-        <p><strong>Developer:</strong> Steven Michael</p>
-        <p><strong>Contact:</strong> Rapid City, South Dakota, USA</p>
+  <p class="lede">
+    A quieter, more intentional relationship with your phone. Breathwork, meditation, reflexology, crystal work, sacred geometry, dream work — 261 blades across 27 workshops. Earn-to-learn, not pay-to-win. No ads, ever.
+  </p>
 
-        <h3>1. Information We Collect</h3>
-        <p>INFINITY SOVEREIGN is designed with a Sovereign-First architecture. We collect only what is necessary to operate the app:</p>
-        <ul>
-            <li><strong>Account Information:</strong> Email address and display name (if you choose to create an account). Guest access is available without any personal information.</li>
-            <li><strong>Progress Data:</strong> Workshop completion, XP earned, and Trade Passport progression — stored to maintain your learning journey.</li>
-            <li><strong>Device Information:</strong> We do not collect device identifiers, advertising IDs, or location data.</li>
-        </ul>
+  <div class="cta-row">
+    <a class="btn gold" href="/sovereign-hub" data-testid="cta-enter">
+      <span>Enter the Hub</span>
+      <span class="meta">Web app →</span>
+    </a>
+    <a class="btn ghost" href="/auth" data-testid="cta-signin">
+      <span>Sign in</span>
+      <span class="meta">Account</span>
+    </a>
+    <a class="btn ghost" href="/launch.html" data-testid="cta-launch-vault">
+      <span>Launch Vault</span>
+      <span class="meta">APK · AAB</span>
+    </a>
+  </div>
 
-        <h3>2. How We Use Information</h3>
-        <ul>
-            <li>To maintain your learning progress and RPG character data</li>
-            <li>To display your Trade Passport and Hybrid Title achievements</li>
-            <li>To authenticate your account (if registered)</li>
-        </ul>
+  <!-- PILLARS -->
+  <h2>Eleven Pillars <span class="h2-sub">· 261 blades</span></h2>
+  <div class="pillar-grid">
+    <div class="pillar"><div class="pillar-name" style="color:#FBBF24">Trade &amp; Craft</div><div class="pillar-desc">Masonry, carpentry, electrical, plumbing, welding, HVAC, forestry, machining — 10 modules.</div></div>
+    <div class="pillar"><div class="pillar-name" style="color:#22C55E">Healing Arts</div><div class="pillar-desc">Herbology, reflexology, acupressure, aromatherapy, reiki, nutrition, first aid.</div></div>
+    <div class="pillar"><div class="pillar-name" style="color:#F4D58D">Sacred Knowledge</div><div class="pillar-desc">Bible study, hermetics, philosophy, sacred texts, numerology, creation stories.</div></div>
+    <div class="pillar"><div class="pillar-name" style="color:#3B82F6">Science &amp; Physics</div><div class="pillar-desc">Robotics, anatomy, geology, astronomy, rock hounding.</div></div>
+    <div class="pillar"><div class="pillar-name" style="color:#EC4899">Creative Arts</div><div class="pillar-desc">Music theory, cardology, cinematic storytelling, the Cosmic Mixer.</div></div>
+    <div class="pillar"><div class="pillar-name" style="color:#A78BFA">Mind &amp; Spirit</div><div class="pillar-desc">Meditation, breathwork, yoga, mudras, dreamwork, the Sage AI coach.</div></div>
+    <div class="pillar"><div class="pillar-name" style="color:#F97316">Exploration</div><div class="pillar-desc">Public speaking, pedagogy, the Starseed Adventure.</div></div>
+    <div class="pillar"><div class="pillar-name" style="color:#60A5FA">Body</div><div class="pillar-desc">Nourishment, elixirs, reflexology, acupressure, rock hounding.</div></div>
+    <div class="pillar"><div class="pillar-name" style="color:#2DD4BF">Observatory</div><div class="pillar-desc">Star chart, live sky, data sonification, suanpan abacus mixer.</div></div>
+    <div class="pillar"><div class="pillar-name" style="color:#C084FC">Oracle</div><div class="pillar-desc">Divination, Tarot overlays, I-Ching, dream interpretation.</div></div>
+    <div class="pillar"><div class="pillar-name" style="color:#FB923C">Trade Circle</div><div class="pillar-desc">Exchange resonant assets. Volunteer-work Fans. The Gilded Path.</div></div>
+  </div>
 
-        <h3>3. Data Sharing</h3>
-        <p>We do not sell, rent, or share your personal information with third parties. Your data stays within the INFINITY SOVEREIGN ecosystem.</p>
+  <!-- LAW OF THE HOUSE -->
+  <h2>The Law of the House</h2>
+  <ul class="law-list">
+    <li><strong>Sparks are earned, never spent.</strong><span>They are the record of your work, not a currency. You cannot buy them, borrow them, or trade them away.</span></li>
+    <li><strong>Dust is the spendable currency.</strong><span>Earn it through daily quests or accept Gilded Path support if you'd rather bypass the grind.</span></li>
+    <li><strong>Fans come from real-world service.</strong><span>10 Fans per hour of volunteering. Use Fans to unlock the same tools the Gilded Path offers.</span></li>
+    <li><strong>Silence is always an option.</strong><span>Every frequency, chime, and haptic can be muted. Nothing plays until you choose it.</span></li>
+  </ul>
 
-        <h3>4. Data Storage & Security</h3>
-        <p>Data is stored on secure, encrypted servers. All API communications use HTTPS. Passwords are hashed using bcrypt and never stored in plain text.</p>
+  <!-- WHAT'S NOT INSIDE -->
+  <h2>What's not inside</h2>
+  <ul class="not-list">
+    <li>Advertising IDs</li>
+    <li>Location tracking</li>
+    <li>Data resale</li>
+    <li>Loot boxes</li>
+    <li>Rage-streak mechanics</li>
+    <li>Contacts / calendar access</li>
+    <li>Doomscroll feeds</li>
+    <li>Dark patterns</li>
+  </ul>
 
-        <h3>5. Data Retention</h3>
-        <p>Your data is retained as long as your account is active. You may request deletion of your account and all associated data at any time by contacting us.</p>
+  <footer>
+    <p>Operated by Steven Michael · 318 National Street #2, Rapid City, SD 57702</p>
+    <p><a href="mailto:kyndsmiles@gmail.com">kyndsmiles@gmail.com</a> · <a href="/privacy.html">Privacy Policy</a></p>
+    <p class="seal">Sovereign Engine · v1.0.3 · 528 Hz Heartbeat</p>
+  </footer>
 
-        <h3>6. Children's Privacy</h3>
-        <p>INFINITY SOVEREIGN is not directed at children under 13. We do not knowingly collect personal information from children under 13.</p>
-
-        <h3>7. Third-Party Services</h3>
-        <p>The app uses OpenAI's API for AI-powered features (contextual generators, deep dives). No personal user data is sent to third-party AI services — only anonymized prompts.</p>
-
-        <h3>8. Your Rights</h3>
-        <ul>
-            <li>Access your stored data at any time through the app</li>
-            <li>Request deletion of your account and data</li>
-            <li>Use the app as a guest without providing any personal information</li>
-        </ul>
-
-        <h3>9. Changes to This Policy</h3>
-        <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated effective date.</p>
-
-        <h3>10. Contact</h3>
-        <p>For privacy-related questions or data deletion requests, contact the developer through the Google Play Store listing or the in-app feedback system.</p>
-    </div>
-
-    <div class="footer">
-        <p>INFINITY SOVEREIGN by Steven Michael — Rapid City, South Dakota</p>
-        <p style="margin-top:8px">27 Workshops | 162 Materials | 243 Tools | 791KB Metabolic Seal</p>
-        <p style="margin-top:8px"><a href="#privacy" style="color:rgba(167,139,250,0.4);text-decoration:none">Privacy Policy</a></p>
-    </div>
+</div>
 </body>
 </html>
