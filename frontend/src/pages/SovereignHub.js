@@ -81,6 +81,7 @@ const PILLARS = [
     { label: 'Elixirs', route: '/elixirs' },
     { label: 'Crystals & Stones', route: '/crystals' },
     { label: 'Acupressure', route: '/acupressure' },
+    { label: 'Reflexology', route: '/reflexology' },
     { label: 'Reiki', route: '/reiki' },
     { label: 'Meal Planning', route: '/meal-planning' },
     { label: 'Botany', route: '/botany' },

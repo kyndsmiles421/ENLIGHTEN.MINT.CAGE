@@ -18,7 +18,10 @@ VAULT = Path("/app/build_artifacts")
 
 # Whitelist — only these filenames are downloadable. Prevents abuse.
 WHITELIST = {
-    # Android binaries
+    # Android binaries — latest v1.0.3 (includes Reflexology)
+    "enlighten-v1.0.3.apk":                ("application/vnd.android.package-archive", "enlighten-v1.0.3.apk"),
+    "enlighten-mint-cafe-v1.0.3.aab":      ("application/octet-stream",                 "enlighten-mint-cafe-v1.0.3.aab"),
+    # Previous version kept for download
     "enlighten-v1.0.2.apk":                ("application/vnd.android.package-archive", "enlighten-v1.0.2.apk"),
     "enlighten-mint-cafe-v1.0.2.aab":      ("application/octet-stream",                 "enlighten-mint-cafe-v1.0.2.aab"),
     "enlighten-mint-cafe-UPLOAD-KEY.keystore": ("application/octet-stream",             "enlighten-mint-cafe-UPLOAD-KEY.keystore"),
@@ -29,6 +32,7 @@ WHITELIST = {
     "playstore/phone_02_orbital.jpeg":        ("image/jpeg", "phone_02_orbital.jpg"),
     "playstore/phone_03_mixer.jpeg":          ("image/jpeg", "phone_03_mixer.jpg"),
     "playstore/phone_04_rock.jpeg":           ("image/jpeg", "phone_04_rock.jpg"),
+    "playstore/phone_05_reflexology.jpeg":    ("image/jpeg", "phone_05_reflexology.jpg"),
     "playstore/tablet7_hub.jpeg":             ("image/jpeg", "tablet7_hub.jpg"),
     "playstore/tablet7_mixer.jpeg":           ("image/jpeg", "tablet7_mixer.jpg"),
     "playstore/tablet10_hub.jpeg":            ("image/jpeg", "tablet10_hub.jpg"),

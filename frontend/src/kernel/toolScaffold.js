@@ -27,6 +27,7 @@ const DOMAIN_MATERIAL = {
   // Oil — culinary, health, biochem
   herbology: 'oil', aromatherapy: 'oil', culinary: 'oil', anatomy: 'oil',
   acupressure: 'oil', breathwork: 'oil', elixirs: 'oil', reiki: 'oil',
+  reflexology: 'oil',
   botany: 'oil', forestry: 'oil', alchemy: 'oil',
   // Gold — economy, sovereign, trade, leadership
   'cosmic-ledger': 'gold', starseed: 'gold', dome: 'gold',

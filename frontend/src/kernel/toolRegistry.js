@@ -28,6 +28,18 @@ registerMany([
   { id: 'meditation.bell',     layer: 2, domain: 'meditation',   unlocks: ['bell_tone'],              requires: ['breath_coherence'],     sparks: 2, purpose: 'Strike the bell at a 528Hz sub-harmonic to anchor the session.' },
   { id: 'meditation.mandala',  layer: 2, domain: 'meditation',   unlocks: ['mandala_completion'],     requires: ['bell_tone'],            sparks: 4, purpose: 'Complete a mandala cycle — unlocks the Crystalline dome.' },
 
+  /* ── Reflexology blades (v68.40) ─────────────────────────────
+   * Foot-mapped bodywork pillar. Each blade corresponds to a mode
+   * in the Reflex Sanctuary page (/reflexology). `atlas-study` is
+   * the free-exploration entry; the others gate on real engagement.
+   */
+  { id: 'reflexology.atlas-study',  layer: 2, domain: 'reflexology', unlocks: ['reflex_atlas_read'],         requires: [],                          sparks: 2, purpose: 'Study the 32-zone foot atlas. Unlocks tactile practice.' },
+  { id: 'reflexology.locate-zone',  layer: 2, domain: 'reflexology', unlocks: ['reflex_locate_mastery'],     requires: ['reflex_atlas_read'],       sparks: 3, purpose: 'Identify a zone on cue. 3-in-a-row streak seals the mastery.' },
+  { id: 'reflexology.press',        layer: 2, domain: 'reflexology', unlocks: ['reflex_press_release'],      requires: ['reflex_locate_mastery'],   sparks: 3, purpose: 'Apply technique-appropriate pressure to a chosen zone.' },
+  { id: 'reflexology.routine',      layer: 2, domain: 'reflexology', unlocks: ['reflex_routine_complete'],   requires: ['reflex_press_release'],    sparks: 6, purpose: 'Complete the 8-zone starter routine (~8 minutes).' },
+  { id: 'reflexology.meridian-align', layer: 3, domain: 'reflexology', unlocks: ['reflex_meridian_seal'],    requires: ['reflex_routine_complete'], sparks: 5, purpose: 'Cross-reference reflex zones with acupressure meridians for whole-body attunement.' },
+  { id: 'reflexology.solfeggio-pair', layer: 3, domain: 'reflexology', unlocks: ['reflex_solfeggio_seal'],   requires: ['reflex_routine_complete'], sparks: 5, purpose: 'Pair each reflex zone to its resonant Solfeggio frequency in the Mixer.' },
+
   /* ── Layer 3 · Quest Bridge (interconnects that consume Layer-2 unlocks) ── */
   { id: 'bridge.quartz-to-observatory', layer: 3, domain: 'observatory', unlocks: ['tesseract_access'],   requires: ['quartz_key'],            sparks: 5, purpose: 'Use a Quartz Key to unlock the Tesseract in the Observatory.' },
   { id: 'bridge.elixir-to-alchemy',     layer: 3, domain: 'alchemy',     unlocks: ['alchemy_seat'],        requires: ['completed_elixir'],      sparks: 5, purpose: 'Present a completed elixir to earn a seat at the Alchemy circle.' },

@@ -1,7 +1,7 @@
 import {
   Music, Map, Triangle, Heart, Wind, Sun, GraduationCap,
   Eye, Star, Telescope, HeartHandshake, Gamepad2, BookOpen,
-  ScrollText, Calculator, Sparkles
+  ScrollText, Calculator, Sparkles, Footprints
 } from 'lucide-react';
 
 export const ALL_SATELLITES = [
@@ -17,6 +17,7 @@ export const ALL_SATELLITES = [
   { id: 'trade', label: 'Trade Circle', icon: HeartHandshake, path: '/trade-circle', color: '#FB923C', desc: 'Exchange resonant assets' },
   { id: 'oracle', label: 'Oracle', icon: Eye, path: '/oracle', color: '#C084FC', desc: 'Divination & insight' },
   { id: 'starseed', label: 'Starseed', icon: Sparkles, path: '/starseed-adventure', color: '#E879F9', desc: 'Channelled starseed adventure' },
+  { id: 'reflexology', label: 'Reflexology', icon: Footprints, path: '/reflexology', color: '#F4D58D', desc: 'Foot-mapped bodywork · 32 zones' },
   { id: 'games', label: 'Games', icon: Gamepad2, path: '/games', color: '#34D399', desc: 'Rock Hounding, RPG, Cryptic Quest' },
   { id: 'journal', label: 'Journal', icon: BookOpen, path: '/journal', color: '#FDA4AF', desc: 'Wisdom journal' },
   { id: 'archives', label: 'Archives', icon: ScrollText, path: '/archives', color: '#F59E0B', desc: 'Deep-dive multi-civilization texts' },
@@ -40,6 +41,7 @@ export const ZONE_AUDIO = {
   'archives': { hz: 174, type: 'sine', gain: 0.05 },
   'suanpan': { hz: 256, type: 'triangle', gain: 0.05 },
   'starseed': { hz: 528, type: 'sine', gain: 0.06 },
+  'reflexology': { hz: 396, type: 'sine', gain: 0.05 },
 };
 
 export const WEATHER_AUDIO_MAP = {

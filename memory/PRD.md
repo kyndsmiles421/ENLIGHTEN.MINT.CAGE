@@ -1,9 +1,27 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.38)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.40)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as a Wellness / Mental Acuity app.
 
-## V68.38 — Live Bug Sweep · v1.0.1 AAB (20 Feb 2026)
+## V68.40 — Reflexology Pillar (21 Feb 2026)
+
+**New full pillar: `/reflexology` — "The Reflex Sanctuary"**
+
+1. ✅ **32-zone foot atlas** (`reflexologyData.js`) — each zone has name, system, organ, element, Solfeggio Hz pairing, technique description, duration, bilateral/lateral side-only metadata, benefits array. Left-only zones: heart, spleen, descending colon. Right-only: liver, gallbladder, spleen [corrected], ascending colon, ileocecal valve.
+2. ✅ **Interactive SVG FootMap component** — both feet rendered from a traced plantar silhouette; 57 hotspot circles with element-colored fills, pulse rings for active zone, dashed halos for practice targets. Labels shown in Study mode, hidden in Locate mode.
+3. ✅ **Three modes integrated into one page:**
+   - **Study** — tap any zone → info sheet with organ, technique, Solfeggio Hz, element, duration, benefits chips
+   - **Locate** — gamified "Find the [Zone]" prompts with streak counter; correct tap → 528Hz chime + 6 Dust; wrong → 396Hz nudge + reveal correct zone (educational, not punishing)
+   - **Routine** — 8-zone starter sequence with per-zone timed progress bar, 417Hz between-step chime, 528Hz completion chime + 40 Dust bonus
+4. ✅ **Tool registry wiring** — 6 new reflexology blades registered in `toolRegistry.js`: atlas-study, locate-zone, press, routine, meridian-align, solfeggio-pair (chained unlocks). Domain added to `toolScaffold.js` oil-material family.
+5. ✅ **Navigation integration:**
+   - `/reflexology` route in `App.js`
+   - Orbital Hub satellite (pink-gold Footprints icon, 396Hz "Liberation from Fear")
+   - Sovereign Hub Body pillar card
+6. ✅ **House convention respected** — `HolographicChamber` wrapper (same chamber aesthetic as Herbology/Acupressure/Aromatherapy); `window.__workAccrue('reflexology', ...)` hook for passive Dust; no Sparks spent — only earned on mastery (house law).
+7. ✅ **Educational disclaimer** — footer: "EDUCATIONAL · NOT MEDICAL ADVICE · HONOR YOUR BODY"
+
+## V68.39 — Full regression + Play Store asset pack (20 Feb 2026)
 1. ✅ **Dead 9×9 lattice fixed** — MiniLattice was reading `r.data.lattice_state.nodes` but backend returns `r.data.lattice.nodes`. All 81 circles now render with 9 distinct node-type colors (gold CORE, purple ORACLE, blue PORTAL, cyan RELAY, green SHIELD, pink MIXER, violet GENERATOR, gold LEDGER, gray VAULT).
 2. ✅ **Rock Hounding — real crystal portraits** — Replaced generic `<Gem>` icon with `CrystalPortrait.js` (deterministic SVG polygon per specimen; facets scale with rarity 6→12; sparkles for epic+; specular highlight, element-color gradient, rarity glow). Added "Learn" expand sheet showing Mohs, stat bonus, depth, dust value, layer, full description. Collection grid uses the same portraits.
 3. ✅ **Duplicate tool registration warnings (11+) eliminated** — Moved `toolScaffold` from top-level import to an explicit `registerScaffold()` export invoked AFTER the real `registerMany([...])` in `toolRegistry.js`.

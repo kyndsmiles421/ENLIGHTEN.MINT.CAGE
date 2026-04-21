@@ -142,6 +142,7 @@ const Herbology = lazy(() => import('./pages/Herbology'));
 const Elixirs = lazy(() => import('./pages/Elixirs'));
 const MealPlanning = lazy(() => import('./pages/MealPlanning'));
 const Acupressure = lazy(() => import('./pages/Acupressure'));
+const Reflexology = lazy(() => import('./pages/Reflexology'));
 const Reiki = lazy(() => import('./pages/Reiki'));
 const TrySomethingNew = lazy(() => import('./pages/TrySomethingNew'));
 const SovereignHub = lazy(() => import('./pages/SovereignHub'));
@@ -469,6 +470,7 @@ function AnimatedRoutes() {
         <Route path="/elixirs" element={<Elixirs />} />
         <Route path="/meal-planning" element={<MealPlanning />} />
         <Route path="/acupressure" element={<Acupressure />} />
+        <Route path="/reflexology" element={<Reflexology />} />
         <Route path="/reiki" element={<Reiki />} />
         <Route path="/discover" element={<TrySomethingNew />} />
         <Route path="/daily-ritual" element={<DailyRitual />} />
