@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, X, Shield, Loader2, ExternalLink, Coins } from 'lucide-react';
+import { Crown, X, Shield, Loader2, ExternalLink, Coins, Clock, ArrowRight } from 'lucide-react';
 import { TIERS, setLocalTierFromServer } from '../kernel/SovereignTiers';
 import LabAudio from '../kernel/LabAudio';
 import useIsAndroidTWA from '../hooks/useIsAndroidTWA';
@@ -34,6 +34,7 @@ import useIsAndroidTWA from '../hooks/useIsAndroidTWA';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
 const WEB_TOPUP_URL = 'https://enlighten-mint-cafe.me/economy?from=android';
+const VOLUNTEER_CREDITS_PER_HOUR = 10;  // Mirrors backend omega_sentinel.VOLUNTEER_RATE
 
 // UI tier.id ("seed", "artisan", ...) → AI Merchant catalog item_id
 const ITEM_ID_FOR_TIER = {
@@ -58,18 +59,29 @@ export default function BuyTimePanel({ open, onClose }) {
   const [statusMsg, setStatusMsg] = useState(null);
   const [justPurchased, setJustPurchased] = useState(null);
 
+  // Volunteer-hours exchange widget state
+  const [volunteerHours, setVolunteerHours] = useState(null);
+  const [exchangeInput, setExchangeInput] = useState('');
+  const [exchanging, setExchanging] = useState(false);
+
   // Hydrate merchant state on open.
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
     (async () => {
       try {
-        const res = await axios.get(`${API}/trade-circle/ai-merchant`, { headers: authHeader(), timeout: 10000 });
+        const [merchant, volunteer] = await Promise.all([
+          axios.get(`${API}/trade-circle/ai-merchant`, { headers: authHeader(), timeout: 10000 }),
+          axios.get(`${API}/sovereign/economy/volunteer/balance`, { headers: authHeader(), timeout: 10000 })
+            .catch(() => ({ data: { total_hours: 0 } })),
+        ]);
         if (cancelled) return;
-        setCredits(res.data?.your_credits ?? 0);
-        setCurrentTier(res.data?.your_gilded_tier || null);
-        setCatalog(res.data?.catalog || []);
-        if (res.data?.gilded_tier_order) setTierOrder(res.data.gilded_tier_order);
+        setCredits(merchant.data?.your_credits ?? 0);
+        setCurrentTier(merchant.data?.your_gilded_tier || null);
+        setCatalog(merchant.data?.catalog || []);
+        if (merchant.data?.gilded_tier_order) setTierOrder(merchant.data.gilded_tier_order);
+        const hrs = Number(volunteer.data?.total_hours || 0);
+        setVolunteerHours(hrs > 0 ? hrs : 0);
       } catch (err) {
         if (!cancelled) setStatusMsg('Could not reach the AI Merchant. Try again in a moment.');
       }
@@ -94,6 +106,38 @@ export default function BuyTimePanel({ open, onClose }) {
   }, [catalog]);
 
   const currentRank = currentTier ? (tierOrder[currentTier] || 0) : 0;
+
+  const exchange = useCallback(async () => {
+    const hrs = parseFloat(exchangeInput);
+    if (!hrs || hrs <= 0) {
+      setStatusMsg('Enter hours > 0 to exchange.');
+      return;
+    }
+    if (volunteerHours !== null && hrs > volunteerHours) {
+      setStatusMsg(`You only have ${volunteerHours} logged hour${volunteerHours === 1 ? '' : 's'}.`);
+      return;
+    }
+    setExchanging(true);
+    setStatusMsg(null);
+    try {
+      const res = await axios.post(
+        `${API}/sovereign/economy/volunteer/exchange`,
+        { hours: hrs },
+        { headers: authHeader(), timeout: 15000 },
+      );
+      const { credits_granted, remaining_hours, new_credit_balance } = res.data || {};
+      setCredits(new_credit_balance ?? ((credits || 0) + (credits_granted || 0)));
+      setVolunteerHours(remaining_hours ?? Math.max(0, (volunteerHours || 0) - hrs));
+      setExchangeInput('');
+      setStatusMsg(`+${credits_granted} Credits from ${hrs} volunteer hour${hrs === 1 ? '' : 's'}.`);
+      LabAudio.playGilded && LabAudio.playGilded();
+    } catch (err) {
+      const detail = err?.response?.data?.detail || err?.message || 'Exchange failed';
+      setStatusMsg(detail);
+    } finally {
+      setExchanging(false);
+    }
+  }, [exchangeInput, volunteerHours, credits]);
 
   const buy = useCallback(async (t) => {
     if (busyTier || !t.item_id) return;
@@ -186,6 +230,69 @@ export default function BuyTimePanel({ open, onClose }) {
             redeemable for cash. The 528 Hz Resonance Click stays exclusive
             to earned mastery.
           </p>
+
+          {!isTWA && volunteerHours !== null && volunteerHours > 0 && (
+            <div
+              data-testid="volunteer-exchange-widget"
+              className="rounded-xl px-4 py-3 mb-5"
+              style={{
+                background: 'linear-gradient(135deg, rgba(134,239,172,0.08), rgba(251,191,36,0.06))',
+                border: '1px solid rgba(134,239,172,0.22)',
+              }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <Clock size={12} style={{ color: '#86EFAC' }} />
+                <p className="text-[10px] uppercase tracking-[0.28em] sov-telemetry" style={{ color: '#86EFAC' }}>
+                  Volunteer Ledger · {volunteerHours} hour{volunteerHours === 1 ? '' : 's'} logged
+                </p>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max={volunteerHours}
+                  value={exchangeInput}
+                  onChange={(e) => setExchangeInput(e.target.value)}
+                  placeholder={`Hours · max ${volunteerHours}`}
+                  disabled={exchanging}
+                  data-testid="volunteer-exchange-input"
+                  className="px-3 py-2 rounded-md text-sm flex-1 min-w-[140px] disabled:opacity-60"
+                  style={{
+                    background: 'rgba(4,6,15,0.6)',
+                    border: '1px solid rgba(134,239,172,0.28)',
+                    color: '#e2e8f0',
+                    fontFamily: 'monospace',
+                    letterSpacing: '0.08em',
+                  }}
+                />
+                <ArrowRight size={14} style={{ color: '#86EFAC' }} />
+                <span className="text-[12px] sov-telemetry" style={{ color: '#FCD34D', letterSpacing: '0.12em', fontFamily: 'monospace' }} data-testid="volunteer-exchange-preview">
+                  {(() => {
+                    const n = parseFloat(exchangeInput);
+                    return Number.isFinite(n) && n > 0
+                      ? `${Math.round(n * VOLUNTEER_CREDITS_PER_HOUR)} CREDITS`
+                      : `${VOLUNTEER_CREDITS_PER_HOUR}c / HR`;
+                  })()}
+                </span>
+                <button
+                  onClick={exchange}
+                  disabled={exchanging || !exchangeInput}
+                  data-testid="volunteer-exchange-btn"
+                  className="px-4 py-2 rounded-md text-[11px] uppercase tracking-[0.22em] disabled:opacity-55"
+                  style={{
+                    background: 'rgba(134,239,172,0.14)',
+                    border: '1px solid rgba(134,239,172,0.42)',
+                    color: '#86EFAC',
+                    fontFamily: 'monospace',
+                    cursor: (exchanging || !exchangeInput) ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {exchanging ? 'Exchanging…' : 'Exchange'}
+                </button>
+              </div>
+            </div>
+          )}
 
           {isTWA ? (
             <TWAGateCard />

@@ -560,6 +560,105 @@ async def get_volunteer_balance(user_id: str = None, authorization: str = Header
     return {"user_id": user_id, "total_hours": 0, "total_credit": 0}
 
 
+class VolunteerExchangeRequest(BaseModel):
+    hours: float
+
+
+@router.post("/economy/volunteer/exchange")
+async def exchange_volunteer_hours(
+    data: VolunteerExchangeRequest,
+    user=Depends(get_current_user),
+):
+    """
+    Convert logged volunteer hours into spendable Resonance Credits.
+
+    Rate: 10 credits per hour (matches omega_sentinel.VOLUNTEER_RATE,
+    reciprocity_gate.CREDIT_VALUE_PER_HOUR, sovereign_ledger.VOLUNTEER_RATE).
+    
+    Balance is computed by summing hours across `volunteer_ledger` — log
+    entries add positive hours (via /economy/volunteer/record), exchanges
+    add NEGATIVE hours so the existing aggregation naturally nets out.
+
+    Audit trail: a merchant_transactions row is written alongside the
+    ledger entry so the exchange shows up in the canonical shop ledger
+    that every other in-app currency event lives in.
+    """
+    import uuid as _uuid
+    CREDIT_RATE = 10  # Keep in lockstep with record_volunteer_activity above.
+    user_id = user["id"]
+    hours_to_exchange = round(float(data.hours), 2)
+
+    if hours_to_exchange <= 0:
+        raise HTTPException(status_code=400, detail="hours must be positive")
+    if hours_to_exchange > 10000:
+        raise HTTPException(status_code=400, detail="hours out of range")
+
+    # 1. Compute current balance by summing every ledger row (positive
+    #    records + negative exchanges already in flight).
+    pipeline = [
+        {"$match": {"user_id": user_id}},
+        {"$group": {"_id": None, "total_hours": {"$sum": "$hours"}}},
+    ]
+    agg = await db.volunteer_ledger.aggregate(pipeline).to_list(1)
+    current_hours = float((agg[0].get("total_hours") if agg else 0) or 0)
+
+    if current_hours < hours_to_exchange:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Insufficient volunteer hours. Have {current_hours:.2f}, need {hours_to_exchange:.2f}.",
+        )
+
+    credits_earned = int(round(hours_to_exchange * CREDIT_RATE))
+    exchange_id = str(_uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+
+    # 2. Insert the NEGATIVE ledger row first. If anything below fails we
+    #    have a record that an exchange was attempted; orphaned negatives
+    #    can be reconciled by inspecting merchant_transactions.
+    await db.volunteer_ledger.insert_one({
+        "id": exchange_id,
+        "user_id": user_id,
+        "hours": -hours_to_exchange,
+        "activity": "volunteer_credit_exchange",
+        "credit_value": -(hours_to_exchange * CREDIT_RATE),  # Keeps old aggregation in sync.
+        "rate": CREDIT_RATE,
+        "type": "exchange",
+        "created_at": now,
+    })
+
+    # 3. Credit the user's Resonance Credit balance atomically.
+    await db.users.update_one(
+        {"id": user_id},
+        {"$inc": {"user_credit_balance": credits_earned}},
+    )
+
+    # 4. Write the canonical merchant_transactions audit row — same
+    #    schema every other in-app currency event uses so a Play Console
+    #    auditor sees a single unified ledger.
+    await db.merchant_transactions.insert_one({
+        "id": exchange_id,
+        "user_id": user_id,
+        "type": "volunteer_exchange",
+        "source": "volunteer_ledger",
+        "hours_spent": hours_to_exchange,
+        "rate_per_hour": CREDIT_RATE,
+        "credits_granted": credits_earned,
+        "created_at": now,
+    })
+
+    # 5. Return the fresh balances so the frontend can update in place.
+    u = await db.users.find_one({"id": user_id}, {"_id": 0, "user_credit_balance": 1})
+    return {
+        "success": True,
+        "hours_exchanged": hours_to_exchange,
+        "credits_granted": credits_earned,
+        "rate_per_hour": CREDIT_RATE,
+        "remaining_hours": round(current_hours - hours_to_exchange, 2),
+        "new_credit_balance": (u or {}).get("user_credit_balance", credits_earned),
+        "ledger_id": exchange_id,
+    }
+
+
 @router.get("/economy/rates")
 async def get_economy_rates(tier: str = "BASIC"):
     """

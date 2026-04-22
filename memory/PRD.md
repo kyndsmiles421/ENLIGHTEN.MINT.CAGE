@@ -1,7 +1,57 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.43)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.44)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as a Wellness / Mental Acuity app.
+
+## V68.44 — Volunteer → Credit Exchange (22 Feb 2026)
+
+**Closed-loop participation mechanic locked in.** Volunteer hours logged
+via `POST /api/sovereign/economy/volunteer/record` can now be converted
+to spendable Resonance Credits at **10 credits per hour** — the rate
+already hard-coded consistently across `omega_sentinel.VOLUNTEER_RATE`,
+`omni_generator.VOLUNTEER_RATE`, `sovereign_ledger.VOLUNTEER_RATE`, and
+`reciprocity_gate.CREDIT_VALUE_PER_HOUR`. This makes the Marketplace
+Identity story concrete for Play Console review: community labor → in-app
+currency → tier unlock, all in one auditable ledger.
+
+1. ✅ **New endpoint `POST /api/sovereign/economy/volunteer/exchange`**
+   (Pydantic `VolunteerExchangeRequest { hours: float }`, requires auth).
+   Computes balance via the existing `{$sum: $hours}` aggregation,
+   inserts a **negative** `hours` row tagged `type: "exchange"` so the
+   existing `/balance` aggregation nets correctly with zero schema
+   migration, then atomically `$inc`s `users.user_credit_balance`, then
+   writes a `merchant_transactions` audit row with
+   `type: "volunteer_exchange"`.
+2. ✅ **BuyTimePanel widget** — when open, fetches
+   `/sovereign/economy/volunteer/balance` in parallel with
+   `/trade-circle/ai-merchant`. If the user has >0 hours logged,
+   renders an inline input + "Exchange" button above the tier grid
+   showing live "N hrs → N×10 CREDITS" preview. On success the panel's
+   own Credit balance + remaining-hours state update in place without
+   a reload.
+3. ✅ **Anti-abuse & race guards**: negative / zero / >10000-hour
+   requests rejected 400; insufficient-balance returns 400 with
+   current vs requested hours in the detail; `hours_exchanged`
+   server-rounded to 2dp so float jitter can't drain the ledger.
+4. ✅ **Audit unification**: every volunteer exchange now appears in
+   the canonical `merchant_transactions` collection next to tier
+   unlocks and Dust purchases. One ledger, one query, one truth for
+   Play Console auditor inspection.
+5. ✅ **End-to-end verified**: 6 hrs logged → exchanged 5 hrs → got 50
+   credits → bought Seed tier for 50 credits → user state
+   `gilded_tier=seed, credits=0, remaining_hours=1`. Zero Stripe calls
+   inside the loop. Ledger shows `volunteer_exchange +50c` followed by
+   `Gilded Path · Seed -50c`.
+
+### Not fixed (out of scope, pre-existing)
+- `sovereign.py:849` + `sovereign.py:990` F811 duplicate-definition
+  warnings — existed before this session; FastAPI uses the last
+  definition, no runtime impact. Flag for a future cleanup pass.
+- `total_credit` field in `/balance` endpoint returns `-50` after an
+  exchange because older log rows don't populate `credit_value` but
+  my negative row does. Consumers should rely on `total_hours`
+  (accurate); `total_credit` is legacy and broken independently of
+  this change.
 
 ## V68.43 — Gilded Path consolidated into AI Merchant (22 Feb 2026)
 
