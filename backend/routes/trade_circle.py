@@ -549,7 +549,20 @@ AI_MERCHANT_CATALOG = [
     {"id": "comp_hull", "name": "Hull Plating Blueprint", "type": "component", "component": "hull_plating", "category": "defense", "power": 5, "price_credits": 8, "tier": "base", "discount": 0, "description": "Pre-fabricated Hull Plating for your Starseed vessel"},
     {"id": "comp_nav", "name": "Signal Booster Kit", "type": "component", "component": "signal_booster", "category": "navigation", "power": 4, "price_credits": 6, "tier": "base", "discount": 0, "description": "Navigation Signal Booster"},
     {"id": "comp_engine", "name": "Resonance Drive Core", "type": "component", "component": "resonance_drive", "category": "propulsion", "power": 7, "price_credits": 12, "tier": "base", "discount": 0, "description": "High-tier engine component"},
+    # ─── Gilded Path · Marketplace Service Tiers ──────────────────────
+    # One-time tier unlocks. Priced in Credits at the same $0.20/credit
+    # rate as the rest of the economy (5 credits = $0.99 via Broker).
+    # Fulfilled atomically in ai_merchant_buy — sets users.gilded_tier,
+    # emits a merchant_transactions ledger row, never double-grants.
+    # Ordered low → high so GILDED_TIER_ORDER comparisons work.
+    {"id": "gilded_path_seed", "name": "Gilded Path · Seed", "type": "tier_unlock", "tier_id": "seed", "tier_rank": 1, "price_credits": 50, "tier": "base", "discount": 0, "description": "Marketplace Starter Access — cosmetic theme pack + 3 sample workshop blades. Non-recurring one-time service fee."},
+    {"id": "gilded_path_artisan", "name": "Gilded Path · Artisan", "type": "tier_unlock", "tier_id": "artisan", "tier_rank": 2, "price_credits": 150, "tier": "medium", "discount": 0, "description": "Marketplace Artisan Access — advanced HUD, Spectrum Filters, verified artisan badge for TradeCircle physical-goods listings."},
+    {"id": "gilded_path_sovereign", "name": "Gilded Path · Sovereign", "type": "tier_unlock", "tier_id": "sovereign", "tier_rank": 3, "price_credits": 500, "tier": "premium", "discount": 0, "description": "Marketplace Sovereign Access — full Arsenal unlock (261 blades), Crystal Fidelity 3D viewer, priority listing surface in the TradeCircle."},
+    {"id": "gilded_path_gilded", "name": "Gilded Path · Gilded", "type": "tier_unlock", "tier_id": "gilded", "tier_rank": 4, "price_credits": 1250, "tier": "premium", "discount": 0, "description": "Marketplace Gilded Membership — Sovereign tier plus priority human support, verified-seller badge, low-fee TradeCircle listings, Visitor-Mode invitations for local swaps. Not redeemable for cash."},
 ]
+
+# Display-order rank for gilded_tier comparison (used to block downgrades).
+GILDED_TIER_ORDER = {"seed": 1, "artisan": 2, "sovereign": 3, "gilded": 4}
 
 RETURN_PENALTY_PCT = 30  # 30% processing fee on all sell-back/refunds
 
@@ -561,7 +574,10 @@ RESONANCE_FEE_PCT = 5  # 5%
 async def ai_merchant_catalog(user=Depends(get_current_user)):
     """AI Merchant — the stabilized storefront. All items have fixed server-set prices."""
     user_id = user["id"]
-    u = await db.users.find_one({"id": user_id}, {"_id": 0, "user_credit_balance": 1, "user_dust_balance": 1})
+    u = await db.users.find_one(
+        {"id": user_id},
+        {"_id": 0, "user_credit_balance": 1, "user_dust_balance": 1, "gilded_tier": 1, "gilded_purchased_at": 1},
+    )
     credits = u.get("user_credit_balance", 0) if u else 0
     dust = u.get("user_dust_balance", 0) if u else 0
 
@@ -569,6 +585,9 @@ async def ai_merchant_catalog(user=Depends(get_current_user)):
         "catalog": AI_MERCHANT_CATALOG,
         "your_credits": credits,
         "your_dust": dust,
+        "your_gilded_tier": (u or {}).get("gilded_tier"),
+        "your_gilded_purchased_at": (u or {}).get("gilded_purchased_at"),
+        "gilded_tier_order": GILDED_TIER_ORDER,
         "resonance_fee_pct": RESONANCE_FEE_PCT,
         "merchant_message": "Welcome, Traveler. I trade in certainties. My prices are fixed, my stock unlimited.",
     }
@@ -592,6 +611,21 @@ async def ai_merchant_buy(data: dict = Body(...), user=Depends(get_current_user)
     current_credits = u.get("user_credit_balance", 0) if u else 0
     if current_credits < total_cost:
         raise HTTPException(status_code=400, detail=f"Need {total_cost} Credits. Have {current_credits}.")
+
+    # Tier unlocks are singletons — block multiple + prevent downgrades.
+    if item["type"] == "tier_unlock":
+        if quantity != 1:
+            raise HTTPException(status_code=400, detail="Tier unlocks are one-time purchases (quantity must be 1).")
+        existing = await db.users.find_one({"id": user_id}, {"_id": 0, "gilded_tier": 1})
+        existing_tier = (existing or {}).get("gilded_tier")
+        if existing_tier:
+            existing_rank = GILDED_TIER_ORDER.get(existing_tier, 0)
+            new_rank = item.get("tier_rank", 0)
+            if existing_rank >= new_rank:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"You already hold the '{existing_tier}' tier — cannot purchase equal or lower rank.",
+                )
 
     # Deduct credits
     await db.users.update_one({"id": user_id}, {"$inc": {"user_credit_balance": -total_cost}})
@@ -617,6 +651,23 @@ async def ai_merchant_buy(data: dict = Body(...), user=Depends(get_current_user)
         }
         await db.starseed_components.insert_one(comp)
         delivery["component"] = item["component"]
+    elif item["type"] == "tier_unlock":
+        # Atomic tier grant — the credit deduction above is the spend;
+        # this flips the gilded_tier field. merchant_transactions below
+        # is the canonical audit row (id == gilded_session_id).
+        merchant_tx_id = str(uuid.uuid4())
+        await db.users.update_one(
+            {"id": user_id},
+            {"$set": {
+                "gilded_tier": item["tier_id"],
+                "gilded_product_sku": item["id"],
+                "gilded_session_id": merchant_tx_id,
+                "gilded_purchased_at": datetime.now(timezone.utc).isoformat(),
+            }},
+        )
+        delivery["tier_id"] = item["tier_id"]
+        delivery["tier_rank"] = item.get("tier_rank")
+        delivery["merchant_tx_id"] = merchant_tx_id
 
     # Log transaction
     await db.merchant_transactions.insert_one({

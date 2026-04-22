@@ -167,37 +167,6 @@ async def stripe_webhook(request: Request):
                     {"id": broker_tx["user_id"]},
                     {"$inc": {"user_credit_balance": broker_tx["credits"]}}
                 )
-            # Gilded Path one-time marketplace unlocks (routes/buy_time.py).
-            # The poll-based /api/purchase/one-time/status/{id} endpoint is
-            # the primary fulfillment path; this branch is a safety net for
-            # the rare case where the user closes the browser before the
-            # success redirect fires. Fulfillment is atomic + idempotent
-            # (matches the {"payment_status": {"$ne": "paid"}} guard).
-            gilded_tx = await db.buy_time_transactions.find_one(
-                {"session_id": event.session_id}, {"_id": 0}
-            )
-            if gilded_tx and gilded_tx.get("payment_status") != "paid":
-                result = await db.buy_time_transactions.update_one(
-                    {"session_id": event.session_id, "payment_status": {"$ne": "paid"}},
-                    {"$set": {
-                        "payment_status": "paid",
-                        "paid_at": datetime.now(timezone.utc).isoformat(),
-                    }},
-                )
-                if result.modified_count > 0:
-                    await db.users.update_one(
-                        {"id": gilded_tx["user_id"]},
-                        {"$set": {
-                            "gilded_tier": gilded_tx["tier_id"],
-                            "gilded_product_sku": gilded_tx.get("product_sku"),
-                            "gilded_session_id": event.session_id,
-                            "gilded_purchased_at": datetime.now(timezone.utc).isoformat(),
-                        }},
-                    )
-                    logger.info(
-                        f"[gilded_path:webhook] fulfilled: user={gilded_tx['user_id']} "
-                        f"tier={gilded_tx['tier_id']} session={event.session_id}"
-                    )
         return {"status": "ok"}
     except Exception as e:
         logger.error(f"Stripe webhook error: {e}")

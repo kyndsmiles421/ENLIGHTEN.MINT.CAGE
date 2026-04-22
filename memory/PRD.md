@@ -1,7 +1,65 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.42)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.43)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as a Wellness / Mental Acuity app.
+
+## V68.43 — Gilded Path consolidated into AI Merchant (22 Feb 2026)
+
+**Architectural simplification.** The parallel `routes/buy_time.py` route
+built earlier this session (paid via Stripe Checkout, separate
+`buy_time_transactions` collection, separate `/api/purchase/one-time/*`
+endpoints) has been **deleted** and replaced by 4 items added to the
+existing `AI_MERCHANT_CATALOG` in `routes/trade_circle.py`. Tier unlocks
+are now purchased with Resonance Credits — the same closed-loop currency
+used for Dust, Gems, and Starseed components. Credit → Tier conversion
+happens atomically inside the proven `/api/trade-circle/ai-merchant/buy`
+endpoint. Zero duplicate infrastructure.
+
+1. ✅ **4 new `type: "tier_unlock"` items in `AI_MERCHANT_CATALOG`** —
+   `gilded_path_seed` (50c), `artisan` (150c), `sovereign` (500c),
+   `gilded` (1250c). Priced at $0.20/credit per existing
+   `BROKER_CREDIT_PACKS` rate. Each carries `tier_id`, `tier_rank`,
+   marketplace-service `description`.
+2. ✅ **`ai_merchant_buy` extended** with a `tier_unlock` branch that
+   (a) blocks `quantity > 1`, (b) blocks downgrades via
+   `GILDED_TIER_ORDER` rank comparison, (c) atomically flips
+   `users.gilded_tier` / `gilded_product_sku` / `gilded_session_id`,
+   (d) writes the canonical `merchant_transactions` audit row.
+3. ✅ **`/trade-circle/ai-merchant` GET** now also returns
+   `your_gilded_tier`, `your_gilded_purchased_at`, and
+   `gilded_tier_order` so the frontend can render correct state.
+4. ✅ **`BuyTimePanel.js` rewired** — hydrates from `/ai-merchant`,
+   shows live Credits balance, per-tier credit price, `owned` /
+   `insufficient credits` states, disables downgrade buttons. No
+   Stripe redirect — entire flow stays in-app. Wrapped in
+   `<PaymentGate>` so Android TWA users see a "Manage credits on
+   web" CTA instead (policy-safe).
+5. ✅ **`routes/buy_time.py` deleted** — 0 imports remained; 404 on all
+   `/api/purchase/one-time/*` paths confirmed via curl.
+6. ✅ **Stripe webhook `server.py` reverted** — removed the
+   `buy_time_transactions` safety-net branch that's no longer needed
+   (buy-time was never a Stripe flow under this architecture).
+7. ✅ **End-to-end verified**: Seed→Sovereign→Gilded upgrade chain,
+   duplicate-prevention (400 "already hold"), downgrade-prevention
+   (400 "equal or lower rank"), quantity=2 rejection, balance
+   deduction, 3 rows in `merchant_transactions` ledger with
+   `delivery.tier_id` + `delivery.merchant_tx_id`.
+
+### Compliance posture (Google Play review)
+- **No Stripe call ever fires from inside the APK** for tier unlocks —
+  Credits are pre-purchased (or earned) via existing `/trade-circle/broker/buy-credits`
+  which already routes through `<PaymentGate>` for TWA users.
+- **Closed-loop currency model** — Credits are earned or purchased,
+  spent inside `AI_MERCHANT_CATALOG`. No P2P money transfer, no
+  cash-out path, no KYC/AML exposure.
+- **Single source of truth ledger** — all economy events write to
+  `merchant_transactions` with `user_id`, `item_id`, `total_credits`,
+  `delivery`, `created_at`. Matches the "Reviewer Briefing"
+  requirement.
+- **Service-fee transparency** — the 30% `RETURN_PENALTY_PCT` on
+  sell-backs and 5% `RESONANCE_FEE_PCT` on P2P escrow are surfaced
+  in the `/ai-merchant` response and in every `merchant_transactions`
+  row where applicable.
 
 ## V68.42 — Metabolic Seal: Chamber Backdrop Compression (22 Feb 2026)
 
