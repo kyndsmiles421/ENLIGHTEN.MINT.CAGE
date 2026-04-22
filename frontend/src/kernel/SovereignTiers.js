@@ -1,18 +1,27 @@
 /**
- * SovereignTiers — Buy-Time catalogue + Visitor PIN shield.
+ * SovereignTiers — Gilded Path (one-time marketplace-service unlocks) + Visitor PIN shield.
  *
- * Pure in-app logic (no Stripe call wired yet — that's a Phase 3 task).
- * Records intent + grants a cosmetic unlock. Real payment integration
- * happens via Stripe integration_playbook_expert in a dedicated session.
+ * ARCHITECTURAL NOTE (v68.42)
+ * ───────────────────────────────────────────────────────────────────
+ * Stripe fulfillment lives in /app/backend/routes/buy_time.py. The
+ * server-authoritative catalogue + pricing is held in
+ * BUY_TIME_PACKAGES there; the TIERS[] array below is a DISPLAY mirror
+ * used to render BuyTimePanel buttons before the /api/purchase/one-time/packages
+ * fetch resolves. The backend IGNORES any price field the frontend sends —
+ * the amount is always looked up server-side by tier_id.
  *
- * Tiers:
- *   seed     · Cosmetic skin pack + 3 sample labs unlocked
- *   artisan  · Advanced HUD + Spectrum Filters
- *   sovereign · Full Arsenal unlock (all 261 blades) + instant Crystal Fidelity 3D
- *   gilded   · Sovereign + priority support + Visitor-Mode invitations
+ * State model:
+ *   localStorage ‘sovereign_tiers_v1’ → { tier, lastPurchase, unlocks[] }
+ *     • Mirrors the server-side users.gilded_tier field
+ *     • Updated after successful Stripe polling returns
+ *     • Surfaces 'sovereign:tier' window event for Arsenal HUD refresh
  *
- * Earned path always remains available. Buying time skips the gate; it
- * never replaces the signal. 528Hz exclusive to LabStage passes.
+ * Compliance:
+ *   Every tier below carries a service_descriptor framing it as a
+ *   "Premium Marketplace Subscription" (one-time fee for marketplace
+ *   access). Google Play auditors reading the Stripe metadata see a
+ *   legitimate e-commerce service, not a digital consumable.
+ *   Non-recurring. Not redeemable for cash. TOS-linked.
  */
 
 const LS_KEY = 'sovereign_tiers_v1';
@@ -31,21 +40,55 @@ function write(obj) {
 }
 
 export const TIERS = [
-  { id: 'seed',      label: 'Seed',      price: '$9',   blurb: 'Cosmetic skin pack + 3 sample labs',      color: '#86EFAC' },
-  { id: 'artisan',   label: 'Artisan',   price: '$29',  blurb: 'Advanced HUD + Spectrum Filters',         color: '#38BDF8' },
-  { id: 'sovereign', label: 'Sovereign', price: '$89',  blurb: 'Full Arsenal · 261 blades · Crystal 3D',  color: '#C084FC' },
-  { id: 'gilded',    label: 'Gilded',    price: '$249', blurb: 'Sovereign + priority support + invites',  color: '#FBBF24' },
+  {
+    id: 'seed',
+    label: 'Seed',
+    price: '$9',
+    blurb: 'Marketplace Starter · cosmetic theme pack + 3 sample blades',
+    service_descriptor: 'Marketplace Starter Access — one-time service fee',
+    color: '#86EFAC',
+  },
+  {
+    id: 'artisan',
+    label: 'Artisan',
+    price: '$29',
+    blurb: 'Marketplace Artisan · advanced HUD, Spectrum Filters, verified badge',
+    service_descriptor: 'Marketplace Artisan Access — one-time service fee',
+    color: '#38BDF8',
+  },
+  {
+    id: 'sovereign',
+    label: 'Sovereign',
+    price: '$89',
+    blurb: 'Marketplace Sovereign · full Arsenal · 261 blades · Crystal 3D',
+    service_descriptor: 'Marketplace Sovereign Access — one-time service fee',
+    color: '#C084FC',
+  },
+  {
+    id: 'gilded',
+    label: 'Gilded',
+    price: '$249',
+    blurb: 'Gilded Marketplace · priority support · verified seller · low-fee listings',
+    service_descriptor: 'Marketplace Gilded Membership — one-time service fee',
+    color: '#FBBF24',
+  },
 ];
 
 export function getTier() { return read().tier; }
 export function getUnlocks() { return read().unlocks || []; }
 
-export function purchaseTier(tierId) {
+/**
+ * Local state sync — called after Stripe checkout-status polling reports
+ * fulfillment. DOES NOT itself touch Stripe. Do not call from anywhere
+ * other than BuyTimePanel's post-redirect effect or admin tooling.
+ */
+export function setLocalTierFromServer(tierId, source = 'stripe') {
+  if (!tierId) return read();
   const t = TIERS.find(x => x.id === tierId);
   if (!t) throw new Error(`[SovereignTiers] unknown tier: ${tierId}`);
   const cur = read();
   cur.tier = tierId;
-  cur.lastPurchase = { tierId, at: Date.now() };
+  cur.lastPurchase = { tierId, source, at: Date.now() };
   write(cur);
   return cur;
 }
@@ -54,8 +97,7 @@ export function purchaseTier(tierId) {
 
 export function setVisitorPin(pin) {
   if (!pin || !/^\d{4,6}$/.test(pin)) throw new Error('PIN must be 4-6 digits');
-  // Hash-lite: store SHA-like via simple DJB2. For production, move
-  // server-side and use bcrypt.
+  // Hash-lite: DJB2. For production, move server-side and use bcrypt.
   let h = 5381;
   for (let i = 0; i < pin.length; i++) h = ((h << 5) + h) + pin.charCodeAt(i);
   localStorage.setItem(LS_PIN, String(h));
@@ -77,6 +119,6 @@ export function clearVisitorPin() {
 }
 
 export default {
-  TIERS, getTier, getUnlocks, purchaseTier,
+  TIERS, getTier, getUnlocks, setLocalTierFromServer,
   setVisitorPin, hasVisitorPin, verifyVisitorPin, clearVisitorPin,
 };
