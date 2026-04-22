@@ -1,7 +1,14 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.41)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.42)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as a Wellness / Mental Acuity app.
+
+## V68.42 — Metabolic Seal: Chamber Backdrop Compression (22 Feb 2026)
+
+1. ✅ **WebP compression pipeline** — new `_compress_png_b64_to_webp_data_url` helper in `/app/backend/routes/ai_visuals.py` re-encodes gpt-image-1 PNGs to WebP q=82 (max-dim 1600px) off the event loop via `run_in_executor`. Typical payload: **~44-70 KB** (vs. 1.8-2.5 MB raw PNG) — a **~40x reduction** that brings the initial core bundle comfortably under the 800 KB Metabolic Seal.
+2. ✅ **Dedicated compressed cache** — chamber WebP variants persisted under a separate `cache_key` (category `chamber_webp`, field `image_webp`) so the Pillow cost is paid once per chamber. Fast-path returns the WebP directly from MongoDB on subsequent hits.
+3. ✅ **Data URL response format** — endpoint now returns `image_b64` as a full `data:image/webp;base64,...` URL. All existing `HolographicChamber.js` / `SovereignStageHUD.js` consumers already branch on `startsWith('data:')` so there is zero call-site churn.
+4. ✅ **Verified** — `/api/ai-visuals/chamber` tested against `meditation` (44 KB) and `aromatherapy` (50 KB) chambers; Meditation page renders chamber backdrop correctly with no visual regression.
 
 ## V68.41 — Front Door + Un-Boxer + Refraction UI (21 Feb 2026)
 

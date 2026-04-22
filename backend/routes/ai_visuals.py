@@ -5,10 +5,61 @@ from emergentintegrations.llm.openai.video_generation import OpenAIVideoGenerati
 from engines.crystal_seal import secure_hash_short
 from datetime import datetime, timezone
 from pathlib import Path
+from io import BytesIO
+from PIL import Image
 import base64
 import asyncio
 import uuid
 import os
+
+
+# ═══════════════════════════════════════════════════════════════════
+# METABOLIC SEAL — WebP compression for chamber backdrops
+# ───────────────────────────────────────────────────────────────────
+# gpt-image-1 returns uncompressed PNGs at ~1.8-2.5 MB each. For
+# chamber backdrops (decorative, full-bleed, not printed) we re-encode
+# to WebP q=82 which typically yields ~150-300 KB — a 10x reduction
+# required to hit the <800 KB initial core-bundle budget on mobile.
+# ═══════════════════════════════════════════════════════════════════
+
+def _compress_png_b64_to_webp_data_url(png_b64: str, quality: int = 82, max_dim: int = 1600) -> str:
+    """Accepts raw PNG base64 (or a data URL), returns a WebP data URL.
+
+    - Caps longest edge at max_dim (chamber backdrops don't need >1600px).
+    - Uses method=6 for max encoder effort (still <1s for a 1024px image).
+    - Idempotent: if already a WebP data URL, returns unchanged.
+    """
+    if not png_b64:
+        return png_b64
+    # Already a data URL? Return as-is if webp, else decode the payload.
+    if png_b64.startswith("data:image/webp"):
+        return png_b64
+    if png_b64.startswith("data:"):
+        try:
+            png_b64 = png_b64.split(",", 1)[1]
+        except Exception:
+            return png_b64
+    try:
+        raw = base64.b64decode(png_b64)
+        img = Image.open(BytesIO(raw))
+        # Flatten alpha onto black for smaller files (chambers are dark anyway)
+        if img.mode in ("RGBA", "LA", "P"):
+            img = img.convert("RGB")
+        # Downscale if huge
+        w, h = img.size
+        longest = max(w, h)
+        if longest > max_dim:
+            scale = max_dim / longest
+            img = img.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+        buf = BytesIO()
+        img.save(buf, format="WEBP", quality=quality, method=6)
+        webp_b64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+        return f"data:image/webp;base64,{webp_b64}"
+    except Exception as e:
+        logger.warning(f"WebP compression failed, falling back to PNG: {e}")
+        # Fallback: return original as a PNG data URL so consumers that
+        # check startsWith('data:') still work.
+        return f"data:image/png;base64,{png_b64}"
 
 router = APIRouter()
 
@@ -257,13 +308,53 @@ async def generate_chamber_backdrop(
     every visitor (including guests) sees the same room every time they
     enter it — reinforcing the "I'm in a real place" immersion the app is
     going for. Public: no auth required.
+
+    Metabolic Seal: payload is WebP q=82 ≤1600px — typically 150-300 KB
+    vs. the 1.8-2.5 MB raw PNG the upstream model returns. The compressed
+    variant is cached in a dedicated field so we only pay the Pillow cost
+    once per chamber.
     """
     chamber_id = (data.get("chamber_id") or "default").lower()
     prompt = CHAMBER_PROMPTS.get(chamber_id, CHAMBER_PROMPTS["default"])
+
+    # Fast-path: return the pre-compressed WebP if we already have it.
+    compressed_cache_key = secure_hash_short(f"chamber:{chamber_id}:{prompt[:100]}", 32)
+    cached_webp = await db.ai_visuals_cache.find_one(
+        {"cache_key": compressed_cache_key}, {"_id": 0, "image_webp": 1}
+    )
+    if cached_webp and cached_webp.get("image_webp"):
+        return {"chamber_id": chamber_id, "image_b64": cached_webp["image_webp"]}
+
+    # Miss — run the normal generator (which may itself hit the PNG cache).
     image_b64 = await get_or_generate_image(prompt, "chamber", chamber_id)
     if not image_b64:
         raise HTTPException(status_code=500, detail="Failed to generate chamber backdrop")
-    return {"chamber_id": chamber_id, "image_b64": image_b64}
+
+    # Compress off the event loop to avoid blocking other requests.
+    loop = asyncio.get_event_loop()
+    compressed_data_url = await loop.run_in_executor(
+        None, _compress_png_b64_to_webp_data_url, image_b64
+    )
+
+    # Persist the compressed variant so future hits are O(1) on the DB.
+    try:
+        await db.ai_visuals_cache.update_one(
+            {"cache_key": compressed_cache_key},
+            {
+                "$set": {
+                    "cache_key": compressed_cache_key,
+                    "category": "chamber_webp",
+                    "ref_id": chamber_id,
+                    "image_webp": compressed_data_url,
+                    "created_at": datetime.now(timezone.utc).isoformat(),
+                }
+            },
+            upsert=True,
+        )
+    except Exception as e:
+        logger.warning(f"Failed to persist compressed chamber cache [{chamber_id}]: {e}")
+
+    return {"chamber_id": chamber_id, "image_b64": compressed_data_url}
 
 
 @router.post("/ai-visuals/forecast")
