@@ -844,12 +844,11 @@ async def execute_action(
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  SOVEREIGN ECONOMY ROUTES
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-@router.get("/economy/rates")
-async def get_economy_rates(tier: str = "NOVICE"):
-    """Get rate breakdown for a specific tier."""
-    from engines.sovereign_economy import sovereign_economy
-    return sovereign_economy.get_rate_breakdown(tier)
+# NOTE: `/economy/rates` and `/economy/volunteer/balance` are served by
+# the earlier definitions (lines 525 and 662). Duplicate route
+# declarations that previously lived here have been removed — they were
+# shadowed at startup by FastAPI's first-match routing and caused F811
+# lint noise. The remaining routes below are unique.
 
 
 @router.get("/economy/tiers")
@@ -984,32 +983,8 @@ async def get_package_cost(
 
 # NOTE: Duplicate volunteer/record route removed — gated version at line 436 handles this
 # with $5 purchase gate + φ-escrow + 10 Credits/hr rate
-
-
-@router.get("/economy/volunteer/balance")
-async def get_volunteer_balance(user=Depends(get_current_user)):
-    """Get volunteer balance and credit for the current user."""
-    from engines.sovereign_economy import sovereign_economy
-    
-    # Get from database
-    cursor = db.volunteer_ledger.find(
-        {"user_id": user["id"]},
-        {"_id": 0}
-    ).sort("timestamp", -1)
-    
-    activities = await cursor.to_list(length=100)
-    
-    total_hours = sum(a.get("hours", 0) for a in activities)
-    total_credit = total_hours * sovereign_economy.volunteer_credit_value
-    
-    return {
-        "user_id": user["id"],
-        "total_hours": total_hours,
-        "total_credit": total_credit,
-        "credit_rate": sovereign_economy.volunteer_credit_value,
-        "activity_count": len(activities),
-        "recent_activities": activities[:10],  # Last 10 activities
-    }
+# NOTE: Duplicate `/economy/volunteer/balance` route removed — first-match
+# at line 525 serves the aggregate query that includes exchange rows.
 
 
 @router.get("/economy/packages")

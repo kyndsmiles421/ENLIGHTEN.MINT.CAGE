@@ -27,6 +27,7 @@ import { ProximityItem } from './SpatialRoom';
 import OmniBridge from './OmniBridge';
 import TraditionLens from './TraditionLens';
 import HolographicChamber from './HolographicChamber';
+import WellnessDisclaimer from './WellnessDisclaimer';
 
 // V68.25 — System-wide gamification plug-in point.
 // Every catalog module using InteractiveModule (Crystals, Herbology,
@@ -975,6 +976,8 @@ export default function InteractiveModule({
         <SageBoard category={category} color={color} discoveredCount={discoveredSet.size} />
 
         {children}
+
+        <WellnessDisclaimer variant="footer" />
       </motion.div>
     </div>
   );

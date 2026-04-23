@@ -2,6 +2,19 @@
 
 Paste these answers into the Play Console → **App content → Data safety** section.
 
+## App Category & Content Purpose (Reviewer Briefing)
+
+- **Primary Play Store Category**: **Apps → Entertainment**
+- **Content Purpose**: **Information & Entertainment only**
+- **NOT a medical app.** The platform is not a substitute for professional diagnosis, treatment, or advice from a licensed practitioner. Every practice surface (Meditation, Reflexology, Acupressure, Herbology, Aromatherapy, Elixirs, Mudras, Botany, Reiki, Nourishment, Crystals) carries a visible `<WellnessDisclaimer />` footer that reads verbatim:
+  > *"For Information & Entertainment Purposes Only · Not Medical Advice · Honor Your Body · Consult a Licensed Professional"*
+- **Terms of Service** (served at `/terms`) reinforces the same stance: *"The wellness modules, interfaith wisdom portal, and AI-driven interactions (Sage AI) are classified as Educational, Informational, and Entertainment Archives. The platform does not provide medical advice, diagnosis, or treatment, and is not a substitute for a licensed professional."*
+- **Landing page** (served at `/landing.html` for logged-out users) has the same full disclosure panel.
+
+This consistent taxonomy across the Play Console metadata, the in-app footer, the ToS, and the landing page is intentional — a reviewer comparing any two surfaces will find matching language and a single, defensible editorial stance.
+
+---
+
 ## Data collection summary
 - **Does your app collect or share any of the required user data types?** → YES
 - **Is all of the user data collected by your app encrypted in transit?** → YES (TLS 1.2+)

@@ -13,6 +13,7 @@ import FeaturedVideos from '../components/FeaturedVideos';
 import useWorkAccrual from '../hooks/useWorkAccrual';
 import { ProximityItem } from '../components/SpatialRoom';
 import HolographicChamber from '../components/HolographicChamber';
+import WellnessDisclaimer from '../components/WellnessDisclaimer';
 import ChamberProp from '../components/ChamberProp';
 import BreathPacerGame from '../components/games/BreathPacerGame';
 import MandalaRitual from '../components/games/MandalaRitual';
@@ -1573,6 +1574,7 @@ export default function Meditation() {
           </motion.div>
         )}
       </AnimatePresence>
+      <WellnessDisclaimer variant="footer" />
     </div>
     </HolographicChamber>
   );

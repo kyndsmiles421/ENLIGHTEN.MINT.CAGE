@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { FiveElementsWheel } from '../components/FiveElementsWheel';
 import { NanoGuide } from '../components/NanoGuide';
+import WellnessDisclaimer from '../components/WellnessDisclaimer';
 import { useCosmicState } from '../context/CosmicStateContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -688,6 +689,7 @@ export default function Botany() {
             <GardenPanel garden={garden} summary={gardenSummary} onNurture={handleNurture} nurturing={nurturing} />
           </div>
         )}
+        <WellnessDisclaimer variant="footer" />
       </div>
     </div>
   );

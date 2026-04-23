@@ -17,7 +17,7 @@ export default function TermsPage() {
       icon: BookOpen,
       title: 'Nature of Service',
       color: '#22C55E',
-      content: 'The wellness modules, interfaith wisdom portal, and AI-driven interactions (Sage AI) are classified as Educational and Informational Archives. The platform does not provide medical advice, diagnosis, or treatment. User engagement is strictly "pull-based," requiring manual activation for all core features to ensure intentionality.',
+      content: 'The wellness modules, interfaith wisdom portal, and AI-driven interactions (Sage AI) are classified as Educational, Informational, and Entertainment Archives. The platform does not provide medical advice, diagnosis, or treatment, and is not a substitute for a licensed professional. User engagement is strictly "pull-based," requiring manual activation for all core features to ensure intentionality.',
     },
     {
       icon: Zap,

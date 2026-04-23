@@ -1,7 +1,67 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.44)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.45)
 
 ## Vision
-Sovereign Unified Engine / PWA targeting Google Play Store submission as a Wellness / Mental Acuity app.
+Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
+
+## V68.45 — Compliance Hardening: WellnessDisclaimer + F811 cleanup (23 Feb 2026)
+
+**Legal posture locked across every practice surface.** A single
+`<WellnessDisclaimer />` component now renders the exact verbiage that
+matches the Play Console category pick ("Entertainment"), the ToS, and
+the Landing page. One string, one component, ten+ render sites.
+
+1. ✅ **New `components/WellnessDisclaimer.js`** — `variant="footer" | "banner"`,
+   optional `accent` override. Hard-coded text:
+   *"For Information & Entertainment Purposes Only · Not Medical Advice · Honor Your Body · Consult a Licensed Professional"*
+   — same string everywhere, so a reviewer reading Play Console metadata,
+   in-app UI, ToS, and landing page sees identical language.
+
+2. ✅ **Centralized injection via `InteractiveModule.js`** —
+   disclaimer rendered at the bottom of the shared module used by
+   **Acupressure, Herbology, Aromatherapy, Elixirs, Crystals, Mudras,
+   Nourishment, Reiki** (8 pillars). One edit, eight surfaces.
+
+3. ✅ **Direct injection** into `pages/Meditation.js` and `pages/Botany.js`
+   (both use custom layouts, not InteractiveModule). Reflexology
+   already has its own disclaimer — left unchanged.
+
+4. ✅ **Landing page updated** (`pages/Landing.js:870`) — "For Wellness
+   & Relaxation Only" → "For Information & Entertainment Purposes
+   Only" to match Play Console category exactly.
+
+5. ✅ **Terms of Service updated** (`pages/TermsPage.js:20`) — added
+   "Entertainment" to the "Educational and Informational Archives"
+   classification; added "is not a substitute for a licensed
+   professional" clause.
+
+6. ✅ **DATA_SAFETY.md prepended with reviewer briefing** — declares
+   `Apps → Entertainment` category and the Information-only stance
+   as the official Play Console statement of intent. First thing a
+   copy-paste submission will see.
+
+7. ✅ **F811 duplicate cleanup in `sovereign.py`** — deleted the
+   shadowed second definitions of `get_economy_rates` (was at 849)
+   and `get_volunteer_balance` (was at 990). FastAPI's first-match
+   routing meant lines 525 + 662 were already serving traffic; the
+   later duplicates were pure dead code causing lint noise. Verified
+   all three affected endpoints still return the correct response
+   shapes post-cleanup.
+
+8. ✅ **`ruff` now reports 0 errors across both `sovereign.py` and
+   `trade_circle.py`**. ESLint 0 issues on `WellnessDisclaimer`,
+   `InteractiveModule`, `BuyTimePanel`.
+
+### Compliance Story Summary (for Play Console submission)
+
+| Surface | Content | Status |
+|---|---|---|
+| Play Store category | Apps → Entertainment | Set |
+| Data Safety form | `/app/memory/DATA_SAFETY.md` | Ready to paste |
+| Privacy Policy | `/app/frontend/public/privacy.html` | Hosted |
+| ToS | `/terms` (in-app) | Updated with Entertainment language |
+| Landing page | `/landing.html` | Updated |
+| Practice pillar footers | 10+ surfaces | `<WellnessDisclaimer />` live |
+| IARC rating Q's | User Interaction: Yes · Digital Purchases: Yes · Simulated Gambling: No · Unrestricted Internet: No · Location: conditional | Pre-filled in DATA_SAFETY.md |
 
 ## V68.44 — Volunteer → Credit Exchange (22 Feb 2026)
 
