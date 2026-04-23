@@ -93,6 +93,7 @@ function CosmicMeshWrapper() {
 // Eager load: Landing + Auth (first screens users see)
 import Landing from './pages/Landing';
 import RootGate from './components/RootGate';
+import MedicalDisclaimerSplash from './components/MedicalDisclaimerSplash';
 import Auth from './pages/Auth';
 import CinematicIntro from './pages/CinematicIntro';
 
@@ -416,6 +417,7 @@ function AnimatedRoutes() {
   return (
     <div className="page-enter" key={location.pathname} style={{ position: 'relative', zIndex: 1 }}>
     {showBackBtn && <BackToHub />}
+    <MedicalDisclaimerSplash />
     <CosmicErrorBoundary>
     <Suspense fallback={<PageLoader />}>
       <Routes location={location}>

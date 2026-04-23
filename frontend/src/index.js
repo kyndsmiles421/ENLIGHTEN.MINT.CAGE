@@ -42,7 +42,7 @@ if (typeof window !== 'undefined') {
   // eslint-disable-next-line no-console
   console.log('%cॐ', glyph);
   // eslint-disable-next-line no-console
-  console.log('%cENLIGHTEN.MINT.CAFE — Sovereign v1.0.0', bigGold);
+  console.log('%cENLIGHTEN.MINT.CAFE — Sovereign v1.0.5', bigGold);
   // eslint-disable-next-line no-console
   console.log('%c// to the first hundred — you are the Sovereigns. 528Hz is the heartbeat. Forge, do not spend.', mono);
 }
