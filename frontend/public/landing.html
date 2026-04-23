@@ -201,16 +201,175 @@
   footer::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 60%; height: 1px; background: linear-gradient(90deg, transparent, rgba(244,213,141,0.25), transparent); }
   footer p { margin: 4px 0; }
   footer .seal { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; margin-top: 18px; opacity: 0.55; }
+
+  /* ───────── MEDICAL DISCLAIMER SPLASH (static mirror of components/MedicalDisclaimerSplash.js) ───────── */
+  /* Shares localStorage keys with the React component — acknowledging in either surface dismisses both. */
+  #emc-splash {
+    position: fixed; inset: 0; z-index: 99999;
+    background: rgba(4,6,15,0.985);
+    -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
+    display: none; align-items: center; justify-content: center; padding: 24px;
+    opacity: 0; transition: opacity 0.5s ease;
+    font-family: "Cormorant Garamond", Georgia, serif;
+  }
+  #emc-splash.emc-show { display: flex; opacity: 1; }
+  #emc-splash .emc-card {
+    max-width: 580px; width: 100%;
+    background: linear-gradient(135deg, rgba(22,18,10,0.94), rgba(10,8,14,0.94));
+    border: 1px solid rgba(251,191,36,0.28);
+    border-radius: 18px; padding: 36px 40px; text-align: center;
+    box-shadow: 0 40px 120px rgba(251,191,36,0.14), inset 0 0 80px rgba(251,191,36,0.04);
+    transform: translateY(28px); opacity: 0;
+    transition: transform 0.5s ease 0.1s, opacity 0.5s ease 0.1s;
+  }
+  #emc-splash.emc-show .emc-card { transform: translateY(0); opacity: 1; }
+  #emc-splash .emc-shield {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 64px; height: 64px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(251,191,36,0.18), rgba(251,191,36,0.02));
+    border: 1px solid rgba(251,191,36,0.36);
+    margin-bottom: 20px;
+  }
+  #emc-splash .emc-shield svg { stroke: #FCD34D; width: 26px; height: 26px; }
+  #emc-splash .emc-tel {
+    color: #FBBF24; font-family: "JetBrains Mono", monospace;
+    font-size: 10px; letter-spacing: 0.34em; text-transform: uppercase;
+    margin: 0 0 8px 0;
+  }
+  #emc-splash h2 {
+    color: #fff; font-weight: 300; font-size: 28px;
+    line-height: 1.2; margin: 0 0 18px 0;
+  }
+  #emc-splash p.emc-body {
+    color: rgba(226,232,240,0.86); font-size: 16px; line-height: 1.55; margin: 0 0 10px 0;
+  }
+  #emc-splash p.emc-body em { font-style: italic; color: #fff; }
+  #emc-splash p.emc-fine {
+    color: rgba(203,213,225,0.76); font-size: 15px; line-height: 1.55; margin: 0 0 22px 0;
+  }
+  #emc-splash .emc-tags {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 0 0 22px 0; opacity: 0.78;
+  }
+  #emc-splash .emc-tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 5px 10px; border-radius: 999px;
+    background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.24); color: #FCD34D;
+  }
+  #emc-splash button.emc-ack {
+    background: linear-gradient(135deg, rgba(251,191,36,0.24), rgba(251,191,36,0.10));
+    border: 1px solid rgba(251,191,36,0.48); color: #FCD34D;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 14px 32px; border-radius: 999px; cursor: pointer;
+    box-shadow: 0 8px 32px rgba(251,191,36,0.14);
+    transition: transform 0.18s ease;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  #emc-splash button.emc-ack:hover { transform: scale(1.02); }
+  #emc-splash button.emc-ack:active { transform: scale(0.98); }
+  #emc-splash .emc-foot {
+    color: rgba(148,163,184,0.48); font-family: "JetBrains Mono", monospace;
+    font-size: 9px; letter-spacing: 0.18em; margin: 24px 0 0 0;
+  }
+  #emc-splash .emc-foot a { color: rgba(148,163,184,0.78); text-decoration: underline; }
 </style>
 </head>
 <body>
+<!-- ───────── MEDICAL DISCLAIMER SPLASH ─────────
+     Static mirror of components/MedicalDisclaimerSplash.js.
+     Fires BEFORE any React bundle loads, so a Play Console
+     reviewer hitting the static landing page sees the
+     "Reviewer Handshake" within milliseconds regardless of
+     network speed or JS hydration state. Shares localStorage
+     keys with the React component — acknowledging in either
+     surface dismisses both. -->
+<div id="emc-splash" role="dialog" aria-modal="true" aria-labelledby="emc-splash-title" data-testid="medical-disclaimer-splash-static">
+  <div class="emc-card">
+    <div class="emc-shield" aria-hidden="true">
+      <!-- Inline SVG shield (identical to lucide-react <Shield />) -->
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>
+      </svg>
+    </div>
+    <p class="emc-tel">A Sovereign Wellness Instrument</p>
+    <h2 id="emc-splash-title">For Information &amp; Entertainment Purposes Only.</h2>
+    <p class="emc-body">
+      ENLIGHTEN.MINT.CAFE is a wellness, mindfulness, and contemplative-practice
+      platform. It is <em>not</em> a medical device, diagnostic tool, or
+      substitute for professional care.
+    </p>
+    <p class="emc-fine">
+      The Reflexology maps, herbology data, acupressure guides, and Sage AI
+      interactions are provided for educational and entertainment purposes. Do
+      not use this app to diagnose, treat, cure, or prevent any condition. For
+      medical concerns, consult a licensed professional.
+    </p>
+    <div class="emc-tags">
+      <span class="emc-tag">Information</span>
+      <span class="emc-tag">Entertainment</span>
+      <span class="emc-tag">Not Medical Advice</span>
+    </div>
+    <button type="button" class="emc-ack" id="emc-splash-ack" data-testid="medical-disclaimer-acknowledge-static">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+      I Understand · Proceed
+    </button>
+    <p class="emc-foot">
+      Full terms at <a href="/terms">/terms</a> · Honor your body · Consult a licensed professional
+    </p>
+  </div>
+</div>
+<script>
+(function(){
+  // MUST match components/MedicalDisclaimerSplash.js — do not fork keys.
+  var STORAGE_KEY = 'disclaimer_acknowledged';
+  var STORAGE_VERSION_KEY = 'disclaimer_version';
+  var STORAGE_DATE_KEY = 'disclaimer_acknowledged_at';
+  var DISCLAIMER_VERSION = 1;
+
+  function shouldShow() {
+    try {
+      var ack = localStorage.getItem(STORAGE_KEY);
+      var ver = parseInt(localStorage.getItem(STORAGE_VERSION_KEY) || '0', 10);
+      return ack !== 'true' || ver < DISCLAIMER_VERSION;
+    } catch (e) {
+      // Privacy mode / quota — fail-safe to showing.
+      return true;
+    }
+  }
+
+  function ack() {
+    try {
+      localStorage.setItem(STORAGE_KEY, 'true');
+      localStorage.setItem(STORAGE_VERSION_KEY, String(DISCLAIMER_VERSION));
+      localStorage.setItem(STORAGE_DATE_KEY, new Date().toISOString());
+    } catch (e) {}
+    var el = document.getElementById('emc-splash');
+    if (el) {
+      el.classList.remove('emc-show');
+      setTimeout(function(){ el.parentNode && el.parentNode.removeChild(el); }, 500);
+    }
+  }
+
+  if (shouldShow()) {
+    var el = document.getElementById('emc-splash');
+    if (el) {
+      // Next tick so the browser paints the card + transition triggers.
+      requestAnimationFrame(function(){ el.classList.add('emc-show'); });
+    }
+    var btn = document.getElementById('emc-splash-ack');
+    if (btn) btn.addEventListener('click', ack, { once: true });
+  }
+})();
+</script>
+
 <div class="wrap">
 
   <!-- HERO -->
   <p class="telemetry">A Sovereign Wellness Instrument</p>
   <h1>ENLIGHTEN<span class="brand-dot">·</span>MINT<span class="brand-dot">·</span>CAFE</h1>
   <p class="tagline-italic">Forge presence. Forge wisdom. Forge sparks.</p>
-  <p class="engine-note">Powered by the Sovereign Engine · v1.0.3</p>
+  <p class="engine-note">Powered by the Sovereign Engine · v1.0.5</p>
 
   <p class="lede">
     A quieter, more intentional relationship with your phone. Breathwork, meditation, reflexology, crystal work, sacred geometry, dream work — 261 blades across 27 workshops. Earn-to-learn, not pay-to-win. No ads, ever.
