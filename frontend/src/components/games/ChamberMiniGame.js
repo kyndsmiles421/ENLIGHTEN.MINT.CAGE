@@ -282,15 +282,21 @@ export default function ChamberMiniGame({
     <AnimatePresence>
       <motion.div
         key={`mini-${effMode}-${effZone}`}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: 'auto' }}
+        exit={{ opacity: 0, height: 0 }}
         style={{
-          position: 'fixed', inset: 0, zIndex: 30,
-          background: background || 'rgba(0,0,0,0.82)',
-          backdropFilter: 'blur(10px)',
+          // Flatland-compliant: inline document flow, no fixed positioning,
+          // no overlay, no backdrop-filter. Game lives WITHIN the page.
+          position: 'relative',
+          width: '100%',
+          minHeight: '70vh',
+          background: background || 'rgba(8,10,18,0.92)',
+          borderRadius: 16,
+          marginBottom: 16,
+          padding: 0,
           display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center',
+          alignItems: 'center', justifyContent: 'flex-start',
           userSelect: 'none', touchAction: 'manipulation',
           overflow: 'hidden',
         }}
@@ -302,7 +308,7 @@ export default function ChamberMiniGame({
           onClick={onClose}
           data-testid={`chamber-game-close-${effZone}`}
           style={{
-            position: 'absolute', top: 18, right: 18,
+            position: 'absolute', top: 14, right: 14,
             background: 'rgba(0,0,0,0.5)', border: `1px solid ${effColor}55`,
             color, borderRadius: 999, padding: 6, cursor: 'pointer',
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',

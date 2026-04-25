@@ -1,31 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Check } from 'lucide-react';
 
 /**
- * MedicalDisclaimerSplash — the "Reviewer Handshake."
+ * MedicalDisclaimerSplash — Flatland-compliant inline banner.
  *
- * Renders a dismissable full-screen statement of intent the FIRST time a
- * user (or Play Console reviewer) opens the app on a given device. Stores
- * acknowledgement in localStorage so returning users never see it again.
+ * Renders INLINE at the top of the document flow (no portal, no fixed,
+ * no overlay, no z-index). When visible it pushes the rest of the page
+ * down. When acknowledged it unmounts and the page snaps back. This
+ * preserves the "Reviewer Handshake" posture without ever blocking
+ * a tap on the underlying UI.
  *
- * Purpose is threefold:
- *   1. Reinforce the "Apps → Entertainment, Information-only" posture
- *      that matches the Play Console category pick — a reviewer who opens
- *      the app and sees this immediately stops looking for medical-claim
- *      violations and moves on.
- *   2. Give the user unambiguous consent at the device level before any
- *      wellness content is shown. This is a stronger legal posture than
- *      footer-only disclaimers on individual pages.
- *   3. Zero backend coupling — the logic lives entirely in localStorage
- *      per the Main-Brain architecture. No PII leaves the device just
- *      to check if the splash was dismissed.
- *
- * Storage keys:
- *   disclaimer_acknowledged = "true" | missing
- *   disclaimer_acknowledged_at = ISO timestamp
- *   disclaimer_version = integer (bump to force re-acknowledge on ToS changes)
+ * Storage keys (shared with public/landing.html static mirror):
+ *   disclaimer_acknowledged       = "true" | missing
+ *   disclaimer_acknowledged_at    = ISO timestamp
+ *   disclaimer_version            = integer (bump to force re-ack)
  */
 
 const DISCLAIMER_VERSION = 1;
@@ -36,14 +24,12 @@ const STORAGE_DATE_KEY = 'disclaimer_acknowledged_at';
 export default function MedicalDisclaimerSplash() {
   const [visible, setVisible] = useState(false);
 
-  // Defer the check to next tick so it can't block initial paint.
   useEffect(() => {
     try {
       const ack = localStorage.getItem(STORAGE_KEY);
       const ver = parseInt(localStorage.getItem(STORAGE_VERSION_KEY) || '0', 10);
       if (ack !== 'true' || ver < DISCLAIMER_VERSION) setVisible(true);
     } catch {
-      // Privacy mode / quota — show it anyway (fail-safe for legal posture).
       setVisible(true);
     }
   }, []);
@@ -57,143 +43,172 @@ export default function MedicalDisclaimerSplash() {
     setVisible(false);
   };
 
-  if (!visible || typeof document === 'undefined') return null;
+  if (!visible) return null;
 
-  return ReactDOM.createPortal(
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.6 }}
-        data-testid="medical-disclaimer-splash"
+  return (
+    <section
+      data-testid="medical-disclaimer-splash"
+      style={{
+        position: 'relative',          // INLINE — flows in document, pushes content down
+        width: '100%',
+        background: 'linear-gradient(135deg, rgba(22,18,10,0.96), rgba(10,8,14,0.96))',
+        borderBottom: '1px solid rgba(251,191,36,0.28)',
+        boxShadow: 'inset 0 -1px 0 rgba(251,191,36,0.10)',
+        padding: '28px 22px',
+      }}
+    >
+      <div
         style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 99999,   // above literally everything else
-          background: 'rgba(4,6,15,0.985)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 24,
+          maxWidth: 640,
+          margin: '0 auto',
+          textAlign: 'center',
         }}
       >
-        <motion.div
-          initial={{ y: 32, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.15, duration: 0.5 }}
-          className="rounded-2xl p-7 sm:p-10 text-center max-w-xl w-full"
+        <div
+          aria-hidden="true"
           style={{
-            background: 'linear-gradient(135deg, rgba(22,18,10,0.94), rgba(10,8,14,0.94))',
-            border: '1px solid rgba(251,191,36,0.28)',
-            boxShadow: '0 40px 120px rgba(251,191,36,0.14), inset 0 0 80px rgba(251,191,36,0.04)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 56,
+            height: 56,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(251,191,36,0.18), rgba(251,191,36,0.02))',
+            border: '1px solid rgba(251,191,36,0.36)',
+            marginBottom: 14,
           }}
         >
-          <motion.div
-            initial={{ scale: 0.6, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.35, type: 'spring', stiffness: 180, damping: 16 }}
-            className="inline-flex items-center justify-center rounded-full mb-5"
-            style={{
-              width: 64,
-              height: 64,
-              background: 'radial-gradient(circle, rgba(251,191,36,0.18), rgba(251,191,36,0.02))',
-              border: '1px solid rgba(251,191,36,0.36)',
-            }}
-          >
-            <Shield size={26} style={{ color: '#FCD34D' }} />
-          </motion.div>
+          <Shield size={24} style={{ color: '#FCD34D' }} />
+        </div>
 
-          <p
-            className="text-[10px] uppercase tracking-[0.34em] mb-2"
-            style={{ color: '#FBBF24', fontFamily: 'monospace' }}
-          >
-            A Sovereign Wellness Instrument
-          </p>
-          <h2
-            className="text-2xl sm:text-3xl font-light mb-4"
-            style={{ color: '#fff', fontFamily: 'Cormorant Garamond, serif', lineHeight: 1.2 }}
-          >
-            For Information &amp; Entertainment Purposes Only.
-          </h2>
-          <p
-            className="text-sm sm:text-base leading-relaxed mb-3"
-            style={{ color: 'rgba(226,232,240,0.86)', fontFamily: 'Cormorant Garamond, serif', fontSize: 16 }}
-          >
-            ENLIGHTEN.MINT.CAFE is a wellness, mindfulness, and
-            contemplative-practice platform. It is <em>not</em> a medical
-            device, diagnostic tool, or substitute for professional care.
-          </p>
-          <p
-            className="text-[13px] leading-relaxed mb-6"
-            style={{ color: 'rgba(203,213,225,0.76)', fontFamily: 'Cormorant Garamond, serif', fontSize: 15 }}
-          >
-            The Reflexology maps, herbology data, acupressure guides, and
-            Sage AI interactions are provided for educational and
-            entertainment purposes. Do not use this app to diagnose,
-            treat, cure, or prevent any condition. For medical concerns,
-            consult a licensed professional.
-          </p>
+        <p
+          style={{
+            color: '#FBBF24',
+            fontFamily: 'monospace',
+            fontSize: 10,
+            letterSpacing: '0.34em',
+            textTransform: 'uppercase',
+            margin: '0 0 6px 0',
+          }}
+        >
+          A Sovereign Wellness Instrument
+        </p>
 
-          <div
-            className="flex items-center gap-2 justify-center mb-6 flex-wrap"
-            style={{ opacity: 0.7 }}
-          >
-            {['INFORMATION', 'ENTERTAINMENT', 'NOT MEDICAL ADVICE'].map(tag => (
-              <span
-                key={tag}
-                className="text-[9px] px-2.5 py-1 rounded-full uppercase"
-                style={{
-                  background: 'rgba(251,191,36,0.08)',
-                  border: '1px solid rgba(251,191,36,0.24)',
-                  color: '#FCD34D',
-                  fontFamily: 'monospace',
-                  letterSpacing: '0.18em',
-                }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
+        <h2
+          style={{
+            color: '#fff',
+            fontFamily: 'Cormorant Garamond, serif',
+            fontWeight: 300,
+            fontSize: 24,
+            lineHeight: 1.2,
+            margin: '0 0 14px 0',
+          }}
+        >
+          For Information &amp; Entertainment Purposes Only.
+        </h2>
 
-          <motion.button
-            onClick={acknowledge}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            data-testid="medical-disclaimer-acknowledge"
-            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full"
-            style={{
-              background: 'linear-gradient(135deg, rgba(251,191,36,0.24), rgba(251,191,36,0.10))',
-              border: '1px solid rgba(251,191,36,0.48)',
-              color: '#FCD34D',
-              fontFamily: 'monospace',
-              fontSize: 12,
-              letterSpacing: '0.22em',
-              textTransform: 'uppercase',
-              cursor: 'pointer',
-              boxShadow: '0 8px 32px rgba(251,191,36,0.14)',
-            }}
-          >
-            <Check size={14} />
-            I Understand &middot; Proceed
-          </motion.button>
+        <p
+          style={{
+            color: 'rgba(226,232,240,0.86)',
+            fontFamily: 'Cormorant Garamond, serif',
+            fontSize: 15,
+            lineHeight: 1.55,
+            margin: '0 0 8px 0',
+          }}
+        >
+          ENLIGHTEN.MINT.CAFE is a wellness, mindfulness, and contemplative-practice
+          platform. It is <em>not</em> a medical device, diagnostic tool, or
+          substitute for professional care.
+        </p>
 
-          <p
-            className="mt-6 text-[9px] tracking-[0.18em]"
-            style={{ color: 'rgba(148,163,184,0.48)', fontFamily: 'monospace' }}
-          >
-            Full terms at{' '}
-            <a
-              href="/terms"
-              style={{ color: 'rgba(148,163,184,0.78)', textDecoration: 'underline' }}
+        <p
+          style={{
+            color: 'rgba(203,213,225,0.76)',
+            fontFamily: 'Cormorant Garamond, serif',
+            fontSize: 14,
+            lineHeight: 1.55,
+            margin: '0 0 18px 0',
+          }}
+        >
+          The Reflexology maps, herbology data, acupressure guides, and Sage AI
+          interactions are provided for educational and entertainment purposes.
+          Do not use this app to diagnose, treat, cure, or prevent any
+          condition. For medical concerns, consult a licensed professional.
+        </p>
+
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 8,
+            justifyContent: 'center',
+            margin: '0 0 18px 0',
+            opacity: 0.78,
+          }}
+        >
+          {['INFORMATION', 'ENTERTAINMENT', 'NOT MEDICAL ADVICE'].map(tag => (
+            <span
+              key={tag}
+              style={{
+                background: 'rgba(251,191,36,0.08)',
+                border: '1px solid rgba(251,191,36,0.24)',
+                color: '#FCD34D',
+                fontFamily: 'monospace',
+                fontSize: 9,
+                letterSpacing: '0.18em',
+                padding: '5px 10px',
+                borderRadius: 999,
+              }}
             >
-              /terms
-            </a>
-            {' '}· Honor your body · Consult a licensed professional
-          </p>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>,
-    document.body,
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={acknowledge}
+          data-testid="medical-disclaimer-acknowledge"
+          style={{
+            background: 'linear-gradient(135deg, rgba(251,191,36,0.24), rgba(251,191,36,0.10))',
+            border: '1px solid rgba(251,191,36,0.48)',
+            color: '#FCD34D',
+            fontFamily: 'monospace',
+            fontSize: 12,
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            padding: '12px 30px',
+            borderRadius: 999,
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            boxShadow: '0 8px 32px rgba(251,191,36,0.14)',
+          }}
+        >
+          <Check size={14} />
+          I Understand · Proceed
+        </button>
+
+        <p
+          style={{
+            marginTop: 18,
+            color: 'rgba(148,163,184,0.55)',
+            fontFamily: 'monospace',
+            fontSize: 9,
+            letterSpacing: '0.18em',
+          }}
+        >
+          Full terms at{' '}
+          <a
+            href="/terms"
+            style={{ color: 'rgba(148,163,184,0.85)', textDecoration: 'underline' }}
+          >
+            /terms
+          </a>{' '}
+          · Honor your body · Consult a licensed professional
+        </p>
+      </div>
+    </section>
   );
 }

@@ -202,28 +202,31 @@
   footer p { margin: 4px 0; }
   footer .seal { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; margin-top: 18px; opacity: 0.55; }
 
-  /* ───────── MEDICAL DISCLAIMER SPLASH (static mirror of components/MedicalDisclaimerSplash.js) ───────── */
-  /* Shares localStorage keys with the React component — acknowledging in either surface dismisses both. */
+  /* ───────── MEDICAL DISCLAIMER SPLASH (static mirror of components/MedicalDisclaimerSplash.js) ─────────
+     Flatland-compliant: renders INLINE at the top of the document flow.
+     No position:fixed, no z-index, no overlay — when shown it pushes the
+     hero down; when acknowledged it removes itself and the page snaps back. */
   #emc-splash {
-    position: fixed; inset: 0; z-index: 99999;
-    background: #04060f;
-    display: none; align-items: center; justify-content: center; padding: 24px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
+    position: relative;
+    width: 100%;
+    background: linear-gradient(135deg, rgba(22,18,10,0.96), rgba(10,8,14,0.96));
+    border-bottom: 1px solid rgba(251,191,36,0.28);
+    box-shadow: inset 0 -1px 0 rgba(251,191,36,0.10);
+    padding: 28px 22px;
+    display: none;
     font-family: "Cormorant Garamond", Georgia, serif;
   }
-  #emc-splash.emc-show { display: flex; opacity: 1; pointer-events: auto; }
+  #emc-splash.emc-show { display: block; }
   #emc-splash .emc-card {
-    max-width: 580px; width: 100%;
-    background: linear-gradient(135deg, rgba(22,18,10,0.94), rgba(10,8,14,0.94));
-    border: 1px solid rgba(251,191,36,0.28);
-    border-radius: 18px; padding: 36px 40px; text-align: center;
-    box-shadow: 0 40px 120px rgba(251,191,36,0.14), inset 0 0 80px rgba(251,191,36,0.04);
-    transform: translateY(28px); opacity: 0;
-    transition: transform 0.5s ease 0.1s, opacity 0.5s ease 0.1s;
+    max-width: 640px; width: 100%;
+    margin: 0 auto;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    text-align: center;
+    box-shadow: none;
   }
-  #emc-splash.emc-show .emc-card { transform: translateY(0); opacity: 1; }
   #emc-splash .emc-shield {
     display: inline-flex; align-items: center; justify-content: center;
     width: 64px; height: 64px; border-radius: 50%;
@@ -285,7 +288,7 @@
      network speed or JS hydration state. Shares localStorage
      keys with the React component — acknowledging in either
      surface dismisses both. -->
-<div id="emc-splash" role="dialog" aria-modal="true" aria-labelledby="emc-splash-title" data-testid="medical-disclaimer-splash-static">
+<div id="emc-splash" role="region" aria-labelledby="emc-splash-title" data-testid="medical-disclaimer-splash-static">
   <div class="emc-card">
     <div class="emc-shield" aria-hidden="true">
       <!-- Inline SVG shield (identical to lucide-react <Shield />) -->
@@ -347,16 +350,9 @@
     } catch (e) {}
     var el = document.getElementById('emc-splash');
     if (el) {
-      // Immediately make non-interactive so taps fall through to the page
-      // even before the element is fully removed (iOS Safari sometimes keeps
-      // a stale paint layer for a frame or two after display:none kicks in).
-      el.style.pointerEvents = 'none';
+      // Inline banner — just remove from DOM. No overlay, no ghost layer.
       el.classList.remove('emc-show');
-      // Remove from DOM after transition so the next paint has zero
-      // chance of leaving a backdrop ghost.
-      setTimeout(function(){
-        if (el.parentNode) el.parentNode.removeChild(el);
-      }, 450);
+      if (el.parentNode) el.parentNode.removeChild(el);
     }
   }
 

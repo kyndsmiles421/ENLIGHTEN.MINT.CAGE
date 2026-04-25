@@ -82,15 +82,10 @@ export default function MissionControlRing({ onOpenAssistant, onOpenCommand, onO
       <AnimatePresence>
         {expanded && (
           <>
-            {/* Background blur overlay */}
-            <motion.div
-              className="fixed inset-0 z-[94]"
-              style={{ background: 'transparent', backdropFilter: 'none'}}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setExpanded(false)}
-            />
+            {/* Flatland: NO backdrop overlay. The ring's own central toggle
+                button collapses the ring; tapping anywhere else simply
+                interacts with that element directly. No fixed inset, no
+                z-index modal, no invisible click-eater. */}
 
             {/* Orbital ring guide */}
             <motion.div

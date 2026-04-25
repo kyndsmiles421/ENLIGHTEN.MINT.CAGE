@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { createPortal } from 'react-dom';
-import { Image, X, Eye, Sparkles, Loader2, Layers, Upload, Trash2, Plus } from 'lucide-react';
+import { X, Eye, Sparkles, Loader2, Layers, Upload, Trash2, Plus } from 'lucide-react';
 import { VIRTUAL_BACKGROUNDS, BLUR_LEVELS } from '../hooks/useVirtualBackground';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -53,29 +52,21 @@ export default function BackgroundPicker({ isOpen, onClose, onSelect, currentBg,
 
   if (!isOpen) return null;
 
-  const modal = (
+  return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center"
-        style={{ background: 'transparent', backdropFilter: 'none'}}
-        onClick={onClose}
-        data-testid="bg-picker-overlay">
-        <motion.div
-          initial={{ y: 60, opacity: 0, scale: 0.95 }}
-          animate={{ y: 0, opacity: 1, scale: 1 }}
-          exit={{ y: 60, opacity: 0, scale: 0.95 }}
-          onClick={e => e.stopPropagation()}
-          className="w-full max-w-xl mx-4 mb-4 md:mb-0 rounded-2xl overflow-hidden"
-          style={{
-            background: 'rgba(16,18,34,0.98)',
-            border: '1px solid rgba(248,250,252,0.06)',
-            boxShadow: '0 30px 60px rgba(0,0,0,0.15)',
-            maxHeight: '80vh',
-          }}
-          data-testid="bg-picker-modal">
+      <motion.section
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: 'auto' }}
+        exit={{ opacity: 0, height: 0 }}
+        className="w-full rounded-2xl overflow-hidden my-4"
+        style={{
+          // Flatland-compliant: inline panel, no fixed, no portal, no overlay.
+          position: 'relative',
+          background: 'rgba(16,18,34,0.98)',
+          border: '1px solid rgba(248,250,252,0.06)',
+          boxShadow: '0 30px 60px rgba(0,0,0,0.15)',
+        }}
+        data-testid="bg-picker-panel">
 
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
@@ -205,10 +196,7 @@ export default function BackgroundPicker({ isOpen, onClose, onSelect, currentBg,
               Virtual backgrounds use AI-powered body segmentation for a natural look
             </p>
           </div>
-        </motion.div>
-      </motion.div>
+      </motion.section>
     </AnimatePresence>
   );
-
-  return createPortal(modal, document.body);
 }

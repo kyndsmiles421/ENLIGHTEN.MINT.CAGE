@@ -386,14 +386,15 @@ function CafeApp() {
           }}
         />
         <ProgressionToast />
+        {/* Flatland: settings panel renders INLINE at top of stage so opening
+            it pushes the page content down rather than overlaying it. */}
+        {!isSovereignRoute && (
+          <Suspense fallback={null}>
+            <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />
+          </Suspense>
+        )}
         <AnimatedRoutes />
       </div>
-      
-      {!isSovereignRoute && (
-        <Suspense fallback={null}>
-          <CafeSettingsPanel isOpen={cafeSettingsOpen} onClose={() => setCafeSettingsOpen(false)} />
-        </Suspense>
-      )}
     </>
   );
 }

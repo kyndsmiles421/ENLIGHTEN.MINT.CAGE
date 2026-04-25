@@ -91,31 +91,24 @@ export default function CafeSettingsPanel({ isOpen, onClose }) {
 
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-        style={{ background: 'transparent', backdropFilter: 'none'}}
-        onClick={onClose}
+      <motion.section
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: 'auto' }}
+        exit={{ opacity: 0, height: 0 }}
+        className="w-full max-w-md mx-auto rounded-2xl overflow-hidden my-4"
+        style={{
+          // Flatland-compliant: inline panel, no fixed/inset/z-index modal.
+          position: 'relative',
+          background: viewTier === 'parchment'
+            ? (colorMode === 'light' ? '#FAF8F5' : '#1A1A1D')
+            : 'rgba(20, 20, 30, 0.98)',
+          border: `1px solid ${viewTier === 'parchment'
+            ? (colorMode === 'light' ? '#E8E4DC' : '#3A3A3E')
+            : 'rgba(129, 140, 248, 0.15)'}`,
+          boxShadow: '0 24px 80px rgba(0,0,0,0.1)',
+        }}
+        data-testid="cafe-settings-panel"
       >
-        <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
-          className="w-full max-w-md rounded-2xl overflow-hidden"
-          style={{
-            background: viewTier === 'parchment' 
-              ? (colorMode === 'light' ? '#FAF8F5' : '#1A1A1D')
-              : 'rgba(20, 20, 30, 0.98)',
-            border: `1px solid ${viewTier === 'parchment' 
-              ? (colorMode === 'light' ? '#E8E4DC' : '#3A3A3E')
-              : 'rgba(129, 140, 248, 0.15)'}`,
-            boxShadow: '0 24px 80px rgba(0,0,0,0.1)',
-          }}
-          onClick={e => e.stopPropagation()}
-          data-testid="cafe-settings-panel"
-        >
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4"
             style={{ 
@@ -381,8 +374,7 @@ export default function CafeSettingsPanel({ isOpen, onClose }) {
               enlightenment.cafe • Your choices, your flow
             </span>
           </div>
-        </motion.div>
-      </motion.div>
+      </motion.section>
     </AnimatePresence>
   );
 }
