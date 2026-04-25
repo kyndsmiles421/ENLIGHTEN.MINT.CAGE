@@ -4,7 +4,7 @@ import {
   Building2, Music, Coins, Truck, Scale, ArrowLeft, Send, Loader2, Trash2,
   Lock, Sparkles, ChevronRight, ArrowRight, Globe, Compass, Brain, Code,
   Leaf, FlaskConical, ShieldCheck, Wrench, Crown, GraduationCap,
-  Volume2, VolumeX,
+  Volume2, VolumeX, X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -182,105 +182,134 @@ function ChatBubble({ msg, color, name }) {
   );
 }
 
-/* ── Purchase Modal (Session or Utility) ── */
-function PurchaseModal({ type, item, dustBalance, onConfirm, onClose, loading }) {
+/* ── Purchase Panel — inline (Flatland-compliant: no fixed positioning, no overlay) ── */
+function PurchasePanel({ type, item, dustBalance, onConfirm, onClose, loading }) {
   const isUtility = type === 'utility';
   const cost = isUtility ? item.discounted_price : item.session_cost;
   const canAfford = dustBalance >= cost;
   const color = isUtility ? item.color : (item.member?.color || '#818CF8');
 
+  // Flatland Rule: NO `fixed inset-0`, NO z-index stacking, NO transparent
+  // overlays. This panel renders inline in the document flow above the
+  // advisor list and scrolls into view. No clicks elsewhere on the page
+  // are blocked because there is no layer covering them.
   return (
     <motion.div
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[300] flex items-center justify-center px-4"
-      style={{ background: 'transparent', backdropFilter: 'none'}}
-      onClick={onClose}
-      data-testid="purchase-modal"
+      initial={{ opacity: 0, y: -8, height: 0 }}
+      animate={{ opacity: 1, y: 0, height: 'auto' }}
+      exit={{ opacity: 0, y: -8, height: 0 }}
+      transition={{ duration: 0.28, ease: 'easeOut' }}
+      className="rounded-xl overflow-hidden mb-3"
+      style={{
+        background: `linear-gradient(135deg, ${color}0F, rgba(4,6,15,0.65))`,
+        border: `1px solid ${color}30`,
+        boxShadow: `0 8px 32px ${color}10`,
+      }}
+      data-testid="purchase-panel"
     >
-      <motion.div
-        initial={{ scale: 0.92, y: 16 }} animate={{ scale: 1, y: 0 }}
-        onClick={e => e.stopPropagation()}
-        className="w-full max-w-sm rounded-2xl overflow-hidden"
-        style={{ background: 'transparent', border: `1px solid ${color}18` }}
-      >
-        <div className="p-5 text-center">
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3" style={{
-            background: `${color}0D`, border: `1px solid ${color}18`,
+      <div className="p-5">
+        <div className="flex items-start gap-3 mb-3">
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0" style={{
+            background: `${color}1A`, border: `1px solid ${color}30`,
           }}>
             {isUtility ? <Wrench size={24} style={{ color }} /> : <Sparkles size={24} style={{ color }} />}
           </div>
-
-          <h3 className="text-sm font-semibold mb-1" style={{ color: '#F8FAFC' }}>
-            {isUtility ? item.name : `Consult ${item.member?.name}`}
-          </h3>
-          <p className="text-[9px] mb-3" style={{ color: 'rgba(255,255,255,0.65)' }}>
-            {isUtility ? item.description : item.member?.role}
-          </p>
-
-          {isUtility && (
-            <div className="flex items-center justify-center gap-2 mb-3">
-              <span className="text-[9px] line-through" style={{ color: 'rgba(255,255,255,0.6)' }}>
-                {item.base_price} Dust
-              </span>
-              <span className="text-xs font-bold" style={{ color }}>
-                {item.discounted_price} Dust
-              </span>
-              <span className="text-[7px] px-1.5 py-0.5 rounded" style={{
-                background: 'rgba(34,197,94,0.08)', color: '#22C55E',
-              }}>
-                Save {item.discount_pct}%
-              </span>
-            </div>
-          )}
-
-          <div className="rounded-lg p-2.5 mb-3" style={{
-            background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)',
-          }}>
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Cost</span>
-              <span className="text-xs font-bold" style={{ color }}>{cost} Dust</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[9px]" style={{ color: 'rgba(255,255,255,0.65)' }}>Balance</span>
-              <span className="text-xs font-semibold" style={{
-                color: canAfford ? '#22C55E' : '#EF4444',
-              }}>{dustBalance} Dust</span>
-            </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold mb-0.5" style={{ color: '#F8FAFC' }}>
+              {isUtility ? item.name : `Consult ${item.member?.name}`}
+            </h3>
+            <p className="text-[10px]" style={{ color: 'rgba(255,255,255,0.65)' }}>
+              {isUtility ? item.description : item.member?.role}
+            </p>
           </div>
+          <button
+            onClick={onClose}
+            data-testid="purchase-panel-close"
+            aria-label="Close"
+            className="p-1.5 rounded-md flex-shrink-0"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              color: 'rgba(255,255,255,0.6)',
+              cursor: 'pointer',
+            }}
+          >
+            <X size={14} />
+          </button>
+        </div>
 
-          {isUtility && (
-            <div className="text-[7px] mb-3 px-2 py-1.5 rounded-lg" style={{
-              background: 'rgba(192,132,252,0.04)', color: 'rgba(255,255,255,0.65)',
-              border: '1px solid rgba(192,132,252,0.08)',
+        {isUtility && (
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <span className="text-[10px] line-through" style={{ color: 'rgba(255,255,255,0.55)' }}>
+              {item.base_price} Dust
+            </span>
+            <span className="text-sm font-bold" style={{ color }}>
+              {item.discounted_price} Dust
+            </span>
+            <span className="text-[8px] px-2 py-0.5 rounded-full" style={{
+              background: 'rgba(34,197,94,0.10)', color: '#22C55E',
             }}>
-              Lifetime license. Protected by the 30% Failure Charge refund protocol.
-            </div>
-          )}
+              Save {item.discount_pct}%
+            </span>
+          </div>
+        )}
 
+        <div className="rounded-lg p-3 mb-3" style={{
+          background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)',
+        }}>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Cost</span>
+            <span className="text-sm font-bold" style={{ color }}>{cost} Dust</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.7)' }}>Your Balance</span>
+            <span className="text-sm font-semibold" style={{
+              color: canAfford ? '#22C55E' : '#EF4444',
+            }}>{dustBalance} Dust</span>
+          </div>
+        </div>
+
+        {isUtility && (
+          <div className="text-[9px] mb-3 px-2.5 py-2 rounded-lg" style={{
+            background: 'rgba(192,132,252,0.06)', color: 'rgba(255,255,255,0.7)',
+            border: '1px solid rgba(192,132,252,0.12)',
+          }}>
+            Lifetime license. Protected by the 30% Failure Charge refund protocol.
+          </div>
+        )}
+
+        <div className="flex items-center gap-2">
           <button
             onClick={onConfirm}
             disabled={!canAfford || loading}
-            className="w-full py-2.5 rounded-xl text-[10px] font-medium transition-all"
+            className="flex-1 py-2.5 rounded-xl text-[11px] font-medium transition-all"
             style={{
-              background: canAfford ? `${color}10` : 'rgba(239,68,68,0.05)',
+              background: canAfford ? `${color}1A` : 'rgba(239,68,68,0.06)',
               color: canAfford ? color : '#EF4444',
-              border: `1px solid ${canAfford ? `${color}18` : 'rgba(239,68,68,0.1)'}`,
-              opacity: (!canAfford || loading) ? 0.5 : 1,
+              border: `1px solid ${canAfford ? `${color}30` : 'rgba(239,68,68,0.16)'}`,
+              opacity: (!canAfford || loading) ? 0.55 : 1,
               cursor: (!canAfford || loading) ? 'not-allowed' : 'pointer',
             }}
             data-testid="confirm-purchase-btn"
           >
-            {loading ? 'Processing...' : canAfford
+            {loading ? 'Processing…' : canAfford
               ? (isUtility ? 'Purchase Utility' : 'Begin Session')
               : 'Insufficient Dust'}
           </button>
+          <button
+            onClick={onClose}
+            className="px-4 py-2.5 rounded-xl text-[11px]"
+            data-testid="purchase-panel-cancel"
+            style={{
+              color: 'rgba(255,255,255,0.65)',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
         </div>
-
-        <button onClick={onClose} className="w-full py-2 text-[9px]" style={{
-          color: 'rgba(255,255,255,0.6)', background: 'rgba(255,255,255,0.01)',
-          borderTop: '1px solid rgba(255,255,255,0.03)', cursor: 'pointer',
-        }}>Cancel</button>
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
@@ -676,6 +705,21 @@ export default function SovereignAdvisors() {
           </span>
         </div>
 
+        {/* Inline Purchase Panel — Flatland-compliant: sits in document flow,
+            no overlay, no fixed positioning, no click-blocking. */}
+        <AnimatePresence>
+          {purchaseModal && (
+            <PurchasePanel
+              type={purchaseModal.type}
+              item={purchaseModal.type === 'utility' ? purchaseModal.item : purchaseModal.item}
+              dustBalance={dustBalance}
+              onConfirm={handleConfirmPurchase}
+              onClose={() => setPurchaseModal(null)}
+              loading={purchasing}
+            />
+          )}
+        </AnimatePresence>
+
         {/* Sovereign Advisors Section */}
         <div className="mb-5">
           <div className="flex items-center gap-1.5 mb-2">
@@ -730,20 +774,6 @@ export default function SovereignAdvisors() {
           </div>
         </div>
       </div>
-
-      {/* Purchase Modal */}
-      <AnimatePresence>
-        {purchaseModal && (
-          <PurchaseModal
-            type={purchaseModal.type}
-            item={purchaseModal.type === 'utility' ? purchaseModal.item : purchaseModal.item}
-            dustBalance={dustBalance}
-            onConfirm={handleConfirmPurchase}
-            onClose={() => setPurchaseModal(null)}
-            loading={purchasing}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
