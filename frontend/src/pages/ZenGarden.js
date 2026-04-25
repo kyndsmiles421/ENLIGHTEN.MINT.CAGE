@@ -313,7 +313,7 @@ function SandCanvas() {
         <span className="text-[11px] ml-2" style={{ color: 'var(--text-muted)' }}>{SAND_COLORS[colorIdx].label}</span>
       </div>
       <canvas ref={canvasRef} className="w-full rounded-2xl cursor-crosshair touch-none"
-        style={{ height: 300, background: 'rgba(11,12,21,0.5)', border: '1px solid rgba(255,255,255,0.04)' }}
+        style={{ height: 'clamp(180px, 30vh, 300px)', background: 'rgba(11,12,21,0.5)', border: '1px solid rgba(255,255,255,0.04)' }}
         onMouseDown={startDraw} onMouseMove={moveDraw} onMouseUp={endDraw} onMouseLeave={endDraw}
         onTouchStart={startDraw} onTouchMove={moveDraw} onTouchEnd={endDraw} data-testid="sand-canvas" />
       <button onClick={clear} className="absolute top-14 right-3 text-xs px-3 py-1.5 rounded-full"
@@ -652,7 +652,7 @@ function KoiPond() {
   return (
     <div className="relative">
       <canvas ref={canvasRef} className="w-full rounded-2xl cursor-pointer"
-        style={{ height: 380, background: 'linear-gradient(180deg, rgba(8,15,25,0.9) 0%, rgba(12,20,35,0.95) 50%, rgba(8,15,25,0.9) 100%)', border: '1px solid rgba(45,212,191,0.08)' }}
+        style={{ height: 'clamp(220px, 36vh, 380px)', background: 'linear-gradient(180deg, rgba(8,15,25,0.9) 0%, rgba(12,20,35,0.95) 50%, rgba(8,15,25,0.9) 100%)', border: '1px solid rgba(45,212,191,0.08)' }}
         onClick={handleClick} data-testid="koi-pond" />
       <p className="text-center mt-3 text-xs" style={{ color: 'var(--text-muted)' }}>
         Tap the pond to create ripples. Watch the koi glide through the water.
@@ -748,8 +748,8 @@ function LanternRelease() {
   };
 
   return (
-    <div className="relative">
-      <div className="relative rounded-2xl overflow-hidden" style={{ height: 400, border: '1px solid rgba(252,211,77,0.08)' }} data-testid="lantern-area">
+    <div className="relative pb-6">
+      <div className="relative rounded-2xl overflow-hidden" style={{ height: 'clamp(180px, 32vh, 320px)', border: '1px solid rgba(252,211,77,0.08)' }} data-testid="lantern-area">
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ width: '100%', height: '100%' }} />
         {/* Lanterns */}
         <AnimatePresence>
@@ -883,7 +883,7 @@ function RainScene() {
 
   return (
     <div className="relative">
-      <canvas ref={canvasRef} className="w-full rounded-2xl" style={{ height: 300, background: 'rgba(11,12,21,0.5)', border: '1px solid rgba(148,163,184,0.08)' }} data-testid="rain-canvas" />
+      <canvas ref={canvasRef} className="w-full rounded-2xl" style={{ height: 'clamp(180px, 30vh, 300px)', background: 'rgba(11,12,21,0.5)', border: '1px solid rgba(148,163,184,0.08)' }} data-testid="rain-canvas" />
       <div className="mt-4 flex items-center gap-4">
         <CloudRain size={16} style={{ color: 'var(--text-muted)' }} />
         <input type="range" min="0.1" max="1" step="0.1" value={intensity} onChange={e => setIntensity(parseFloat(e.target.value))}
