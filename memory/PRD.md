@@ -1,7 +1,43 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.45)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.46)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
+
+## V68.46 — Audit + Diagnostic Hardening (23 Feb 2026)
+
+User reported "A dimensional rift appeared" CosmicErrorBoundary fallback
+on production. Dispatched testing_agent_v3_fork for a real, exhaustive
+frontend audit (iteration_425.json). Result: **45 / 45 routes pass in
+preview**, all 11 dock panels work, BuyTimePanel + MedicalDisclaimerSplash
+both green. Crash could not be reproduced in preview, meaning it's
+production-environment-specific (likely stale service worker cache or
+corrupted localStorage on the user's device).
+
+1. ✅ **Real audit done**: iteration_425.json — 45 routes hit, every
+   bottom-dock panel clicked, every primary feature surface exercised.
+   Zero ErrorBoundary triggers in the preview build.
+2. ✅ **`/apex-creator` → `ApexCreatorPage` route alias added** —
+   previously only `/creator-console` was registered, so any link to
+   `/apex-creator` would 404. Fixed in `App.js` + `showBackBtn`
+   exclusion list.
+3. ✅ **CosmicErrorBoundary upgraded** — when a runtime error fires,
+   the browser console now logs a structured frame with: the error
+   message, full JS stack, React component stack, and the active
+   route. AND the user gets a "Show details" button that surfaces
+   the same info in-app for copy-paste bug reports. No more
+   diagnose-by-guessing.
+4. ✅ **Return Home redirect fixed** — was pointing at the obsolete
+   `/dashboard` route, now goes to `/sovereign-hub` (the real home).
+
+### Three production-debug recommendations for the user
+1. **Clear service worker on the affected device** — Chrome → Site
+   settings → Cookies and site data → Clear · Application →
+   Service Workers → Unregister
+2. **Clear localStorage on the affected device** — DevTools →
+   Application → Local Storage → right-click → Clear
+3. **Reload the affected route** — if the rift reappears, tap "Show
+   details" and paste the error message. We now have the wiring to
+   actually fix it instead of guessing.
 
 ## V68.45 — Compliance Hardening: WellnessDisclaimer + F811 cleanup (23 Feb 2026)
 

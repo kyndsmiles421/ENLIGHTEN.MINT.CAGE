@@ -412,7 +412,7 @@ function AnimatedRoutes() {
   // Don't show nav/chrome in split view iframe
   const isSplitView = new URLSearchParams(location.search).get('splitview') === 'true';
 
-  const showBackBtn = !['/sovereign-hub', '/landing', '/auth', '/intro', '/', '/hub', '/creator-console'].includes(location.pathname);
+  const showBackBtn = !['/sovereign-hub', '/landing', '/auth', '/intro', '/', '/hub', '/creator-console', '/apex-creator'].includes(location.pathname);
 
   return (
     <div className="page-enter" key={location.pathname} style={{ position: 'relative', zIndex: 1 }}>
@@ -579,6 +579,7 @@ function AnimatedRoutes() {
         <Route path="/eldercare-workbench" element={<Navigate to="/workshop/eldercare" replace />} />
         <Route path="/workshop/:moduleId" element={<DynamicWorkshop />} />
         <Route path="/creator-console" element={<ApexCreatorPage />} />
+        <Route path="/apex-creator" element={<ApexCreatorPage />} />
         <Route path="/quantum-loom" element={<QuantumLoom />} />
         <Route path="/membership" element={<MembershipLoom />} />
         <Route path="/resonance/:shareId" element={<ResonanceShare />} />
