@@ -346,8 +346,16 @@
     } catch (e) {}
     var el = document.getElementById('emc-splash');
     if (el) {
+      // Immediately make non-interactive so taps fall through to the page
+      // even before the element is fully removed (iOS Safari sometimes keeps
+      // a stale paint layer for a frame or two after display:none kicks in).
+      el.style.pointerEvents = 'none';
       el.classList.remove('emc-show');
-      setTimeout(function(){ el.parentNode && el.parentNode.removeChild(el); }, 500);
+      // Remove from DOM after transition so the next paint has zero
+      // chance of leaving a backdrop ghost.
+      setTimeout(function(){
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }, 450);
     }
   }
 

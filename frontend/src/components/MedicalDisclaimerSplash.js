@@ -72,7 +72,6 @@ export default function MedicalDisclaimerSplash() {
           inset: 0,
           zIndex: 99999,   // above literally everything else
           background: 'rgba(4,6,15,0.985)',
-          backdropFilter: 'blur(24px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
