@@ -1,0 +1,154 @@
+{
+  "summary": "Comprehensive Mobile Viewport Audit (414x896) for ENLIGHTEN.MINT.CAFE - All 21 primary practice routes working, mixer dock functional with all 11 tabs rendering content, Flatland Rule compliance verified, no click-eater overlays found.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "Various API calls", "issue": "401 errors in console for unauthenticated requests - expected behavior for protected endpoints"}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "mobile_viewport_audit": {
+    "viewport": "414x896 (iPhone XR sized)",
+    "routes_tested": 21,
+    "routes_working": 21,
+    "routes_broken": 0,
+    "tested_routes": [
+      {"route": "/breathing", "status": "OK", "mixer_visible": true},
+      {"route": "/meditation", "status": "OK", "mixer_visible": true},
+      {"route": "/journal", "status": "OK", "mixer_visible": true},
+      {"route": "/coach", "status": "OK", "mixer_visible": true},
+      {"route": "/reflexology", "status": "OK", "mixer_visible": true},
+      {"route": "/herbology", "status": "OK", "mixer_visible": true},
+      {"route": "/aromatherapy", "status": "OK", "mixer_visible": true},
+      {"route": "/crystals", "status": "OK", "mixer_visible": true},
+      {"route": "/oracle", "status": "OK", "mixer_visible": true},
+      {"route": "/sacred-texts", "status": "OK", "mixer_visible": true},
+      {"route": "/encyclopedia", "status": "OK", "mixer_visible": true},
+      {"route": "/numerology", "status": "OK", "mixer_visible": true},
+      {"route": "/yoga", "status": "OK", "mixer_visible": true},
+      {"route": "/mudras", "status": "OK", "mixer_visible": true},
+      {"route": "/mantras", "status": "OK", "mixer_visible": true},
+      {"route": "/elixirs", "status": "OK", "mixer_visible": true},
+      {"route": "/acupressure", "status": "OK", "mixer_visible": true},
+      {"route": "/dreams", "status": "OK", "mixer_visible": true},
+      {"route": "/soundscapes", "status": "OK", "mixer_visible": true},
+      {"route": "/cosmic-calendar", "status": "OK", "mixer_visible": true},
+      {"route": "/forecasts", "status": "OK", "mixer_visible": true}
+    ]
+  },
+  "mixer_dock_audit": {
+    "location": "Bottom of pages (hidden on /, /sovereign-hub, /landing, /auth, /intro)",
+    "tabs_tested": 11,
+    "tabs_working": 11,
+    "tab_results": [
+      {"tab": "torus (Orbit)", "status": "OK", "panel_height": 313, "unlocked": true},
+      {"tab": "mix", "status": "OK", "panel_height": 734, "unlocked": true},
+      {"tab": "culture", "status": "OK", "panel_height": 697, "unlocked": true},
+      {"tab": "audio", "status": "OK", "panel_height": 720, "unlocked": true, "note": "AUDIO panel renders properly, NOT 1px tall"},
+      {"tab": "text", "status": "OK", "panel_height": 697, "unlocked": true},
+      {"tab": "overlay (Layer)", "status": "OK", "panel_height": 697, "unlocked": true},
+      {"tab": "record (Rec)", "status": "OK", "panel_height": 697, "unlocked": true},
+      {"tab": "effects (FX)", "status": "OK", "panel_height": 697, "unlocked": true},
+      {"tab": "ai", "status": "OK", "panel_height": 697, "unlocked": true},
+      {"tab": "export (Out)", "status": "OK", "panel_height": 697, "unlocked": true},
+      {"tab": "account (Me)", "status": "OK", "panel_height": 697, "unlocked": true}
+    ]
+  },
+  "zen_garden_audit": {
+    "route": "/zen-garden",
+    "status": "OK",
+    "sub_tabs_tested": ["Plant Garden", "Koi Pond", "Sand Drawing", "Lantern Release", "Rain Scene"],
+    "sub_tabs_working": 5,
+    "lantern_release": {
+      "input_visible": true,
+      "release_button_visible": true,
+      "canvas_renders": true,
+      "note": "Lantern input and release button are visible and clickable on mobile viewport"
+    }
+  },
+  "trade_circle_audit": {
+    "route": "/trade-circle",
+    "status": "OK",
+    "ai_merchant_buttons": 1,
+    "exchange_elements": 1
+  },
+  "flatland_rule_audit": {
+    "status": "COMPLIANT",
+    "fixed_overlays_found": 11,
+    "click_eaters_found": 0,
+    "acceptable_layers": [
+      {"id": "touch-light-canvas", "pointer_events": "none", "status": "CORRECT"}
+    ],
+    "visible_modals": 0,
+    "note": "No fixed overlays covering viewport with pointer-events enabled"
+  },
+  "landing_page_audit": {
+    "route": "/landing",
+    "disclaimer_banner": {
+      "position": "relative (INLINE)",
+      "is_fixed": false,
+      "covers_viewport": false,
+      "status": "CORRECT - Flatland Rule compliant"
+    },
+    "cta_buttons_below_disclaimer": ["Sign In/Register", "Quick Reset", "Share"],
+    "ctas_clickable": true
+  },
+  "auth_flow_audit": {
+    "login_page": "/auth",
+    "credentials_used": "kyndsmiles@gmail.com / Sovereign2026!",
+    "login_successful": true,
+    "redirect_to_sovereign_hub": true,
+    "medical_disclaimer_acknowledged": true
+  },
+  "backend_health": {
+    "endpoint": "/api/health",
+    "status": 200,
+    "response": {"status": "ok", "service": "ENLIGHTEN.MINT.CAFE API"}
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_426.json"
+  ],
+  "screenshots": [
+    ".screenshots/mobile_auth_page.png",
+    ".screenshots/mobile_after_login.png",
+    ".screenshots/mobile_sovereign_hub.png",
+    ".screenshots/mobile_meditation_page.png",
+    ".screenshots/mobile_audio_panel.png",
+    ".screenshots/mobile_zen_garden.png",
+    ".screenshots/mobile_lantern_view.png",
+    ".screenshots/mobile_lantern_released.png",
+    ".screenshots/mobile_trade_circle.png",
+    ".screenshots/mobile_flatland_check.png",
+    ".screenshots/mobile_landing_page.png",
+    ".screenshots/mobile_sovereign_hub_buttons.png",
+    ".screenshots/mobile_meditation_buttons.png"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "Mixer dock correctly hidden on /sovereign-hub, /landing, /auth, /intro, / as per design",
+    "All 11 mixer tabs render panels with height > 50px - AUDIO panel specifically at 720px (not 1px)",
+    "Flatland Rule compliance verified - no fixed overlays blocking interactions",
+    "touch-light-canvas has pointer-events: none as required",
+    "Landing page disclaimer is inline (position: relative) not fixed"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100% (health check passed)",
+    "frontend": "100% (21/21 routes working, 11/11 mixer tabs working)"
+  },
+  "test_credentials": "Owner: kyndsmiles@gmail.com / Sovereign2026!",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All routes and mixer dock tabs verified working on 414x896 mobile viewport. Flatland Rule compliance confirmed. No dead buttons found. The 401 console errors are expected for unauthenticated API calls to protected endpoints.",
+  "rca_of_the_issue": {
+    "issue": "User reported dead buttons and overlapping UI",
+    "reproduction_status": "COULD NOT REPRODUCE",
+    "findings": "All tested buttons are clickable, mixer dock renders properly, no overlapping UI elements found on mobile viewport",
+    "conclusion": "App appears to be functioning correctly on mobile viewport 414x896"
+  }
+}
