@@ -4,10 +4,15 @@
  * Displays the 4 elemental daily challenges with real-time task progress.
  * Can be embedded in the Sovereign Hub or any page.
  * Each challenge has multi-room tasks that span the entire app.
+ * 
+ * V56.2 — task rows are now tap-to-navigate. Tapping "Complete 3 breathing
+ * sessions" routes to /breathing where the user can actually do the activity.
+ * The progress counters increment when xp_log records the source-event.
  */
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, Droplets, Wind, Mountain, Award, Check, ChevronRight, Zap } from 'lucide-react';
+import { Flame, Droplets, Wind, Mountain, Award, Check, ChevronRight, Zap, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
@@ -21,7 +26,29 @@ const ELEMENT_ICONS = {
   Water: Droplets,
 };
 
+// Map backend xp_log source slugs → frontend route a user should visit to
+// progress that task. This is the *tap target* for each task row.
+const TASK_SOURCE_TO_ROUTE = {
+  // Air Temple
+  breathing_exercise: '/breathing',
+  oracle_reading: '/oracle',
+  frequencies: '/soundscapes',
+  // Fire of Transformation
+  meditation_session: '/meditation',
+  elixirs: '/elixirs',
+  mantras: '/mantras',
+  // Waters of Healing
+  herbology: '/herbology',
+  reiki: '/reiki',
+  mood_log: '/mood',
+  // Earth Element
+  crystals: '/crystals',
+  yoga_practice: '/yoga',
+  dream_journal: '/dreams',
+};
+
 function ChallengeCard({ challenge, onClaim }) {
+  const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [claiming, setClaiming] = useState(false);
   const Icon = ELEMENT_ICONS[challenge.element] || Zap;
@@ -109,33 +136,50 @@ function ChallengeCard({ challenge, onClaim }) {
               <p className="text-[10px] mb-2" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 {challenge.description}
               </p>
-              {challenge.tasks.map((task, i) => (
-                <div key={i} className="flex items-center gap-2.5 py-1.5"
-                  style={{ borderTop: i > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}>
-                  <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
+              {challenge.tasks.map((task, i) => {
+                const route = TASK_SOURCE_TO_ROUTE[task.source];
+                const tappable = !!route && !task.done;
+                return (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => { if (tappable) navigate(route); }}
+                    disabled={!tappable}
+                    className="w-full flex items-center gap-2.5 py-1.5 px-1 -mx-1 rounded-md text-left active:scale-[0.98] transition-all"
                     style={{
-                      background: task.done ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.03)',
-                      border: `1px solid ${task.done ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.06)'}`,
+                      borderTop: i > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                      cursor: tappable ? 'pointer' : 'default',
+                      background: 'transparent',
+                    }}
+                    data-testid={`task-${challenge.id}-${i}`}>
+                    <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0"
+                      style={{
+                        background: task.done ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${task.done ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.06)'}`,
+                      }}>
+                      {task.done ? (
+                        <Check size={10} style={{ color: '#22C55E' }} />
+                      ) : (
+                        <span className="text-[8px] font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                          {task.current}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs flex-1" style={{
+                      color: task.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.85)',
+                      textDecoration: task.done ? 'line-through' : 'none',
                     }}>
-                    {task.done ? (
-                      <Check size={10} style={{ color: '#22C55E' }} />
-                    ) : (
-                      <span className="text-[8px] font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                        {task.current}
-                      </span>
+                      {task.label}
+                    </span>
+                    <span className="text-[9px] font-mono" style={{ color: task.done ? '#22C55E' : 'rgba(255,255,255,0.3)' }}>
+                      {task.current}/{task.count}
+                    </span>
+                    {tappable && (
+                      <ArrowRight size={11} style={{ color: challenge.color, opacity: 0.7 }} />
                     )}
-                  </div>
-                  <span className="text-xs flex-1" style={{
-                    color: task.done ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.7)',
-                    textDecoration: task.done ? 'line-through' : 'none',
-                  }}>
-                    {task.label}
-                  </span>
-                  <span className="text-[9px] font-mono" style={{ color: task.done ? '#22C55E' : 'rgba(255,255,255,0.3)' }}>
-                    {task.current}/{task.count}
-                  </span>
-                </div>
-              ))}
+                  </button>
+                );
+              })}
 
               {/* Claim button */}
               {allDone && !claimed && (
