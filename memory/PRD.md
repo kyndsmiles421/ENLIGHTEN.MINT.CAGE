@@ -1,7 +1,94 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.46)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.47)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
+
+## V68.47 — Flatland Rule + Side-Effect Audit (26 Feb 2026)
+
+User flagged: "every time I go in I run into dead f****** buttons" and
+"the entire gamified world... is not accessible". Did a surgical pass.
+Independent verification: `/app/test_reports/iteration_428.json` — 5/5
+fixes PASS, 12/12 gamified routes PASS, 11/11 dock tabs PASS.
+
+### Fixes shipped
+1. ✅ **Flatland Rule fully enforced.** Removed `position:fixed inset:0`
+   modal wrappers from `MedicalDisclaimerSplash.js`, `BackgroundPicker.js`,
+   `CafeSettingsPanel.js`, `MissionControlRing.js` (overlay backdrop dim),
+   and the `landing.html` static disclaimer mirror. All now render INLINE
+   in the document flow — no portal, no z-index modals, no click-eaters.
+2. ✅ **Quest task rows are tap-to-navigate.** `DailyChallenges.js` —
+   added `TASK_SOURCE_TO_ROUTE` map and `useNavigate`. Each task button
+   now routes to the appropriate module (e.g., "Complete 3 breathing
+   sessions" → `/breathing`). Visual `→` arrow indicates tappability.
+3. ✅ **CULTURE mixer panel makes sound.** `CulturalMixerPanel.js` —
+   was visual-only / zero audio. Rewrote with per-layer AudioContext +
+   GainNode. `tagProfile()` classifies each cultural tag as drum / chant /
+   drone, `startTag()` builds the matching Web Audio graph (noise-burst
+   loops at tag BPM for drums, harmonic oscillators with vibrato for
+   chants, filtered sustained tones for drones). Volume slider live-
+   modulates layer gain. Tap pill twice to mute. Clear stops all audio.
+4. ✅ **Mantras auto-play on tap.** `Mantras.js` — `handleTap` now
+   auto-clicks the embedded `NarrationPlayer` button 350ms after expand,
+   so users immediately HEAR the mantra (TTS via `/api/tts/narrate`)
+   instead of a silent two-step.
+5. ✅ **Webpack ChunkLoadError auto-recover.** `index.js` — global
+   error + unhandledrejection listeners detect "ChunkLoadError" /
+   "Loading chunk … failed" and force a single hard reload. Prevents the
+   red "Uncaught runtime errors" overlay after redeploys / Cloudflare
+   challenges. Reload-once flag in sessionStorage stops loops.
+6. ✅ **Zen Garden canvases responsive.** `ZenGarden.js` — fixed-height
+   `400px`/`300px`/`380px` canvases switched to `clamp(180px, 32vh, 320px)`
+   so on a 414×896 mobile viewport the lantern input + Release button fit
+   on screen below the canvas (previously squeezed off-screen).
+
+### Gamified universe — reachable from one tap
+`/realms` (gallery hub) lists all 12 worlds:
+- ⚔ `/starseed-adventure` · AI scene RPG
+- 🌌 `/starseed-worlds` · multiverse star map
+- ◯ `/starseed-realm` · single-realm explore
+- ♾ `/multiverse-realms` · Astral Garden, Crystal Caverns, Celestial Ocean, Solar Temple (frequency-tagged)
+- ☾ `/dream-realms` · lucid adventures
+- ◈ `/cryptic-quest` · hidden terminal nodes
+- ⚙ `/rpg` · Cosmic Realm · Lvl 4 Seeker · 11 daily quests · Mine / Decode / Nexus / Dreams
+- ▲ `/starseed` · origin
+- 🎮 `/games` · arcade
+- 🛰 `/observatory` · `/tesseract` · `/dimensional-space` · `/multiverse-map`
+
+### Visual proof gallery
+- Live URL: `https://zero-scale-physics.preview.emergentagent.com/proof2/`
+- 60+ before/after interaction screenshots organized into sections:
+  ★★ Gamified Universe (12) · ★ Culture audio (6) · Quest Tasks (3) ·
+  Auth (3) · Breathing/Oracle/Journal/Herbology/Crystals/Reflexology
+  before-after (12) · Lantern Release (3) · Mixer Dock (4)
+
+### Files of reference (this session)
+- `/app/frontend/src/index.js` (chunk-error handler)
+- `/app/frontend/src/components/MedicalDisclaimerSplash.js` (inline)
+- `/app/frontend/public/landing.html` (inline disclaimer mirror)
+- `/app/frontend/src/components/DailyChallenges.js` (tap-to-navigate)
+- `/app/frontend/src/components/console/CulturalMixerPanel.js` (Web Audio)
+- `/app/frontend/src/pages/Mantras.js` (auto-play on tap)
+- `/app/frontend/src/pages/ZenGarden.js` (responsive canvases)
+- `/app/frontend/src/components/MissionControlRing.js` (no overlay backdrop)
+- `/app/frontend/src/components/BackgroundPicker.js` (inline panel)
+- `/app/frontend/src/components/CafeSettingsPanel.js` (inline panel)
+- `/app/frontend/src/App.js` (settings panel inside content stage)
+- `/app/frontend/src/pages/RealmsGallery.js` (12 gamified routes)
+
+### Independent test artefacts
+- `/app/test_reports/iteration_428.json` — 5/5 PASS, 100% success rate
+- `/app/test_reports/iteration_427.json` — system-wide audio/network audit
+- `/app/test_reports/iteration_426.json` — 21 routes + 11 dock tabs
+- `/app/test_reports/iteration_425.json` — pre-session baseline
+
+### Known follow-ups (P1 / P2)
+- AAB local build (preview container has no Java 21/Android SDK) — user runs `./gradlew bundleRelease` locally
+- Sage AI Coach "AI TIME" gauge (P1)
+- Sage Long-Term Cognitive Memory (P2)
+- Quad-Pane SplitScreen Refactor (P2)
+- Phase 4b GLB Avatar Generator (P2)
+- Resend cron for Time Capsules (P2)
+- 62 orphaned components cleanup (deferred to v1.1)
 
 ## V68.46 — Audit + Diagnostic Hardening (23 Feb 2026)
 
