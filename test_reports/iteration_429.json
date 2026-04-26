@@ -1,0 +1,197 @@
+{
+  "dead_buttons": [
+    {
+      "route": "/sovereign-hub",
+      "button_label": "Active MissionVisit Geology Workshop and identify Minerals",
+      "button_testid": "active-mission-toggle",
+      "button_path_in_dom": "button[1]"
+    },
+    {
+      "route": "/sovereign-hub",
+      "button_label": "Share",
+      "button_testid": "hub-share",
+      "button_path_in_dom": "button[4]"
+    },
+    {
+      "route": "/sovereign-hub",
+      "button_label": "Fire of Transformation0/3 tasks110 XP x1.2",
+      "button_testid": "",
+      "button_path_in_dom": "button[7]"
+    },
+    {
+      "route": "/sovereign-hub",
+      "button_label": "Waters of Healing0/3 tasks100 XP x1.2",
+      "button_testid": "",
+      "button_path_in_dom": "button[8]"
+    },
+    {
+      "route": "/breathing",
+      "button_label": "4-7-8 RelaxationDeep relaxation and sleep preparation",
+      "button_testid": "breathing-pattern-4-7-8-relaxation",
+      "button_path_in_dom": "button[6]"
+    },
+    {
+      "route": "/meditation",
+      "button_label": "Compassion",
+      "button_testid": "meditation-filter-compassion",
+      "button_path_in_dom": "button[9]"
+    },
+    {
+      "route": "/meditation",
+      "button_label": "Focus",
+      "button_testid": "meditation-filter-focus",
+      "button_path_in_dom": "button[10]"
+    },
+    {
+      "route": "/meditation",
+      "button_label": "Energy",
+      "button_testid": "meditation-filter-energy",
+      "button_path_in_dom": "button[11]"
+    },
+    {
+      "route": "/meditation",
+      "button_label": "Visualization",
+      "button_testid": "meditation-filter-visualization",
+      "button_path_in_dom": "button[12]"
+    },
+    {
+      "route": "/meditation",
+      "button_label": "Sleep",
+      "button_testid": "meditation-filter-sleep",
+      "button_path_in_dom": "button[13]"
+    },
+    {
+      "route": "/journal",
+      "button_label": "COS",
+      "button_testid": "pillar-fader-cosmos",
+      "button_path_in_dom": "button[11]"
+    },
+    {
+      "route": "/coach",
+      "button_label": "Spiritual Guidance2 msgsWelcome, traveler. It is a joy to connect with you today",
+      "button_testid": "session-ec1bc4c7-f60c-4fe6-97cd-2be5891669f2",
+      "button_path_in_dom": "button[3]"
+    },
+    {
+      "route": "/coach",
+      "button_label": "",
+      "button_testid": "",
+      "button_path_in_dom": "button[4]"
+    },
+    {
+      "route": "/coach",
+      "button_label": "sage2 msgsIt is wonderful to see your light shining so consistently, dear one. M",
+      "button_testid": "session-3dfb827c-0587-4e76-83c4-dd68cc38d7da",
+      "button_path_in_dom": "button[7]"
+    },
+    {
+      "route": "/coach",
+      "button_label": "",
+      "button_testid": "",
+      "button_path_in_dom": "button[8]"
+    },
+    {
+      "route": "/herbology",
+      "button_label": "Explore",
+      "button_testid": "mode-discover",
+      "button_path_in_dom": "button[3]"
+    },
+    {
+      "route": "/herbology",
+      "button_label": "Nervous (7)",
+      "button_testid": "filter-Nervous",
+      "button_path_in_dom": "button[7]"
+    },
+    {
+      "route": "/herbology",
+      "button_label": "Endocrine (1)",
+      "button_testid": "filter-Endocrine",
+      "button_path_in_dom": "button[8]"
+    },
+    {
+      "route": "/herbology",
+      "button_label": "Reproductive (1)",
+      "button_testid": "filter-Reproductive",
+      "button_path_in_dom": "button[10]"
+    },
+    {
+      "route": "/herbology",
+      "button_label": "Digestive (5)",
+      "button_testid": "filter-Digestive",
+      "button_path_in_dom": "button[11]"
+    },
+    {
+      "route": "/herbology",
+      "button_label": "\u2726???",
+      "button_testid": "node-nettle",
+      "button_path_in_dom": "button[12]"
+    },
+    {
+      "route": "/herbology",
+      "button_label": "\u2726???",
+      "button_testid": "node-passionflower",
+      "button_path_in_dom": "button[13]"
+    },
+    {
+      "route": "/herbology",
+      "button_label": "\u2726???",
+      "button_testid": "node-lions_mane",
+      "button_path_in_dom": "button[14]"
+    },
+    {
+      "route": "/herbology",
+      "button_label": "\u2726???",
+      "button_testid": "node-echinacea",
+      "button_path_in_dom": "button[15]"
+    },
+    {
+      "route": "/aromatherapy",
+      "button_label": "Challenge",
+      "button_testid": "mode-challenge",
+      "button_path_in_dom": "button[3]"
+    },
+    {
+      "route": "/aromatherapy",
+      "button_label": "Cultural Lens",
+      "button_testid": "tradition-lens-btn",
+      "button_path_in_dom": "button[4]"
+    },
+    {
+      "route": "/aromatherapy",
+      "button_label": "All (12)",
+      "button_testid": "filter-all",
+      "button_path_in_dom": "button[5]"
+    },
+    {
+      "route": "/aromatherapy",
+      "button_label": "Air (2)",
+      "button_testid": "filter-Air",
+      "button_path_in_dom": "button[6]"
+    },
+    {
+      "route": "/aromatherapy",
+      "button_label": "Fire (4)",
+      "button_testid": "filter-Fire",
+      "button_path_in_dom": "button[7]"
+    },
+    {
+      "route": "/aromatherapy",
+      "button_label": "Ether (1)",
+      "button_testid": "filter-Ether",
+      "button_path_in_dom": "button[8]"
+    },
+    {
+      "route": "/aromatherapy",
+      "button_label": "\ud83d\udd25???",
+      "button_testid": "node-peppermint",
+      "button_path_in_dom": "button[11]"
+    }
+  ],
+  "stub_buttons": [],
+  "summary": {
+    "total_buttons_clicked": 103,
+    "dead_count": 31,
+    "stub_count": 0,
+    "wired_count": 72
+  }
+}
