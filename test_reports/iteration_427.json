@@ -1,0 +1,204 @@
+{
+  "summary": "Focused Side-Effect Audit for ENLIGHTEN.MINT.CAFE - Testing audio, network, and dock panel actions. CULTURE panel audio bug is FIXED. Found several dead components.",
+  "audio_test": [
+    {
+      "page": "/soundscapes",
+      "button": "soundscape button (Forest Sounds)",
+      "fired_audio_nodes": true,
+      "evidence": "oscillators=1, bufferSources=0 - AudioContext created and oscillator started"
+    },
+    {
+      "page": "/frequencies",
+      "button": "432 Hz button",
+      "fired_audio_nodes": true,
+      "evidence": "oscillators=1 - Frequency tone plays correctly"
+    },
+    {
+      "page": "/mantras",
+      "button": "mantra button",
+      "fired_audio_nodes": false,
+      "evidence": "oscillators=0, bufferSources=0 - No audio nodes created when clicking mantras"
+    },
+    {
+      "page": "/breathing",
+      "button": "Begin Breathwork",
+      "fired_audio_nodes": true,
+      "evidence": "oscillators=1 - Audio plays on session start"
+    },
+    {
+      "page": "/meditation (CULTURE panel)",
+      "button": "108 Om Chanting pill",
+      "fired_audio_nodes": true,
+      "evidence": "oscillators: 1 -> 2, gainNodes: 1 -> 2 - ORIGINAL BUG FIXED - pills now create audio"
+    }
+  ],
+  "network_test": [
+    {
+      "page": "/coach",
+      "action": "send chat message",
+      "fetch_fired": false,
+      "response_rendered": false,
+      "evidence": "Chat input element not found in DOM - UI may have changed or requires different selector"
+    },
+    {
+      "page": "/journal",
+      "action": "save entry",
+      "fetch_fired": false,
+      "response_rendered": false,
+      "evidence": "No /api/journal POST intercepted after clicking Save button"
+    },
+    {
+      "page": "/oracle",
+      "action": "draw card",
+      "fetch_fired": true,
+      "response_rendered": true,
+      "evidence": "POST https://zero-scale-physics.preview.emergentagent.com/api/oracle/reading intercepted"
+    },
+    {
+      "page": "/mood",
+      "action": "log mood (Happy)",
+      "fetch_fired": false,
+      "response_rendered": false,
+      "evidence": "No /api/mood POST intercepted after clicking Happy button"
+    }
+  ],
+  "dock_test": [
+    {
+      "tab": "MIX",
+      "action": "pillar faders (PRA, DIV, SAN)",
+      "side_effect_fired": true,
+      "evidence": "oscillators: 1 -> 4 - Audio nodes created when interacting with mix panel"
+    },
+    {
+      "tab": "CULTURE",
+      "action": "frequency/sound pills",
+      "side_effect_fired": true,
+      "evidence": "oscillators: 1 -> 2 - CULTURE PANEL BUG IS FIXED"
+    },
+    {
+      "tab": "AUDIO",
+      "action": "Record Voice",
+      "side_effect_fired": true,
+      "evidence": "getUserMedia called: True - Microphone access requested"
+    },
+    {
+      "tab": "REC",
+      "action": "record button",
+      "side_effect_fired": false,
+      "evidence": "getUserMedia called: False - Record button did not trigger media capture"
+    },
+    {
+      "tab": "AI",
+      "action": "generator/preset buttons",
+      "side_effect_fired": false,
+      "evidence": "No fetch calls intercepted - AI generators may not be firing API calls"
+    },
+    {
+      "tab": "TEXT/LAYER/FX/OUT/ME",
+      "action": "various",
+      "side_effect_fired": "LOCKED",
+      "evidence": "These tabs are tier-gated (ARTISAN tier required) - shows 'Upgrade Tier' prompt"
+    }
+  ],
+  "quest_progression": {
+    "counter_incremented": false,
+    "evidence": "Could not locate breathing task counter in /sovereign-hub UI. Task navigation buttons not found with expected selectors."
+  },
+  "dead_components": [
+    "/mantras - audio buttons (pills highlight but no sound)",
+    "/coach - chat input not found",
+    "/journal - save does not fire API call",
+    "/mood - mood selection does not fire API call",
+    "REC tab - record button does not trigger getUserMedia",
+    "AI tab - generator buttons do not fire fetch calls"
+  ],
+  "working_components": [
+    "/soundscapes - audio WIRED",
+    "/frequencies - audio WIRED (432Hz, 528Hz)",
+    "/breathing - audio WIRED",
+    "CULTURE panel - audio WIRED (BUG FIXED)",
+    "MIX tab - audio WIRED",
+    "AUDIO tab Record Voice - WIRED",
+    "/oracle - network WIRED (POST /api/oracle/reading)"
+  ],
+  "summary_stats": {
+    "tested": 15,
+    "wired": 8,
+    "dead": 6,
+    "locked": 5
+  },
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "/mantras",
+        "issue": "Mantra buttons highlight on tap but do not create audio nodes",
+        "priority": "HIGH"
+      },
+      {
+        "component": "/coach",
+        "issue": "Chat input element not found - may need different selector or UI changed",
+        "priority": "MEDIUM"
+      },
+      {
+        "component": "REC tab",
+        "issue": "Record button does not trigger getUserMedia for video/audio/screen capture",
+        "priority": "MEDIUM"
+      },
+      {
+        "component": "AI tab generators",
+        "issue": "Script/Lesson/Game/Ritual buttons do not fire API calls",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "/journal save",
+        "issue": "Save button click does not trigger POST /api/journal",
+        "priority": "HIGH"
+      },
+      {
+        "flow": "/mood log",
+        "issue": "Mood button click does not trigger POST /api/mood",
+        "priority": "HIGH"
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_427.json"
+  ],
+  "action_items": [
+    "FIX: /mantras - Ensure mantra buttons trigger TTS API call and audio playback",
+    "FIX: /journal - Wire Save button to POST /api/journal endpoint",
+    "FIX: /mood - Wire mood selection buttons to POST /api/mood endpoint",
+    "FIX: REC tab - Ensure record buttons call navigator.mediaDevices.getUserMedia",
+    "FIX: AI tab - Wire generator buttons to POST /api/knowledge/deep-dive",
+    "VERIFY: /coach chat - Check if chat input selector changed or component restructured"
+  ],
+  "critical_code_review_comments": [
+    "CULTURE panel audio bug is FIXED - oscillators now created when clicking pills",
+    "Many dock tabs are tier-gated (TEXT, LAYER, FX, OUT, ME) - this is by design",
+    "Journal and Mood pages have UI but no backend integration firing on button clicks",
+    "Mantras page may be missing the TTS API call that generates audio"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend-only test)",
+    "frontend": "53% (8/15 components wired)"
+  },
+  "test_credentials": "kyndsmiles@gmail.com / Sovereign2026!",
+  "seed_data_creation": "None",
+  "retest_needed": true,
+  "main_agent_can_self_test": false,
+  "context_for_next_testing_agent": "CULTURE panel audio bug is FIXED. Main issues are: (1) /mantras audio dead, (2) /journal save not wired, (3) /mood log not wired, (4) REC tab not triggering getUserMedia, (5) AI tab generators not firing fetch. Many dock tabs are tier-locked which is expected behavior.",
+  "rca_of_the_issue": {
+    "original_bug": "CULTURE mixer panel highlighted pills on tap but produced ZERO sound",
+    "status": "FIXED",
+    "evidence": "AudioContext.createOscillator calls increased from 1 to 2 when clicking CULTURE panel pills",
+    "remaining_issues": "Similar 'looks-active-but-does-nothing' pattern found in /mantras, /journal save, /mood log, REC tab, AI tab generators"
+  }
+}
