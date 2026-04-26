@@ -23,6 +23,31 @@ if (typeof window !== "undefined") {
   window.__REACT_DEVTOOLS_GLOBAL_HOOK__.supportsFiber = true;
   window.__REACT_DEVTOOLS_GLOBAL_HOOK__.onCommitFiberRoot = () => {};
   window.__REACT_DEVTOOLS_GLOBAL_HOOK__.onCommitFiberUnmount = () => {};
+
+  // V57.2 — Webpack ChunkLoadError auto-recover.
+  // When a lazy-loaded chunk fails (stale hash after redeploy, intermittent
+  // network, Cloudflare bot challenge), webpack throws "ChunkLoadError" and
+  // CRA's overlay shows a giant red wall of text. Detect it once and force
+  // a single hard reload — same behaviour every PWA expects on update.
+  const handleChunkError = (msg) => {
+    if (typeof msg !== "string") return false;
+    if (!/ChunkLoadError|Loading chunk .* failed/i.test(msg)) return false;
+    if (sessionStorage.getItem("__chunk_reload__")) {
+      // Already tried once this session — stop the loop, just log.
+      return false;
+    }
+    sessionStorage.setItem("__chunk_reload__", "1");
+    setTimeout(() => window.location.reload(), 100);
+    return true;
+  };
+  window.addEventListener("error", (e) => {
+    if (handleChunkError(e?.message || e?.error?.message)) e.preventDefault();
+  });
+  window.addEventListener("unhandledrejection", (e) => {
+    if (handleChunkError(e?.reason?.message || String(e?.reason))) e.preventDefault();
+  });
+  // Clear the reload-once flag after 30 s so future stale chunks recover too.
+  setTimeout(() => sessionStorage.removeItem("__chunk_reload__"), 30000);
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

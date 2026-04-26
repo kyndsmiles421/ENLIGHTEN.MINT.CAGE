@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,11 +12,24 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 function MantraItem({ mantra, index }) {
   const [expanded, setExpanded] = useState(false);
   const [xpShown, setXpShown] = useState(false);
+  // V57.1 — auto-play TTS when the mantra is first tapped so users
+  // immediately HEAR it instead of having to expand + tap "Chant".
+  const playerRef = useRef(null);
   const color = mantra.energy === 'power' ? '#EF4444' : mantra.energy === 'memory' ? '#8B5CF6' : mantra.energy === 'adventure' ? '#FB923C' : mantra.energy === 'love' ? '#F472B6' : '#FCD34D';
 
   const handleTap = () => {
     if (!expanded) { setXpShown(true); setTimeout(() => setXpShown(false), 2000); if (typeof window.__workAccrue === 'function') window.__workAccrue('mantras', 5); }
     setExpanded(!expanded);
+    // After the panel opens, auto-click the NarrationPlayer's first button
+    // (the play/listen control) so the chant starts immediately.
+    if (!expanded) {
+      setTimeout(() => {
+        try {
+          const btn = playerRef.current?.querySelector('button');
+          if (btn) btn.click();
+        } catch {}
+      }, 350);
+    }
   };
 
   return (
@@ -39,7 +52,7 @@ function MantraItem({ mantra, index }) {
         {expanded && (
           <motion.div initial={{height:0,opacity:0}} animate={{height:'auto',opacity:1}} exit={{height:0,opacity:0}} className="overflow-hidden">
             <div className="pb-4 pl-11">
-              <div className="flex items-center gap-2 flex-wrap">
+              <div ref={playerRef} className="flex items-center gap-2 flex-wrap">
                 <NarrationPlayer text={mantra.text} label="Chant" color={color} context="mantras" />
                 <DeepDive topic={mantra.text} category="mantras" context={mantra.category} color={color} label="Explore meaning" />
               </div>
