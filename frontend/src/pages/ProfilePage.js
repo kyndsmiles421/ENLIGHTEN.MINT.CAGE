@@ -185,7 +185,16 @@ export default function ProfilePage() {
         <img src={p.cover_image || covers[0]?.url} alt="Cover" className="w-full h-full object-cover" style={{ filter: 'brightness(0.7)' }} />
         <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 40%, var(--bg-default) 100%)` }} />
         {editing && (
-          <button onClick={() => {}} className="absolute top-4 right-4 btn-glass text-xs flex items-center gap-2" data-testid="change-cover-btn">
+          <button
+            onClick={() => {
+              // Scroll to the inline cover-image picker grid that's already
+              // rendered further down the page in editing mode. No modal,
+              // no overlay — just smooth-scroll to the picker.
+              const picker = document.querySelector('[data-testid="cover-picker"]');
+              if (picker) picker.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }}
+            className="absolute top-4 right-4 btn-glass text-xs flex items-center gap-2"
+            data-testid="change-cover-btn">
             <Camera size={14} /> Change Cover
           </button>
         )}
@@ -278,7 +287,7 @@ export default function ProfilePage() {
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden mb-8">
               <div className="p-6 space-y-6">
                 {/* Cover Selection */}
-                <div>
+                <div data-testid="cover-picker">
                   <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--text-muted)' }}>Cover Photo</p>
                   <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
                     {covers.map(c => (

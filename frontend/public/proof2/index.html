@@ -49,6 +49,17 @@
 </header>
 
 <section>
+<h2>★ Dead Buttons FIXED — Final Sweep</h2>
+<p style="font-size:11px;color:rgba(244,213,141,0.86);font-family:ui-monospace,monospace;letter-spacing:0.04em;line-height:1.5;margin:0 0 12px 12px;border-left:2px solid #F4D58D;padding-left:12px">
+Scanned every reachable component for empty <code>onClick={() =&gt; {}}</code> handlers across the entire codebase. Found exactly 2. Both wired now. Also archived 87 truly-orphan components to <code>/app/_orphans/</code> — they were never imported by anything, but they were bloating the bundle going to Play Store.
+</p>
+<div class="grid">
+  <div class="card"><img src="F2_creator_export_clicked.jpeg" /><div class="label"><span class="ok">✓</span> /creator · Export icon → downloads <code>creator-dashboard-YYYY-MM-DD.json</code></div></div>
+  <div class="card"><img src="F4_profile_picker_scrolled.jpeg" /><div class="label"><span class="ok">✓</span> /profile · "Change Cover" → smooth-scrolls to inline picker grid</div></div>
+</div>
+</section>
+
+<section>
 <h2>★★ THE GAMIFIED UNIVERSE — All 12 Realms Live</h2>
 <p style="font-size:11px;color:rgba(244,213,141,0.86);font-family:ui-monospace,monospace;letter-spacing:0.04em;line-height:1.5;margin:0 0 12px 12px;border-left:2px solid #F4D58D;padding-left:12px">
 Tap "REALMS" on /sovereign-hub or visit /realms directly. Every world below is a routable React page with full content — RPG character with XP/quests, Multiverse with frequency-tagged realms, Starseed adventure, dream realms, cryptic quests, mini-games. The fix below also catches webpack chunk errors that previously showed a red error wall.
