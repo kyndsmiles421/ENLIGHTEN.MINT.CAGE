@@ -24,6 +24,7 @@ import VisitorModeShield from '../components/VisitorModeShield';
 import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
+import SageEngineGauge from '../components/SageEngineGauge';
 import { useProcessorState, MODULE_REGISTRY } from '../state/ProcessorState';
 import SovereignPreferences from '../kernel/SovereignPreferences';
 
@@ -813,10 +814,17 @@ function MatrixModuleDispatcher() {
     <div
       style={{
         display: 'flex', flexWrap: 'wrap', gap: 8,
-        justifyContent: 'center', padding: '8px 12px',
+        justifyContent: 'center', alignItems: 'center', padding: '8px 12px',
       }}
       data-testid="matrix-dispatcher"
     >
+      {/* V68.58 — Cognitive Voltmeter sits inline with the dispatcher
+          row. The user keeps the AI TIME gauge in peripheral vision
+          while pulling tools so they can FEEL when the engine is
+          cold (need to feed it), in flow (gold zone), or overheating
+          (back off, let the field settle). Inline · Flatland · no
+          fixed positioning. */}
+      <SageEngineGauge size={64} />
       {modules.map(m => (
         <button
           key={m.id}

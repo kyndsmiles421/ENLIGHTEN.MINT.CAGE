@@ -22,7 +22,10 @@ android {
             // proof / SEO files that are NOT referenced at runtime by
             // the React app inside the WebView. Each pattern is
             // colon-separated. Keep the leading default-ignore tokens.
-            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:!showcase.mp4:!showcase.webm:!store-assets:!proof:!proof2:!docs:!qr:!qr-code.png'
+            // V68.58 — `qr` removed from strip list (ACTIVELY referenced
+            // by QRRefractionDisplay + SovereignQRPortal). Adding it
+            // back would 404 the QR features in production builds.
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:!showcase.mp4:!showcase.webm:!store-assets:!proof:!proof2:!docs:!qr-code.png'
         }
     }
     signingConfigs {
