@@ -74,6 +74,16 @@ export function MixerProvider({ children }) {
   const [expandedPillar, setExpandedPillar] = useState(null);
   const [modStates, setModStates] = useState({});
   const [masterLevel, setMasterLevel] = useState(80);
+
+  // V57.6 — Resonance Field coupling. Whenever pillar levels change, the
+  // entire app's atmospheric backdrop re-tunes. The ResonanceField listens
+  // for 'sovereign:pillar-levels' and re-paints. Dispatched on every set
+  // so atmosphere tracks the slider in real time.
+  useEffect(() => {
+    try {
+      window.dispatchEvent(new CustomEvent('sovereign:pillar-levels', { detail: { pillarLevels } }));
+    } catch { /* noop */ }
+  }, [pillarLevels]);
   const [showStore, setShowStore] = useState(false);
   const [storeItems, setStoreItems] = useState([]);
   const [credits, setCredits] = useState(0);

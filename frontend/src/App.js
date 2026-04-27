@@ -1,6 +1,7 @@
 import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, Link } from 'react-router-dom';
 import BackToHub from './components/BackToHub';
+import ResonanceField from './components/ResonanceField';
 
 // V58.0: Engine init deferred to requestIdleCallback (already in lines below)
 // Only import the immediate-need engines synchronously
@@ -348,6 +349,11 @@ function CafeApp() {
   
   return (
     <>
+      {/* V57.6 — Sovereign Resonance Field. Atmospheric backdrop driven by
+          the 7 pillar frequency sliders. Lives at z-index:0 behind the app
+          stage. pointer-events:none so it never eats taps (Flatland safe). */}
+      {!isSovereignRoute && <ResonanceField />}
+
       {/* V-ENGINE: Golden Ratio Spiral KILLED - Pure Obsidian Void */}
       {/* <div className="emergent-layer" style={{ 
         position: 'fixed', 
