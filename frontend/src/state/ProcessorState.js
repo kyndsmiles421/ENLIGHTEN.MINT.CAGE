@@ -23,6 +23,10 @@
  *   lattice slot.
  */
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { analyzeResonance, blendVectors } from '../services/ResonanceAnalyzer';
+import { initResonanceSettings, getResonanceSettings } from './ResonanceSettings';
+
+initResonanceSettings();
 
 const ProcessorStateContext = createContext(null);
 
@@ -72,28 +76,62 @@ function emitPulse(moduleId) {
 /**
  * emitOutputPulse — public API for tools to amplify resonance when
  * they produce output (story complete, avatar minted, forecast ready).
- * Tools call this with their moduleId and an intensity multiplier
- * (default 1.4 = ~40% above the steady-state pull pulse). The pulse
- * is one-shot — the field briefly flashes, then the steady state of
- * the active module resumes. This is how the engine "thinks out loud."
+ *
+ * V68.50 — Now flows through the Semantic Middleware: if an `output`
+ * payload is provided, the analyzer extracts a content-derived pulse
+ * which is blended with the module's steady-state signature. Global
+ * `RESONANCE_SETTINGS` (gain + mode) shape the final emission so the
+ * user's Tuning panel choices apply to every existing call site
+ * without per-tool changes.
+ *
+ * @param {string} moduleId  e.g. 'STORY_GEN'
+ * @param {number|object} intensityOrOpts  number → multiplier; object → {output, intensity}
  */
-export function emitOutputPulse(moduleId, intensity = 1.4) {
+function clamp01(n) { return Math.max(0, Math.min(1, n)); }
+
+export function emitOutputPulse(moduleId, intensityOrOpts = 1.4) {
+  const opts = typeof intensityOrOpts === 'number'
+    ? { output: null, intensity: intensityOrOpts }
+    : { output: intensityOrOpts?.output ?? null, intensity: intensityOrOpts?.intensity ?? 1.4 };
+
+  const live = getResonanceSettings();
   const base = MODULE_FREQUENCIES[moduleId] || MODULE_FREQUENCIES.IDLE;
-  const k = Math.max(0.5, Math.min(2.0, intensity));
+
+  // If we have content, derive a semantic vector and blend 60/40
+  // toward content. If not, just amplify the base signature.
+  let vec;
+  if (opts.output != null) {
+    const semantic = analyzeResonance(opts.output, { mode: live.mode });
+    vec = blendVectors(base, semantic, 0.6);
+  } else {
+    vec = { ...base };
+  }
+
+  const k = Math.max(0.5, Math.min(2.0, opts.intensity)) * (live.gain || 1);
   const burst = {
-    bass:   Math.min(1, base.bass * k),
-    mid:    Math.min(1, base.mid  * k),
-    treble: Math.min(1, base.treble * k),
-    peak:   Math.min(1, (base.peak || 0.5) * k),
+    bass:   clamp01(vec.bass   * k),
+    mid:    clamp01(vec.mid    * k),
+    treble: clamp01(vec.treble * k),
+    peak:   clamp01((vec.peak ?? 0.5) * k),
   };
   try {
     window.dispatchEvent(new CustomEvent('sovereign:pulse', { detail: burst }));
-    // Decay back to steady state after ~600ms so the field doesn't
-    // stay "loud" — one-shot accents, not sustained drones.
+    // Decay back to module steady-state after ~600ms
     setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('sovereign:pulse', { detail: base }));
+      const decay = applyGain(base, live.gain);
+      window.dispatchEvent(new CustomEvent('sovereign:pulse', { detail: decay }));
     }, 600);
   } catch { /* noop */ }
+}
+
+function applyGain(vec, gain) {
+  const k = Math.max(0, Math.min(2, gain || 1));
+  return {
+    bass:   clamp01(vec.bass   * k),
+    mid:    clamp01(vec.mid    * k),
+    treble: clamp01(vec.treble * k),
+    peak:   clamp01((vec.peak ?? 0.5) * k),
+  };
 }
 
 export { MODULE_FREQUENCIES };

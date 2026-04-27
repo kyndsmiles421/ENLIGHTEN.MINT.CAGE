@@ -7,7 +7,7 @@
  */
 import {
   Globe, Sliders, Video, Music, Type, Layers, Wand2,
-  Sparkles, Download, User, Compass,
+  Sparkles, Download, User, Compass, Radio,
 } from 'lucide-react';
 
 // Tier numeric values (match backend TIERS dict)
@@ -39,6 +39,7 @@ export const TOOL_TABS = [
   { key: 'record', label: 'Rec', icon: Video, color: '#EF4444', minTier: 2 },
   { key: 'effects', label: 'FX', icon: Wand2, color: '#E879F9', minTier: 3 },
   { key: 'ai', label: 'AI', icon: Sparkles, color: '#FB923C', minTier: 3 },
+  { key: 'tuning', label: 'Tune', icon: Radio, color: '#FBBF24', minTier: 0 },
   { key: 'export', label: 'Out', icon: Download, color: '#22C55E', minTier: 3 },
   { key: 'account', label: 'Me', icon: User, color: '#F8FAFC', minTier: 0 },
 ];

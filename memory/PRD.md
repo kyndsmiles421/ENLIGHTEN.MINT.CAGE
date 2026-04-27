@@ -3,6 +3,72 @@
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
 
+## V68.50 — Semantic Middleware Layer / Closed Cybernetic Loop (27 Feb 2026)
+
+User directive: "We need a Semantic Middleware Layer. Patching every
+tool individually creates technical debt. Implement a universal
+service that intercepts the API output stream and forces it through
+the Resonance Loop before it hits the UI."
+
+### Wiring shipped (V68.50)
+1. ✅ **`/services/ResonanceAnalyzer.js`** — pure logic service. Converts
+   any tool output (string / object / number) into a pulse vector via
+   lexicon-based spectral mapping. Heavy/dark/battle keywords spike
+   bass; bright/hope/light spike treble; density (log-scaled length)
+   surges mid; sentiment magnitude flashes peak. `analyzeResonance(data,
+   {mode})` is the single public API. `blendVectors(a, b, weight)` is
+   exported for module-signature blending.
+2. ✅ **`/state/ResonanceSettings.js`** — `window.RESONANCE_SETTINGS`
+   global (gain 0..2, mode RAW/STANDARD/CALM/INTENSE) backed by
+   localStorage. `getResonanceSettings()` / `setResonanceSettings(patch)`.
+   Writes broadcast `sovereign:resonance-settings` so live subscribers
+   re-read on the next pulse. `initResonanceSettings()` boots once at
+   app load (called from `ProcessorState.js` import + `useResonance`).
+3. ✅ **`/hooks/useResonance.js`** — universal hook. Any tool calls
+   `triggerPulse(data, moduleId)` and the analyzer extracts the
+   semantic vector, blends it 60/40 with the module's steady-state
+   signature, applies global gain, dispatches `sovereign:pulse`, then
+   decays back to module steady-state after 700ms. Hook also subscribes
+   to `sovereign:resonance-settings` so panel changes apply immediately.
+4. ✅ **`/components/console/TuningPanel.js`** — new dock tab. Slider
+   for global gain + 4-cell mode picker (RAW/STANDARD/CALM/INTENSE)
+   with live descriptions + a "Fire Preview Pulse" button. Persists to
+   localStorage and broadcasts the settings event. data-testids
+   throughout: `tuning-panel`, `tuning-gain-slider`, `tuning-gain-value`,
+   `tuning-mode-{raw|standard|calm|intense}`, `tuning-preview-btn`.
+5. ✅ **`TOOL_TABS` extended** in `console/constants.js` — `Tune` tab
+   inserted at index 9 (between AI and OUT). Uses `Radio` lucide icon,
+   gold `#FBBF24` accent, `minTier: 0` (available to all tiers).
+6. ✅ **`UnifiedCreatorConsole`** PANEL_RENDERERS now includes
+   `tuning: () => <TuningPanel />`. Console index re-exports TuningPanel.
+7. ✅ **`ProcessorState.emitOutputPulse` rewritten** — now flows through
+   the analyzer + settings automatically. Accepts either a number
+   (legacy intensity) or an object `{output, intensity}`. With
+   `output`, the function blends content-derived pulse with the module
+   signature; without it, it amplifies the base signature. Either way,
+   global gain applies. Every existing call site becomes settings-aware
+   without per-tool changes.
+
+### Architecture: Closed Cybernetic Loop
+```
+[Tool output]
+   → useResonance.triggerPulse(data, moduleId)
+   → analyzeResonance(data, mode)        ← lexicon → spectral bands
+   → blendVectors(MODULE_FREQUENCIES[id], semantic, 0.6)
+   → applyGain(blended, RESONANCE_SETTINGS.gain)
+   → window.dispatchEvent('sovereign:pulse', vec)
+   → ResonanceField repaints (existing listener, zero changes)
+```
+
+### Verification (live console capture on /creator-console)
+```
+All 12 tabs present (incl. tab-tuning)
+TuningPanel renders inline
+INTENSE mode click → RESONANCE_SETTINGS = {gain:1, mode:'INTENSE'}
+Persisted: {"gain":1,"mode":"INTENSE"}
+Preview pulse fires bursts on the event bus
+```
+
 ## V68.49 — State-Loop Integration / Resonance Output (27 Feb 2026)
 
 User directive: "We are now strictly performing System Wiring. Tools

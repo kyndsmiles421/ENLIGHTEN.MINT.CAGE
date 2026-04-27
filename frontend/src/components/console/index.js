@@ -16,6 +16,7 @@ export { default as MixerNavBar } from './MixerNavBar';
 export { default as CulturalMixerPanel } from './CulturalMixerPanel';
 export { default as ParticleField } from './ParticleField';
 export { default as ResonanceCamera } from './ResonanceCamera';
+export { default as TuningPanel } from './TuningPanel';
 export { TOOL_TABS } from './constants';
 export { useMediaControls } from './useMediaControls';
 export { useResonanceCapture } from './useResonanceCapture';

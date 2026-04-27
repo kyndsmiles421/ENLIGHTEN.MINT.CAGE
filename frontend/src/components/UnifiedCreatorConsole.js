@@ -26,7 +26,7 @@ import {
   TorusPanel, MixPanel, RecordPanel, AudioPanel,
   TextPanel, OverlayPanel, EffectsPanel, AIPanel,
   ExportPanel, AccountPanel, StoreView, MixerNavBar,
-  CulturalMixerPanel, ParticleField, ResonanceCamera,
+  CulturalMixerPanel, ParticleField, ResonanceCamera, TuningPanel,
 } from './console';
 import { useMediaControls } from './console/useMediaControls';
 import { useResonanceCapture } from './console/useResonanceCapture';
@@ -294,6 +294,7 @@ export function MixerProvider({ children }) {
     overlay: () => <OverlayPanel imageOverlays={imageOverlays} setImageOverlays={setImageOverlays} />,
     effects: () => <EffectsPanel monitorFilters={monitorFilters} setMonitorFilters={setMonitorFilters} />,
     ai: () => <AIPanel monitorFilters={monitorFilters} setMonitorFilters={setMonitorFilters} handleNav={handleNav} currentRoute={location.pathname} />,
+    tuning: () => <TuningPanel />,
     export: () => <ExportPanel selectedAspectRatio={selectedAspectRatio} setSelectedAspectRatio={setSelectedAspectRatio} handlePrintModule={handlePrintModule} handlePrintLedger={handlePrintLedger} />,
     account: () => <AccountPanel authToken={authToken} authUser={authUser} tier={tier} handleBroadcast={handleBroadcast} handleSever={handleSever} handleNav={handleNav} loadStore={loadStore} />,
   };
