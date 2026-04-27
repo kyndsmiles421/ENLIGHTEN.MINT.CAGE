@@ -291,7 +291,14 @@ export default function ChamberMiniGame({
           position: 'relative',
           width: '100%',
           minHeight: '70vh',
-          background: background || 'rgba(8,10,18,0.92)',
+          // V57.3 — environmental depth so the chamber doesn't render as a
+          // pure black void. Subtle radial gradient with the chamber's
+          // accent color gives the user a sense of "world".
+          background: background || `
+            radial-gradient(circle at 30% 30%, ${effColor}1A 0%, transparent 35%),
+            radial-gradient(circle at 70% 70%, ${effColor}14 0%, transparent 40%),
+            linear-gradient(180deg, rgba(8,10,18,0.96) 0%, rgba(4,6,15,0.98) 100%)
+          `,
           borderRadius: 16,
           marginBottom: 16,
           padding: 0,
@@ -534,15 +541,28 @@ export default function ChamberMiniGame({
 
 // ────────── BREAK STAGE ──────────
 // N targets sit statically at random positions. Each needs `hits` taps.
-function BreakStage({ count, hits, color, verb, Icon, onHit, onCleared, reduceFlashing, reduceMotion, zone }) {  const [targets, setTargets] = useState(() =>
-    Array.from({ length: count }).map((_, i) => ({
-      id: i,
-      x: 12 + Math.random() * 70,
-      y: 25 + Math.random() * 55,
-      hp: hits,
-      cleared: false,
-    })),
-  );
+function BreakStage({ count, hits, color, verb, Icon, onHit, onCleared, reduceFlashing, reduceMotion, zone }) {
+  // V57.3 — distribute targets evenly across the chamber instead of pure
+  // random clustering. Splits the stage into a quasi-grid then jitters
+  // each cell so it still feels organic but every target is visible
+  // and reachable.
+  const [targets, setTargets] = useState(() => {
+    const cols = count <= 4 ? 2 : 3;
+    const rows = Math.ceil(count / cols);
+    return Array.from({ length: count }).map((_, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const xCell = (100 / cols) * col + (100 / cols) / 2;
+      const yCell = 18 + ((100 - 35) / Math.max(1, rows - 1 || 1)) * row;
+      return {
+        id: i,
+        x: Math.max(14, Math.min(86, xCell + (Math.random() - 0.5) * 14)),
+        y: Math.max(20, Math.min(82, yCell + (Math.random() - 0.5) * 10)),
+        hp: hits,
+        cleared: false,
+      };
+    });
+  });
   const tap = (id) => {
     setTargets((ts) => ts.map((t) => {
       if (t.id !== id || t.cleared) return t;
@@ -557,6 +577,39 @@ function BreakStage({ count, hits, color, verb, Icon, onHit, onCleared, reduceFl
   };
   return (
     <>
+      {/* V57.3 — Ambient depth particles so the chamber doesn't look like an empty void.
+          Drift slowly behind the targets, giving the user a sense of "world" without
+          competing for attention. CSS-only, GPU-accelerated. */}
+      {!reduceMotion && Array.from({ length: 14 }).map((_, i) => (
+        <motion.div
+          key={`amb-${i}`}
+          aria-hidden="true"
+          initial={{ opacity: 0 }}
+          animate={{
+            opacity: [0, 0.4, 0],
+            x: [0, (Math.random() - 0.5) * 60],
+            y: [0, (Math.random() - 0.5) * 60],
+          }}
+          transition={{
+            duration: 8 + Math.random() * 6,
+            repeat: Infinity,
+            delay: i * 0.35,
+            ease: 'easeInOut',
+          }}
+          style={{
+            position: 'absolute',
+            left: `${5 + Math.random() * 90}%`,
+            top: `${10 + Math.random() * 80}%`,
+            width: 2 + Math.random() * 4,
+            height: 2 + Math.random() * 4,
+            borderRadius: '50%',
+            background: color,
+            boxShadow: reduceFlashing ? 'none' : `0 0 8px ${color}`,
+            pointerEvents: 'none',
+            zIndex: 0,
+          }}
+        />
+      ))}
       {targets.map((t) => {
         if (t.cleared) return null;
         const progress = 1 - t.hp / hits;
@@ -578,7 +631,7 @@ function BreakStage({ count, hits, color, verb, Icon, onHit, onCleared, reduceFl
               border: `2px solid ${color}`,
               background: `radial-gradient(circle at 35% 30%, ${color}55 0%, ${color}22 50%, #000 95%)`,
               boxShadow: reduceFlashing ? 'none' : `0 0 34px ${color}66, inset 0 0 22px ${color}55`,
-              cursor: 'pointer', color: '#fff', padding: 0,
+              cursor: 'pointer', color: '#fff', padding: 0, zIndex: 2,
               display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center',
             }}

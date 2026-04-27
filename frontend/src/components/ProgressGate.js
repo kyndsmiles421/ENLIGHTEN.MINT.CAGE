@@ -31,15 +31,30 @@ export default function ProgressGate({ gateId, children, color = '#A78BFA' }) {
 
   useEffect(() => {
     if (!gate || !user) { setLoading(false); return; }
-    
+
+    // V57.5 — admin / owner bypass. The developer-account should never be
+    // locked out of their own app while testing; there's nothing to "earn"
+    // when you OWN the universe. Anyone else with a real account still
+    // hits the normal milestone progression.
+    const isPrivileged = user?.role === 'admin' || user?.role === 'owner'
+      || user?.is_admin === true || user?.tier === 'sovereign'
+      || (typeof user?.email === 'string' && user.email === 'kyndsmiles@gmail.com');
+    if (isPrivileged) { setUnlocked(true); setLoading(false); return; }
+
     const checkGate = async () => {
       try {
         const res = await axios.get(`${API}/rpg/milestones`, { headers: authHeaders });
         const milestones = res.data?.milestones || [];
         const m = milestones.find(ms => ms.id === gate.milestone);
         if (m) {
-          setUnlocked(m.completed);
-          setProgress(m.progress || 0);
+          const prog = m.progress || 0;
+          setProgress(prog);
+          // V57.4 — also unlock when local progress already meets the gate's
+          // count threshold. The backend's `m.completed` flag occasionally
+          // lags behind the actual milestone tally (race between xp_log
+          // and the milestone reconciler), which left users staring at
+          // "6/5 — Locked". If you've earned the threshold, the realm opens.
+          setUnlocked(m.completed || prog >= gate.count);
         } else {
           setUnlocked(true); // If milestone not found, don't block
         }
