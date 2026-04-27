@@ -1,7 +1,50 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.47)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.48)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
+
+## V68.48 — Geology Bleed Sealed + State Substitution Rolled Out (27 Feb 2026)
+
+User reported the Geology Workshop was "bleeding generic Wrench icons"
+and demanded a system-wide audit for dead states + the State
+Substitution rollout for the remaining tools. Independent verification:
+`/app/test_reports/iteration_430.json` — 100% PASS across both backend
+(8/8) and frontend (all visual verifications).
+
+### Fixes shipped (V68.48)
+1. ✅ **Geology icon bleed sealed.** `UniversalWorkshop.js` —
+   added `LUCIDE_ICON_MAP` (full Lucide library import: Wind, Search,
+   Compass, Map, Eye, Activity, Cog, Mountain, Pickaxe, Stethoscope,
+   etc.); added `MODULE_TOOL_FALLBACK` keyed by moduleId so legacy
+   single-letter glyph modules (masonry/carpentry/electrical/nursing
+   /etc.) get themed Lucide icons (Hammer/Axe/Zap/Stethoscope) instead
+   of universal Wrench; added `resolveMaterialIcon()` so geology
+   formations render appropriate material icons — Igneous→Flame,
+   Sedimentary→Layers, Metamorphic→Sparkles, Minerals→Gem,
+   Plate Tectonics→Mountain, Hydrogeology→Droplets. Glyph letters now
+   appear only as small corner badges on legacy modules.
+2. ✅ **Latent `Wind` ReferenceError eliminated.** `MODULE_GAME_THEME`
+   referenced Wind icon for meteorology but it was never imported;
+   added to import list (preventive — meteorology wasn't routed yet).
+3. ✅ **Direct State Substitution rollout — 6 new Engine adapters.**
+   Created `CosmicPortraitEngine.js`, `ForecastsEngine.js`,
+   `DreamVizEngine.js`, `StoryGenEngine.js`, `SceneGenEngine.js`,
+   `StarseedRPGEngine.js` (each is a 4-line adapter that mounts the
+   existing page directly into the matrix slot — no new logic, just a
+   doorway). Registered all 7 in `MODULE_REGISTRY`. Expanded
+   `MatrixModuleDispatcher` with 7 PULL pills.
+4. ✅ **Flatland Rule preserved end-to-end.** Tapping a PULL pill
+   swaps the lattice for the tool's render-mode without changing the
+   URL, without unmounting the engine, without any portal/overlay.
+   `matrix-release` button restores the lattice in milliseconds.
+5. ✅ **Dead-state audit — none of the audited surfaces are actually
+   dead.** Verified `POST /api/journal`, `POST /api/moods`,
+   `POST /api/sage-fx/prompt-to-fx`, `POST /api/coach/sessions`,
+   `POST /api/coach/chat` all 200. REC dock tab uses MediaRecorder +
+   file download. AI dock tab POSTs to `/api/sage-fx/prompt-to-fx`,
+   mutates monitor filters, awards XP. Coach chat input (`coach-input`)
+   reachable after `new-session-btn` flow. Pytest suite at
+   `/app/backend/tests/test_iteration_430.py` passes 8/8.
 
 ## V68.47 — Flatland Rule + Side-Effect Audit (26 Feb 2026)
 
