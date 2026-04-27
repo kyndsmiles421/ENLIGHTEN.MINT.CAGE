@@ -3,6 +3,55 @@
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
 
+## V68.55 — R3F Crystalline Lattice · Spatial Processor (27 Feb 2026)
+
+User directive: "Pivot to Step 5–6 (R3F Crystalline Columns).
+Visualizing the data as physical columns is the wiring. You will be
+able to see the machine's load by the height of the columns. You
+will be able to feel the resonance by how the columns physically
+move."
+
+### Spatial wiring shipped
+1. ✅ **`/components/CrystallineLattice3D.js`** — 9×9 InstancedMesh of
+   cylinder geometries in R3F Canvas. 81 columns rendered in a
+   single GPU draw call. Spectral band assignment by ring distance
+   from center:
+   - **Inner ring (0-1)**  → BASS column heights
+   - **Middle ring (2-3)** → MID column heights
+   - **Outer ring (4)**    → TREBLE column heights
+   - **Spotlight intensity** → PEAK
+2. ✅ **Pulse-driven, not React-driven.** Pulse vector lives in `useRef`
+   and is read inside `useFrame` (60fps) — no React re-render storm.
+   Spring-smoothed with ~250ms time-constant so columns breathe
+   instead of snapping. Subtle radial wobble keeps the lattice alive
+   even at IDLE.
+3. ✅ **Per-instance color modulation.** Hue rotates around the rings;
+   saturation tracks live `mid`; lightness flares with `peak`. The
+   field flashes hot on output bursts, cools to violet at IDLE.
+4. ✅ **Lazy-loaded** — `lazy(() => import('../components/CrystallineLattice3D'))`
+   in `SovereignHub.js` so 2D users never download three.js
+   (~250KB). Suspense fallback is the existing 2D MiniLattice.
+5. ✅ **`SovereignLatticeSurface` switch** reads
+   `SovereignPreferences.visual.crystalFidelity` and re-subscribes to
+   the `sovereign:preferences` broadcast event so the user can toggle
+   2D ↔ 3D from the Sovereign Choice panel without a page reload.
+
+### Verification (live console)
+```
+3D lattice mounted:     True
+Canvas present:         True (1880 × 360 WebGL canvas)
+Pulse count after pull: 2  (lattice received heavy-bass STARSEED signature)
+Toggle to 2D:           3D unmounts, MiniLattice returns
+Toggle back to 3D:      R3F canvas re-mounts via Suspense
+```
+
+### Architectural property unlocked
+The Hub's IDLE slot is now a **physical control surface**. Tap a PULL
+pill — the inner ring of crystalline columns rises with the tool's
+bass signature; the spotlight flares with peak; the field hue
+shifts to match the pulse's mid frequency. The user *sees* the
+machine's load.
+
 ## V68.54 — Primer-Keyed Caching · Engine World-Memory (27 Feb 2026)
 
 User directive: "Move to Step 4 immediately. Until we implement

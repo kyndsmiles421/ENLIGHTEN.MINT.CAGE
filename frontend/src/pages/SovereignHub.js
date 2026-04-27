@@ -4,7 +4,7 @@
  * Broadcast + Sever + Discover integrated into pillars.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, Link } from 'react-router-dom';
 import { ChevronDown, Share2, LogOut, LogIn, User, Swords } from 'lucide-react';
@@ -25,6 +25,12 @@ import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
 import { useProcessorState, MODULE_REGISTRY } from '../state/ProcessorState';
+import SovereignPreferences from '../kernel/SovereignPreferences';
+
+// V68.55 — R3F lattice is heavy (three.js + drei). Lazy-load so the
+// 2D-skin user never downloads it. Mounts only when crystalFidelity
+// === '3d'. Falls back to MiniLattice on any load error.
+const CrystallineLattice3D = lazy(() => import('../components/CrystallineLattice3D'));
 
 const PILLARS = [
   { title: 'Practice', color: '#D8B4FE', items: [
@@ -690,6 +696,44 @@ export default function SovereignHub() {
 }
 
 /* ═══════════════════════════════════════════════
+   SOVEREIGN LATTICE SURFACE (V68.55)
+   ═══════════════════════════════════════════════
+   Render-mode switch for the lattice itself. Reads
+   SovereignPreferences.visual.crystalFidelity each frame the IDLE
+   slot mounts; the chosen fidelity drives whether the user sees the
+   2D MiniLattice (lean SVG, ~50KB) or the 3D CrystallineLattice3D
+   (R3F volumetric columns, ~250KB). The choice lives in the
+   Sovereign Choice panel and is persisted to localStorage. The 3D
+   surface is lazy-loaded so 2D users never download three.js.
+*/
+function SovereignLatticeSurface() {
+  const [fidelity, setFidelity] = useState(() => {
+    try { return SovereignPreferences.get().visual?.crystalFidelity || '2d'; }
+    catch { return '2d'; }
+  });
+
+  useEffect(() => {
+    // Re-read on the broadcast event so toggling Crystal Fidelity
+    // in the choice panel updates the lattice without a page reload.
+    const onPrefs = (e) => {
+      const next = e?.detail?.visual?.crystalFidelity;
+      if (next && next !== fidelity) setFidelity(next);
+    };
+    window.addEventListener('sovereign:preferences', onPrefs);
+    return () => window.removeEventListener('sovereign:preferences', onPrefs);
+  }, [fidelity]);
+
+  if (fidelity === '3d') {
+    return (
+      <Suspense fallback={<MiniLattice />}>
+        <CrystallineLattice3D />
+      </Suspense>
+    );
+  }
+  return <MiniLattice />;
+}
+
+/* ═══════════════════════════════════════════════
    MATRIX RENDER SLOT
    ═══════════════════════════════════════════════
    The single render-mode switch. State-vector → component.
@@ -710,7 +754,7 @@ function MatrixRenderSlot() {
             unmounts and the lattice + dispatcher fill the slot. */}
         <Onboarding />
         <MatrixModuleDispatcher />
-        <MiniLattice />
+        <SovereignLatticeSurface />
       </>
     );
   }
