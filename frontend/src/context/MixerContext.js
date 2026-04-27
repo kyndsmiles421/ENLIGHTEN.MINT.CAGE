@@ -210,6 +210,46 @@ export function MixerProvider({ children }) {
     if (masterGainRef.current) masterGainRef.current.gain.value = muted ? 0 : phiVolumeCurve(masterVol);
   }, [masterVol, muted]);
 
+  // V57.7 — Audio-Reactive Resonance Field. Once the master AudioContext
+  // exists, drive a low-overhead RAF loop that samples the analyser node
+  // and dispatches `sovereign:pulse` events with normalized bass + mid +
+  // treble amplitudes. The ResonanceField listens and pulses on beat.
+  // Loop self-stops when nothing is playing (gain == 0) to save battery.
+  useEffect(() => {
+    let raf = 0;
+    let bytes = null;
+    const tick = () => {
+      const an = analyserRef.current;
+      if (an) {
+        if (!bytes || bytes.length !== an.frequencyBinCount) {
+          bytes = new Uint8Array(an.frequencyBinCount);
+        }
+        an.getByteFrequencyData(bytes);
+        // Bass = first 8 bins (~0-700 Hz), Mid = bins 8-32, Treble = bins 32+.
+        let bass = 0, mid = 0, treble = 0;
+        for (let i = 0; i < bytes.length; i++) {
+          if (i < 8) bass += bytes[i];
+          else if (i < 32) mid += bytes[i];
+          else treble += bytes[i];
+        }
+        const intensity = {
+          bass:   (bass / 8) / 255,
+          mid:    (mid / 24) / 255,
+          treble: (treble / Math.max(1, bytes.length - 32)) / 255,
+          peak:   bytes.reduce((m, v) => v > m ? v : m, 0) / 255,
+        };
+        // Only dispatch if there's actual signal to react to (saves cycles
+        // when the user is on a quiet page).
+        if (intensity.peak > 0.04) {
+          window.dispatchEvent(new CustomEvent('sovereign:pulse', { detail: intensity }));
+        }
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   // V68.31 — 528Hz Starseed Transition Lock (SOVEREIGN CHOICE-GATED).
   // When the Sovereign Kernel broadcasts `sovereign:audio-lock { frequency:528 }`,
   // we ONLY duck the master gain if BOTH conditions hold:

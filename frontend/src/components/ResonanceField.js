@@ -38,6 +38,10 @@ const PILLAR_KEYS = ['practice', 'divination', 'sanctuary', 'body', 'wisdom', 's
 export default function ResonanceField() {
   // Levels normalized 0..1 per pillar
   const [levels, setLevels] = useState(PILLAR_KEYS.map(() => 0.4));
+  // V57.7 — audio-reactive pulse driven by MixerContext analyser RAF loop.
+  // Bass kicks pulse the brightness, mid drives saturation, treble drives
+  // starfield twinkle speed.
+  const [pulse, setPulse] = useState({ bass: 0, mid: 0, treble: 0, peak: 0 });
 
   useEffect(() => {
     const onLevels = (e) => {
@@ -45,8 +49,16 @@ export default function ResonanceField() {
       if (!Array.isArray(arr) || arr.length !== 7) return;
       setLevels(arr.map((v) => Math.max(0, Math.min(1, v / 100))));
     };
+    const onPulse = (e) => {
+      const d = e?.detail;
+      if (d) setPulse(d);
+    };
     window.addEventListener('sovereign:pillar-levels', onLevels);
-    return () => window.removeEventListener('sovereign:pillar-levels', onLevels);
+    window.addEventListener('sovereign:pulse', onPulse);
+    return () => {
+      window.removeEventListener('sovereign:pillar-levels', onLevels);
+      window.removeEventListener('sovereign:pulse', onPulse);
+    };
   }, []);
 
   // Build 7 radial gradients positioned around the viewport, intensity ∝ level.
@@ -99,9 +111,13 @@ export default function ResonanceField() {
         pointerEvents: 'none',     // CRITICAL: pure paint, no click target
         // Composited gradients
         background: gradients.join(', '),
+        // V57.7 — audio-reactive brightness + saturation. Bass kicks
+        // brighten the field, mid frequencies saturate the color.
+        // Falls back gracefully when nothing is playing (pulse=0).
+        filter: `brightness(${(0.95 + pulse.bass * 0.5).toFixed(3)}) saturate(${(0.95 + pulse.mid * 0.55).toFixed(3)})`,
         // Vital-pulse via animation timeline (slow heartbeat)
         animation: `resonance-breath ${5 / bodPulse}s ease-in-out infinite alternate`,
-        transition: 'background 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
+        transition: 'filter 0.06s linear, background 0.8s cubic-bezier(0.22, 1, 0.36, 1)',
       }}
     >
       {/* Starfield — density driven by COS pillar */}

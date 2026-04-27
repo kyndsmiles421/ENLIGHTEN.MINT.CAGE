@@ -347,8 +347,9 @@ export default function RecursivePortal({ children }) {
               />
             )}
             
-            {/* Action hints */}
-            <div className="flex items-center gap-3 text-[9px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            {/* Action hints — hidden on small mobile so they don't collide
+                with the central lattice. Re-emerge on tablets+. */}
+            <div className="hidden sm:flex items-center gap-3 text-[9px]" style={{ color: 'rgba(255,255,255,0.4)' }}>
               {selectedLine !== null ? (
                 <span>
                   <kbd className="px-1 py-0.5 rounded bg-white/10">Pinch in</kbd> to dive into {LINE_FLAVORS[selectedLine]?.name}

@@ -604,6 +604,9 @@ export default function TesseractExperience() {
   // MATRIX COLLAPSE STATE
   // ═══════════════════════════════════════════════════════════════════════════
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
+  // V57.7 — collapse the seed-hunt sidebar on mobile so it stops
+  // overlapping the central lattice. Toggle pill reveals it on demand.
+  const [seedHuntVisible, setSeedHuntVisible] = useState(false);
   const MATRIX_OPACITY = 0.6; // Dimmed but visible - translucent like everything else
   
   // ═══════════════════════════════════════════════════════════════════════════
@@ -983,10 +986,29 @@ export default function TesseractExperience() {
         canMint={core.depth >= 1 && core.address}
       />
       
-      {/* Seed Hunt Widget (sidebar) - LOOP-FIX: CSS Variable breathing */}
-      <div 
-        className="fixed right-4 top-1/2 -translate-y-1/2 w-64 z-30 origin-right hud-widget-breathing"
+      {/* Seed Hunt Widget (sidebar) - LOOP-FIX: CSS Variable breathing
+          V57.7 — On mobile (< 640px) the widget is hidden by default to
+          stop it covering 60% of the central lattice. A small floating
+          "QUEST" toggle pill in the top-right reveals it on demand. */}
+      <button
+        onClick={() => setSeedHuntVisible(v => !v)}
+        className="md:hidden fixed top-16 right-3 z-40 px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wider"
         style={{
+          background: 'rgba(245,158,11,0.12)',
+          border: '1px solid rgba(245,158,11,0.32)',
+          color: '#F59E0B',
+          backdropFilter: 'blur(8px)',
+        }}
+        data-testid="tesseract-quest-toggle"
+      >
+        {seedHuntVisible ? 'HIDE' : 'QUEST'}
+      </button>
+      <div
+        className={`fixed right-4 top-1/2 -translate-y-1/2 w-64 z-30 origin-right hud-widget-breathing ${
+          seedHuntVisible ? '' : 'hidden md:block'
+        }`}
+        style={{
+          maxWidth: 'calc(100vw - 32px)',
           transform: 'scale(calc(1 - (var(--lattice-zoom, 0) * 0.15)))',
           opacity: 'calc(1 - (var(--lattice-zoom, 0) * 0.2))',
           transition: 'transform 0.3s ease-out, opacity 0.3s ease-out',
