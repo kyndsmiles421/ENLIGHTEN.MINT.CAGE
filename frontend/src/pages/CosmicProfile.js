@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Star, Hash, Heart, Sparkles, Loader2, Zap, Flame, Droplets, Wind, Globe, Trophy, Sprout, BarChart3, TrendingUp, Image } from 'lucide-react';
+import { commit as busCommit } from '../state/ContextBus';
+import { useResonance } from '../hooks/useResonance';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -54,6 +56,7 @@ function BarSection({ items, colorMap, label }) {
 
 export default function CosmicProfile() {
   const { user, authHeaders } = useAuth();
+  const cosmicResonance = useResonance();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [portrait, setPortrait] = useState(null);
@@ -141,6 +144,23 @@ export default function CosmicProfile() {
                     traits: `${profile.dominant_system || ''} focus, ${profile.dominant_energy_type || ''} energy, level ${profile.gamification?.level || 1}`,
                   }, { headers: authHeaders, timeout: 120000 });
                   setPortrait(r.data.image_b64);
+
+                  // V68.52 — commit cosmic identity to bus + paint field
+                  try {
+                    busCommit('entityState', {
+                      type: 'cosmic_portrait',
+                      zodiac: profile.zodiac_sign || null,
+                      element: profile.dominant_element || null,
+                      energy_level: profile.avg_cosmic_energy || null,
+                      energy_type: profile.dominant_energy_type || null,
+                      system: profile.dominant_system || null,
+                      level: profile.gamification?.level || null,
+                    }, { moduleId: 'COSMIC_PORTRAIT' });
+                    cosmicResonance.triggerPulse(
+                      `${profile.zodiac_sign || ''} ${profile.dominant_element || ''} ${profile.dominant_energy_type || ''}`,
+                      'COSMIC_PORTRAIT',
+                    );
+                  } catch { /* noop */ }
                 } catch { /* silent */ }
                 setGenPortrait(false);
               }} disabled={genPortrait}

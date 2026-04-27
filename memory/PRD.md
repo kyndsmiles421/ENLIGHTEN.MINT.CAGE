@@ -3,6 +3,70 @@
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
 
+## V68.52 — Closing the Final Mile · Backend Primer + 4 Generators (27 Feb 2026)
+
+User directive: "Closing the final mile is the priority. Without the
+backend patch, the Story Generator has the context, but it can't
+'think' with it."
+
+### Steps 1, 2, 4, 9 of the 10-step Consolidation Roadmap shipped
+1. ✅ **Backend Semantic Patch** — `/app/backend/routes/creation_stories.py`
+   `POST /api/myths/{civ_id}/generate` now reads optional
+   `context_primer` from the body, injects it into the LLM
+   `system_message` so the model writes the myth FROM THE
+   PERSPECTIVE of the user's live world/narrative/entity state.
+   Primer'd generations bypass the shared cache (session-specific).
+   Length-capped at 1800 chars to keep prompts tight. Each myth doc
+   carries a `context_primed: bool` flag so we can tell the two
+   apart on retrieval.
+2. ✅ **Bus-Wiring (Generators 4-7)** — same 3-line pattern shipped to:
+   - `/pages/Forecasts.js` — generate() commits `narrativeContext`
+     (system, period, summary, themes, energy) + triggerPulse.
+   - `/pages/Dreams.js` — save() commits `narrativeContext` (title,
+     body, mood, vividness, lucid, symbols) + triggerPulse on every
+     dream entry.
+   - `/pages/CosmicProfile.js` — Generate Cosmic Portrait commits
+     `entityState` (zodiac, element, energy_level, system, level) +
+     triggerPulse.
+   - `/components/SceneGenerator.js` — `generateScene()` commits
+     `sceneFrame` (resonance_name, colors, mood, prompt) directly to
+     the bus (auto-pulses through analyzer + settings).
+
+### Verification — live integration tests
+```
+test_myth_generate_without_primer_returns_uncontexted    PASSED
+test_myth_generate_with_primer_returns_contexted_and_picks_up_hints  PASSED
+```
+Manual curl proof:
+```
+TITLE: "The Nocturnal Heart: Kinich Ahau's Descent through Xibalba"
+TYPE: transformation
+CONTEXT_PRIMED: True
+PRIMER HINTS PICKED UP: ['Pleiades','crystalline','crystal','violet','obsidian','phoenix']
+STORY: "When the obsidian gates of the horizon breathe their violet
+shadows across the world, the transition of the Great Light begins.
+In the high Crystalline Caverns of the celestial Black Hills,
+Kinich Ahau—the golden-eyed sovereign—prepares for his most perilous
+transformation..."
+```
+The Mayan Jaguar Sun God myth was just fused with the Pleiades / Crystalline
+Caverns / phoenix world-state from the user's prior Starseed RPG session.
+**All 6 primer hints landed in the LLM's narrative.**
+
+### What's now true of the engine
+- All 7 active generators (Avatar, Cosmic Portrait, Forecasts, Dream Viz,
+  Story Gen, Scene Gen, Starseed RPG) commit to the bus + paint the field
+  with semantic-derived pulses
+- The backend reads ContextBus primers and the LLM thinks WITH them
+- Unprimed generation still works (cache hit, backwards-compat)
+- Regression test suite at `/app/backend/tests/test_iteration_v68_52.py`
+
+### Steps still on the consolidation roadmap (deferred — separate sessions)
+- Step 3 — Navigation drain (replace `useNavigate` with `pull()`)
+- Steps 5-6 — R3F Base Plane Phase 3 (3D crystalline columns)
+- Step 7 — Sage AI Coach "AI TIME" gauge
+- Steps 8/10 — Local AAB build (user's machine)
+
 ## V68.51 — Unified Context Bus / Central Nervous System (27 Feb 2026)
 
 User directive: "The Game Generator and Story Generator are not

@@ -4,6 +4,8 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Star, Hash, CreditCard, Globe, Sun, Layers, Loader2, ChevronRight, Sparkles, Trash2, Clock, Zap, Heart, ArrowLeft, Share2, Check, Image } from 'lucide-react';
 import { toast } from 'sonner';
+import { commit as busCommit } from '../state/ContextBus';
+import { useResonance } from '../hooks/useResonance';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -193,6 +195,7 @@ function ForecastCard({ forecast, onDelete, onShare }) {
 
 export default function Forecasts() {
   const { user, authHeaders } = useAuth();
+  const forecastResonance = useResonance();
   const [systems, setSystems] = useState({});
   const [selectedSystem, setSelectedSystem] = useState('astrology');
   const [selectedPeriod, setSelectedPeriod] = useState('daily');
@@ -230,6 +233,23 @@ export default function Forecasts() {
         return [res.data, ...filtered];
       });
       toast.success(`${PERIOD_LABELS[selectedPeriod].label} ${systems[selectedSystem]?.name} forecast ready`);
+
+      // V68.52 — commit forecast to bus + paint the field.
+      try {
+        const fc = res.data?.forecast || {};
+        busCommit('narrativeContext', {
+          type: 'forecast',
+          system: selectedSystem,
+          period: selectedPeriod,
+          summary: fc.summary || fc.headline || res.data?.title || '',
+          themes: fc.themes || fc.areas || [],
+          energy: fc.energy_quality || null,
+        }, { moduleId: 'FORECASTS' });
+        forecastResonance.triggerPulse(
+          (fc.summary || '') + ' ' + JSON.stringify(fc.themes || []),
+          'FORECASTS',
+        );
+      } catch { /* noop */ }
     } catch {
       toast.error('Could not generate forecast. Please try again.');
     }

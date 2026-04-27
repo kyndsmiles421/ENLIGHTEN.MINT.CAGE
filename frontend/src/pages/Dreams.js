@@ -7,12 +7,15 @@ import { Moon, Sparkles, Loader2, Trash2, Calendar, Eye, Search, ChevronRight, C
 import { toast } from 'sonner';
 import { CosmicBanner, CosmicMiniTag } from '../components/CosmicBanner';
 import { ProximityItem } from '../components/SpatialRoom';
+import { commit as busCommit } from '../state/ContextBus';
+import { useResonance } from '../hooks/useResonance';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const MOODS = ['peaceful','joyful','anxious','confused','mysterious','frightening','neutral','profound'];
 
 function NewDreamForm({ onSaved, symbols }) {
   const { authHeaders } = useAuth();
+  const dreamResonance = useResonance();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [mood, setMood] = useState('neutral');
@@ -43,6 +46,23 @@ function NewDreamForm({ onSaved, symbols }) {
         title: title.trim() || 'Untitled Dream', content: content.trim(), mood, vividness, lucid, symbols: found, interpretation,
       }, { headers: authHeaders });
       toast.success('Dream saved');
+
+      // V68.52 — commit dream to bus + paint the field. The dream's
+      // mood + vividness shape the pulse; subsequent Forecast/Story
+      // pulls inherit the dream's atmosphere.
+      try {
+        busCommit('narrativeContext', {
+          type: 'dream',
+          title: title.trim() || 'Untitled Dream',
+          body: content.trim(),
+          mood,
+          vividness,
+          lucid,
+          symbols: found,
+        }, { moduleId: 'DREAM_VIZ' });
+        dreamResonance.triggerPulse(content.trim(), 'DREAM_VIZ');
+      } catch { /* noop */ }
+
       setTitle(''); setContent(''); setMood('neutral'); setVividness(5); setLucid(false); setInterpretation('');
       onSaved();
     } catch { toast.error('Failed to save'); }

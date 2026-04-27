@@ -389,12 +389,22 @@ async def generate_myth(civ_id: str, body: dict, user=Depends(get_current_user))
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail="seed_title required")
 
-    # Check if already generated
-    existing = await db.myths.find_one(
-        {"civilization_id": civ_id, "seed_title": seed_title}, {"_id": 0}
-    )
-    if existing:
-        return existing
+    # V68.52 — ContextBus primer ingestion. If the frontend ships
+    # `context_primer` (a snapshot of the user's current world /
+    # narrative / entity state from the Sovereign Engine), the LLM
+    # writes the myth FROM THAT PERSPECTIVE — so a user who just
+    # walked the Pleiades caverns gets a Pleiades-aware myth, not a
+    # generic one. Length-capped to keep prompts under 2k tokens.
+    context_primer = (body.get("context_primer") or "").strip()[:1800]
+
+    # Cache hit only when no primer is supplied — primer'd generations
+    # are intentionally fresh so they reflect the user's CURRENT state.
+    if not context_primer:
+        existing = await db.myths.find_one(
+            {"civilization_id": civ_id, "seed_title": seed_title}, {"_id": 0}
+        )
+        if existing:
+            return existing
 
     prompt = f"""You are a master storyteller and cultural historian. Tell the myth/legend of "{seed_title}" from the {civ['name']} tradition ({civ['region']}).
 
@@ -410,10 +420,24 @@ Write it as an immersive, richly detailed narrative — not an academic summary.
 Return as JSON with keys: title, type, characters (list of {{name, role}}), story, lesson, symbols (list), connected_myths (list)"""
 
     try:
+        # Build the system message — augment with ContextBus primer
+        # when provided so the LLM "thinks with" the user's live state.
+        base_system = "You are a master storyteller and cultural historian. Return responses as valid JSON only."
+        if context_primer:
+            system_message = (
+                f"{base_system}\n\n"
+                f"You are also the Sovereign Engine of ENLIGHTEN.MINT.CAFE. "
+                f"The user is currently in the following session state — weave "
+                f"this perspective into the myth's tone, imagery, and specific "
+                f"details where it serves the story:\n{context_primer}"
+            )
+        else:
+            system_message = base_system
+
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"myth-gen-{civ_id}-{uuid.uuid4().hex[:8]}",
-            system_message="You are a master storyteller and cultural historian. Return responses as valid JSON only.",
+            system_message=system_message,
         )
         chat.with_model("gemini", "gemini-3-flash-preview")
         response = await chat.send_message(UserMessage(text=prompt))
@@ -445,9 +469,13 @@ Return as JSON with keys: title, type, characters (list of {{name, role}}), stor
             "connected_myths": data.get("connected_myths", []),
             "generated_by": user["id"],
             "created_at": datetime.now(timezone.utc).isoformat(),
+            "context_primed": bool(context_primer),
         }
 
-        await db.myths.insert_one({**myth_doc, "_id": myth_id})
+        # Only cache myths generated WITHOUT a primer. Primed myths are
+        # session-specific and shouldn't pollute the shared cache.
+        if not context_primer:
+            await db.myths.insert_one({**myth_doc, "_id": myth_id})
         return myth_doc
 
     except Exception as e:
