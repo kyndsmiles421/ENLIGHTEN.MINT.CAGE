@@ -49,6 +49,20 @@
 </header>
 
 <section>
+<h2>★★★★★ DIRECT STATE SUBSTITUTION — Avatar Pulled Into The Matrix</h2>
+<p style="font-size:11px;color:rgba(244,213,141,0.86);font-family:ui-monospace,monospace;letter-spacing:0.04em;line-height:1.5;margin:0 0 12px 12px;border-left:2px solid #F4D58D;padding-left:12px">
+Pilot module is live. The Sovereign Engine no longer "navigates" to a tool — it shifts its render-mode while remaining mounted. New code: <code>state/ProcessorState.js</code> (Context provider with <code>activeModule</code>, <code>pull</code>, <code>release</code>) + <code>engines/AvatarGeneratorEngine.js</code> (4-line adapter that imports the existing AvatarCreator) + <code>MatrixRenderSlot</code> in SovereignHub (the switch). When user taps "✦ PULL · AVATAR GEN", URL stays at <code>/sovereign-hub</code>, the 9×9 lattice unmounts in its slot, and AvatarCreator's body mounts in the SAME slot — same React parent, same stacking context, same Resonance Field below, same ToroidalEngine still spinning. No portal. No overlay. No DOM teardown. WebXR camera coordinate system would stay locked. PROOF: PSS1 vs PSS2 → identical chrome (header, wallet pills, mission HUD), only the matrix slot's content swapped.
+</p>
+<div class="grid">
+  <div class="card"><img src="PSS1_idle_lattice_with_pill.jpeg" /><div class="label"><span class="ok">✓</span> IDLE state · "✦ PULL · AVATAR GEN" pill above the 9×9 SOVEREIGN LATTICE</div></div>
+  <div class="card"><img src="PSS2_pulled_avatar_gen.jpeg" /><div class="label"><span class="ok">✓</span> AVATAR_GEN state · URL unchanged · lattice slot now renders Avatar Creator inline</div></div>
+</div>
+<p style="font-size:11px;color:rgba(160,180,200,0.78);font-family:ui-monospace,monospace;letter-spacing:0.04em;line-height:1.55;margin-top:14px;padding-left:12px;border-left:2px solid rgba(160,180,200,0.3)">
+NEXT MODULES (5 minutes each — same pattern, same registry): Cosmic Portrait, Story Generator, Forecast, Dream Visualizer, Scene Generator. Each one is a 4-line adapter file + one entry in MODULE_REGISTRY + one pill in MatrixModuleDispatcher.
+</p>
+</section>
+
+<section>
 <h2>★★★★ TOOLS YOU ALREADY HAVE — Generator + Creator Inventory</h2>
 <p style="font-size:11px;color:rgba(244,213,141,0.86);font-family:ui-monospace,monospace;letter-spacing:0.04em;line-height:1.5;margin:0 0 12px 12px;border-left:2px solid #F4D58D;padding-left:12px">
 You asked where the generators are. They're already built and wired into the frontend, calling backend endpoints powered by Emergent LLM key (OpenAI GPT Image 1, Gemini Nano Banana, Sora 2 video, Claude text). Backend has 26 AI generation endpoints across <code>ai_visuals.py</code>, <code>scene_gen.py</code>, <code>spiritual_avatar.py</code>: meditation backdrops, chamber backdrops, dream visualizations, cosmic portraits, daily oracle cards, story scenes, intro videos, batch image gen, video status polling, avatar generation. Below: every frontend tool that uses them. None of these are mocked. All real generators waiting to be discovered.

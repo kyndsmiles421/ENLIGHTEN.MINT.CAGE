@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, Link } from 'react-router-dom';
 import BackToHub from './components/BackToHub';
 import ResonanceField from './components/ResonanceField';
+import { ProcessorStateProvider } from './state/ProcessorState';
 
 // V58.0: Engine init deferred to requestIdleCallback (already in lines below)
 // Only import the immediate-need engines synchronously
@@ -640,8 +641,10 @@ function App() {
       <BrowserRouter>
         <Suspense fallback={<div style={{background:'#000',minHeight:'100vh'}} />}>
           <SovereignProviders>
-            <TouchLightEngine />
-            <CafeApp />
+            <ProcessorStateProvider>
+              <TouchLightEngine />
+              <CafeApp />
+            </ProcessorStateProvider>
           </SovereignProviders>
         </Suspense>
       </BrowserRouter>

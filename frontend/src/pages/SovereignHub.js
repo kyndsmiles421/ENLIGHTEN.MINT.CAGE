@@ -24,6 +24,7 @@ import VisitorModeShield from '../components/VisitorModeShield';
 import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
+import { useProcessorState, MODULE_REGISTRY } from '../state/ProcessorState';
 
 const PILLARS = [
   { title: 'Practice', color: '#D8B4FE', items: [
@@ -313,8 +314,14 @@ export default function SovereignHub() {
       {/* V68.4 — Active Mission HUD (inline, below wallet pills) */}
       <ActiveMissionHUD />
 
-      {/* V68.6 — Sovereign Mini-Lattice (9x9 crystalline journey) */}
-      <MiniLattice />
+      {/* V57.9 — DIRECT STATE SUBSTITUTION
+          The matrix renders ONE thing at a time. In IDLE state it's the
+          9×9 MiniLattice (the gear mechanism). When the processor is
+          pulled into a tool state (AVATAR_GEN etc.), the SAME slot
+          renders the tool's component. Same parent, same stacking
+          context. No portal. No overlay. The engine never unmounts —
+          its render-mode mutates. */}
+      <MatrixRenderSlot />
 
       {/* Utility Row: Sign In / Share / Sign Out */}
       <div className="flex justify-center gap-3 px-4 pb-6">
@@ -608,6 +615,101 @@ export default function SovereignHub() {
           })}
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════
+   MATRIX RENDER SLOT
+   ═══════════════════════════════════════════════
+   The single render-mode switch. State-vector → component.
+   This is NOT a router and NOT a modal. It's the engine's display
+   loop. The active processor state determines which set of nodes
+   render into the lattice slot. Same React parent, same stacking
+   context, same Resonance Field underneath. */
+function MatrixRenderSlot() {
+  const { activeModule, release } = useProcessorState();
+  const ActiveEngine = MODULE_REGISTRY[activeModule];
+
+  // IDLE — the engine renders itself (the 9×9 crystalline lattice)
+  if (activeModule === 'IDLE' || !ActiveEngine) {
+    return (
+      <>
+        <MatrixModuleDispatcher />
+        <MiniLattice />
+      </>
+    );
+  }
+
+  // PULL state — a tool's logic is rendering into the matrix slot.
+  // We surface a small "RELEASE" pill so the user can return to IDLE
+  // without unmounting anything; the engine remains alive.
+  return (
+    <div data-testid="matrix-render-slot" style={{ position: 'relative', width: '100%' }}>
+      <button
+        type="button"
+        onClick={release}
+        data-testid="matrix-release"
+        style={{
+          // NOT sticky — was getting hidden behind wallet pills' sticky
+          // bar. Inline at top of the slot in normal flow.
+          display: 'flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '6px 12px',
+          borderRadius: 999,
+          background: 'rgba(244,213,141,0.12)',
+          border: '1px solid rgba(244,213,141,0.42)',
+          color: '#FCD34D',
+          fontFamily: 'monospace',
+          fontSize: 10,
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase',
+          cursor: 'pointer',
+          margin: '6px auto 12px',
+        }}
+      >
+        ◀ Release · Return to Lattice
+      </button>
+      <React.Suspense fallback={null}>
+        <ActiveEngine />
+      </React.Suspense>
+    </div>
+  );
+}
+
+/* PILL ROW — visible only in IDLE. Tapping a pill issues a PULL into
+   that module's render-mode. No navigation, no URL change. */
+function MatrixModuleDispatcher() {
+  const { pull } = useProcessorState();
+  const modules = [
+    { id: 'AVATAR_GEN', label: 'Avatar Gen', color: '#C084FC' },
+  ];
+  return (
+    <div
+      style={{
+        display: 'flex', flexWrap: 'wrap', gap: 8,
+        justifyContent: 'center', padding: '8px 12px',
+      }}
+      data-testid="matrix-dispatcher"
+    >
+      {modules.map(m => (
+        <button
+          key={m.id}
+          type="button"
+          onClick={() => pull(m.id)}
+          data-testid={`pull-${m.id.toLowerCase()}`}
+          style={{
+            padding: '6px 12px', borderRadius: 999,
+            background: `${m.color}14`, border: `1px solid ${m.color}55`,
+            color: m.color, fontFamily: 'monospace',
+            fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase',
+            cursor: 'pointer',
+          }}
+        >
+          ✦ Pull · {m.label}
+        </button>
+      ))}
     </div>
   );
 }
