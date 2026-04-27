@@ -36,8 +36,13 @@ const ProcessorStateContext = createContext(null);
  */
 export const MODULE_REGISTRY = {
   IDLE:       null,
-  AVATAR_GEN: React.lazy(() => import('../engines/AvatarGeneratorEngine')),
-  // Future: STARSEED, FORECAST_GEN, COSMIC_PORTRAIT, DREAM_VIZ, etc.
+  AVATAR_GEN:      React.lazy(() => import('../engines/AvatarGeneratorEngine')),
+  COSMIC_PORTRAIT: React.lazy(() => import('../engines/CosmicPortraitEngine')),
+  FORECASTS:       React.lazy(() => import('../engines/ForecastsEngine')),
+  DREAM_VIZ:       React.lazy(() => import('../engines/DreamVizEngine')),
+  STORY_GEN:       React.lazy(() => import('../engines/StoryGenEngine')),
+  SCENE_GEN:       React.lazy(() => import('../engines/SceneGenEngine')),
+  STARSEED:        React.lazy(() => import('../engines/StarseedRPGEngine')),
 };
 
 export function ProcessorStateProvider({ children }) {

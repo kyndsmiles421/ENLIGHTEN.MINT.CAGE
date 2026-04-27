@@ -23,6 +23,9 @@ import { useMixer } from '../context/MixerContext';
 import {
   ChevronDown, ChevronUp, Layers, Gem, Zap,
   Hammer, Axe, Flame, Wrench, Droplets, Leaf, BookOpen, Heart, Sparkles,
+  Wind, Search, Compass, Map, Eye, Activity, Cog, Mountain, Pickaxe,
+  Telescope, FlaskConical, Bone, Trees, Scissors, Shovel, Ruler, Thermometer,
+  Stethoscope, Syringe, Microscope, Cpu, Pencil, Feather, Cross,
 } from 'lucide-react';
 import axios from 'axios';
 import HolographicChamber from './HolographicChamber';
@@ -49,6 +52,10 @@ const MODULE_TO_CHAMBER = {
   landscaping: 'herbology',
   gardening: 'herbology',
   herbalism: 'herbology',
+  geology: 'crystals',
+  meteorology: 'physics',
+  ecology: 'herbology',
+  paleontology: 'crystals',
 };
 
 // Gameplay theme per module: which verb, which icon, which mode. This
@@ -70,13 +77,122 @@ const MODULE_GAME_THEME = {
   childcare:    { mode: 'rhythm',  verb: 'SOOTHE',  icon: Heart,    title: 'MATCH THE RHYTHM',    msg: 'CHILD SOOTHED' },
   eldercare:    { mode: 'rhythm',  verb: 'TEND',    icon: Heart,    title: 'STEADY PRESENCE',    msg: 'DIGNITY HELD' },
   bible:        { mode: 'collect', verb: 'VERSE',   icon: BookOpen, title: 'GATHER THE VERSES',   msg: 'VERSES SEALED' },
+  // V57.11 — Science pillar: real subject-specific gameplay instead of
+  // generic wrench-tap. Geology = strike rock with Hammer; Meteorology
+  // = align frequencies with Wind; Ecology = harvest with Leaf;
+  // Paleontology = excavate with Pickaxe.
+  geology:      { mode: 'break',   verb: 'STRIKE',  icon: Hammer,   title: 'STRIKE THE FORMATION', msg: 'ROCK FRACTURED' },
+  meteorology:  { mode: 'rhythm',  verb: 'TUNE',    icon: Wind,     title: 'READ THE PRESSURE',    msg: 'FRONT MAPPED' },
+  ecology:      { mode: 'collect', verb: 'OBSERVE', icon: Leaf,     title: 'SAMPLE THE BIOME',    msg: 'SPECIMEN LOGGED' },
+  paleontology: { mode: 'collect', verb: 'EXCAVATE', icon: Hammer,  title: 'EXCAVATE THE FOSSIL', msg: 'SPECIMEN RECOVERED' },
 };
 
-// Tool symbol → themed icon glyph. Many backend tool rows ship with a
-// short `icon_symbol` character; this maps typical masonry/carpentry/
-// electrical tool glyphs onto a real lucide icon so the prop looks like
-// a tool, not a letter. Unknown glyphs fall back to Wrench.
+// Tool symbol → themed icon glyph. Two paths:
+//  1) If the backend ships a full Lucide component name in `icon_symbol`
+//     (e.g. "Hammer", "Search", "Compass", "Cog") we render that exact
+//     icon. The Geology / Science modules use this style.
+//  2) If the backend ships a single-letter glyph (legacy modules:
+//     masonry/carpentry/electrical/plumbing/nursing/etc.), we look up a
+//     trade-specific fallback so the user sees a Hammer for masonry, a
+//     Stethoscope for nursing, etc., instead of the generic Wrench.
+const LUCIDE_ICON_MAP = {
+  Hammer, Axe, Flame, Wrench, Droplets, Leaf, BookOpen, Heart, Sparkles,
+  Wind, Search, Compass, Map, Eye, Activity, Cog, Mountain, Pickaxe,
+  Telescope, FlaskConical, Bone, Trees, Scissors, Shovel, Ruler, Thermometer,
+  Stethoscope, Syringe, Microscope, Cpu, Pencil, Feather, Cross, Gem, Zap, Layers,
+};
+
+// Per-module fallback when the backend only ships a letter-glyph.
+const MODULE_TOOL_FALLBACK = {
+  masonry: Hammer,
+  carpentry: Axe,
+  culinary: Flame, cooking: Flame, baking: Flame,
+  electrical: Zap,
+  plumbing: Droplets,
+  landscaping: Leaf, gardening: Leaf, herbalism: Leaf,
+  nursing: Stethoscope,
+  childcare: Heart,
+  eldercare: Heart,
+  bible: BookOpen,
+  geology: Hammer,
+  meteorology: Wind,
+  ecology: Leaf,
+  paleontology: Pickaxe,
+  forestry: Trees,
+  welding: Flame,
+  automotive: Cog,
+  nutrition: Leaf,
+  meditation: Sparkles,
+  hvac: Wind,
+  robotics: Cpu,
+  first_aid: Heart,
+  hermetics: Sparkles,
+  speaking: Feather,
+  philosophy: BookOpen,
+  pedagogy: BookOpen,
+  anatomy: Heart,
+  machining: Cog,
+};
+
 const TOOL_ICON_FALLBACK = Wrench;
+
+// Resolve a tool's display icon. Prefers a Lucide component name shipped
+// by the backend; otherwise picks the per-module fallback so each trade
+// has its own visual signature instead of every tool looking like a wrench.
+function resolveToolIcon(tool, moduleId) {
+  const sym = tool?.icon_symbol;
+  if (sym && LUCIDE_ICON_MAP[sym]) return LUCIDE_ICON_MAP[sym];
+  return MODULE_TOOL_FALLBACK[moduleId] || TOOL_ICON_FALLBACK;
+}
+
+// Whether the icon_symbol is just a letter glyph (legacy modules) — we
+// keep it as a small corner badge when so, and hide it when the backend
+// already shipped a full icon name.
+function isGlyphSymbol(sym) {
+  if (!sym) return false;
+  if (LUCIDE_ICON_MAP[sym]) return false;
+  return sym.length <= 2;
+}
+
+// Per-module + per-material icon resolver. Science modules ship rich
+// material identities (igneous rock, fossils, biome samples) — render
+// a material-themed icon in the center block instead of the verb-tool.
+// Falls back to the module game-theme icon when no specific map applies.
+const MATERIAL_ICON_BY_ID = {
+  // GEOLOGY rocks
+  igneous: Flame, sedimentary: Layers, metamorphic: Sparkles,
+  minerals: Gem, plate_tectonics: Mountain, hydrogeology: Droplets,
+  // PALEONTOLOGY (if added later)
+  fossil: Bone, dinosaur: Bone,
+  // ECOLOGY
+  forest: Trees, biome: Leaf,
+};
+
+const MATERIAL_ICON_BY_MODULE = {
+  geology: Mountain,
+  paleontology: Bone,
+  ecology: Leaf,
+  meteorology: Wind,
+  forestry: Trees,
+  masonry: Mountain,
+  carpentry: Trees,
+  herbalism: Leaf,
+  landscaping: Leaf,
+  gardening: Leaf,
+  nursing: Heart,
+  childcare: Heart,
+  eldercare: Heart,
+  bible: BookOpen,
+  philosophy: BookOpen,
+  hermetics: Sparkles,
+};
+
+function resolveMaterialIcon(material, moduleId, themeFallback) {
+  if (!material) return themeFallback;
+  if (MATERIAL_ICON_BY_ID[material.id]) return MATERIAL_ICON_BY_ID[material.id];
+  if (MATERIAL_ICON_BY_MODULE[moduleId]) return MATERIAL_ICON_BY_MODULE[moduleId];
+  return themeFallback || Gem;
+}
 
 function CenterBlock({ material, isActive, onTap, accentColor }) {
   if (!material) return null;
@@ -435,7 +551,7 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
           {selMat && (() => {
             const theme = MODULE_GAME_THEME[moduleId] || MODULE_GAME_THEME.masonry;
             const matColor = selMat.color || accentColor;
-            const MatIcon = theme.icon || Gem;
+            const MatIcon = resolveMaterialIcon(selMat, moduleId, theme.icon || Gem);
             return (
               <motion.button
                 type="button"
@@ -485,6 +601,8 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
                 const sel = selTool?.id === tool.id;
                 const c = tool.color || accentColor;
                 const glyph = tool.icon_symbol;
+                const ToolIcon = resolveToolIcon(tool, moduleId);
+                const showGlyphBadge = isGlyphSymbol(glyph);
                 return (
                   <motion.button
                     key={tool.id}
@@ -507,9 +625,9 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}
                   >
-                    <TOOL_ICON_FALLBACK size={22} style={{ color: c }} />
-                    {/* Glyph watermark under the icon */}
-                    {glyph && (
+                    <ToolIcon size={22} style={{ color: c, filter: `drop-shadow(0 0 6px ${c}88)` }} />
+                    {/* Glyph watermark only for legacy single-letter modules */}
+                    {showGlyphBadge && (
                       <span style={{
                         position: 'absolute', top: -4, right: -4,
                         fontSize: 9, fontFamily: 'monospace',
@@ -606,12 +724,20 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
           );
         })()}
 
-        {selTool && !diveOpen && (
+        {selTool && !diveOpen && (() => {
+          const SelToolIcon = resolveToolIcon(selTool, moduleId);
+          const selGlyph = selTool.icon_symbol;
+          const showSelGlyph = isGlyphSymbol(selGlyph);
+          return (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
             className="mb-4 rounded-xl p-3" style={{ background: `${selTool.color}06`, border: `1px solid ${selTool.color}15` }} data-testid="tool-info">
             <div className="flex items-center gap-2 mb-1">
-              <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
-                style={{ background: `${selTool.color}20`, color: selTool.color }}>{selTool.icon_symbol}</div>
+              <div className="w-6 h-6 rounded-full flex items-center justify-center"
+                style={{ background: `${selTool.color}20`, color: selTool.color }}>
+                {showSelGlyph
+                  ? <span className="text-xs font-bold">{selGlyph}</span>
+                  : <SelToolIcon size={14} style={{ color: selTool.color }} />}
+              </div>
               <div>
                 <h3 className="text-sm font-medium" style={{ color: selTool.color, fontFamily: 'Cormorant Garamond, serif' }}>{selTool.name}</h3>
                 <p className="text-[8px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.4)' }}>{selTool.action_verb} — {selMat?.name}</p>
@@ -620,7 +746,8 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
             <p className="text-[10px] leading-relaxed mt-1" style={{ color: 'rgba(255,255,255,0.6)' }}>{selTool.description}</p>
             <p className="text-[9px] leading-relaxed mt-1 italic" style={{ color: 'rgba(255,255,255,0.45)' }}>{selTool.technique}</p>
           </motion.div>
-        )}
+          );
+        })()}
 
         <AnimatePresence>
           {diveOpen && <DivePanel material={selMat} isOpen={diveOpen} onClose={() => setDiveOpen(false)} accentColor={accentColor} moduleId={moduleId} />}

@@ -686,7 +686,13 @@ function MatrixRenderSlot() {
 function MatrixModuleDispatcher() {
   const { pull } = useProcessorState();
   const modules = [
-    { id: 'AVATAR_GEN', label: 'Avatar Gen', color: '#C084FC' },
+    { id: 'AVATAR_GEN',      label: 'Avatar',          color: '#C084FC' },
+    { id: 'COSMIC_PORTRAIT', label: 'Cosmic Portrait', color: '#FBBF24' },
+    { id: 'FORECASTS',       label: 'Forecasts',       color: '#38BDF8' },
+    { id: 'DREAM_VIZ',       label: 'Dream Viz',       color: '#818CF8' },
+    { id: 'STORY_GEN',       label: 'Story Gen',       color: '#F472B6' },
+    { id: 'SCENE_GEN',       label: 'Scene Gen',       color: '#2DD4BF' },
+    { id: 'STARSEED',        label: 'Starseed RPG',    color: '#EF4444' },
   ];
   return (
     <div
