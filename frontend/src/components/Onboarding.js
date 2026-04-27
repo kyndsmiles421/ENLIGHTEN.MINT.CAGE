@@ -42,50 +42,59 @@ export default function Onboarding() {
     setVisible(false);
   };
 
-  // INLINE card — NOT an overlay. Flows with page content.
+  // V57.10 — INLINE row, no floating card aesthetic. Matches the page
+  // rhythm of the surrounding mission/wallet rows so the tutorial reads
+  // as the next item in the document, not as an overlay sitting on top.
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-          className="mx-4 mb-4 rounded-xl overflow-hidden"
-          style={{
-            background: 'linear-gradient(135deg, rgba(10,10,20,0.95), rgba(18,18,30,0.95))',
-            border: '1px solid rgba(45,212,191,0.15)',
-          }}
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          className="px-5 py-3"
           data-testid="onboarding-card"
         >
           <motion.div
             key={step}
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 12 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.25 }}
-            className="p-5"
+            transition={{ duration: 0.22 }}
+            className="flex items-start gap-3"
           >
-            <p className="text-[9px] font-mono uppercase tracking-wider mb-2" style={{ color: 'rgba(45,212,191,0.5)' }}>
-              {step + 1}/{STEPS.length}
-            </p>
-            <h3 className="text-base font-semibold mb-2" style={{ color: '#fff' }}>
-              {STEPS[step].title}
-            </h3>
-            <p className="text-xs leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              {STEPS[step].text}
-            </p>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={advance}
-                className="px-5 py-2 rounded-lg text-xs font-medium"
-                style={{ background: 'rgba(45,212,191,0.15)', border: '1px solid rgba(45,212,191,0.3)', color: '#2DD4BF' }}
-                data-testid="onboarding-next"
-              >
-                {step < STEPS.length - 1 ? 'Next' : 'Got It'}
-              </button>
-              <button onClick={skip} className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}
-                data-testid="onboarding-skip">
-                Skip
-              </button>
+            <span
+              aria-hidden="true"
+              className="mt-1 flex-shrink-0 w-1 h-12 rounded-full"
+              style={{ background: 'linear-gradient(180deg, #2DD4BF, rgba(45,212,191,0.1))' }}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-[9px] font-mono uppercase tracking-[0.2em] mb-1.5" style={{ color: 'rgba(45,212,191,0.6)' }}>
+                Tour · {step + 1}/{STEPS.length}
+              </p>
+              <h3 className="text-sm font-medium mb-1.5" style={{ color: 'rgba(255,255,255,0.92)' }}>
+                {STEPS[step].title}
+              </h3>
+              <p className="text-xs leading-relaxed mb-3" style={{ color: 'rgba(255,255,255,0.55)' }}>
+                {STEPS[step].text}
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={advance}
+                  className="px-3 py-1 rounded-md text-[10px] font-mono uppercase tracking-wider transition-colors"
+                  style={{ background: 'rgba(45,212,191,0.12)', border: '1px solid rgba(45,212,191,0.32)', color: '#2DD4BF' }}
+                  data-testid="onboarding-next"
+                >
+                  {step < STEPS.length - 1 ? 'Next ›' : 'Got it'}
+                </button>
+                <button
+                  onClick={skip}
+                  className="text-[10px] font-mono uppercase tracking-wider"
+                  style={{ color: 'rgba(255,255,255,0.32)' }}
+                  data-testid="onboarding-skip"
+                >
+                  Skip tour
+                </button>
+              </div>
             </div>
           </motion.div>
         </motion.div>
