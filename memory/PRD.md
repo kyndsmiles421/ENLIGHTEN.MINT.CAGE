@@ -3,6 +3,74 @@
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
 
+## V68.56 — Engine Hardening · AAB Build Prep (27 Feb 2026)
+
+User directive: "Defrag · Compress · Zip. Authorize Phase 1 (Engine
+Hardening), specifically the code-defrag and asset-purge."
+
+### Honest scope of what shipped here vs. what's on user's machine
+The Capacitor android project lives at `/app/frontend/android/`, and
+the keystore (`enlighten-mint-cafe.keystore`) is already generated.
+This pod has no JDK + Android SDK, so the **gradle bundle command
+must run on the user's machine** — but every config / rules file
+is now production-ready.
+
+### Asset purge — actionable strip identified by audit
+| Asset | Size | Referenced? |
+|---|---|---|
+| `showcase.mp4` | 2.1 MB | ❌ — strippable |
+| `showcase.webm` | 4.9 MB | ❌ — strippable |
+| `store-assets/` | 8.4 MB | only `og:image` web SEO — strippable from AAB |
+| `proof/` + `proof2/` | 2.6 MB | ❌ — strippable |
+| `docs/`, `qr/`, `qr-code.png` | ~80 KB | ❌ — strippable |
+| **Total stripped** | **~18 MB** | |
+
+`landing.html`, `index.html`, all `icon_*.png` / `maskable_*.png`,
+and the React bundle are intentionally **kept** (RootGate references
+landing.html; PWA + Android need the icons).
+
+### Files modified
+1. ✅ **`/app/frontend/android/app/build.gradle`**:
+   - `minifyEnabled true` (was false)
+   - `shrinkResources true` (new)
+   - Switched ProGuard config to `proguard-android-optimize.txt`
+     (more aggressive default rules)
+   - `aaptOptions.ignoreAssetsPattern` extended to strip the 18 MB
+     of marketing files
+   - `versionCode` 6 → 7, `versionName` 1.0.5 → 1.0.6
+   - `bundle { language { enableSplit }; density { enableSplit };
+     abi { enableSplit } }` — Play per-device delivery
+
+2. ✅ **`/app/frontend/android/app/proguard-rules.pro`** — replaced
+   the empty boilerplate with a real keep-rule set:
+   - Capacitor / Cordova bridge classes (reflection-discovered plugins)
+   - `@CapacitorPlugin`, `@PluginMethod`, `@JSExport` annotations
+   - `@JavascriptInterface` methods (WebView bridge)
+   - App entry-point classes
+   - AndroidX lifecycle + splashscreen
+   - dontwarn for kotlin/javax/checkerframework noise
+
+3. ✅ **`/app/frontend/android/BUILD_RUNBOOK.md`** — full step-by-step
+   build instructions for the user's local machine: prereqs, sync,
+   bundleRelease, AAB inspection, Play Console upload, common
+   issues. Includes verification commands (`bundletool dump
+   manifest`) so the user can confirm the asset strip worked.
+
+### Honest non-shipments (and why)
+- ❌ **R3F texture compression to basis universal** — moot. Our
+  `CrystallineLattice3D.js` uses zero texture assets (pure shader
+  `meshStandardMaterial` on cylinder geometry). Nothing to compress.
+- ❌ **Running `./gradlew bundleRelease`** — no JDK in this pod.
+  Documented as the user's machine step.
+- ❌ **Generating keystore** — already exists, untouched. Signing
+  identity preserved across versions.
+
+### Verification
+- `build.gradle`: 90 lines, braces balanced (20/20), parens balanced
+  (18/18), all V68.56 directives present
+- ESLint clean across `SovereignHub.js` after `MiniLattice` swap
+- `proguard-rules.pro`: production-grade, documented per-rule
+
 ## V68.55 — R3F Crystalline Lattice · Spatial Processor (27 Feb 2026)
 
 User directive: "Pivot to Step 5–6 (R3F Crystalline Columns).
