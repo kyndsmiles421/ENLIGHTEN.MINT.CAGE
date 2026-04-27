@@ -25,6 +25,9 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { analyzeResonance, blendVectors } from '../services/ResonanceAnalyzer';
 import { initResonanceSettings, getResonanceSettings } from './ResonanceSettings';
+// Side-effect import — exposes window.ContextBus and boots the
+// shared-memory buffer whenever the Sovereign Engine mounts.
+import './ContextBus';
 
 initResonanceSettings();
 

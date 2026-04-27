@@ -3,6 +3,69 @@
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
 
+## V68.51 — Unified Context Bus / Central Nervous System (27 Feb 2026)
+
+User directive: "The Game Generator and Story Generator are not
+sharing the same reality. Make them work together. Utilize everything
+in the app already and integrate the interface to be utilized as such."
+
+### Wiring shipped (V68.51)
+1. ✅ **`/state/ContextBus.js`** — singleton shared-memory buffer.
+   Holds `worldMetadata` (game), `narrativeContext` (story), `entityState`
+   (avatar/cosmic portrait), `sceneFrame` (scene gen) plus a 16-deep
+   commit history. Persists to `emcafe_context_bus_v1`. API surface:
+   `commit(key, data, {moduleId})`, `read()`, `readKey(k)`,
+   `subscribe(fn)`, `clear()`, `primerForPrompt(activeKey)`. Auto-
+   exposes on `window.ContextBus` for cross-cutting reads.
+2. ✅ **Auto-pulse on every commit.** Every write runs the payload
+   through the Resonance Analyzer (with the user's current
+   gain + mode) and dispatches `sovereign:pulse` — so the field
+   paints WHATEVER the engine just thought, even if that tool isn't
+   in the matrix slot.
+3. ✅ **`sovereign:context-update` event** — any tool can subscribe and
+   re-prime its own UI when another tool commits. Carries
+   `{key, data, moduleId, snapshot}`.
+4. ✅ **`/hooks/useContextBus.js`** — React hook. Returns reactive
+   `bus` snapshot (re-renders on commit), `commit`, `primer`, `readKey`.
+5. ✅ **`primerForPrompt(activeKey)`** — returns a formatted block that
+   any generator can append to its system prompt. Skips the active
+   key so we don't echo a tool's own state back at itself. Empty
+   string when bus is fresh (graceful first-generation).
+6. ✅ **Boot via ProcessorState** — added `import './ContextBus'` to
+   `ProcessorState.js` so the bus is alive on every page that mounts
+   the engine, not just when a generator is lazy-loaded.
+7. ✅ **Three generators wired as proof-of-loop:**
+   - `StarseedAdventure.js` — `beginAdventure` and `makeChoice` both
+     `commit('worldMetadata', {origin, biome, scene_*})` + trigger
+     resonance pulse with the scene description.
+   - `CreationStories.js` — `generateMyth` reads `primerForPrompt`
+     and ships it as `context_primer` to the backend, then commits
+     `narrativeContext` on success.
+   - `AvatarCreator.js` — `generateAIAvatar` commits `entityState`
+     with the description/element/spirit_animal + triggers pulse.
+
+### Verification (live console capture on /sovereign-hub)
+```
+DATA-DERIVED PULSES: 3 distinct spectral signatures
+  [STARSEED] heavy/dark/battle  → bass=0.90 peak=0.96  (BASS-DOMINANT)
+  [STORY]    light/hope/sacred  → treble=1.00 mid=0.83 (TREBLE-DOMINANT)
+  [AVATAR]   balanced descriptive → bass=0.20 treble=0.34 (BALANCED)
+
+PRIMER carries all 3 simultaneously:
+  ✓ worldMetadata    inherited (Pleiades · Crystalline Caverns)
+  ✓ narrativeContext inherited (Crystal Sovereign awakening)
+  ✓ entityState      inherited (phoenix · violet aura)
+
+Bus persisted · history=3 · context-update events fired for all 3 keys
+```
+
+### Architectural property
+"Context-aware" is no longer a per-tool feature — it's a property of the
+Engine. New tools wired into the registry inherit this for free: one
+`commit()` call exposes their state to every other tool in the system,
+one `primer()` call lets them inherit everyone else's state. The
+Sovereign Engine now has a central nervous system.
+
 ## V68.50 — Semantic Middleware Layer / Closed Cybernetic Loop (27 Feb 2026)
 
 User directive: "We need a Semantic Middleware Layer. Patching every

@@ -8,6 +8,8 @@ import { Sparkles, Star } from 'lucide-react';
 import { CosmicCanvas, CharacterSelect, GameScene } from '../components/starseed';
 import ProgressGate from '../components/ProgressGate';
 import SovereignKernel from '../kernel/SovereignKernel';
+import { commit as busCommit } from '../state/ContextBus';
+import { useResonance } from '../hooks/useResonance';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -16,6 +18,7 @@ export default function StarseedAdventure() {
 
   const { user, authHeaders, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const starseedResonance = useResonance();
 
   const [origins, setOrigins] = useState([]);
   const [characters, setCharacters] = useState([]);
@@ -104,6 +107,23 @@ export default function StarseedAdventure() {
       setCharacterState(sceneRes.data.character);
       toast.success(`${origin.name} adventure begins!`);
       generateSceneImage(sceneRes.data.scene.image_prompt, originId);
+
+      // V68.51 — commit world to ContextBus so Story / Forecast /
+      // Dream tools inherit this Starseed reality automatically.
+      try {
+        busCommit('worldMetadata', {
+          origin_id: originId,
+          origin_name: origin?.name,
+          scene_title: sceneRes.data.scene?.title,
+          scene_description: sceneRes.data.scene?.description,
+          biome: sceneRes.data.scene?.location || origin?.name,
+          ts: Date.now(),
+        }, { moduleId: 'STARSEED' });
+        starseedResonance.triggerPulse(
+          (sceneRes.data.scene?.description || sceneRes.data.scene?.title || '') + ' ' + (origin?.name || ''),
+          'STARSEED',
+        );
+      } catch { /* noop */ }
     } catch {
       toast.error('Could not start adventure');
       // Roll back to select on failure
@@ -159,6 +179,23 @@ export default function StarseedAdventure() {
       setCurrentScene(res.data.scene);
       setCharacterState(res.data.character);
       generateSceneImage(res.data.scene.image_prompt, activeOrigin.id);
+
+      // V68.51 — every choice updates the world snapshot on the bus.
+      try {
+        busCommit('worldMetadata', {
+          origin_id: activeOrigin.id,
+          origin_name: activeOrigin.name,
+          scene_title: res.data.scene?.title,
+          scene_description: res.data.scene?.description,
+          biome: res.data.scene?.location || activeOrigin.name,
+          last_choice: choiceIndex,
+          ts: Date.now(),
+        }, { moduleId: 'STARSEED' });
+        starseedResonance.triggerPulse(
+          res.data.scene?.description || res.data.scene?.title || '',
+          'STARSEED',
+        );
+      } catch { /* noop */ }
     } catch {
       toast.error('The cosmos falters... try again');
     } finally {

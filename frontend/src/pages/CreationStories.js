@@ -11,6 +11,8 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { commit as busCommit, primerForPrompt } from '../state/ContextBus';
+import { useResonance } from '../hooks/useResonance';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
@@ -748,19 +750,43 @@ export default function CreationStories() {
     setMythsLoading(false);
   }, []);
 
-  // Generate a myth
+  // Generate a myth — V68.51: now context-aware via the ContextBus.
+  // Reads any active worldMetadata (from Game/Starseed) to bias the
+  // generation, and commits its output back to narrativeContext so
+  // downstream tools (Forecasts, Dreams, Scene Gen) inherit the myth's
+  // mood. Resonance Field auto-paints from the commit.
+  const { triggerPulse } = useResonance();
   const generateMyth = useCallback(async (myth) => {
     if (!token) { toast.error('Please sign in to generate myths'); return; }
     setGeneratingMyth(myth.seed_title);
     try {
-      const r = await axios.post(`${API}/myths/${selectedCiv.id}/generate`, { seed_title: myth.seed_title }, { headers: authHeaders });
+      // Pull existing world / entity context to bias the prompt.
+      // Backend already accepts an optional `context_primer` field;
+      // tools that don't yet read it simply ignore the extra prop.
+      const primer = primerForPrompt('narrativeContext');
+      const r = await axios.post(
+        `${API}/myths/${selectedCiv.id}/generate`,
+        { seed_title: myth.seed_title, ...(primer ? { context_primer: primer } : {}) },
+        { headers: authHeaders }
+      );
       // Update list
       setCivMyths(prev => prev.map(m => m.seed_title === myth.seed_title ? { ...r.data, generated: true } : m));
       setSelectedMyth({ ...r.data, generated: true });
       toast.success('Myth revealed by the cosmos');
+
+      // ── Commit narrative to the bus + paint the field ──────────
+      const narrative = {
+        title: r.data?.title || myth.seed_title,
+        body: typeof r.data?.body === 'string' ? r.data.body : (r.data?.text || ''),
+        civilization: selectedCiv?.name || selectedCiv?.id,
+        type: r.data?.myth_type || 'myth',
+        ts: Date.now(),
+      };
+      busCommit('narrativeContext', narrative, { moduleId: 'STORY_GEN' });
+      triggerPulse(narrative.body || narrative.title, 'STORY_GEN');
     } catch { toast.error('Failed to generate myth'); }
     setGeneratingMyth(null);
-  }, [token, authHeaders, selectedCiv]);
+  }, [token, authHeaders, selectedCiv, triggerPulse]);
 
   // Search myths with debounce
   useEffect(() => {

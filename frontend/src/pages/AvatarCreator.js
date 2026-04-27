@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { useAvatar } from '../context/AvatarContext';
+import { commit as busCommit } from '../state/ContextBus';
+import { useResonance } from '../hooks/useResonance';
 import {
   Save, Loader2, Sparkles, Activity, Zap, TrendingUp, ChevronRight,
   Heart, Wand2, Palette, Image, Layers, Star, Eye, Shield, Flame,
@@ -497,6 +499,7 @@ export default function AvatarCreator() {
 
   const { authHeaders } = useAuth();
   const { refreshAvatar } = useAvatar();
+  const avatarResonance = useResonance();
 
   // Tabs
   const [activeTab, setActiveTab] = useState('ai');
@@ -595,6 +598,23 @@ export default function AvatarCreator() {
 
       setGeneratedAvatar(res.data);
       toast.success('Your cosmic avatar has manifested!');
+
+      // V68.51 — Commit entity to ContextBus + paint the field.
+      // Story / Forecast / Dream tools now inherit this avatar's
+      // archetype as their "current sovereign entity" automatically.
+      try {
+        const entity = {
+          description: aiDescription,
+          style: aiStyle,
+          element: aiElement || null,
+          spirit_animal: aiSpiritAnimal || null,
+          sacred_geometry: aiSacredGeometry || null,
+          aura_color: aiAuraColor || null,
+          created_at: res.data?.created_at || Date.now(),
+        };
+        busCommit('entityState', entity, { moduleId: 'AVATAR_GEN' });
+        avatarResonance.triggerPulse(aiDescription, 'AVATAR_GEN');
+      } catch { /* noop */ }
 
       // Refresh gallery and global avatar
       const galleryRes = await axios.get(`${API}/ai-visuals/my-avatars`, { headers: authHeaders });
