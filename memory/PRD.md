@@ -3,6 +3,63 @@
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
 
+## V68.53 — Navigation Drain (Phased) (27 Feb 2026)
+
+User directive: "Replace all remaining useNavigate() calls in the 7
+pillars with pull() state-substitution. This permanently disables
+browser routing for the wired pillars, forcing the system to operate
+as a singular, state-locked Processor."
+
+### Implementation strategy: graceful split-personality dispatcher
+Rather than ripping `useNavigate` out of `SovereignHub.js` entirely
+(which would break 123+ unwired pillar items), V68.53 installs a
+**single dispatcher** — `dispatchPillar(route)` — that consults a
+`ROUTE_TO_MODULE` map. Wired routes pull the engine into the matrix
+slot (no URL change, no DOM teardown, ContextBus preserved). Unwired
+routes fall through to navigate(). Each new adapter that lands adds
+one line to the map and that pillar auto-upgrades.
+
+### Wired routes (V68.53)
+```js
+const ROUTE_TO_MODULE = {
+  '/avatar':              'AVATAR_GEN',
+  '/avatar-creator':      'AVATAR_GEN',
+  '/cosmic-profile':      'COSMIC_PORTRAIT',
+  '/forecasts':           'FORECASTS',
+  '/dreams':              'DREAM_VIZ',
+  '/creation-stories':    'STORY_GEN',
+  '/starseed-adventure':  'STARSEED',
+};
+```
+
+### Visual indication
+Wired pillar items now render with:
+- Brighter border (`pillar.color}88` vs `33`)
+- Soft glow shadow (`0 0 12px ${pillar.color}33`)
+- Crystal facet at 0.95 opacity (vs 0.5)
+- Caption changes from `Enter` to `✦ Pull · in-engine`
+- `data-wired="true"` for testability
+
+### Verification (live console capture)
+```
+Divination drawer expanded:
+  Wired items:   2 → ['nav-dream-journal', 'nav-forecasts']
+  Unwired items: 13
+
+After clicking nav-dream-journal:
+  URL changed:           False   ← /sovereign-hub stays put
+  state-shift event:     1 (moduleId='DREAM_VIZ')
+  matrix-release button: visible
+  matrix-render-slot:    now contains the engine adapter
+```
+
+### Architectural property after V68.53
+The Hub is no longer a navigation menu. It is a **state-vector
+dispatcher** for the 7 wired tools and a navigation menu for
+everything else — a phased migration path that doesn't break
+existing functionality. Each new `[Tool]Engine.js` adapter that ships
+upgrades its pillar item automatically via the `ROUTE_TO_MODULE` map.
+
 ## V68.52 — Closing the Final Mile · Backend Primer + 4 Generators (27 Feb 2026)
 
 User directive: "Closing the final mile is the priority. Without the

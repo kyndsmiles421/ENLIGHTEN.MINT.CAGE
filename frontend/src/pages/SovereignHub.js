@@ -228,8 +228,29 @@ const PILLARS = [
   ]},
 ];
 
+/**
+ * V68.53 — Route-to-Module Drain Map.
+ *
+ * Maps the 7 wired pillars to their MODULE_REGISTRY ids. When a user
+ * taps a pillar item, dispatchPillar() consults this map: a hit means
+ * the engine swaps render-mode in place via pull() (Direct State
+ * Substitution, no URL change, no DOM teardown, no ContextBus reset).
+ * A miss falls back to navigate() so the 123+ unwired pillars keep
+ * working until their adapters land — phased drain, not big-bang.
+ */
+const ROUTE_TO_MODULE = {
+  '/avatar':              'AVATAR_GEN',
+  '/avatar-creator':      'AVATAR_GEN',
+  '/cosmic-profile':      'COSMIC_PORTRAIT',
+  '/forecasts':           'FORECASTS',
+  '/dreams':              'DREAM_VIZ',
+  '/creation-stories':    'STORY_GEN',
+  '/starseed-adventure':  'STARSEED',
+};
+
 export default function SovereignHub() {
   const navigate = useNavigate();
+  const { pull } = useProcessorState();
   const { user } = useAuth();
   useSovereignUniverse();
   const [expanded, setExpanded] = useState(null);
@@ -238,6 +259,27 @@ export default function SovereignHub() {
   const [lensOpen, setLensOpen] = useState(false);
   const [buyTimeOpen, setBuyTimeOpen] = useState(false);
   const [visitorOpen, setVisitorOpen] = useState(false);
+
+  /**
+   * dispatchPillar(route) — single dispatcher for every pillar item.
+   * Wired routes pull() the engine into the matrix slot (no URL
+   * change). Unwired routes fall through to navigate(). Closes the
+   * pillar drawer either way so the lattice is visible after dispatch.
+   */
+  const dispatchPillar = useCallback((route) => {
+    const moduleId = ROUTE_TO_MODULE[route];
+    if (moduleId && MODULE_REGISTRY[moduleId] !== undefined) {
+      setExpanded(null);
+      pull(moduleId);
+      // Scroll to the matrix slot so the user sees the engine swap
+      try {
+        const slot = document.querySelector('[data-testid="matrix-render-slot"]');
+        if (slot) slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } catch { /* noop */ }
+      return;
+    }
+    navigate(route);
+  }, [navigate, pull]);
 
   useEffect(() => {
     if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 5);
@@ -578,7 +620,9 @@ export default function SovereignHub() {
                         className="grid gap-2"
                         style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))' }}
                       >
-                        {pillar.items.map((item, i) => (
+                        {pillar.items.map((item, i) => {
+                          const wired = !!ROUTE_TO_MODULE[item.route];
+                          return (
                           <motion.button
                             key={item.label}
                             initial={{ opacity: 0, y: 6 }}
@@ -586,25 +630,28 @@ export default function SovereignHub() {
                             transition={{ delay: 0.03 * i, duration: 0.3 }}
                             whileHover={{ y: -2, scale: 1.02 }}
                             whileTap={{ scale: 0.97 }}
-                            onClick={() => navigate(item.route)}
+                            onClick={() => dispatchPillar(item.route)}
                             className="relative rounded-xl px-3 py-3 text-left overflow-hidden group"
                             style={{
                               background: `linear-gradient(135deg, ${pillar.color}18 0%, rgba(10,10,18,0.5) 100%)`,
-                              border: `1px solid ${pillar.color}33`,
+                              border: `1px solid ${pillar.color}${wired ? '88' : '33'}`,
+                              boxShadow: wired ? `0 0 12px ${pillar.color}33, inset 0 0 8px ${pillar.color}22` : 'none',
                               color: '#F1F5F9',
                             }}
                             data-testid={`nav-${item.label.toLowerCase().replace(/[\s&]/g, '-')}`}
+                            data-wired={wired ? 'true' : 'false'}
                           >
                             {/* Mini crystal facet */}
                             <svg className="absolute top-1 right-1 opacity-70" width="14" height="14" viewBox="0 0 16 16" aria-hidden>
-                              <polygon points="8,1 14,6 12,14 4,14 2,6" fill={pillar.color} opacity="0.5" />
+                              <polygon points="8,1 14,6 12,14 4,14 2,6" fill={pillar.color} opacity={wired ? 0.95 : 0.5} />
                             </svg>
                             <span className="block text-[12px] font-semibold leading-tight">{item.label}</span>
                             <span className="block text-[9px] uppercase tracking-[0.2em] mt-1 opacity-60" style={{ color: pillar.color }}>
-                              Enter
+                              {wired ? '✦ Pull · in-engine' : 'Enter'}
                             </span>
                           </motion.button>
-                        ))}
+                          );
+                        })}
                       </div>
                     </motion.div>
                   )}
