@@ -4,6 +4,7 @@ from emergentintegrations.llm.chat import LlmChat, UserMessage
 from emergentintegrations.llm.openai import OpenAITextToSpeech
 from engines.crystal_seal import secure_hash_short
 from datetime import datetime, timezone
+import hashlib
 import uuid
 import asyncio
 
@@ -397,14 +398,26 @@ async def generate_myth(civ_id: str, body: dict, user=Depends(get_current_user))
     # generic one. Length-capped to keep prompts under 2k tokens.
     context_primer = (body.get("context_primer") or "").strip()[:1800]
 
-    # Cache hit only when no primer is supplied — primer'd generations
-    # are intentionally fresh so they reflect the user's CURRENT state.
-    if not context_primer:
-        existing = await db.myths.find_one(
-            {"civilization_id": civ_id, "seed_title": seed_title}, {"_id": 0}
-        )
-        if existing:
-            return existing
+    # V68.54 — Primer-Keyed Caching. Hash the primer so revisits to a
+    # previously-imprinted world-state restore the personalized myth
+    # instantly (no re-generation cost). Different primer → different
+    # cache slot → fresh myth. Empty primer → uses the legacy shared
+    # cache (backwards-compat).
+    primer_hash = (
+        hashlib.sha256(context_primer.encode("utf-8")).hexdigest()[:16]
+        if context_primer else None
+    )
+
+    cache_filter = {"civilization_id": civ_id, "seed_title": seed_title}
+    if primer_hash:
+        cache_filter["primer_hash"] = primer_hash
+    else:
+        # Legacy unprimed slots have no primer_hash field at all.
+        cache_filter["primer_hash"] = {"$in": [None, ""]}
+
+    existing = await db.myths.find_one(cache_filter, {"_id": 0})
+    if existing:
+        return existing
 
     prompt = f"""You are a master storyteller and cultural historian. Tell the myth/legend of "{seed_title}" from the {civ['name']} tradition ({civ['region']}).
 
@@ -470,12 +483,16 @@ Return as JSON with keys: title, type, characters (list of {{name, role}}), stor
             "generated_by": user["id"],
             "created_at": datetime.now(timezone.utc).isoformat(),
             "context_primed": bool(context_primer),
+            "primer_hash": primer_hash,
         }
 
-        # Only cache myths generated WITHOUT a primer. Primed myths are
-        # session-specific and shouldn't pollute the shared cache.
-        if not context_primer:
-            await db.myths.insert_one({**myth_doc, "_id": myth_id})
+        # V68.54 — cache every successful generation, indexed by
+        # (civ, seed, primer_hash). Unprimed myths land in the legacy
+        # shared slot (primer_hash=None); primed myths get their own
+        # slot per unique world-state hash so revisits are instant.
+        # `_id` includes the hash to allow multiple primer slots per seed.
+        doc_id = f"{myth_id}-{primer_hash}" if primer_hash else myth_id
+        await db.myths.insert_one({**myth_doc, "_id": doc_id})
         return myth_doc
 
     except Exception as e:

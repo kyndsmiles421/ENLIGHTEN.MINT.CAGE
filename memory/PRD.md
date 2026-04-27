@@ -3,6 +3,69 @@
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
 
+## V68.54 — Primer-Keyed Caching · Engine World-Memory (27 Feb 2026)
+
+User directive: "Move to Step 4 immediately. Until we implement
+primer-keyed caching, the machine 'forgets' the specific flavor of
+the world as soon as the session hash expires. By caching the primed
+myths, we enable the engine to recognize biomes it has already
+visited."
+
+### Backend wiring shipped
+1. ✅ **`hashlib.sha256(primer)[:16]` keyed cache** in
+   `/app/backend/routes/creation_stories.py`. Each unique primer
+   payload gets its own cache slot via `primer_hash`. Same primer →
+   same myth (instant restore). Different primer → fresh generation
+   in a different slot. Empty primer falls through to the legacy
+   shared cache (`primer_hash: None`) for backwards compat.
+2. ✅ **Per-primer document keying.** `_id` includes the primer hash
+   so multiple primer slots can coexist per `(civ_id, seed_title)`
+   without document conflicts.
+3. ✅ **`primer_hash` field returned** on every myth doc so the
+   frontend can detect cache vs. fresh generations.
+
+### Frontend polish — Thematic Caption Map
+1. ✅ Per-pillar verb registry in `SovereignHub.js`:
+   ```
+   Practice              → ✦ Inhale   "breath into the engine"
+   Divination            → ✦ Channel  "channel the oracle"
+   Sanctuary             → ✦ Enter    "cross the threshold"
+   Nourish & Heal        → ✦ Restore  "restore the body-field"
+   Knowledge             → ✦ Receive  "receive the teaching"
+   Creators & Generators → ✦ Manifest "manifest from the field"
+   Sage AI Coach         → ✦ Commune  "commune with the sage"
+   RPG & Adventure       → ✦ Embark   "embark — engine becomes the world"
+   Cosmos & Physics      → ✦ Observe  "observe the field"
+   Sovereign Council     → ✦ Convene  "convene the council"
+   ```
+2. ✅ Tooltip via `title=` attribute surfaces the gloss on hover.
+
+### Verification
+**Pytest suite: 3/3 PASS**, including the new
+`test_myth_generate_primer_keyed_cache_returns_instantly_on_revisit`.
+
+**Live timing proof:**
+```
+FIRST   call (LLM):           11.50s  hash=18b463196fecc231
+SECOND  call (same primer):    0.14s  same hash, same title  ← 79.6× speedup
+OTHER   call (different):     10.55s  different hash, different myth
+```
+
+**Thematic captions verified in DOM:**
+```
+Divination wired pillars:
+  Dream Journal → "✦ CHANNEL" (gloss: "channel the oracle")
+  Forecasts     → "✦ CHANNEL"
+```
+
+### Architectural property unlocked
+The Engine now has **world memory**. A sovereign who walks the
+Pleiades caverns, the Sirius forest, and the Andromeda iron sea will
+have **three distinct cached myths** for the same Mayan seed-title
+"The Jaguar Sun God" — each painted by its respective world's
+spectral signature, each restored in <0.2s on revisit. The machine no
+longer "forgets the flavor of the world" — it imprints it.
+
 ## V68.53 — Navigation Drain (Phased) (27 Feb 2026)
 
 User directive: "Replace all remaining useNavigate() calls in the 7

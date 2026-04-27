@@ -229,6 +229,24 @@ const PILLARS = [
 ];
 
 /**
+ * V68.54 — Per-pillar thematic verbs for wired pillar items. The
+ * caption replaces "✦ Pull · in-engine" with a phrase that matches
+ * each pillar's character. Unmapped pillars fall back to "✦ Pull".
+ */
+const PILLAR_VERB = {
+  'Practice':              { verb: '✦ Inhale',   gloss: 'breath into the engine' },
+  'Divination':            { verb: '✦ Channel',  gloss: 'channel the oracle' },
+  'Sanctuary':             { verb: '✦ Enter',    gloss: 'cross the threshold' },
+  'Nourish & Heal':        { verb: '✦ Restore',  gloss: 'restore the body-field' },
+  'Knowledge':             { verb: '✦ Receive',  gloss: 'receive the teaching' },
+  'Creators & Generators': { verb: '✦ Manifest', gloss: 'manifest from the field' },
+  'Sage AI Coach':         { verb: '✦ Commune',  gloss: 'commune with the sage' },
+  'RPG & Adventure':       { verb: '✦ Embark',   gloss: 'embark — the engine becomes the world' },
+  'Cosmos & Physics':      { verb: '✦ Observe',  gloss: 'observe the field' },
+  'Sovereign Council':     { verb: '✦ Convene',  gloss: 'convene the council' },
+};
+
+/**
  * V68.53 — Route-to-Module Drain Map.
  *
  * Maps the 7 wired pillars to their MODULE_REGISTRY ids. When a user
@@ -622,6 +640,8 @@ export default function SovereignHub() {
                       >
                         {pillar.items.map((item, i) => {
                           const wired = !!ROUTE_TO_MODULE[item.route];
+                          const verbCfg = PILLAR_VERB[pillar.title];
+                          const wiredCaption = (verbCfg?.verb) || '✦ Pull';
                           return (
                           <motion.button
                             key={item.label}
@@ -646,8 +666,12 @@ export default function SovereignHub() {
                               <polygon points="8,1 14,6 12,14 4,14 2,6" fill={pillar.color} opacity={wired ? 0.95 : 0.5} />
                             </svg>
                             <span className="block text-[12px] font-semibold leading-tight">{item.label}</span>
-                            <span className="block text-[9px] uppercase tracking-[0.2em] mt-1 opacity-60" style={{ color: pillar.color }}>
-                              {wired ? '✦ Pull · in-engine' : 'Enter'}
+                            <span
+                              className="block text-[9px] uppercase tracking-[0.2em] mt-1 opacity-60"
+                              style={{ color: pillar.color }}
+                              title={wired ? verbCfg?.gloss : undefined}
+                            >
+                              {wired ? wiredCaption : 'Enter'}
                             </span>
                           </motion.button>
                           );
