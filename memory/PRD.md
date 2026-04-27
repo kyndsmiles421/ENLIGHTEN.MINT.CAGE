@@ -3,6 +3,54 @@
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
 
+## V68.49 — State-Loop Integration / Resonance Output (27 Feb 2026)
+
+User directive: "We are now strictly performing System Wiring. Tools
+must act as Internal Logic Modules, not external services. Wire the
+output of every tool back into the ResonanceField so the matrix's
+visuals shift to match the engine's current task."
+
+### Wiring shipped (V68.49)
+1. ✅ **MODULE_FREQUENCIES table** added in `ProcessorState.js` — each
+   of the 7 registered modules has a signature pulse vector
+   `{bass, mid, treble, peak}`. STARSEED is bass/peak-heavy (combat
+   energy), DREAM_VIZ is treble-heavy (high-frequency dream detail),
+   STORY_GEN is mid-heavy (narrative density), AVATAR_GEN is balanced
+   warm, COSMIC_PORTRAIT is treble+mid (celestial), FORECASTS is mid
+   (oracle), SCENE_GEN is mid+treble (composition), IDLE is ambient.
+2. ✅ **`pull()` and `release()` now emit pulses.** `emitPulse(moduleId)`
+   dispatches `sovereign:pulse` with the module's signature on every
+   state-vector transition. ResonanceField (already listening on this
+   event) immediately repaints brightness, saturation, starfield speed.
+   No wrapper, no listener, no extra component — the state vector
+   itself drives the field.
+3. ✅ **`sovereign:state-shift` companion event** dispatched alongside
+   the pulse, carrying `{moduleId, signature, t}`. Other reactors
+   (mini-games, skin shifters, ResonanceCamera) can hook this without
+   colliding with the audio analyser's continuous pulse stream.
+4. ✅ **`emitOutputPulse(moduleId, intensity)` exported** — tools call
+   this when they produce output (story complete, avatar minted,
+   forecast ready). One-shot 600ms burst at intensity * signature, then
+   auto-decay to the steady-state. The engine "thinks out loud."
+
+### Verification (live console capture)
+```
+URL after pull: /sovereign-hub        ← Flatland preserved
+Pulse: {bass:0.78, mid:0.46, treble:0.52, peak:0.85}  ← STARSEED signature
+State-shift: {moduleId:'STARSEED', signature:{...}, t:...}
+Release fired IDLE shift: True
+```
+
+### Architectural decision: navigation drain (not deletion)
+User asked whether to delete `useNavigate` from SovereignHub entirely.
+**Decision: phased drain, not big-bang deletion.** Of 130+ pillar items,
+only 7 have engine adapters today. Deleting nav would break 123 routes.
+The discipline is: as each tool's adapter ships, its pillar item swaps
+from `navigate(route)` to `pull(moduleId)`. When a pillar is fully
+covered, that pillar's nav calls are deleted. When the registry covers
+everything, `useNavigate` is excised. This avoids re-introducing the
+"dead button" entropy we just spent two sessions removing.
+
 ## V68.48 — Geology Bleed Sealed + State Substitution Rolled Out (27 Feb 2026)
 
 User reported the Geology Workshop was "bleeding generic Wrench icons"
