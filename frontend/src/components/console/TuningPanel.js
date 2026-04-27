@@ -10,10 +10,11 @@
  * UnifiedCreatorConsole's panel slot.
  */
 import React, { useEffect, useState } from 'react';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Mic, MicOff } from 'lucide-react';
 import {
   RESONANCE_MODES, getResonanceSettings, setResonanceSettings,
 } from '../../state/ResonanceSettings';
+import { useVocalResonance } from '../../hooks/useVocalResonance';
 
 const MODE_DESC = {
   RAW:      'Direct data → pulse · no shaping (fastest, most erratic)',
@@ -31,6 +32,7 @@ const MODE_COLOR = {
 
 export default function TuningPanel() {
   const [settings, setSettings] = useState(getResonanceSettings());
+  const vocal = useVocalResonance();
 
   // Stay in sync with external writes
   useEffect(() => {
@@ -161,6 +163,66 @@ export default function TuningPanel() {
       >
         ⌁ Fire Preview Pulse
       </button>
+
+      {/* VOCAL RESONANCE — V68.57 */}
+      <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>
+            Vocal Resonance · Mic FFT → Lattice
+          </span>
+          {vocal.isHot && (
+            <span className="flex items-center gap-1 text-[8px]" style={{ color: '#EF4444' }} data-testid="vocal-hot-indicator">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+              LIVE
+            </span>
+          )}
+        </div>
+        <p className="text-[9px] leading-relaxed mb-2" style={{ color: 'rgba(255,255,255,0.55)' }}>
+          Speak into the mic. The FFT extracts bass / mid / treble from your tone
+          and drives the crystalline columns at 30 fps.
+        </p>
+        {vocal.error && (
+          <p className="text-[8px] mb-2" style={{ color: '#EF4444' }} data-testid="vocal-error">
+            {vocal.error === 'permission-denied' && 'Mic permission denied — check browser settings.'}
+            {vocal.error === 'unsupported' && 'Web Audio not supported on this device.'}
+            {vocal.error === 'unknown' && 'Mic capture failed — try again.'}
+          </p>
+        )}
+        {/* In-panel VU meter */}
+        {vocal.isHot && (
+          <div className="space-y-1 mb-2" data-testid="vocal-vu">
+            {[
+              { key: 'bass',   label: 'Bass',   val: vocal.levels.bass,   color: '#EF4444' },
+              { key: 'mid',    label: 'Mid',    val: vocal.levels.mid,    color: '#A78BFA' },
+              { key: 'treble', label: 'Treble', val: vocal.levels.treble, color: '#2DD4BF' },
+            ].map((b) => (
+              <div key={b.key} className="flex items-center gap-2">
+                <span className="text-[7px] uppercase w-10" style={{ color: 'rgba(255,255,255,0.4)' }}>{b.label}</span>
+                <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                  <div
+                    className="h-full transition-all duration-100"
+                    style={{ width: `${Math.round(b.val * 100)}%`, background: b.color }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={() => (vocal.isHot ? vocal.stop() : vocal.start())}
+          data-testid="vocal-toggle-btn"
+          className="w-full px-3 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider active:scale-95 flex items-center justify-center gap-2"
+          style={{
+            background: vocal.isHot ? 'rgba(239, 68, 68, 0.12)' : 'rgba(45, 212, 191, 0.10)',
+            border: `1px solid ${vocal.isHot ? 'rgba(239, 68, 68, 0.40)' : 'rgba(45, 212, 191, 0.30)'}`,
+            color: vocal.isHot ? '#EF4444' : '#2DD4BF',
+          }}
+        >
+          {vocal.isHot ? <MicOff size={12} /> : <Mic size={12} />}
+          {vocal.isHot ? 'Silence Mic' : 'Open Mic · Resonate'}
+        </button>
+      </div>
     </div>
   );
 }

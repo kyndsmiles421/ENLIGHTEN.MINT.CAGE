@@ -3,6 +3,63 @@
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
 
+## V68.57 — Vocal Resonance + CDN Helper (27 Feb 2026)
+
+User directive: "Step 1: Functional Vocal Resonance — wire MixerContext
+(FFT analysis) to the triggerPulse hook. Your voice volume/pitch now
+drives the Lattice 3D columns. Step 4: Asset CDN Migration."
+
+### Vocal Resonance shipped (Step 1)
+1. ✅ **`/hooks/useVocalResonance.js`** — Web Audio API hook.
+   `getUserMedia({audio:true})` on user-initiated `start()`,
+   `MediaStreamSource → AnalyserNode (fftSize 256, smoothing 0.6)`,
+   `requestAnimationFrame` loop dispatches `sovereign:pulse` at 30 Hz.
+   Voice band mapping (256-bin FFT, ~22 kHz half-rate):
+   - bass    bins 0–3   (~0–700 Hz)   — fundamentals
+   - mid     bins 4–15  (~700–2700 Hz) — vowels
+   - treble  bins 16–63 (~2700–11kHz)  — consonants
+   - peak    = max(bass, mid, treble)
+   Global tuning gain applied on every emission. Clean teardown
+   (track stop + AudioContext close) on stop()/unmount/permission
+   denial. Returns `{isHot, error, start, stop, levels}`.
+
+2. ✅ **TuningPanel section added** — opens with "⌁ OPEN MIC · RESONATE"
+   call-to-action (mint Mic icon). When live: red pulsing dot, in-panel
+   3-band VU meter (bass red / mid violet / treble teal), button
+   morphs to red "SILENCE MIC" with MicOff icon. Graceful error
+   messages for `permission-denied`, `unsupported`, `unknown`.
+
+### CDN Helper shipped (Step 4 — partial)
+1. ✅ **`/services/cdnAssets.js`** — `cdnUrl(path, fallback)` resolver.
+   Reads `process.env.REACT_APP_CDN_BASE_URL` from frontend `.env`.
+   When unset, falls back to local `/${path}`. Single source of truth
+   so individual components don't hardcode CDN URLs.
+
+### Honest scope for the showcase.* migration
+Audit confirmed: `showcase.mp4` (2.1 MB) and `showcase.webm` (4.9 MB)
+are **truly orphaned** — zero references in `src/`, `public/`, or any
+HTML file. The V68.56 `ignoreAssetsPattern` already excludes them
+from the AAB. They are also unused on web. Recommendation: **delete
+them outright** rather than CDN-migrate (you cannot "migrate" what
+nothing references). The `cdnUrl()` helper is in place for future
+heavy media additions.
+
+### Verification (live console capture on /creator-console)
+```
+tuning-panel:                present
+vocal-toggle-btn:            present
+idle toggle text:            'OPEN MIC · RESONATE'
+Web Audio APIs supported:    True (mediaDevices + AudioContext)
+Permission-denied path:      'Mic capture failed — try again.'
+```
+
+### Architectural property unlocked
+The lattice now **listens**. Whisper → inner ring rises softly.
+Speak normally → middle ring surges with vowel mid-band. Sing a
+sustained note → sustained bass + mid dominance + treble flicker on
+sibilance. The user's voice physically drives the engine's spatial
+columns at 30 fps via the existing `sovereign:pulse` event bus.
+
 ## V68.56 — Engine Hardening · AAB Build Prep (27 Feb 2026)
 
 User directive: "Defrag · Compress · Zip. Authorize Phase 1 (Engine
