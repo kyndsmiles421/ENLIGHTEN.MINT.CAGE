@@ -291,7 +291,6 @@ export default function SovereignHub() {
 
   return (
     <div className="min-h-screen" style={{ background: 'transparent' }} data-testid="sovereign-hub">
-      <Onboarding />
       {/* Title */}
       <div className="pt-10 pb-4 px-5">
         <h1
@@ -635,6 +634,10 @@ function MatrixRenderSlot() {
   if (activeModule === 'IDLE' || !ActiveEngine) {
     return (
       <>
+        {/* V57.10 — Tutorial lives INSIDE the matrix slot during IDLE.
+            Same pane, no separate overlay zone. When dismissed it
+            unmounts and the lattice + dispatcher fill the slot. */}
+        <Onboarding />
         <MatrixModuleDispatcher />
         <MiniLattice />
       </>
