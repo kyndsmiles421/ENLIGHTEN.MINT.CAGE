@@ -49,6 +49,16 @@
 </header>
 
 <section>
+<h2>★ State-Adjustment Fix — ChamberProp No Longer Overlaps Filter Chips</h2>
+<p style="font-size:11px;color:rgba(244,213,141,0.86);font-family:ui-monospace,monospace;letter-spacing:0.04em;line-height:1.5;margin:0 0 12px 12px;border-left:2px solid #F4D58D;padding-left:12px">
+Root cause: <code>index.css</code> had a <code>position: fixed !important</code> rule on <code>.chamber-prop-portal</code> that overrode every React-side fix. The prop was painting at viewport-relative coordinates (left:22%, top:55%) which on a 414×896 phone landed directly on top of the meditation filter chips, eating taps. Per the Single-Plane-Pull architecture the prop must live INSIDE its host chamber zone (HolographicChamber's <code>position: relative</code> container), not the viewport. Fix removed the !important override + removed the React portal to <code>document.body</code>. The prop now renders inline in the React tree with <code>position: absolute</code>, resolving its coordinates against the chamber container. It can never paint outside the chamber, can never overlap unrelated content. No new layer, no overlay added. Pure stacking-context correction.
+</p>
+<div class="grid">
+  <div class="card"><img src="M4_props_inside_chamber.jpeg" /><div class="label"><span class="ok">✓</span> /meditation · BREATHE / RING BELL / MANDALA stack cleanly above content · Relaxation chip reachable</div></div>
+</div>
+</section>
+
+<section>
 <h2>★ Phase 1 + 2 Locked — Tesseract Mobile · Audio-Reactive Field</h2>
 <p style="font-size:11px;color:rgba(244,213,141,0.86);font-family:ui-monospace,monospace;letter-spacing:0.04em;line-height:1.5;margin:0 0 12px 12px;border-left:2px solid #F4D58D;padding-left:12px">
 PHASE 1 — Tesseract mobile cleanup. The 256px-wide SeedHuntWidget that was covering 60% of the central lattice is now hidden by default on viewports &lt; 640px and revealed via a small "QUEST" pill. The hexagram action-hint tooltip that overlapped the central scene is also hidden on small mobile. The 9×9 grid + L-shaped node pattern + VOID/SOURCE/MATTER deep-dive controls are now clearly visible. PHASE 2 — Audio-Reactive Resonance Field. The MixerContext's existing analyser node now drives a RAF loop that dispatches <code>sovereign:pulse</code> events with normalized bass/mid/treble/peak amplitudes. The ResonanceField listens and modulates brightness (bass kicks) + saturation (mid frequencies) in real time. Self-throttles when audio is silent (peak &lt; 4%) to save battery.

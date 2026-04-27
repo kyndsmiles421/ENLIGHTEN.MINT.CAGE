@@ -120,20 +120,24 @@ body.scene-active .min-h-screen {
    button/motion styles force position:relative. Pin the prop to the
    viewport explicitly so left/top % resolve against the viewport and
    props never stack inside the HUD pane. */
+/* V57.8 — STATE ADJUSTMENT.
+   Chamber props now live INSIDE their host chamber zone (the
+   HolographicChamber container, which is `position: relative`). The
+   prop renders inline in the React tree and uses `position: absolute`
+   so its left/top % resolves against the chamber, not the viewport.
+   This was previously forced to `position: fixed !important` which
+   placed the prop at viewport-percentage coordinates and made it
+   overlap unrelated page content (filter chips, CTAs) on mobile. */
 .chamber-prop-portal {
-  position: fixed !important;
-  z-index: 60 !important;
-  
-  /* Earth-Tuned Iridescence */
+  /* Earth-Tuned Iridescence — paint vars only, NO position override. */
   --earth-glow: rgba(34, 211, 238, 0.2);
   --solfeggio-glow: rgba(192, 132, 252, 0.3);
   --sigfield-glow: rgba(168, 85, 247, 0.4);
 }
 
-/* V68.30 — While the MyQRSheet overlay is open, hide every portaled
-   chamber prop so the scanner-critical QR code can never be occluded
-   by BREATHE / RING BELL / MANDALA / etc. Restored automatically on
-   close. */
+/* While the MyQRSheet overlay is open, hide every chamber prop so the
+   scanner-critical QR code can never be occluded by BREATHE / RING
+   BELL / MANDALA. Restored automatically on close. */
 html.qr-sheet-open .chamber-prop-portal {
   opacity: 0 !important;
   pointer-events: none !important;

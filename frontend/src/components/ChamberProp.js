@@ -18,7 +18,6 @@
  *   disabled    — hide / ignore taps while a mini-game is active
  */
 import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSensory } from '../context/SensoryContext';
 
@@ -60,10 +59,17 @@ export default function ChamberProp({
   if (disabled) return null;
   const isStringGlyph = typeof icon === 'string';
   const IconComp = !isStringGlyph && icon ? icon : null;
-  // V68.29 — Portal the prop out of the chamber's transformed ancestor
-  // so `position: fixed` resolves against the true viewport. Without
-  // this, framer-motion's transform on the chamber wrapper would make
-  // "fixed" behave as "absolute", stacking props into the HUD pane.
+
+  // V57.8 — STATE ADJUSTMENT, not new layer.
+  // The chamber prop is meant to live inside its HOST CHAMBER ZONE
+  // (the holographic-chamber container), not the viewport. Previously
+  // this used `position: fixed` portaled to document.body, which on
+  // mobile placed the prop at viewport-relative percentages and caused
+  // it to land directly on top of the page's filter chips — eating
+  // taps. The fix: render the prop INLINE inside the page flow with
+  // `position: absolute` relative to its NEAREST `position: relative`
+  // ancestor (the chamber container). When no relative ancestor exists,
+  // the prop simply doesn't paint over content. No portal. No new layer.
   const node = (
     <motion.button
       type="button"
@@ -73,7 +79,13 @@ export default function ChamberProp({
       whileHover={{ scale: 1.08 }}
       whileTap={{ scale: 0.94 }}
       style={{
-        position: 'fixed',
+        // V57.8 — `absolute` not `fixed`, no portal. The prop now flows
+        // inside its HOST chamber zone (the closest position:relative
+        // ancestor: HolographicChamber's outer div). It can never paint
+        // outside the chamber, so it can never overlap unrelated page
+        // content. The y-percentage maps to the chamber height, not the
+        // viewport height.
+        position: 'absolute',
         left: `${x}%`,
         top: `${y}%`,
         transform: 'translate(-50%, -50%)',
@@ -171,6 +183,9 @@ export default function ChamberProp({
       )}
     </motion.button>
   );
-  if (typeof document === 'undefined') return node;
-  return createPortal(node, document.body);
+  // V57.8 — No portal. The prop renders inline so it inherits its
+  // host chamber's stacking context. CSS `position: absolute` resolves
+  // against the nearest `position: relative` ancestor, which is the
+  // HolographicChamber container. The prop can never escape its host.
+  return node;
 }

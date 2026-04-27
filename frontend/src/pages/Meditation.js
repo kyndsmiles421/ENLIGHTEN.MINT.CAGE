@@ -1367,7 +1367,6 @@ export default function Meditation() {
               g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.6);
               osc.stop(ctx.currentTime + 2.6);
             } catch { /* audio blocked */ }
-            // Visible expanding ripple at the bell's position + XP flyaway
             spawnRipple(82, 22, '#FCD34D', '+2 SPARKS');
             const token = localStorage.getItem('zen_token');
             if (token && token !== 'guest_token') {
