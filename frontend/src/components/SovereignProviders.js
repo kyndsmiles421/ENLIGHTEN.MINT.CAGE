@@ -35,8 +35,14 @@ import { SplitScreenProvider } from '../components/SplitScreen';
 import RecursivePortal from '../components/RecursivePortal';
 import { SceneProvider } from '../components/SceneEngine';
 import { MixerProvider as SystemMixerProvider } from '../components/UnifiedCreatorConsole';
+import { useSessionPersistence } from '../hooks/useSessionPersistence';
 
 export default function SovereignProviders({ children }) {
+  // V68.59 — Time-capsule beacon. Fires sendBeacon to
+  // `/api/time-capsules/archive` on every tab-hide / pagehide so the
+  // user's ContextBus state survives the browser tearing the page
+  // down. Mounted at the root provider so every route benefits.
+  useSessionPersistence();
   return (
     <CreditProvider>
     <AvatarProvider>

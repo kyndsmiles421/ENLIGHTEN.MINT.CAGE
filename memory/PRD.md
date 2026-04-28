@@ -3,6 +3,82 @@
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
 
+## V68.59 — Time-Capsule Archival · Save-Game Loop (27 Feb 2026)
+
+User directive: "Pivot to Step 3 (Archival). Data Integrity >
+Performance Throttling. If the user closes the tab before session
+state persists, they lose Sovereign Context. You cannot have a
+persistent 'Game' if the state is volatile."
+
+### Closed loop shipped (frontend + backend)
+1. ✅ **`/app/backend/routes/time_capsules.py`** — two endpoints:
+   - `POST /api/time-capsules/archive` — beacon-friendly. Auth
+     token IN BODY (sendBeacon can't set Authorization headers due
+     to CORS-safelisted Content-Type restriction). 16 KB payload
+     cap. 5-second per-session dedup so visibilitychange + pagehide
+     double-fires write only once. Always 200 (beacon doesn't
+     read responses). Uses `decode_token()` from `deps.py`.
+   - `GET /api/time-capsules/recent?limit=N` — standard
+     Authorization-header authenticated read. Newest-first.
+2. ✅ **`/app/frontend/src/hooks/useSessionPersistence.js`** — fires
+   `navigator.sendBeacon()` (with `fetch keepalive` fallback) on
+   `visibilitychange === 'hidden'`, `pagehide`, and `beforeunload`.
+   Throttled to one beacon per 8 seconds. Generates a stable
+   `session_id` in `sessionStorage` (UUID v4) for backend dedup.
+3. ✅ **Mounted in `SovereignProviders.js`** at the root — single
+   global listener, every route inherits the save-game loop.
+4. ✅ **`window.__sovereignGauge` + `window.__sovereignActiveModule`**
+   — useEngineLoad + ProcessorState publish their state to globals
+   so the beacon can capture the user's last-known cognitive load
+   and active module without subscribing (subscribing would create
+   a re-render loop on the global listener).
+
+### Verification
+**Pytest 8/8 PASS** (5 new V68.59 tests + 3 V68.52 still green):
+```
+test_archive_basic_write_and_recent_readback           PASSED
+test_archive_dedup_within_window                       PASSED
+test_archive_post_dedup_window_creates_new_doc         PASSED
+test_archive_rejects_invalid_token_gracefully          PASSED
+test_archive_rejects_oversize_payload                  PASSED
+```
+
+**Live integration loop (curl trace):**
+```
+Archive #1:           200 {ok: True}
+Archive (within 5s):  200 {ok: True, deduped: True}    ← dedup confirmed
+Archive #2 (after 6s): 200 {ok: True}                  ← post-window write
+Recent endpoint:      2 capsules (newest=overheating, oldest=flow)
+  → snapshot keys: ['worldMetadata','narrativeContext','entityState','history']
+Invalid token:        200 {ok: False, reason: 'invalid-token'}    (no 401)
+Oversize 18KB:        200 {ok: False, reason: 'payload-too-large'}
+```
+
+### Closed-loop diagram
+```
+[User opens app]
+   ↓ sessionStorage.session_id (uuid)
+   ↓ gauge starts COLD 0%
+[User generates / pulls]
+   ↓ ContextBus commits → field paints → gauge climbs FLOW
+[User backgrounds tab / closes browser]
+   ↓ visibilitychange + pagehide both fire (mobile-reliable)
+   ↓ useSessionPersistence.fire() (8s throttle)
+   ↓ navigator.sendBeacon(/api/time-capsules/archive, {token, session_id, snapshot, gauge, active_module})
+[Browser tears page down — beacon survives]
+   ↓ Backend: decode_token → 5s dedup → insert into time_capsules
+[User reopens days later]
+   ↓ GET /api/time-capsules/recent?limit=10
+   ↓ All prior sessions visible, ready to restore
+```
+
+### Architectural property unlocked
+The Sovereign Engine now has **durable session memory**. Cognitive
+load, active module, full ContextBus snapshot, and history all
+survive the browser tearing the page down — even on mobile where
+`beforeunload` is unreliable. The gauge's value is no longer
+ephemeral; every flow-state session is documented.
+
 ## V68.58 — Sage AI TIME Gauge + Asset Purge (27 Feb 2026)
 
 User directive: "Step 2 — Sage AI TIME Gauge bound to ContextBus

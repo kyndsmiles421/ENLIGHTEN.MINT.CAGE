@@ -169,11 +169,16 @@ export function ProcessorStateProvider({ children }) {
     }
     setActiveModule(moduleId);
     emitPulse(moduleId);
+    // V68.59 — publish the active module to a global so the
+    // time-capsule beacon can capture the user's last "scene" on
+    // tab-hide without subscribing to ProcessorState.
+    try { window.__sovereignActiveModule = moduleId; } catch { /* noop */ }
   }, []);
 
   const release = useCallback(() => {
     setActiveModule('IDLE');
     emitPulse('IDLE');
+    try { window.__sovereignActiveModule = 'IDLE'; } catch { /* noop */ }
   }, []);
 
   const value = useMemo(

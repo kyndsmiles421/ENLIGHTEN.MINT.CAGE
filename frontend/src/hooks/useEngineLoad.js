@@ -70,8 +70,12 @@ export function useEngineLoad() {
       if (t - lastUiPush >= tickIntervalMs) {
         lastUiPush = t;
         const v = Math.max(0, Math.min(1, loadRef.current));
+        const st = classify(v);
         setLoad(v);
-        setState(classify(v));
+        setState(st);
+        // V68.59 — publish to a global so the time-capsule beacon
+        // can read the latest gauge state without subscribing.
+        try { window.__sovereignGauge = { load: v, state: st, t: Date.now() }; } catch { /* noop */ }
       }
     };
     raf = requestAnimationFrame(loop);
