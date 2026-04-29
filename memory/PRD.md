@@ -1,7 +1,84 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.63)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.64)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
+
+## V68.64 — Knowledge-as-Substance Chamber Bridge (29 Feb 2026)
+
+User directive: *"Replace the leaf/flame icons themselves with
+knowledge fragments. The gesture IS the teaching. Tight mechanical
+symbolism — every gesture maps to a real herbalism technique."*
+
+### Audit-first finding (Possibility #2: Partially Built)
+The chamber game already had:
+  • `teach={topic, category, context}` prop on every chamber game ✅
+  • `loadLesson()` POSTing to `/api/knowledge/deep-dive` (cached) ✅
+  • 3-stage drill chain (pluck→grind→dose) per call site ✅
+  • V68.62 `entityState.activeEntity` already broadcast on Inlay open ✅
+
+What was missing — only the **bridges**:
+  • Chamber didn't *read* `entityState` → topics stayed generic.
+  • Tap flashes were mute "+2 SPARKS" — no gesture-bound knowledge.
+  • LEARN button gated behind completion → invisible during play.
+
+### Bridge shipped (no rebuild)
+1. ✅ **`frontend/src/data/herbal_gestures.js`** — gesture-fragment
+   registry. 7 starter herbs (peppermint, holy_basil, lavender,
+   reishi, chamomile, ashwagandha, ginger) each with mode-specific
+   fragments (`collect` / `break` / `rhythm`), `pace`, and
+   per-mode `teach.topic` overrides. Single file = single source of
+   truth for adding any new herb. Falls back to `GENERIC` when the
+   active entity isn't yet bespoke.
+2. ✅ **`ChamberMiniGame.js` reads `ContextBus.entityState`** —
+   resolves `activeEntity` + `activeEntityName` on open, live-
+   subscribes for mid-game swaps (rare but possible).
+3. ✅ **`effTeach` memo** — layers an herb-specific topic from
+   `teachOverrideFor()` over whatever the parent declared.
+   Mint + grind → "Cold-mortar grinding of Peppermint — why heat
+   destroys its volatile signature" (instead of generic "Mortar
+   and pestle technique"). Context line tells the LLM to teach
+   THIS herb specifically.
+4. ✅ **Fragment flash overlay** — every tap on a leaf/flame
+   surfaces a knowledge fragment near the tap point ("tear, don't
+   cut — menthol shatters under blade pressure", "Cold marble —
+   heat kills the cool"). Replaces the previously-mute "+2 SPARKS"
+   flash. The gesture IS the teaching.
+5. ✅ **"✦ TEACH ME FIRST" button** — visible from the moment the
+   chamber opens (was previously gated behind completion). User
+   can read about the herb's technique BEFORE / DURING / AFTER
+   the work.
+6. ✅ **Active-herb chip in HUD** — "WORKING WITH PEPPERMINT" shown
+   beside the XP/progress display. User sees instantly that the
+   chamber is bound to their chosen herb, not generic.
+7. ✅ **TDZ fix** — `effTeach` useMemo references `activeEntity` /
+   `activeEntityName`; reordered hooks so state is declared first.
+
+### Verification
+**Pytest 2/2 PASS** (V68.64):
+```
+test_deep_dive_accepts_herb_specific_payload   PASSED
+test_deep_dive_rejects_empty_topic             PASSED
+```
+**Playwright smoke**: Mint committed to ContextBus → Pluck Herbs
+chamber opened → HUD reads "PLUCK THE FLOATING HERBS · +0
+SPARKS · XP · 0/8 · **WORKING WITH PEPPERMINT**" + "✦ TEACH ME
+FIRST" pill button visible during play. No error boundary.
+Schema verified.
+
+### What's now visible to the user
+- Chamber title + active herb chip in the same line.
+- LEARN button available before, during, and after the work.
+- Each tap surfaces a 1-line gesture fragment specific to Mint,
+  Tulsi, Lavender, Reishi, Chamomile, Ashwagandha, or Ginger.
+  All other herbs use the GENERIC fallback (still meaningful;
+  not generic AI fluff).
+- The LLM lesson, when triggered, knows the herb and teaches
+  THAT herb's preparation, not a generic herbalism overview.
+
+### Adding a new herb
+One entry in `/app/frontend/src/data/herbal_gestures.js`. No code
+changes elsewhere. Falls through gracefully if the entity isn't
+yet bespoke.
 
 ## V68.63 — Multiverse Slot Machine → Real RPG (29 Feb 2026)
 

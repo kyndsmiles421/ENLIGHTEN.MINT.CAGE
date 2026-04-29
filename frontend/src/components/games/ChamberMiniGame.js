@@ -38,12 +38,22 @@
  *   onComplete      — optional callback fired on completion
  *   background      — optional background accent (theme flavor)
  */
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles } from 'lucide-react';
 import { useSensory } from '../../context/SensoryContext';
 import { useSovereignUniverse } from '../../context/SovereignUniverseContext';
+// V68.64 — Knowledge-as-Substance bridge. The chamber reads the
+// active entity from ContextBus.entityState (already broadcast by
+// V68.62 InteractiveModule) and replaces abstract leaf/flame
+// flashes with herb-specific gesture fragments + lesson topics.
+import { readKey as busReadKey, subscribe as busSubscribe } from '../../state/ContextBus';
+import {
+  fragmentsFor,
+  paceFor,
+  teachOverrideFor,
+} from '../../data/herbal_gestures';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -155,7 +165,6 @@ export default function ChamberMiniGame({
   const effZone          = stageOverride?.zone          ?? zone;
   const effCompletionMsg = stageOverride?.completionMsg ?? completionMsg;
   const effCompletionXP  = stageOverride?.completionXP  ?? completionXP;
-  const effTeach         = stageOverride?.teach         ?? teach;
 
   // Read the adaptive level for this zone (0 = first run).
   const levelKey = `emcafe_gamelvl_${effZone}`;
@@ -174,6 +183,81 @@ export default function ChamberMiniGame({
   const [cleared, setCleared] = useState(0);
   const [done, setDone] = useState(false);
   const [flashAt, setFlashAt] = useState(null); // {x,y,key}
+
+  // V68.64 — Read the active entity from ContextBus. When the user
+  // opened Mint (or any herb) from the unified Inlay, the InteractiveModule
+  // commits entityState. We pick that up here so the chamber's gestures,
+  // pace, and lessons all bind to the herb the user is actually working
+  // with — no more generic "Sacred Herbalism" filler.
+  const [activeEntity, setActiveEntity] = useState(() => {
+    try { return busReadKey('entityState')?.activeEntity || null; } catch { return null; }
+  });
+  const [activeEntityName, setActiveEntityName] = useState(() => {
+    try { return busReadKey('entityState')?.name || null; } catch { return null; }
+  });
+  useEffect(() => {
+    if (!open) return;
+    // Re-read on open in case the user picked an herb just before launching.
+    try {
+      const es = busReadKey('entityState');
+      setActiveEntity(es?.activeEntity || null);
+      setActiveEntityName(es?.name || null);
+    } catch { /* noop */ }
+    // Live subscribe so an entity swap mid-game (rare but possible) updates the fragments.
+    const unsub = busSubscribe(() => {
+      try {
+        const es = busReadKey('entityState');
+        setActiveEntity(es?.activeEntity || null);
+        setActiveEntityName(es?.name || null);
+      } catch { /* noop */ }
+    });
+    return unsub;
+  }, [open]);
+
+  // Knowledge fragments for THIS herb + THIS mode. Falls back to GENERIC.
+  const fragments = useMemo(() => fragmentsFor(activeEntity, effMode), [activeEntity, effMode]);
+  const pace = useMemo(() => paceFor(activeEntity), [activeEntity]);
+
+  // V68.64 — Resolve the effective teach payload, layering an
+  // herb-specific topic when the active entity has one (Mint →
+  // "Peppermint harvest — the tear-not-cut technique..."). Falls
+  // through to whatever the parent (Herbology page) declared.
+  const effTeach = useMemo(() => {
+    const base = stageOverride?.teach ?? teach;
+    if (!base) return base;
+    const override = teachOverrideFor(activeEntity, effMode);
+    if (override) {
+      return {
+        ...base,
+        topic: override,
+        context: `${base.context || ''} The user is currently working with ${activeEntityName || 'this herb'}. Teach THIS herb specifically — its constituents, its preparation, its real-world use — not a generic herbalism overview.`.trim(),
+      };
+    }
+    if (activeEntityName) {
+      return {
+        ...base,
+        topic: `${base.topic} \u2014 applied to ${activeEntityName}`,
+        context: `${base.context || ''} The user is currently working with ${activeEntityName}. Reference this herb specifically.`.trim(),
+      };
+    }
+    return base;
+  }, [stageOverride, teach, activeEntity, activeEntityName, effMode]);
+
+  // V68.64 — Inline fragment that flashes near each tap. Replaces the
+  // mute "+2 SPARKS" with an actual teaching shard.
+  const [fragmentFlashes, setFragmentFlashes] = useState([]);
+  const fragmentIndexRef = useRef(0);
+  const showFragmentAt = useCallback((x, y) => {
+    if (!fragments.length) return;
+    const text = fragments[fragmentIndexRef.current % fragments.length];
+    fragmentIndexRef.current += 1;
+    const id = Date.now() + Math.random();
+    setFragmentFlashes((arr) => [...arr.slice(-4), { id, text, x, y }]);
+    setTimeout(() => {
+      setFragmentFlashes((arr) => arr.filter((f) => f.id !== id));
+    }, 2200);
+  }, [fragments]);
+
   // V68.30 — inline lesson state for the LEARN button
   const [lessonLoading, setLessonLoading] = useState(false);
   const [lessonText, setLessonText] = useState(null);
@@ -209,12 +293,19 @@ export default function ChamberMiniGame({
     } catch { /* brain unavailable — safe no-op */ }
   }, [brain, brainSignal, zone, mode, level]);
 
-  const onHit = useCallback(() => {
+  const onHit = useCallback((tapEvent = null) => {
     setXp((v) => v + MICRO_SPARKS);
     creditSparks(zone, 2);
     haptic();
     fireBrain('hit');
-  }, [zone, fireBrain]);
+    // V68.64 — Knowledge-as-substance: every tap surfaces a gesture
+    // fragment (Mint → "tear, don't cut — menthol shatters under blade").
+    try {
+      const x = (tapEvent?.clientX ?? tapEvent?.touches?.[0]?.clientX) ?? null;
+      const y = (tapEvent?.clientY ?? tapEvent?.touches?.[0]?.clientY) ?? null;
+      if (x != null && y != null) showFragmentAt(x, y);
+    } catch { /* noop */ }
+  }, [zone, fireBrain, showFragmentAt]);
 
   const onTargetCleared = useCallback(() => {
     setCleared((c) => {
@@ -339,8 +430,87 @@ export default function ChamberMiniGame({
             <span data-testid={`chamber-game-progress-${effZone}`}>
               {Math.min(cleared, scaledTargetCount)}/{scaledTargetCount}
             </span>
+            {/* V68.64 — Active herb chip. Lets the user see the
+                gestures + lessons are bound to THIS herb. */}
+            {activeEntityName && (
+              <span
+                data-testid="chamber-active-entity"
+                style={{
+                  letterSpacing: 1.5,
+                  opacity: 0.95,
+                  color: effColor,
+                  textShadow: `0 0 8px ${effColor}40`,
+                }}
+              >
+                · WORKING WITH {activeEntityName.toUpperCase()}
+              </span>
+            )}
           </div>
         </div>
+
+        {/* V68.64 — Early LEARN button. The lesson is no longer gated
+            behind completion; the user can read about THIS herb's
+            technique BEFORE the work, DURING the work, or AFTER. */}
+        {effTeach?.topic && !lessonText && !done && (
+          <button
+            type="button"
+            onClick={loadLesson}
+            disabled={lessonLoading}
+            data-testid={`chamber-learn-first-${effZone}`}
+            style={{
+              position: 'absolute', top: 56, right: 14,
+              background: `${effColor}10`,
+              border: `1px solid ${effColor}55`,
+              color: effColor,
+              borderRadius: 999, padding: '6px 12px',
+              fontSize: 9, letterSpacing: 1.5,
+              fontFamily: 'monospace',
+              cursor: 'pointer',
+              opacity: lessonLoading ? 0.5 : 0.85,
+              zIndex: 4,
+            }}
+          >
+            {lessonLoading ? 'TEACHING\u2026' : '\u2726 TEACH ME FIRST'}
+          </button>
+        )}
+
+        {/* V68.64 — Fragment flash overlay. Each tap surfaces a
+            herb-specific knowledge fragment near the tap site. The
+            gesture IS the teaching. */}
+        <AnimatePresence>
+          {fragmentFlashes.map((f) => (
+            <motion.div
+              key={f.id}
+              initial={{ opacity: 0, y: 0, scale: 0.85 }}
+              animate={{ opacity: 1, y: -28, scale: 1 }}
+              exit={{ opacity: 0, y: -56 }}
+              transition={{ duration: 1.8, ease: 'easeOut' }}
+              data-testid="chamber-fragment-flash"
+              style={{
+                position: 'fixed',
+                left: f.x, top: f.y,
+                transform: 'translate(-50%, -50%)',
+                pointerEvents: 'none',
+                fontFamily: 'monospace',
+                fontSize: 11,
+                letterSpacing: 0.6,
+                color: effColor,
+                background: 'rgba(0,0,0,0.55)',
+                padding: '4px 10px',
+                borderRadius: 6,
+                border: `1px solid ${effColor}55`,
+                textShadow: `0 0 8px ${effColor}80`,
+                whiteSpace: 'nowrap',
+                maxWidth: 'min(80vw, 360px)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                zIndex: 6,
+              }}
+            >
+              {f.text}
+            </motion.div>
+          ))}
+        </AnimatePresence>
 
         {/* Mode-specific stage */}
         {mode === 'break' && (
@@ -563,7 +733,7 @@ function BreakStage({ count, hits, color, verb, Icon, onHit, onCleared, reduceFl
       };
     });
   });
-  const tap = (id) => {
+  const tap = (id, e) => {
     setTargets((ts) => ts.map((t) => {
       if (t.id !== id || t.cleared) return t;
       const hp = t.hp - 1;
@@ -573,7 +743,7 @@ function BreakStage({ count, hits, color, verb, Icon, onHit, onCleared, reduceFl
       }
       return { ...t, hp };
     }));
-    onHit();
+    onHit(e);
   };
   return (
     <>
@@ -618,7 +788,7 @@ function BreakStage({ count, hits, color, verb, Icon, onHit, onCleared, reduceFl
           <motion.button
             key={t.id}
             type="button"
-            onClick={() => tap(t.id)}
+            onClick={(e) => tap(t.id, e)}
             data-testid={`chamber-break-target-${zone}-${t.id}`}
             whileTap={{ scale: 0.88 }}
             animate={reduceMotion ? {} : { y: [0, -4, 0] }}
@@ -679,9 +849,9 @@ function CollectStage({ count, color, verb, Icon, onHit, onCleared, reduceMotion
     return () => clearInterval(iv);
   }, [count]);
 
-  const tap = (id) => {
+  const tap = (id, e) => {
     setTargets((ts) => ts.filter((t) => t.id !== id));
-    onHit();
+    onHit(e);
     onCleared();
   };
 
@@ -753,11 +923,11 @@ function RhythmStage({ count, color, verb, Icon, onHit, onCleared, onFlash, redu
   const bandHalf = 0.06;
   const inZone = Math.abs(pos - PHI) <= bandHalf;
 
-  const onTap = () => {
+  const onTap = (e) => {
     if (hitsRef.current >= count) return;
     if (inZone) {
       hitsRef.current += 1;
-      onHit();
+      onHit(e);
       onCleared();
       lastTapWasInZoneRef.current = true;
       try {
