@@ -25,6 +25,7 @@ import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
 import SageEngineGauge from '../components/SageEngineGauge';
+import TimeCapsuleDrawer from '../components/TimeCapsuleDrawer';
 import { useProcessorState, MODULE_REGISTRY } from '../state/ProcessorState';
 import SovereignPreferences from '../kernel/SovereignPreferences';
 
@@ -801,6 +802,7 @@ function MatrixRenderSlot() {
    that module's render-mode. No navigation, no URL change. */
 function MatrixModuleDispatcher() {
   const { pull } = useProcessorState();
+  const [capsuleOpen, setCapsuleOpen] = useState(false);
   const modules = [
     { id: 'AVATAR_GEN',      label: 'Avatar',          color: '#C084FC' },
     { id: 'COSMIC_PORTRAIT', label: 'Cosmic Portrait', color: '#FBBF24' },
@@ -811,37 +813,57 @@ function MatrixModuleDispatcher() {
     { id: 'STARSEED',        label: 'Starseed RPG',    color: '#EF4444' },
   ];
   return (
-    <div
-      style={{
-        display: 'flex', flexWrap: 'wrap', gap: 8,
-        justifyContent: 'center', alignItems: 'center', padding: '8px 12px',
-      }}
-      data-testid="matrix-dispatcher"
-    >
-      {/* V68.58 — Cognitive Voltmeter sits inline with the dispatcher
-          row. The user keeps the AI TIME gauge in peripheral vision
-          while pulling tools so they can FEEL when the engine is
-          cold (need to feed it), in flow (gold zone), or overheating
-          (back off, let the field settle). Inline · Flatland · no
-          fixed positioning. */}
-      <SageEngineGauge size={64} />
-      {modules.map(m => (
+    <>
+      <div
+        style={{
+          display: 'flex', flexWrap: 'wrap', gap: 8,
+          justifyContent: 'center', alignItems: 'center', padding: '8px 12px',
+        }}
+        data-testid="matrix-dispatcher"
+      >
+        {/* V68.58 — Cognitive Voltmeter sits inline with the dispatcher
+            row. The user keeps the AI TIME gauge in peripheral vision
+            while pulling tools so they can FEEL when the engine is
+            cold (need to feed it), in flow (gold zone), or overheating
+            (back off, let the field settle). Inline · Flatland · no
+            fixed positioning. */}
+        <SageEngineGauge size={64} />
+        {/* V68.60 — Recall · opens the inline TimeCapsuleDrawer below
+            so the user can resurrect any prior session. */}
         <button
-          key={m.id}
           type="button"
-          onClick={() => pull(m.id)}
-          data-testid={`pull-${m.id.toLowerCase()}`}
+          onClick={() => setCapsuleOpen(v => !v)}
+          data-testid="recall-toggle-btn"
           style={{
             padding: '6px 12px', borderRadius: 999,
-            background: `${m.color}14`, border: `1px solid ${m.color}55`,
-            color: m.color, fontFamily: 'monospace',
+            background: capsuleOpen ? 'rgba(168,139,250,0.20)' : 'rgba(168,139,250,0.10)',
+            border: `1px solid rgba(168,139,250,${capsuleOpen ? '0.55' : '0.30'})`,
+            color: '#A78BFA', fontFamily: 'monospace',
             fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase',
             cursor: 'pointer',
           }}
         >
-          ✦ Pull · {m.label}
+          ☉ Recall
         </button>
-      ))}
-    </div>
+        {modules.map(m => (
+          <button
+            key={m.id}
+            type="button"
+            onClick={() => pull(m.id)}
+            data-testid={`pull-${m.id.toLowerCase()}`}
+            style={{
+              padding: '6px 12px', borderRadius: 999,
+              background: `${m.color}14`, border: `1px solid ${m.color}55`,
+              color: m.color, fontFamily: 'monospace',
+              fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase',
+              cursor: 'pointer',
+            }}
+          >
+            ✦ Pull · {m.label}
+          </button>
+        ))}
+      </div>
+      <TimeCapsuleDrawer open={capsuleOpen} onClose={() => setCapsuleOpen(false)} />
+    </>
   );
 }

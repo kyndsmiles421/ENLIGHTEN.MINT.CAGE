@@ -47,7 +47,7 @@ function getSessionId() {
 
 function getToken() {
   try {
-    return localStorage.getItem('token') || localStorage.getItem('auth_token') || '';
+    return localStorage.getItem('zen_token') || localStorage.getItem('token') || '';
   } catch { return ''; }
 }
 
