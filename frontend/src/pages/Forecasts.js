@@ -226,6 +226,13 @@ export default function Forecasts() {
       const res = await axios.post(`${API}/forecasts/generate`, {
         system: selectedSystem,
         period: selectedPeriod,
+        // V68.61 — Resonance Cross-Pollination. Pull the primer
+        // published by ProcessorState.pull('FORECASTS') so the
+        // forecast reflects the seeker's current Story / Avatar /
+        // Scene state in addition to their birth chart.
+        ...(typeof window !== 'undefined' && window.__sovereignPrimer
+          ? { context_primer: window.__sovereignPrimer }
+          : {}),
       }, { headers: authHeaders });
       setActiveForecast(res.data);
       setHistory(prev => {

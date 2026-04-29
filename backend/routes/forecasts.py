@@ -6,6 +6,7 @@ import asyncio
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 import json as json_mod
 import random
+import hashlib
 
 router = APIRouter()
 
@@ -121,14 +122,26 @@ async def generate_forecast(data: dict = Body(...), user=Depends(get_current_use
     """Generate a cosmic forecast for a given system and period."""
     system = data.get("system", "astrology")
     period = data.get("period", "daily")
+    # V68.61 — Resonance Cross-Pollination. Optional ContextBus primer
+    # carries Avatar / Story / Scene state from other active modules
+    # so the forecast reads the user's current engine state, not just
+    # their birth data.
+    context_primer = (data.get("context_primer") or "").strip()[:1800]
 
     if system not in FORECAST_SYSTEMS:
         raise HTTPException(status_code=400, detail="Invalid forecast system")
     if period not in FORECAST_PERIODS:
         raise HTTPException(status_code=400, detail="Invalid period")
 
-    # Check cache
+    # Check cache. V68.61 — primer hash is part of the key so a
+    # cross-pollinated forecast doesn't collide with a stand-alone one.
+    primer_hash = (
+        hashlib.sha256(context_primer.encode("utf-8")).hexdigest()[:16]
+        if context_primer else None
+    )
     cache_key = _cache_key(user["id"], system, period)
+    if primer_hash:
+        cache_key = f"{cache_key}:p{primer_hash}"
     cached = await db.forecasts.find_one({"cache_key": cache_key}, {"_id": 0})
     if cached:
         return cached
@@ -184,6 +197,12 @@ Create a richly detailed, personalized {period} forecast. Structure it as a JSON
 - "overall_energy": A number 1-10 representing the overall cosmic energy level
 
 Return ONLY valid JSON. No markdown, no explanation."""
+
+    if context_primer:
+        prompt += (
+            f"\n\nContext from the seeker's current sovereign engine state — "
+            f"weave its themes into the forecast where they fit naturally:\n{context_primer}"
+        )
 
     system_msg = f"You are a master cosmic forecaster combining ancient wisdom with intuitive insight. You specialize in {FORECAST_SYSTEMS[system]['name']}. Your forecasts are specific, poetic, deeply personal, and never generic. Always respond with valid JSON only."
 

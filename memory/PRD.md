@@ -3,6 +3,61 @@
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
 
+## V68.61 — Resonance Cross-Pollination Filter (29 Feb 2026)
+
+User directive: "Inject the Resonance Cross-Pollination filter
+into the MODULE_REGISTRY now so that all wired modules auto-prime
+from each other."
+
+### Synthetic-mind plumbing shipped (frontend + backend)
+1. ✅ **`MODULE_CONSUMES`** map in `ProcessorState.js` — declares the
+   ContextBus key each module OWNS (writes). Used as the `skipKey`
+   when computing the primer so a module never feeds its own output
+   back into itself.
+2. ✅ **`publishPrimer(moduleId)`** — on every `pull()` AND on every
+   ContextBus commit (via `busSubscribe`), recomputes
+   `primerForPrompt(skipKey)` and publishes it to:
+   - `window.__sovereignPrimer` — synchronous read site for any
+     generator that hits a backend.
+   - `window.__sovereignPrimerModule` — debug companion.
+   - `sovereign:prime` CustomEvent — for React subscribers.
+3. ✅ **Backend acceptance**:
+   - `models.py` — `ReadingRequest.context_primer: Optional[str]`.
+   - `oracle.py` — primer spliced into all 5 reading-type prompts
+     (tarot, astrology, chinese_astrology, iching, sacred_geometry)
+     via a single `primer_clause` appended to every `chat.send_message` call.
+   - `forecasts.py` — primer accepted from request body, appended
+     to the JSON-prompt, AND folded into the cache key (sha256
+     hash, first 16 chars) so primer-driven forecasts don't
+     collide with stand-alone ones.
+4. ✅ **Frontend write-sites**:
+   - `Oracle.js` — both call sites (`/oracle/reading` POST and the
+     I Ching coin-toss callback) auto-attach `context_primer` from
+     `window.__sovereignPrimer`. Reading result also commits back
+     to `narrativeContext` so downstream modules absorb the verdict.
+   - `Forecasts.js` — `generate()` attaches primer.
+   - `CreationStories.js` — already wired in V68.51 (no change).
+
+### Verification
+**Pytest 3/3 PASS** (V68.61):
+```
+test_oracle_reading_accepts_context_primer            PASSED
+test_oracle_reading_without_primer_still_works        PASSED
+test_forecast_primer_isolates_cache                   PASSED
+```
+**Frontend smoke** (Playwright): committed forecast + worldMetadata
+to bus → pull AVATAR_GEN → primer contains BOTH (skipKey is
+`entityState`). Then pull ORACLE → primer correctly excludes
+narrativeContext (Oracle's own write-key) but retains
+worldMetadata. Cross-pollination filter behaves as designed.
+
+### Effect
+17 disparate tools → single synthetic mind. Storm-mood Forecast
+now bleeds into Tarot. Phoenix-archetype Avatar now bleeds into
+Oracle's geometry meditation. Vega-system Starseed world now
+bleeds into Cosmic Insights. The user FEELS the engine "thinking"
+across modules, not just rendering them.
+
 ## V68.61 — Navigation Drain · Phase 2 (Divination Band) (29 Feb 2026)
 
 User directive (Final Launch Sequence Step 2): "Convert the

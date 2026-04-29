@@ -97,6 +97,16 @@ async def get_sacred_geometry():
 @router.post("/oracle/reading")
 async def get_reading(req: ReadingRequest):
     try:
+        # V68.61 — Resonance Cross-Pollination. The frontend sends the
+        # ContextBus primer (Forecast mood, Avatar archetype, Story
+        # narrative, etc.) so the reading reflects the user's current
+        # engine state instead of being a stand-alone draw.
+        primer_text = (req.context_primer or "").strip()[:1800]
+        primer_clause = (
+            f"\n\nContext from the seeker's current sovereign engine state — "
+            f"weave its themes into the reading where they fit naturally:\n{primer_text}"
+            if primer_text else ""
+        )
         if req.reading_type == "tarot":
             cards = random.sample(TAROT_MAJOR_ARCANA, 3 if req.spread == "three_card" else 1)
             reversed_flags = [random.choice([True, False]) for _ in cards]
@@ -110,7 +120,7 @@ async def get_reading(req: ReadingRequest):
             
             chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"tarot-{uuid.uuid4()}", system_message=system_msg)
             chat.with_model("openai", "gpt-5.2")
-            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
+            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt + primer_clause)), timeout=30)
             
             return {"type": "tarot", "cards": [{"name": c["name"], "reversed": r, "keywords": c["reversed"] if r else c["upright"], "element": c["element"]} for c, r in zip(cards, reversed_flags)], "interpretation": response}
         
@@ -126,7 +136,7 @@ async def get_reading(req: ReadingRequest):
             
             chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"astro-{uuid.uuid4()}", system_message=system_msg)
             chat.with_model("openai", "gpt-5.2")
-            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
+            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt + primer_clause)), timeout=30)
             
             return {"type": "astrology", "sign": sign, "reading": response}
         
@@ -146,7 +156,7 @@ async def get_reading(req: ReadingRequest):
             
             chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"chinese-{uuid.uuid4()}", system_message=system_msg)
             chat.with_model("openai", "gpt-5.2")
-            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
+            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt + primer_clause)), timeout=30)
             
             return {"type": "chinese_astrology", "animal": animal, "element": element, "year": year, "reading": response}
         
@@ -163,7 +173,7 @@ async def get_reading(req: ReadingRequest):
             
             chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"iching-{uuid.uuid4()}", system_message=system_msg)
             chat.with_model("openai", "gpt-5.2")
-            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
+            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt + primer_clause)), timeout=30)
             
             return {"type": "iching", "hexagram_number": hex_num, "lines": hexagram_lines, "changing": changing, "interpretation": response}
         
@@ -177,7 +187,7 @@ async def get_reading(req: ReadingRequest):
             
             chat = LlmChat(api_key=EMERGENT_LLM_KEY, session_id=f"geometry-{uuid.uuid4()}", system_message=system_msg)
             chat.with_model("openai", "gpt-5.2")
-            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt)), timeout=30)
+            response = await asyncio.wait_for(chat.send_message(UserMessage(text=prompt + primer_clause)), timeout=30)
             
             return {"type": "sacred_geometry", "pattern": pattern, "meditation": response}
         

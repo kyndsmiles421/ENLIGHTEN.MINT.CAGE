@@ -79,6 +79,11 @@ class ReadingRequest(BaseModel):
     zodiac_sign: Optional[str] = None
     birth_year: Optional[int] = None
     question: Optional[str] = None
+    # V68.61 — Resonance Cross-Pollination. Optional snapshot of the
+    # ContextBus state from other active modules (Forecast, Avatar,
+    # Story, Scene). Spliced into the system prompt so the Tarot /
+    # I Ching / etc. reading reflects the user's current engine state.
+    context_primer: Optional[str] = None
 
 class ClassEnroll(BaseModel):
     class_id: str

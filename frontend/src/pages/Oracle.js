@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { Sparkles, Loader2, RotateCcw, Star, Sun, Moon, Hexagon, Triangle, X } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
 import IChingCoinToss from '../components/IChingCoinToss';
+import { commit as busCommit } from '../state/ContextBus';
 
 
 
@@ -253,12 +254,33 @@ export default function Oracle() {
         birth_year: tab === 'chinese' ? (parseInt(birthYear) || null) : null,
         question: question || null,
         focus_tags: focusTags.map(t => t.label),
+        // V68.61 — Resonance Cross-Pollination. Auto-pick up the
+        // primer published by ProcessorState.pull('ORACLE'), so the
+        // reading reflects the user's current Forecast / Avatar /
+        // Story state without any extra UI step.
+        ...(typeof window !== 'undefined' && window.__sovereignPrimer
+          ? { context_primer: window.__sovereignPrimer }
+          : {}),
       };
       
       // Trigger crystal shatter transition
       triggerCrystalTransition(async () => {
         const res = await axios.post(`${API}/oracle/reading`, payload);
         setReading(res.data);
+        // V68.61 — Commit the reading back to ContextBus so the next
+        // module pulled absorbs the Oracle's verdict (e.g., a Story
+        // generated after a heavy Tarot reading inherits the cards'
+        // shadow). The narrativeContext key matches MODULE_CONSUMES.ORACLE.
+        try {
+          const r = res.data || {};
+          busCommit('narrativeContext', {
+            type: 'oracle',
+            reading_type: r.type || tab,
+            title: (r.cards && r.cards[0] && r.cards[0].name) || r.sign?.sign || r.pattern?.name || 'Reading',
+            body: r.interpretation || r.reading || r.meditation || '',
+            cards: r.cards || null,
+          }, { moduleId: 'ORACLE' });
+        } catch { /* noop */ }
         setTimeout(() => setRevealed(true), 300);
         setLoading(false);
         // Silent dust accrual for oracle reading
@@ -481,6 +503,10 @@ export default function Oracle() {
                         question: question || null,
                         focus_tags: focusTags.map(t => t.label),
                         lines: lines,
+                        // V68.61 — Cross-Pollination
+                        ...(typeof window !== 'undefined' && window.__sovereignPrimer
+                          ? { context_primer: window.__sovereignPrimer }
+                          : {}),
                       });
                       setReading(res.data);
                       setTimeout(() => setRevealed(true), 300);

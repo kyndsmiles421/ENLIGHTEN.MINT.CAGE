@@ -22,12 +22,13 @@
  *   whether it should consume the entire matrix viewport or just the
  *   lattice slot.
  */
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { analyzeResonance, blendVectors } from '../services/ResonanceAnalyzer';
 import { initResonanceSettings, getResonanceSettings } from './ResonanceSettings';
 // Side-effect import — exposes window.ContextBus and boots the
 // shared-memory buffer whenever the Sovereign Engine mounts.
 import './ContextBus';
+import { primerForPrompt, subscribe as busSubscribe } from './ContextBus';
 
 initResonanceSettings();
 
@@ -151,6 +152,60 @@ function applyGain(vec, gain) {
 export { MODULE_FREQUENCIES };
 
 /**
+ * MODULE_CONSUMES — V68.61 Resonance Cross-Pollination Filter.
+ *
+ * Each module declares the ContextBus key it OWNS (writes to). The
+ * pull() dispatcher computes `primerForPrompt(ownedKey)` — i.e., the
+ * cross-pollinated state from EVERY OTHER module — and publishes it
+ * to `window.__sovereignPrimer` plus a `sovereign:prime` event.
+ *
+ * Any generator (frontend hook OR backend prompt builder) that reads
+ * the primer auto-receives the engine's current state. Forecast
+ * mood bleeds into Tarot draws. Avatar archetype bleeds into Story
+ * Gen. Scene palette bleeds into Dream Viz. The 17 wired modules
+ * become a single synthetic mind, not a toolbelt.
+ *
+ * Modules without a writeKey (Star Chart, Numerology, Cardology,
+ * Mayan, Animal Totems, Cosmic Insights, Soul Reports, Hexagram)
+ * default to entityState/narrativeContext-shaped output — they pull
+ * the primer with no skip key, drinking the entire bus.
+ */
+const MODULE_CONSUMES = {
+  IDLE:            null,
+  AVATAR_GEN:      'entityState',
+  COSMIC_PORTRAIT: 'entityState',
+  FORECASTS:       'narrativeContext',
+  DREAM_VIZ:       'narrativeContext',
+  STORY_GEN:       'narrativeContext',
+  SCENE_GEN:       'sceneFrame',
+  STARSEED:        'worldMetadata',
+  ORACLE:          'narrativeContext',
+  AKASHIC:         'narrativeContext',
+  STAR_CHART:      null,
+  NUMEROLOGY:      null,
+  MAYAN:           null,
+  CARDOLOGY:       null,
+  ANIMAL_TOTEMS:   null,
+  HEXAGRAM:        'narrativeContext',
+  COSMIC_INSIGHTS: null,
+  SOUL_REPORTS:    null,
+};
+
+function publishPrimer(moduleId) {
+  try {
+    const skipKey = MODULE_CONSUMES[moduleId] || '';
+    const primer = primerForPrompt(skipKey);
+    window.__sovereignPrimer = primer;
+    window.__sovereignPrimerModule = moduleId;
+    window.dispatchEvent(new CustomEvent('sovereign:prime', {
+      detail: { moduleId, primer, skipKey, t: Date.now() },
+    }));
+  } catch { /* SSR / pre-mount no-op */ }
+}
+
+export { MODULE_CONSUMES };
+
+/**
  * MODULE_REGISTRY
  *
  * Each module is loaded lazily so the IDLE bundle stays under the
@@ -195,13 +250,28 @@ export function ProcessorStateProvider({ children }) {
     // time-capsule beacon can capture the user's last "scene" on
     // tab-hide without subscribing to ProcessorState.
     try { window.__sovereignActiveModule = moduleId; } catch { /* noop */ }
+    // V68.61 — Resonance Cross-Pollination. Refresh the primer for
+    // the newly active module so its first generation already sees
+    // the engine's accumulated state from other modules.
+    publishPrimer(moduleId);
   }, []);
 
   const release = useCallback(() => {
     setActiveModule('IDLE');
     emitPulse('IDLE');
     try { window.__sovereignActiveModule = 'IDLE'; } catch { /* noop */ }
+    publishPrimer('IDLE');
   }, []);
+
+  // V68.61 — Keep the published primer fresh while a module is open.
+  // Any commit to the bus (from any module) re-publishes the primer
+  // for the currently active module, so an open Oracle pane always
+  // sees the freshest Forecast/Avatar state without re-pulling.
+  useEffect(() => {
+    publishPrimer(activeModule);
+    const unsub = busSubscribe(() => publishPrimer(activeModule));
+    return unsub;
+  }, [activeModule]);
 
   const value = useMemo(
     () => ({ activeModule, pull, release }),
