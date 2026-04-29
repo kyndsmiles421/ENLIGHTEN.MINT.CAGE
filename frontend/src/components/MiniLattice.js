@@ -110,6 +110,20 @@ export default function MiniLattice() {
     return null;
   })();
 
+  // V68.66 — Floor evolution: as the user illuminates more of the
+  // unified Inlay (window.__sovereignDepth from useEngineLoad), the
+  // 2D lattice's background warms from charcoal toward a luminous
+  // violet field. Mirrors the 3D lattice's hue shift so both
+  // renderers feel the same internal evolution.
+  const depthRatio = (typeof window !== 'undefined' && window.__sovereignDepth?.ratio) || 0;
+  const depthBgAlpha = 0.25 + depthRatio * 0.18;          // 0.25 → 0.43
+  const depthHueR = Math.round(8 + depthRatio * 70);      // floor warms
+  const depthHueG = Math.round(8 + depthRatio * 24);
+  const depthHueB = Math.round(26 + depthRatio * 90);
+  const depthBg = `rgba(${depthHueR},${depthHueG},${depthHueB},${depthBgAlpha.toFixed(3)})`;
+  const depthBorder = `rgba(192,132,252,${(0.06 + depthRatio * 0.30).toFixed(3)})`;
+  const depthGridStroke = `rgba(255,255,255,${(0.04 + depthRatio * 0.06).toFixed(3)})`;
+
   return (
     <div className="flex flex-col items-center px-4 py-3" data-testid="mini-lattice">
       <div className="flex items-center gap-2 mb-1.5">
@@ -123,17 +137,18 @@ export default function MiniLattice() {
         )}
       </div>
       <svg width={viewBox} height={viewBox} viewBox={`0 0 ${viewBox} ${viewBox}`}
-        style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}
-        data-testid="mini-lattice-svg">
+        style={{ background: depthBg, borderRadius: 10, border: `1px solid ${depthBorder}`, transition: 'background 1.2s ease, border-color 1.2s ease' }}
+        data-testid="mini-lattice-svg"
+        data-depth-ratio={depthRatio.toFixed(3)}>
         {/* Faint grid lines */}
         {Array.from({ length: size + 1 }).map((_, i) => (
           <React.Fragment key={`grid-${i}`}>
             <line x1={padding + i * cellSize} y1={padding}
               x2={padding + i * cellSize} y2={padding + size * cellSize}
-              stroke="rgba(255,255,255,0.04)" strokeWidth="0.5" />
+              stroke={depthGridStroke} strokeWidth="0.5" />
             <line x1={padding} y1={padding + i * cellSize}
               x2={padding + size * cellSize} y2={padding + i * cellSize}
-              stroke="rgba(255,255,255,0.04)" strokeWidth="0.5" />
+              stroke={depthGridStroke} strokeWidth="0.5" />
           </React.Fragment>
         ))}
         {/* Resonance path (user's journey) */}

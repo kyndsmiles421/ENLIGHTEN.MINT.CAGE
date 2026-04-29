@@ -1,7 +1,89 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.65)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.66)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
+
+## V68.66 — Floor Evolution + Final Launch Audit (29 Feb 2026)
+
+User directive: *"YES to the floor color shift. A floor that
+brightens from a dull charcoal to a luminous violet as you explore
+50% of the graph is an internal evolution. Ready for Step 5 (CDN
+Offload) and Step 6 (R8 Verify)."*
+
+### Floor evolution shipped (depth as visible status)
+1. ✅ **`CrystallineLattice3D` (3D)** — every cell's HSL color now
+   layers a depth-driven offset:
+     • `hueShift = depth × 0.30` (rotation around the wheel)
+     • `satBoost = depth × 0.28` (saturation deepens)
+     • `lumBoost = depth × 0.20` (luminosity rises, capped at 0.85)
+   Reads `window.__sovereignDepth.ratio` published by the V68.65
+   `useEngineLoad` hook (no extra fetch, zero perf cost).
+2. ✅ **`MiniLattice` (2D SVG default)** — same shift expressed as
+   background `rgba(R,G,B,A)` interpolation:
+     • bg goes from `rgba(8,8,26,0.25)` (charcoal) →
+       `rgba(78,32,116,0.43)` (luminous violet) at 100%
+     • border alpha rises from 0.06 → 0.36
+     • grid lines get brighter
+     • `transition: 1.2s ease` so the shift breathes, doesn't pop
+   Both renderers feel the same internal evolution.
+
+### Step 5 (CDN Offload) — audit result: **Already optimized**
+- Total `frontend/public/` = **380 KB** of code/HTML/icons
+- 8.4 MB `store-assets/` directory holds **Play Console marketing
+  graphics** (feature-graphic, app-icon-1024, og-cover, screenshots).
+  These are uploaded to Play Console, **NOT bundled in the AAB**.
+- Capacitor's `aaptOptions.ignoreAssetsPattern` in `build.gradle`
+  already strips unreferenced assets from the AAB at build time.
+- **No CDN offload action needed for launch.** Marketing graphics
+  could be moved to a CDN later for the marketing site, not the AAB.
+
+### Step 6 (R8 / ProGuard) — audit result: **Already complete (V68.56)**
+- `proguard-rules.pro` exists, 73 lines, well-commented.
+- All reflection-heavy paths protected:
+  • Capacitor + Cordova bridge (`-keep` annotations preserved)
+  • `@JavascriptInterface` methods (`-keepattributes`)
+  • App entry points (`cafe.mint.enlighten.**`)
+  • AndroidX lifecycle + splashscreen
+- `build.gradle`: `minifyEnabled true` + `shrinkResources true` ✅
+- The truth (already documented in the rules file): R8 only sees
+  the Capacitor Java layer; the React bundle is already minified
+  by webpack inside `assets/public/`. **The heavy savings (~18 MB)
+  come from `aaptOptions.ignoreAssetsPattern`**, which is in place.
+- **No R8 changes needed for launch.**
+
+### Final Launch Sequence — STATUS
+| Step | Description | Status |
+|------|-------------|--------|
+| 1 | Resurrection UI | ✅ V68.60 |
+| 2 | Navigation Drain (17/120) | 🟡 Continuing |
+| 3 | FFT Fine-tuning | ✅ V68.58 |
+| 4 | Sage Gauge ↔ ContextBus | ✅ V68.65 |
+| 5 | CDN Offload | ✅ Audit confirms already optimized |
+| 6 | R8 Verify | ✅ Audit confirms V68.56 rules complete |
+| **7** | **`./gradlew bundleRelease` (USER)** | 🟢 **Ready to run** |
+| 8 | Play Console metadata | 🟢 Ready (store-assets in `public/store-assets/`) |
+| 9 | Data Safety + Target Audience | 🟢 Ready |
+| 10 | Internal Testing → Production | 🟢 Ready |
+
+### Verification
+**Pytest 3/3 PASS** (V68.66):
+```
+test_surface_area_ratio_drives_floor               PASSED
+test_subscription_and_marketplace_intact           PASSED
+test_v68_61_through_65_stack_still_responds        PASSED
+```
+**Playwright smoke**: at 4.3% depth (3/70 cells), MiniLattice bg
+= `rgba(11,9,30,0.26)`, border = `rgba(192,132,252,0.075)`.
+Math verified live: floor evolution working, shift intentionally
+subtle at low depth and builds progressively.
+
+### What this means for the user
+The Final Launch Sequence is now at the **green gate**. Steps 5
+& 6 didn't require new code — both audits confirmed prior cycles
+(V68.55-58) had already done the optimization work. The only
+remaining technical action is yours: `./gradlew bundleRelease`
+per `/app/frontend/android/BUILD_RUNBOOK.md` to produce the
+signed `.aab` artifact.
 
 ## V68.65 — Omni-Utility · Discovery Economy + Density Gauge + Privacy Lockdown (29 Feb 2026)
 

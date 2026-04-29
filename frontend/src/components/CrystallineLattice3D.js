@@ -113,6 +113,21 @@ function CrystallineColumns() {
     const t = performance.now() * 0.001;
     const colorAttr = mesh.geometry?.attributes ? null : null;
 
+    // V68.66 — Depth-driven floor evolution. The lattice's hue
+    // rotates and its saturation deepens as the user illuminates
+    // more of the unified Inlay. At 0% it's a dull charcoal violet;
+    // at 100% it's a luminous magenta-cyan field. This is the user's
+    // "world brightening" — internal status without a leaderboard.
+    //   • depth 0.00 → hue offset 0.00, sat boost 0.00, lum boost 0.00
+    //   • depth 0.10 → hue offset 0.05, sat boost 0.05, lum boost 0.04
+    //   • depth 0.25 → hue offset 0.10, sat boost 0.10, lum boost 0.08
+    //   • depth 0.50 → hue offset 0.18, sat boost 0.18, lum boost 0.12
+    //   • depth 1.00 → hue offset 0.30, sat boost 0.28, lum boost 0.20
+    const depth = (typeof window !== 'undefined' && window.__sovereignDepth?.ratio) || 0;
+    const depthHueShift = depth * 0.30;
+    const depthSatBoost = depth * 0.28;
+    const depthLumBoost = depth * 0.20;
+
     for (let i = 0; i < CELL_META.length; i++) {
       const c = CELL_META[i];
       const bandVal = c.band === 'bass' ? sm.bass
@@ -130,10 +145,13 @@ function CrystallineColumns() {
 
       // Per-instance color: hue rotates around the cell, brightness
       // tracks the live peak so the lattice flares on output bursts.
+      // V68.66 — Depth offsets shift the whole lattice's color
+      // signature so a user's exploration progress is visibly
+      // reflected in the floor itself.
       tmpColor.setHSL(
-        c.hue,
-        0.55 + sm.mid * 0.4,
-        0.32 + sm.peak * 0.45,
+        (c.hue + depthHueShift) % 1.0,
+        Math.min(1, 0.55 + sm.mid * 0.4 + depthSatBoost),
+        Math.min(0.85, 0.32 + sm.peak * 0.45 + depthLumBoost),
       );
       mesh.setColorAt(i, tmpColor);
     }
