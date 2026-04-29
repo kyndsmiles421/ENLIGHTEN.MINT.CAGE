@@ -144,12 +144,16 @@ const CROSS_LINKS = {
 // ═══════════════════════════════════════════════════════════════
 // DISCOVERY NODE — Each item is a discoverable node on the map
 // ═══════════════════════════════════════════════════════════════
-function DiscoveryNode({ item, color, category, index, discovered, onDiscover, onStudy }) {
+function DiscoveryNode({ item, color, category, index, discovered, onDiscover, onStudy, searchActive }) {
   const [hovering, setHovering] = useState(false);
   const [justDiscovered, setJustDiscovered] = useState(false);
   const itemColor = item.color || color;
   const title = item.name || item.title;
   const element = item.element || item.chakra || '';
+  // V68.62 — When the user is actively searching, reveal the name.
+  // They typed the term explicitly; hiding it defeats the search.
+  // Discovery XP still awarded on first tap.
+  const reveal = discovered || !!searchActive;
 
   const ELEMENT_SHAPES = {
     Fire: '🔥', Water: '💧', Air: '🌬', Earth: '🌿', Metal: '⚡',
@@ -191,8 +195,8 @@ function DiscoveryNode({ item, color, category, index, discovered, onDiscover, o
       }}
       data-testid={`node-${item.id || index}`}
     >
-      {/* Fog overlay for undiscovered */}
-      {!discovered && (
+      {/* Fog overlay for undiscovered (cleared by search reveal) */}
+      {!reveal && (
         <div className="absolute inset-0 rounded-xl flex items-center justify-center"
           style={{
             background: 'rgba(8,8,14,0.7)',
@@ -226,7 +230,7 @@ function DiscoveryNode({ item, color, category, index, discovered, onDiscover, o
       </AnimatePresence>
 
       {/* Element icon OR item image if provided (mudras, crystals, etc.) */}
-      {item.image_url && discovered ? (
+      {item.image_url && reveal ? (
         <div className="w-12 h-12 rounded-xl overflow-hidden"
           style={{
             background: `linear-gradient(135deg, ${itemColor}25, ${itemColor}08)`,
@@ -248,9 +252,9 @@ function DiscoveryNode({ item, color, category, index, discovered, onDiscover, o
 
       {/* Title */}
       <p className="text-xs font-medium leading-tight" style={{
-        color: discovered ? itemColor : 'rgba(255,255,255,0.3)',
+        color: reveal ? itemColor : 'rgba(255,255,255,0.3)',
       }}>
-        {discovered ? title : '???'}
+        {reveal ? title : '???'}
       </p>
 
       {/* Discovery XP popup */}
@@ -784,6 +788,11 @@ export default function InteractiveModule({
   category = 'knowledge', items = [],
   filters, filterFn, searchFn,
   children, headerExtra,
+  // V68.62 — Optional callback fired when the user opens an item.
+  // Herbology passes a handler that hits /entity/{id} and commits
+  // the unified node to ContextBus.entityState — turns each card
+  // open into a full Entity Page broadcast.
+  onItemOpen,
   // V68.25 — holographic chamber integration. Every catalog module
   // auto-wraps with its themed cinematic backdrop. Pass an explicit
   // chamberId to override the map or holographic={false} to opt out
@@ -816,7 +825,12 @@ export default function InteractiveModule({
 
   const handleStudy = useCallback((item) => {
     setStudyItem(item);
-  }, []);
+    // V68.62 — Entity broadcast. The page-level handler reads the
+    // unified node from /entity/{id} and commits to ContextBus so
+    // the rest of the engine reacts (lattice repaints, Oracle/Tarot
+    // primer absorbs the entity for the next pull).
+    if (onItemOpen) { try { onItemOpen(item); } catch { /* noop */ } }
+  }, [onItemOpen]);
 
   // Shuffle items on each mount so order varies per visit
   // Re-shuffle when items change (e.g., async load)
@@ -948,7 +962,7 @@ export default function InteractiveModule({
               {filtered.map((item, i) => {
                 const originalIndex = items.indexOf(item);
                 return (
-                  <ProximityItem key={item.id || i} index={i} totalItems={filtered.length}>
+                  <ProximityItem key={item.id || i} index={i} totalItems={filtered.length} forceVisible={!!search.trim()}>
                     <DiscoveryNode
                       item={item}
                       color={color}
@@ -957,6 +971,7 @@ export default function InteractiveModule({
                       discovered={discoveredSet.has(originalIndex)}
                       onDiscover={handleDiscover}
                       onStudy={handleStudy}
+                      searchActive={!!search.trim()}
                     />
                   </ProximityItem>
                 );

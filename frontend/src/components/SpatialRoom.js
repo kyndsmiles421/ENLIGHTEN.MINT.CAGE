@@ -184,7 +184,7 @@ function DepthParticles({ color, count = 16 }) {
  * Collision radius uses Fibonacci-spaced depth zones.
  * 3-second hover in active octant = auto-extrude with Phi scaling.
  */
-export function ProximityItem({ index, children, totalItems, color }) {
+export function ProximityItem({ index, children, totalItems, color, forceVisible }) {
   const spatial = useSpatial();
   const [autoTriggered, setAutoTriggered] = useState(false);
   const [collisionActive, setCollisionActive] = useState(false);
@@ -229,6 +229,17 @@ export function ProximityItem({ index, children, totalItems, color }) {
   }, [isActive]);
 
   if (!spatial) return <div>{children}</div>;
+
+  // V68.62 — When the parent says force-visible (active search), bypass
+  // the proximity collision animation entirely. Search results must be
+  // legible without scroll-hunting.
+  if (forceVisible) {
+    return (
+      <div data-proximity="search-revealed" data-testid={`proximity-item-${index}`}>
+        {children}
+      </div>
+    );
+  }
 
   // φ-Ratio Extrusion — Golden Ratio scaling instead of linear
   const phi = phiExtrusion(distance);

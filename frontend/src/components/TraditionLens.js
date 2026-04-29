@@ -7,10 +7,18 @@
  * - "Omni" mode shows the genuine thread between all 10
  * 
  * Plugs into any module via: <TraditionLens module="crystals" topic="Amethyst" />
+ *
+ * V68.62 — Freeze fix:
+ *   • 25 s AbortController timeout on every LLM call (no more
+ *     stuck `loading=true` if the network or LLM hangs).
+ *   • Inline X close button on the insight panel so the user can
+ *     ALWAYS dismiss the lens — no UX dead-end.
+ *   • `loading` state forced false in `finally` so even an
+ *     unexpected throw can never lock the spinner on.
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, ChevronDown, Loader2, Compass } from 'lucide-react';
+import { Globe, ChevronDown, Loader2, Compass, X } from 'lucide-react';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -47,33 +55,90 @@ export default function TraditionLens({ module = 'general', topic = '', context 
   const [selected, setSelected] = useState(null);
   const [insight, setInsight] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [lensError, setLensError] = useState(null);
+  const abortRef = useRef(null);
+
+  // V68.62 — if the parent topic changes mid-channel, kill the
+  // stale request. Otherwise an old "Lakota perspective" can land
+  // after the user has navigated to another herb.
+  useEffect(() => {
+    return () => {
+      if (abortRef.current) { try { abortRef.current.abort(); } catch { /* noop */ } }
+    };
+  }, [topic]);
 
   const fetchLensInsight = useCallback(async (traditionId) => {
     if (!topic) return;
     setLoading(true);
     setInsight(null);
+    setLensError(null);
+
+    // V68.62 — abort after 25s so the spinner never sticks if the
+    // backend or LLM hangs. Track the controller in a ref so a
+    // close-click can also kill an in-flight request.
+    if (abortRef.current) { try { abortRef.current.abort(); } catch { /* noop */ } }
+    const controller = new AbortController();
+    abortRef.current = controller;
+    // Mark this as the active fetch so the dismiss handler can flag
+    // intentional aborts and prevent the catch-block from re-painting
+    // an error message after we've already cleared the panel.
+    controller._intentional = false;
+    const timeoutHandle = setTimeout(() => {
+      try { controller.abort(); } catch { /* noop */ }
+    }, 25000);
 
     try {
+      let res;
       if (traditionId === 'omni') {
-        // Use the standard omni-bridge insight (all traditions)
-        const res = await fetch(`${API}/api/omni-bridge/insight`, {
+        res = await fetch(`${API}/api/omni-bridge/insight`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ module, topic, context }),
+          signal: controller.signal,
         });
-        if (res.ok) setInsight(await res.json());
       } else {
-        // Use cross-tradition with a single tradition for focused lens
-        const res = await fetch(`${API}/api/omni-bridge/cross-tradition`, {
+        res = await fetch(`${API}/api/omni-bridge/cross-tradition`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ traditions: [traditionId], topic, module }),
+          signal: controller.signal,
         });
-        if (res.ok) setInsight(await res.json());
       }
-    } catch {}
-    setLoading(false);
+      if (res && res.ok) {
+        setInsight(await res.json());
+      } else {
+        setLensError(`Couldn’t channel ${TRADITION_LABELS[traditionId] || 'tradition'} (${res?.status || 'no-response'}).`);
+      }
+    } catch (e) {
+      // V68.62 — if the user dismissed the lens, swallow silently —
+      // do not paint an error after the panel is already closed.
+      if (controller._intentional) {
+        // intentional abort from dismissLens; stay quiet.
+      } else if (e?.name === 'AbortError') {
+        setLensError('Channel timed out at 25 s — the field is quiet, try again.');
+      } else {
+        setLensError('Channel disrupted — check the connection and try again.');
+      }
+    } finally {
+      clearTimeout(timeoutHandle);
+      // Always release the spinner — no stuck UI ever.
+      if (!controller._intentional) setLoading(false);
+    }
   }, [module, topic, context]);
+
+  const dismissLens = useCallback(() => {
+    if (abortRef.current) {
+      // Mark before abort so the catch block knows to stay quiet.
+      try { abortRef.current._intentional = true; } catch { /* noop */ }
+      try { abortRef.current.abort(); } catch { /* noop */ }
+      abortRef.current = null;
+    }
+    setLoading(false);
+    setInsight(null);
+    setLensError(null);
+    setSelected(null);
+    setOpen(false);
+  }, []);
 
   const selectTradition = (tid) => {
     setSelected(tid);
@@ -139,21 +204,47 @@ export default function TraditionLens({ module = 'general', topic = '', context 
 
       {/* Insight display */}
       <AnimatePresence>
-        {(loading || insight) && (
+        {(loading || insight || lensError) && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mt-2 rounded-xl p-3 overflow-hidden"
+            className="mt-2 rounded-xl p-3 overflow-hidden relative"
             style={{ background: `${color}04`, border: `1px solid ${color}10` }}
             data-testid="tradition-lens-insight"
           >
+            {/* V68.62 — Always-available exit. The lens never traps. */}
+            <button
+              type="button"
+              onClick={dismissLens}
+              data-testid="tradition-lens-close"
+              aria-label="Close cultural lens"
+              className="absolute top-1.5 right-1.5 p-1 rounded-md hover:bg-white/5 active:scale-95"
+              style={{ color: `${color}80` }}
+            >
+              <X size={11} />
+            </button>
             {loading ? (
               <div className="flex items-center gap-2 py-2 justify-center">
                 <Loader2 size={12} className="animate-spin" style={{ color }} />
                 <span className="text-[9px]" style={{ color: `${color}80` }}>
                   Channeling {TRADITION_LABELS[selected]}...
                 </span>
+              </div>
+            ) : lensError ? (
+              <div className="py-2">
+                <p className="text-[10px] mb-2" style={{ color: '#FB7185' }}>
+                  {lensError}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => fetchLensInsight(selected)}
+                  data-testid="tradition-lens-retry"
+                  className="text-[9px] px-2 py-1 rounded-md active:scale-95"
+                  style={{ background: `${color}14`, border: `1px solid ${color}33`, color }}
+                >
+                  Retry
+                </button>
               </div>
             ) : insight ? (
               <>

@@ -1,7 +1,103 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.61)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.62)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
+
+## V68.62 — Unified Entity Inlay + Cultural Lens Freeze Fix (29 Feb 2026)
+
+User-reported bugs:
+  1. **Mint search returns "No results found"** — even though the
+     app is named ENLIGHTEN.MINT.CAFE.
+  2. **Cultural overlay (Lakota perspective) freezes** the app —
+     no way to dismiss the panel.
+
+User architectural directive:
+  *"You aren't building a dictionary; you are building a living,
+   immersive space. Inlay = canonical Knowledge Graph (immutable);
+   Pull = 9×9 Crystal Helix Lattice (subjective resonance through
+   the active session path)."*
+
+### Audit-first findings (no rebuild — only bridges)
+The pre-existing infrastructure was already 95% there:
+  • `routes/herbology.py` (15 herbs · Ayurveda+Western)
+  • `routes/botany.py` (18 plants · TCM-leaning)
+  • `routes/aromatherapy.py` (12 oils · incl. **Peppermint!**)
+  • `routes/sovereign_library.py` (50+ tradition plant mentions)
+  • `routes/omni_bridge.py` `/cross-tradition` LLM synthesizer
+  • `routes/knowledge.py` `/knowledge/deep-dive` cached LLM brain
+  • `components/TraditionLens.js` 10-tradition lens UI
+  • `components/InteractiveModule.js` discovery + study panel
+The gap was purely **bridges between silos**, not missing features.
+
+### Inlay shipped (`routes/entity_graph.py`)
+1. ✅ **Federated resolver** — imports HERBS, PLANT_CATALOG,
+   ESSENTIAL_OILS, SOVEREIGN_LIBRARY at boot, deduplicates by
+   canonical id, layers tradition_views from sovereign_library
+   onto matching plants. **70 unified nodes, 185 aliases sealed.**
+2. ✅ **`GET /api/entity/index`** — flat whitelist (count, aliases,
+   nodes). Frontend fetches once, caches client-side.
+3. ✅ **`GET /api/entity/{id}`** — federated lookup. Resolves
+   "mint" → "peppermint" via the alias map. Returns unified node
+   + computed graph edges (same family, shared traditions, blends_with).
+4. ✅ **`POST /api/entity/synthesize`** — circuit-breaker LLM gate
+   for off-graph queries. Persists to `entities_generated` Mongo
+   collection. Hot-grafts back into the live graph on next read.
+   Boot-time rehydration includes all previously-synthesized nodes.
+5. ✅ **`context_seed`** baked into every entity response — drives
+   ContextBus.entityState commit, which V68.61 cross-pollination
+   filter feeds straight into Tarot/Oracle/Forecast prompts.
+
+### Pull shipped (frontend wiring)
+1. ✅ **`pages/Herbology.js`** — sources from `/entity/index` (70
+   nodes), not the 15-herb silo. Filter tabs auto-built from
+   types (Herbs/Plants/Oils/Tradition) and active traditions
+   (Mayan/Yoruba/Vedic/Kemetic/Taoist/Sufi). `onItemOpen` pulls
+   the unified node and commits to ContextBus.entityState.
+2. ✅ **`InteractiveModule.js`** — added `onItemOpen` prop +
+   `searchActive` reveal: when the user is searching, the
+   discovery fog and proximity-collision animation are bypassed
+   so search results are always legible. (Discovery XP still
+   awarded on first tap.)
+3. ✅ **`SpatialRoom.js` `ProximityItem`** — added `forceVisible`
+   prop. When set, bypasses φ-ratio extrusion and renders the
+   child at full opacity — search results never hide behind the
+   "Approaching..." mechanic.
+
+### Cultural Lens freeze fix (`components/TraditionLens.js`)
+1. ✅ **Inline X close button** on the insight panel — the lens
+   never traps the user. Aborts any in-flight LLM call.
+2. ✅ **25s `AbortController` timeout** — spinner can never stick.
+3. ✅ **`finally`-clause loading reset** — even an unexpected
+   throw releases the spinner.
+4. ✅ **Topic-change cleanup effect** — stale Lakota perspective
+   never lands on a freshly-opened Peppermint page.
+5. ✅ **`_intentional` abort flag** — race-condition fix so
+   dismiss-mid-fetch doesn't repaint an error after the panel
+   was already cleared.
+6. ✅ **Retry button** on error states.
+
+### Verification
+**Pytest 6/6 PASS** (V68.62):
+```
+test_entity_index_returns_unified_corpus      PASSED
+test_mint_resolves_to_peppermint              PASSED
+test_tulsi_resolves_to_holy_basil_with_vedic  PASSED
+test_unknown_entity_returns_404               PASSED
+test_context_seed_present_for_pollination     PASSED
+test_lakota_perspective_endpoint_responds     PASSED
+```
+**Playwright smoke**: Herbology page loads 70 nodes, "All (70)"
+counter visible, filter tabs render Tradition (36), Herbs (11),
+Plants (11), Oils (12), and 6 tradition pivots. Search "mint"
+filters to 1 card with "Peppermint" rendered (no fog overlay).
+Cultural Lens dropdown opens, Vedic/Lakota/etc. clickable,
+close-X dismisses without race condition.
+
+### Bugs sealed
+- ✅ "Mint" search now returns Peppermint (Mentha piperita)
+- ✅ Cultural overlay no longer traps; X button always available
+- ✅ Search reveals card names instead of "???"
+- ✅ Spinner can never stick (25s timeout + finally clause)
 
 ## V68.61 — Resonance Cross-Pollination Filter (29 Feb 2026)
 

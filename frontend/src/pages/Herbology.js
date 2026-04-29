@@ -6,6 +6,7 @@ import InteractiveModule from '../components/InteractiveModule';
 import HolographicChamber from '../components/HolographicChamber';
 import ChamberProp from '../components/ChamberProp';
 import ChamberMiniGame from '../components/games/ChamberMiniGame';
+import { commit as busCommit } from '../state/ContextBus';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const ACCENT = '#84CC16';
@@ -16,11 +17,49 @@ export default function Herbology() {
   const [brewOpen, setBrewOpen] = useState(false);
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('herbology', 8); }, []);
+
+  // V68.62 — Source from the unified Entity Inlay, not the 15-herb silo.
+  // The Inlay merges herbology + botany + aromatherapy + sovereign_library
+  // tradition mentions into one searchable graph. "Mint" now resolves
+  // through the alias map. Falls back to the legacy endpoint if the
+  // Inlay isn't reachable so the page never goes blank.
   useEffect(() => {
-    axios.get(`${API}/herbology/herbs`).then(res => setHerbs(res.data.herbs || [])).catch(() => toast.error('Could not load herbs'));
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await axios.get(`${API}/entity/index`);
+        if (cancelled) return;
+        const nodes = (res.data?.nodes || []).map(n => ({
+          // Shape it for InteractiveModule's DiscoveryNode card.
+          id:          n.id,
+          name:        n.name,
+          latin:       n.latin || '',
+          color:       n.color || ACCENT,
+          type:        n.type,
+          traditions:  n.traditions || [],
+          sources:     n.sources || [],
+          systems:     n.traditions || [],   // filter pivot for tabs
+          properties:  [],                   // hydrated on click via /entity/{id}
+        }));
+        setHerbs(nodes);
+      } catch {
+        // Fallback to the legacy 15-herb silo so the page never blanks.
+        try {
+          const res = await axios.get(`${API}/herbology/herbs`);
+          if (!cancelled) setHerbs(res.data.herbs || []);
+        } catch {
+          if (!cancelled) toast.error('Could not load the herb encyclopedia');
+        }
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
-  const allSystems = [...new Set(herbs.flatMap(h => h.systems || []))];
+  // V68.62 — Build dynamic filters from the unified set's traditions
+  // so the user can pivot the whole encyclopedia by Vedic / TCM /
+  // Lakota / Yoruba / etc. without leaving the page.
+  const allTraditions = [...new Set(herbs.flatMap(h => h.traditions || []))];
+  const allTypes      = [...new Set(herbs.map(h => h.type).filter(Boolean))];
 
   return (
     <HolographicChamber
@@ -116,7 +155,7 @@ export default function Herbology() {
 
       <InteractiveModule
         title="The Healing Herb Garden"
-        subtitle="Sacred Herbology"
+        subtitle="Sacred Herbology · Unified Inlay"
         icon={Leaf}
         color={ACCENT}
         category="herbology"
@@ -124,12 +163,42 @@ export default function Herbology() {
         items={herbs}
         filters={[
           { key: 'all', label: 'All', count: herbs.length },
-          ...allSystems.slice(0, 5).map(s => ({ key: s, label: s, count: herbs.filter(h => h.systems?.includes(s)).length })),
+          ...allTypes.slice(0, 4).map(t => ({
+            key: `type:${t}`,
+            label: t === 'oil' ? 'Oils' : t === 'plant' ? 'Plants' : t === 'tradition_plant' ? 'Tradition' : 'Herbs',
+            count: herbs.filter(h => h.type === t).length,
+          })),
+          ...allTraditions.slice(0, 6).map(t => ({
+            key: `trad:${t}`,
+            label: t.charAt(0).toUpperCase() + t.slice(1),
+            count: herbs.filter(h => (h.traditions || []).includes(t)).length,
+          })),
         ]}
-        filterFn={(item, filter) => item.systems?.includes(filter)}
+        filterFn={(item, filter) => {
+          if (filter.startsWith('type:')) return item.type === filter.slice(5);
+          if (filter.startsWith('trad:')) return (item.traditions || []).includes(filter.slice(5));
+          return true;
+        }}
         searchFn={(item, q) => {
           const s = q.toLowerCase();
-          return item.name?.toLowerCase().includes(s) || item.latin?.toLowerCase().includes(s) || item.properties?.some(p => p.toLowerCase().includes(s));
+          return (
+            item.name?.toLowerCase().includes(s) ||
+            item.latin?.toLowerCase().includes(s) ||
+            (item.traditions || []).some(t => t.toLowerCase().includes(s)) ||
+            (item.properties || []).some(p => p.toLowerCase().includes(s))
+          );
+        }}
+        onItemOpen={async (item) => {
+          // V68.62 — Entity Page resolution: every opened herb broadcasts
+          // its full unified node to the ContextBus so Tarot/Oracle/Story
+          // absorb it through the V68.61 cross-pollination filter. The
+          // user is no longer "looking up a card" — they're inhabiting
+          // the entity.
+          try {
+            const r = await axios.get(`${API}/entity/${item.id}`);
+            const seed = r.data?.context_seed || { activeEntity: item.id, name: item.name };
+            busCommit('entityState', seed, { moduleId: 'HERBOLOGY' });
+          } catch { /* noop */ }
         }}
       />
     </HolographicChamber>
