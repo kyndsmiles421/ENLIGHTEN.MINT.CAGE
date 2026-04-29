@@ -2,10 +2,19 @@
  * MixPanel.js — Channel fader strip panel
  * Extracted from UnifiedCreatorConsole.js
  * Shows master fader, pillar-level faders, and per-module mixer channels.
+ *
+ * V68.67 — Ambient Sound Bank surfaced.
+ *   The MixerContext already builds 11 procedural ambient sources
+ *   (rain, ocean, wind, fire, singing-bowl, thunder, stream, forest,
+ *   cave, night, waterfall) via Web Audio API. Previously the MIX
+ *   panel only showed faders — no UI exposed the sound triggers,
+ *   so moving the master fader produced no audible result. This
+ *   row of toggle pills lets the user actually hear the mixer.
  */
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PILLARS, findModule } from '../ConsoleConstants';
+import { useMixer, SOUNDS } from '../../context/MixerContext';
 
 export default function MixPanel({
   masterLevel, setMasterLevel, pillarLevels, setPillarLevels,
@@ -13,6 +22,9 @@ export default function MixPanel({
   handleMuteChange, handleNav, currentRoute,
 }) {
   const current = findModule(currentRoute);
+  const mixer = useMixer();
+  const activeSounds = mixer?.activeSounds || new Set();
+  const toggleSound = mixer?.toggleSound;
 
   return (
     <div style={{ background: '#080812' }}>
@@ -78,6 +90,54 @@ export default function MixPanel({
           );
         })()}
       </AnimatePresence>
+
+      {/* V68.67 — Ambient Sound Bank. Tap a pill to start/stop a
+          procedural ambient track. Master + pillar faders above
+          finally have something to mix. */}
+      {toggleSound && (
+        <div
+          className="px-2 pt-1 pb-2"
+          style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}
+          data-testid="mixer-sound-bank"
+        >
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[6px] font-mono tracking-[0.18em] text-white/35">
+              AMBIENT BANK
+            </span>
+            <span className="text-[6px] font-mono text-white/25">
+              {activeSounds.size}/{SOUNDS.length} ACTIVE
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1">
+            {SOUNDS.map((s) => {
+              const on = activeSounds.has(s.id);
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => toggleSound(s)}
+                  data-testid={`mixer-sound-${s.id}`}
+                  className="text-[7px] font-bold uppercase tracking-wider px-2 py-1 rounded-md active:scale-95 transition-all"
+                  style={{
+                    background: on ? `${s.color}24` : 'rgba(255,255,255,0.03)',
+                    border: on ? `1px solid ${s.color}88` : '1px solid rgba(255,255,255,0.06)',
+                    color: on ? s.color : 'rgba(255,255,255,0.45)',
+                    boxShadow: on ? `0 0 8px ${s.color}40` : 'none',
+                  }}
+                >
+                  {on && (
+                    <span
+                      className="inline-block w-1 h-1 rounded-full mr-1 align-middle animate-pulse"
+                      style={{ background: s.color }}
+                    />
+                  )}
+                  {s.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

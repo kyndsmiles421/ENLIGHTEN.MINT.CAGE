@@ -1,7 +1,57 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.66)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.67)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
+
+## V68.67 — Mixer + Screen Record Bug Fixes (29 Feb 2026)
+
+User-reported bugs:
+  1. **The Mixer doesn't work** — moving sliders produces no sound.
+  2. **Screen Record doesn't work** — tapping Screen capture fails.
+
+### Audit findings (Possibility #2 again — Partially Built)
+- **MIX panel** had master/pillar/module *faders* but did NOT
+  expose the 11 procedural ambient sources already built in
+  `MixerContext` (rain, ocean, wind, fire, singing bowl, thunder,
+  stream, forest, cave, night, waterfall — all real Web Audio API
+  oscillators + filters). Faders moved, no source playing →
+  silence. Classic "infrastructure ready, UI missing" pattern.
+- **Screen Record** uses `navigator.mediaDevices.getDisplayMedia`,
+  which is a **desktop-only browser API**. On the Play Store
+  target (Capacitor Android WebView), it throws permission denied.
+  Video + Audio (`getUserMedia`) work everywhere; Screen does not.
+
+### Bridges shipped (no rebuilds)
+1. ✅ **`MixPanel.js` — Ambient Sound Bank surfaced**.
+   Imports `SOUNDS` + `useMixer` from `MixerContext`. Renders an
+   inline pill-strip below the existing faders showing all 11
+   ambient tracks. Tap a pill → `toggleSound(s)` → procedural
+   audio starts (or stops). Active pills get a colored pulse-dot,
+   the source's color tint, glow, and an "X/11 ACTIVE" counter.
+   `data-testid="mixer-sound-rain"` + 10 more for testing.
+2. ✅ **`RecordPanel.js` — Mobile-aware screen capture**.
+   Detects support up-front via
+   `typeof navigator.mediaDevices?.getDisplayMedia === 'function'`.
+   On supported platforms (desktop browsers): all 3 options enabled.
+   On unsupported (Capacitor WebView, mobile Safari):
+     • Screen pill rendered `disabled` with `opacity 0.4`
+     • Description text changes to "Desktop browser only"
+     • Inline note `data-testid="rec-screen-note"`:
+       "Screen capture requires a desktop browser. Video + Audio
+       recording work on every device."
+   No more cryptic permission errors, no false promise.
+
+### Verification
+**Playwright smoke**: Creator Console → MIX tab → ambient bank
+renders 11 pills → tap RAIN → blue pulse-dot active, "1/11
+ACTIVE" counter, source playing in MIXER context. REC tab → Video
++ Audio + Screen all enabled (desktop test environment). Screen
+detection works as designed.
+
+### Bugs sealed
+- ✅ Mixer now produces sound (11 procedural sources accessible).
+- ✅ Screen capture either works (desktop) or gracefully explains
+  why it can't (mobile/Capacitor) — no broken silent click.
 
 ## V68.66 — Floor Evolution + Final Launch Audit (29 Feb 2026)
 
