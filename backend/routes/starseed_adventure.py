@@ -8,6 +8,11 @@ from fastapi import APIRouter, Depends, Body, HTTPException
 from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from emergentintegrations.llm.openai.image_generation import OpenAIImageGeneration
+# V68.63 — pull MULTIVERSE_REALMS from the world catalog so the
+# narrative engine can weave the realm's lore (Astral Sanctum,
+# Shadow Nexus, etc.) into the opening scene when the player
+# enters via the Multiverse map's "Explore This Realm" button.
+from routes.starseed_worlds import MULTIVERSE_REALMS
 
 router = APIRouter()
 
@@ -175,6 +180,12 @@ async def get_my_characters(user=Depends(get_current_user)):
 async def generate_scene(data: dict = Body(...), user=Depends(get_current_user)):
     origin_id = data.get("origin_id")
     choice_index = data.get("choice_index")  # None for first scene
+    # V68.63 — Optional realm context. When the user enters the RPG
+    # from the Multiverse Map's "Explore This Realm" button, the
+    # realm_id is passed through so the LLM weaves the realm's lore
+    # (Astral Sanctum, Shadow Nexus, Crystal Caverns, Void Between)
+    # into the opening scene + boss/element/enemies.
+    realm_id = data.get("realm_id")
 
     uid = user["id"]
     char = await db.starseed_characters.find_one(
@@ -264,6 +275,32 @@ async def generate_scene(data: dict = Body(...), user=Depends(get_current_user))
         legendary_prompt += "\nAdd 'legendary_path' field with the path id to legendary choices."
         resonance_prompt += legendary_prompt
 
+    # V68.63 — Realm anchoring. If a realm_id was passed (Multiverse
+    # entry path), look up its lore so the narrative actually inhabits
+    # the realm the player chose. If nothing passed but the character
+    # has a persisted current_realm from a prior scene, reuse that so
+    # the realm identity bleeds through chapters. No realm = generic
+    # adventure (legacy path, still works).
+    realm_prompt = ""
+    realm_meta = None
+    effective_realm_id = realm_id or char.get("current_realm")
+    if effective_realm_id:
+        realm_meta = next((r for r in MULTIVERSE_REALMS if r.get("id") == effective_realm_id), None)
+        if realm_meta:
+            realm_prompt = (
+                f"\n\nREALM ANCHOR — the player is exploring {realm_meta['name']} "
+                f"({realm_meta.get('subtitle', '')}). Lore: {realm_meta.get('lore', '')} "
+                f"This realm's element is {realm_meta.get('element', 'unknown')}. "
+                f"Difficulty: {realm_meta.get('difficulty', 'normal')}. "
+                f"The boss who governs this realm is {realm_meta.get('boss', 'unknown')}. "
+                f"Common enemies: {', '.join(realm_meta.get('enemies', []))}. "
+                f"Atmospheric hooks: {realm_meta.get('atmosphere', '')}.\n"
+                f"WEAVE THIS REALM'S DISTINCT IDENTITY into the scene — "
+                f"its element ({realm_meta.get('element', '')}), its inhabitants, "
+                f"its sensory texture. Do NOT default to generic cosmic descriptions; "
+                f"the player must FEEL they are in {realm_meta['name']} specifically."
+            )
+
     # If a choice was made, record it
     if choice_index is not None and story_memory:
         last_scene = story_memory[-1] if story_memory else {}
@@ -319,7 +356,7 @@ RULES:
 - Make the {origin['element']} element central to the narrative
 - Include an "image_prompt" field: a 1-sentence cinematic scene description for AI art generation (cosmic, painterly, no text/words)
 - Return ONLY valid JSON with no markdown formatting
-{resonance_prompt}
+{resonance_prompt}{realm_prompt}
 
 JSON format:
 {{
@@ -339,7 +376,8 @@ JSON format:
 {recent_choices_summary}
 
 Generate the next scene for Chapter {chapter}, Scene {scene + 1} of the {origin['name']} starseed adventure.
-{"This is the OPENING scene — set the stage with a dramatic awakening moment." if scene == 0 else "Continue the adventure from the previous events."}"""
+{"This is the OPENING scene — set the stage with a dramatic awakening moment." if scene == 0 else "Continue the adventure from the previous events."}
+{f"The player has just stepped through the portal into {realm_meta['name']}. Open with their arrival in this specific realm — its sights, sounds, and atmosphere — not a generic cosmic vista." if (realm_meta and scene == 0) else ""}"""
 
     try:
         chat = LlmChat(
@@ -408,6 +446,12 @@ Generate the next scene for Chapter {chapter}, Scene {scene + 1} of the {origin[
         achievements.append("ten_choices")
         new_achievements.append({"id": "ten_choices", "title": "Decisive Mind", "desc": "Made 10 choices"})
 
+    # V68.63 — persist the realm anchor on first entry so subsequent
+    # scene generations (when realm_id isn't passed) still know where
+    # the player is. Once committed, only an explicit new realm_id
+    # overrides it.
+    realm_to_persist = realm_id or char.get("current_realm")
+
     await db.starseed_characters.update_one(
         {"user_id": uid, "origin_id": origin_id},
         {"$set": {
@@ -420,6 +464,7 @@ Generate the next scene for Chapter {chapter}, Scene {scene + 1} of the {origin[
             "choices_made": choices_made,
             "achievements": achievements,
             "story_memory": story_memory,
+            "current_realm": realm_to_persist,
             "updated_at": now,
         }},
     )

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
@@ -19,6 +19,12 @@ export default function StarseedAdventure() {
   const { user, authHeaders, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const starseedResonance = useResonance();
+  // V68.63 — When the player enters from the Multiverse map, the
+  // realm id is on the URL. We pass it through to the scene
+  // generator so the LLM weaves the realm's lore into the opening.
+  const [searchParams] = useSearchParams();
+  const realmFromUrl = searchParams.get('realm') || null;
+  const originFromUrl = searchParams.get('origin') || null;
 
   const [origins, setOrigins] = useState([]);
   const [characters, setCharacters] = useState([]);
@@ -101,7 +107,7 @@ export default function StarseedAdventure() {
         origin_id: originId, character_name: characterName,
       }, { headers: buildHeaders() });
       const sceneRes = await axios.post(`${API}/starseed/generate-scene`, {
-        origin_id: originId, choice_index: null,
+        origin_id: originId, choice_index: null, realm_id: realmFromUrl || undefined,
       }, { headers: buildHeaders() });
       setCurrentScene(sceneRes.data.scene);
       setCharacterState(sceneRes.data.character);
@@ -133,7 +139,7 @@ export default function StarseedAdventure() {
       setLoading(false);
       SovereignKernel.unlockAudio();
     }
-  }, [buildHeaders, origins, generateSceneImage]);
+  }, [buildHeaders, origins, generateSceneImage, realmFromUrl]);
 
   const resumeAdventure = useCallback(async (originId) => {
     setLoading(true);
@@ -147,7 +153,7 @@ export default function StarseedAdventure() {
       const charRes = await axios.get(`${API}/starseed/character/${originId}`, { headers: buildHeaders() });
       setCharacterState(charRes.data);
       const sceneRes = await axios.post(`${API}/starseed/generate-scene`, {
-        origin_id: originId, choice_index: null,
+        origin_id: originId, choice_index: null, realm_id: realmFromUrl || undefined,
       }, { headers: buildHeaders() });
       setCurrentScene(sceneRes.data.scene);
       setCharacterState(sceneRes.data.character);
@@ -162,7 +168,23 @@ export default function StarseedAdventure() {
     } finally {
       setLoading(false);
     }
-  }, [buildHeaders, origins, generateSceneImage]);
+  }, [buildHeaders, origins, generateSceneImage, realmFromUrl]);
+
+  // V68.63 — When the player enters from the Multiverse map with a
+  // realm + origin in the URL, auto-resume the matching character
+  // instead of forcing them through the character-select screen
+  // again. If they don't have one for this origin, select stays so
+  // they can name a new one.
+  const autoEnteredRef = React.useRef(false);
+  useEffect(() => {
+    if (autoEnteredRef.current) return;
+    if (initialLoading || !originFromUrl || !origins.length) return;
+    const existing = characters.find(c => c.origin_id === originFromUrl);
+    if (existing) {
+      autoEnteredRef.current = true;
+      resumeAdventure(originFromUrl);
+    }
+  }, [initialLoading, originFromUrl, origins, characters, resumeAdventure]);
 
   const makeChoice = useCallback(async (choiceIndex) => {
     if (!activeOrigin || loading) return;

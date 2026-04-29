@@ -329,7 +329,7 @@ function RealmDetailPanel({ realm, onExplore, exploring, onClose }) {
             }}
             data-testid={`explore-${realm.id}`}>
             {exploring ? <Loader2 size={14} className="animate-spin" /> : <Compass size={14} />}
-            {exploring ? 'Exploring...' : 'Explore This Realm'}
+            {exploring ? 'Opening Portal...' : 'Enter the Story'}
           </motion.button>
         )}
       </div>
@@ -610,19 +610,25 @@ export default function StarseedWorlds() {
 
   const exploreRealm = useCallback(async () => {
     if (!selectedRealm || !activeOrigin || exploring) return;
+    // V68.63 — The "slot machine" path is dead. The Multiverse map
+    // now hands off to the real branching-narrative RPG, anchored
+    // to this realm's lore. The /starseed-adventure flow already has
+    // chapter progression, branching choices, gem-resonance, and AI
+    // cosmic art per scene — we just had it disconnected from this
+    // door for too long.
+    if (!selectedRealm.unlocked) return;
     setExploring(true);
+    // Persist selection so StarseedAdventure picks it up on mount,
+    // even across reloads.
     try {
-      const res = await axios.post(`${API}/starseed/worlds/explore`, {
-        realm_id: selectedRealm.id, origin_id: activeOrigin,
-      }, { headers: authHeaders });
-      setExplorationResult(res.data);
-      refreshData();
-    } catch (err) {
-      toast.error(err.response?.data?.detail || 'Exploration failed');
-    } finally {
-      setExploring(false);
-    }
-  }, [selectedRealm, activeOrigin, exploring, authHeaders, refreshData]);
+      sessionStorage.setItem('multiverse_entry', JSON.stringify({
+        realm_id: selectedRealm.id,
+        origin_id: activeOrigin,
+        ts: Date.now(),
+      }));
+    } catch { /* noop */ }
+    navigate(`/starseed-adventure?realm=${encodeURIComponent(selectedRealm.id)}&origin=${encodeURIComponent(activeOrigin)}`);
+  }, [selectedRealm, activeOrigin, exploring, navigate]);
 
   const equipGear = useCallback(async (item) => {
     try {

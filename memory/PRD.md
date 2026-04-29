@@ -1,7 +1,77 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.62)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.63)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
+
+## V68.63 — Multiverse Slot Machine → Real RPG (29 Feb 2026)
+
+User-reported bug: *"It's supposed to be a role-playing game.
+Choose your own adventure type thing. Why is it just being cheesy
+not telling the story or having any visualizations or being
+gamified whatsoever?"*
+
+### Audit-first finding
+The Multiverse map (`StarseedWorlds.js`) had been calling
+`/starseed/worlds/explore` — a **pure slot-machine endpoint**:
+random XP roll, random encounter pick, random gem roll, flat
+result card. **Zero story. Zero choices.**
+
+Meanwhile, a fully-built branching-narrative RPG already existed
+at `/starseed/generate-scene` and `pages/StarseedAdventure.js`
+with: chapter progression, story_memory, choices_made history,
+3 stat-influenced branching choices per scene, gem-resonance
+hidden paths, legendary path arcs, AI cosmic art per scene.
+**The two systems were never connected.**
+
+### Bridge shipped (no rebuild — just connection)
+1. ✅ **`/starseed/generate-scene` now accepts `realm_id`** —
+   when passed, looks up the realm from `MULTIVERSE_REALMS`,
+   builds a `realm_prompt` with the realm's lore, element,
+   boss, common enemies, and atmosphere. The LLM weaves the
+   realm's distinct identity into the opening narrative.
+2. ✅ **`current_realm` persisted** on the starseed character
+   so subsequent scenes (without realm_id) still know where the
+   player is — realm identity bleeds across chapters.
+3. ✅ **`StarseedWorlds.js exploreRealm`** rewritten — no longer
+   POSTs to the slot-machine. Now `navigate('/starseed-adventure?
+   realm=<id>&origin=<id>')`. Button label changed from
+   "Explore This Realm" → **"Enter the Story"**.
+4. ✅ **`StarseedAdventure.js` reads URL params** — `?realm=` and
+   `?origin=` flow through to `/starseed/generate-scene`. Auto-
+   resume effect detects an existing character for the requested
+   origin and skips the character-select screen, dropping the
+   player straight into Chapter X / Scene N anchored to the
+   chosen realm.
+5. ✅ **TDZ bug** — `useEffect` referenced `resumeAdventure`
+   before its `useCallback` declaration → `CosmicErrorBoundary`
+   triggered. Reordered effect placement so callback is in scope.
+
+### Verification
+**Pytest 3/3 PASS** (V68.63):
+```
+test_generate_scene_accepts_realm_id           PASSED
+test_realm_persists_on_character               PASSED
+test_no_realm_id_still_works_legacy_path       PASSED
+```
+**Curl proof**: scene generated for Pleiadian + Astral Sanctum
+opens with *"As you traverse the astral corridors of the
+Sanctum, your Pleiadian heart beats in synchrony with the
+luminous surroundings..."* + 3 branching choices including a
+gem-resonance path, atmosphere=ethereal, AI image_prompt
+referencing "Lyria stands at an ethereal intersection of
+glowing astral paths in the Astral Sanctum."
+
+**Playwright smoke**: Multiverse → Astral Sanctum → "Enter the
+Story" → URL transitions to `/starseed-adventure?realm=astral-
+sanctum&origin=pleiadian` → existing Lyria character (LVL 4,
+Ch.4 Sc.17) auto-resumes with stats bar (WIS / CRG 8 / CMP 10
+/ INT 11 / RES 9), XP bar 255/274, and scene panel rendering
+the AI cosmic art. **No error boundary, real RPG.**
+
+### Bug sealed
+- ✅ Multiverse "Explore This Realm" no longer triggers slot-
+  machine; routes straight into the branching narrative engine
+  with realm-anchored scene generation.
 
 ## V68.62 — Unified Entity Inlay + Cultural Lens Freeze Fix (29 Feb 2026)
 
