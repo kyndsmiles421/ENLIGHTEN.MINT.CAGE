@@ -189,15 +189,34 @@ export default function Herbology() {
           );
         }}
         onItemOpen={async (item) => {
-          // V68.62 — Entity Page resolution: every opened herb broadcasts
-          // its full unified node to the ContextBus so Tarot/Oracle/Story
-          // absorb it through the V68.61 cross-pollination filter. The
-          // user is no longer "looking up a card" — they're inhabiting
-          // the entity.
+          // V68.62 + V68.65 — Entity Page resolution + Discovery economy.
+          // Every opened herb broadcasts its full unified node to the
+          // ContextBus so Tarot/Oracle/Story absorb it (V68.61
+          // cross-pollination filter). On first-view, the backend
+          // credits 6 sparks and we re-fire the surface-area refresh
+          // so the Sage Gauge depth ring updates immediately.
           try {
-            const r = await axios.get(`${API}/entity/${item.id}`);
+            const token = localStorage.getItem('zen_token');
+            const headers = token && token !== 'guest_token'
+              ? { Authorization: `Bearer ${token}` } : {};
+            const r = await axios.get(`${API}/entity/${item.id}`, { headers });
             const seed = r.data?.context_seed || { activeEntity: item.id, name: item.name };
             busCommit('entityState', seed, { moduleId: 'HERBOLOGY' });
+            const discovery = r.data?.discovery;
+            if (discovery?.is_first_view) {
+              try {
+                window.dispatchEvent(new CustomEvent('sovereign:entity-discovery', {
+                  detail: {
+                    id: item.id,
+                    name: item.name,
+                    sparks: discovery.sparks_credited || 0,
+                  },
+                }));
+              } catch { /* noop */ }
+              if (discovery.sparks_credited) {
+                toast.success(`+${discovery.sparks_credited} Sparks \u2014 ${item.name} illuminated`);
+              }
+            }
           } catch { /* noop */ }
         }}
       />

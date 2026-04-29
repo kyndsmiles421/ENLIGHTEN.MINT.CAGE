@@ -312,14 +312,69 @@ async def entity_index():
     }
 
 
+@router.get("/entity/surface-area")
+async def entity_surface_area(user=Depends(get_current_user_optional)):
+    """V68.65 — Sage Gauge depth feed.
+
+    Returns the total Inlay node count, the count this user has
+    illuminated, and a list of unexplored nodes ordered so the
+    gauge can pulse the user toward where their graph is thinnest.
+    Anonymous → returns total only.
+
+    NOTE: This static route MUST be declared BEFORE the dynamic
+    `/entity/{entity_id}` resolver below, otherwise FastAPI tries
+    to resolve "surface-area" as an entity id (returning 404).
+    """
+    total = len(ENTITY_INDEX)
+    if not user:
+        return {
+            "total":     total,
+            "viewed":    0,
+            "ratio":     0.0,
+            "unexplored_sample": [],
+        }
+    viewed_ids = set()
+    try:
+        cursor = db.entity_views.find({"user_id": user["id"]}, {"_id": 0, "entity_id": 1})
+        async for doc in cursor:
+            viewed_ids.add(doc.get("entity_id"))
+    except Exception as e:
+        logger.warning(f"entity_views read failed: {e}")
+    viewed = len(viewed_ids & set(ENTITY_INDEX.keys()))
+    ratio = round(viewed / total, 4) if total else 0.0
+    unexplored = []
+    for cid, node in ENTITY_INDEX.items():
+        if cid in viewed_ids:
+            continue
+        unexplored.append({
+            "id":         cid,
+            "name":       node["name"],
+            "type":       node["type"],
+            "richness":   len(node.get("tradition_views") or {}) + len(node.get("sources") or []),
+        })
+    unexplored.sort(key=lambda n: -n["richness"])
+    return {
+        "total":              total,
+        "viewed":             viewed,
+        "ratio":              ratio,
+        "unexplored_sample":  unexplored[:6],
+    }
+
+
 @router.get("/entity/{entity_id}")
-async def entity_resolve(entity_id: str):
+async def entity_resolve(entity_id: str, user=Depends(get_current_user_optional)):
     """Federated resolver. Pulls the full unified node from the Inlay.
     The frontend reads this once and broadcasts to ContextBus, so the
-    whole engine knows what's active."""
+    whole engine knows what's active.
+
+    V68.65 — Side-effect: logs a view in `entity_views` and credits
+    sparks on the user's FIRST encounter with this entity. The
+    economy is now part of the graph: discovering a new node
+    rewards you. Anonymous viewers (no auth) are tracked by
+    session-less view but earn no sparks.
+    """
     canonical = _resolve(entity_id)
     if not canonical:
-        # Try the alias map's case-insensitive fallback before failing.
         raise HTTPException(
             status_code=404,
             detail=f"Entity '{entity_id}' not in the Inlay. "
@@ -328,6 +383,47 @@ async def entity_resolve(entity_id: str):
     node = ENTITY_INDEX.get(canonical)
     if not node:
         raise HTTPException(status_code=404, detail="Node missing")
+
+    # V68.65 — Log the view + credit on first-view (server-side, idempotent).
+    sparks_credited = 0
+    is_first_view = False
+    if user:
+        try:
+            existing = await db.entity_views.find_one({
+                "user_id": user["id"], "entity_id": canonical,
+            })
+            if not existing:
+                is_first_view = True
+                await db.entity_views.insert_one({
+                    "user_id": user["id"],
+                    "entity_id": canonical,
+                    "first_viewed_at": datetime.now(timezone.utc).isoformat(),
+                    "view_count": 1,
+                })
+                # Credit sparks for graph exploration. 6 sparks per
+                # NEW node revealed — matches the chamber-tap economy
+                # (≈3 taps' worth) so discovering a node feels like
+                # finding a treasure, not a click.
+                ENTITY_DISCOVERY_SPARKS = 6
+                await db.spark_wallets.update_one(
+                    {"user_id": user["id"]},
+                    {"$inc": {
+                        "sparks": ENTITY_DISCOVERY_SPARKS,
+                        "total_earned": ENTITY_DISCOVERY_SPARKS,
+                        "entities_discovered": 1,
+                    }},
+                    upsert=True,
+                )
+                sparks_credited = ENTITY_DISCOVERY_SPARKS
+            else:
+                await db.entity_views.update_one(
+                    {"user_id": user["id"], "entity_id": canonical},
+                    {"$inc": {"view_count": 1},
+                     "$set": {"last_viewed_at": datetime.now(timezone.utc).isoformat()}},
+                )
+        except Exception as e:
+            logger.warning(f"entity_views log failed: {e}")
+
     # Compute graph edges on the fly: same family, shared traditions,
     # any blends_with link from aromatherapy.
     related = set()
@@ -360,6 +456,11 @@ async def entity_resolve(entity_id: str):
             "type":              node["type"],
             "traditions":        node.get("traditions", []),
             "primary_tradition": (node.get("traditions") or [None])[0],
+        },
+        # V68.65 — Discovery economy.
+        "discovery": {
+            "is_first_view":    is_first_view,
+            "sparks_credited":  sparks_credited,
         },
     }
 

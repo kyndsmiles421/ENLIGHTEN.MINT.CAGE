@@ -1,7 +1,113 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.64)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.65)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
+
+## V68.65 — Omni-Utility · Discovery Economy + Density Gauge + Privacy Lockdown (29 Feb 2026)
+
+User directive: *"Continue utilizing every movement efficiently.
+Proficiently precision excellence and user interface friendliness
+also making sure every piece is utilized as it should. Also keeping
+all the private stuff that doesn't need to be public like that. Key
+store information not available up front only to me. Also make sure
+that's the subscription tiered structure is still in place along
+with the marketplace of them being able to buy utilities."*
+
+### Audit-first finding (Possibility #2: Partially Built)
+Three bridges to ship; no rebuilds:
+  • Sage Gauge tracks velocity but NOT depth (entity surface area)
+  • Credit Ledger has `/sparks/immersion` for chamber taps but no
+    reward fires on Entity Graph exploration
+  • Assembler pattern for Tarot/Oracle/Forecast was **already
+    shipped in V68.61** (cross-pollination filter) — skipped to
+    avoid duplicate work
+  • **🚨 Privacy: 4 keystore artifacts were tracked in git** —
+    `build_artifacts/enlighten-mint-cafe-UPLOAD-KEY.keystore`,
+    `build_artifacts/KEYSTORE_FINGERPRINTS.txt`,
+    `frontend/android/infinity-sovereign.keystore.legacy`,
+    `twa/enlighten.keystore`
+
+### Bridges shipped
+1. ✅ **`/api/entity/{id}` first-view discovery economy** —
+   server-side, idempotent. On user's first view of any node:
+     • Inserts row in `entity_views` (user_id + entity_id +
+       first_viewed_at + view_count)
+     • Increments `spark_wallets` by **6 sparks** (matches
+       chamber-tap economy ≈ 3 taps' worth — discovery feels like
+       finding treasure, not a click)
+     • Increments `entities_discovered` counter on the wallet
+   On subsequent views: increments view_count + last_viewed_at,
+   no double-credit.
+   Response now includes `discovery: { is_first_view, sparks_credited }`
+   so frontend can fire toasts and surface-area refresh.
+2. ✅ **`/api/entity/surface-area`** (NEW) — returns
+     `{ total, viewed, ratio, unexplored_sample[6] }`
+   The unexplored_sample is sorted by node *richness*
+   (count of tradition_views + sources) so the gauge can pulse the
+   user toward the densest unexplored cells.
+   **Static route registered BEFORE dynamic `/entity/{id}`** so
+   FastAPI resolves it correctly (a 60-second bug — `/entity/{id}`
+   was catching it as a literal entity name). Test locks this in.
+3. ✅ **`useEngineLoad` extended** — now also returns
+   `{ depth, viewed, total, nextCells }`. Polls
+   `/entity/surface-area` every 30s, refreshes immediately on
+   `sovereign:entity-discovery` CustomEvent. Publishes
+   `window.__sovereignDepth` for any downstream consumer.
+4. ✅ **`SageEngineGauge` outer depth ring** — purple stroke
+   around the load ring, fills proportional to surface-area ratio.
+   Inline readout below the gauge: **"X/Y CELLS"** (e.g., "1/70 CELLS").
+   Confirmed live in screenshot — gauge transformed from a timer
+   into a metabolic processor readout.
+5. ✅ **`Herbology.js onItemOpen`** — when the resolver returns
+   `discovery.is_first_view=true`:
+     • Toasts **"+6 Sparks — Peppermint illuminated"**
+     • Fires `sovereign:entity-discovery` CustomEvent (triggers
+       gauge depth refresh)
+   The economic loop is now part of the graph.
+
+### Privacy lockdown shipped
+6. ✅ **4 keystore artifacts removed from git tracking** via
+   `git rm --cached` (files remain on disk for local AAB signing).
+7. ✅ **Root `.gitignore` hardened** with explicit rules:
+     `*.keystore`, `*.keystore.*`, `*.jks`, `*.p12`, `*.pfx`,
+     `key.properties`, `keystore.properties`,
+     `KEYSTORE_FINGERPRINTS.txt`, `*-UPLOAD-KEY.*`,
+     `build_artifacts/*.keystore`, `build_artifacts/*.jks`,
+     `build_artifacts/KEYSTORE_*`, `frontend/android/*.keystore`,
+     `frontend/android/*.jks`, `twa/*.keystore`
+   Verified with `git check-ignore -v` — all 4 paths now blocked.
+
+### ⚠️ User action recommended
+The keystores were previously in git history. If the repo has
+been pushed to a remote (GitHub, GitLab, etc.), the keys ARE
+exposed in history even after this fix. To fully secure:
+  • Rotate the upload key (generate new keystore for the next
+    AAB build); OR
+  • If the repo is private and never pushed, no rotation needed —
+    just keep the new gitignore rules in place.
+This is a one-time decision; the new rules prevent recurrence.
+
+### Subscription + Marketplace verified intact
+- `GET /api/subscriptions/tiers` — 200 ✅
+- `GET /api/marketplace/store` — 200 (auth required, working as designed) ✅
+- All 16 marketplace endpoints intact (buy-credits, buy-item,
+  mixer-store, equip-cosmetic, sell-minerals, subscribe-nexus,
+  inventory, convert-dust, etc.)
+- Subscription tier engine (Sedimentary/Igneous/Metamorphic)
+  still gates premium features.
+
+### Verification
+**Pytest 5/5 PASS** (V68.65):
+```
+test_surface_area_resolves_static_route          PASSED
+test_first_view_credits_sparks_subsequent_does_not PASSED
+test_anonymous_surface_area_does_not_crash       PASSED
+test_subscription_tiers_still_intact             PASSED
+test_marketplace_store_still_intact              PASSED
+```
+**Playwright smoke**: gauge renders depth ring + "1/70 CELLS"
+readout, subscription/marketplace endpoints respond 200,
+data-engine-depth attribute on gauge = 0.014.
 
 ## V68.64 — Knowledge-as-Substance Chamber Bridge (29 Feb 2026)
 

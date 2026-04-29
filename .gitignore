@@ -306,3 +306,24 @@ credentials.json
 *.pem
 *.key
 .credentials
+
+# ─────────────────────────────────────────────────────────────────
+# V68.65 — Private signing material. Keystores, fingerprints, and
+# upload-key bundles must NEVER reach the remote. Files stay on
+# disk for local AAB signing.
+# ─────────────────────────────────────────────────────────────────
+*.keystore
+*.keystore.*
+*.jks
+*.p12
+*.pfx
+key.properties
+keystore.properties
+KEYSTORE_FINGERPRINTS.txt
+*-UPLOAD-KEY.*
+build_artifacts/*.keystore
+build_artifacts/*.jks
+build_artifacts/KEYSTORE_*
+frontend/android/*.keystore
+frontend/android/*.jks
+twa/*.keystore
