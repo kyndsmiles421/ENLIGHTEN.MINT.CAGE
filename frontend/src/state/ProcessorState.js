@@ -61,6 +61,17 @@ const MODULE_FREQUENCIES = {
   STORY_GEN:       { bass: 0.48, mid: 0.74, treble: 0.32, peak: 0.62 },
   SCENE_GEN:       { bass: 0.36, mid: 0.58, treble: 0.66, peak: 0.58 },
   STARSEED:        { bass: 0.78, mid: 0.46, treble: 0.52, peak: 0.85 },
+  // Phase 2 — Divination & Oracle band
+  ORACLE:          { bass: 0.30, mid: 0.70, treble: 0.62, peak: 0.60 },
+  AKASHIC:         { bass: 0.25, mid: 0.55, treble: 0.82, peak: 0.50 },
+  STAR_CHART:      { bass: 0.20, mid: 0.48, treble: 0.88, peak: 0.55 },
+  NUMEROLOGY:      { bass: 0.32, mid: 0.62, treble: 0.50, peak: 0.45 },
+  MAYAN:           { bass: 0.45, mid: 0.58, treble: 0.55, peak: 0.55 },
+  CARDOLOGY:       { bass: 0.28, mid: 0.65, treble: 0.58, peak: 0.50 },
+  ANIMAL_TOTEMS:   { bass: 0.65, mid: 0.42, treble: 0.48, peak: 0.65 },
+  HEXAGRAM:        { bass: 0.38, mid: 0.72, treble: 0.42, peak: 0.55 },
+  COSMIC_INSIGHTS: { bass: 0.24, mid: 0.60, treble: 0.74, peak: 0.50 },
+  SOUL_REPORTS:    { bass: 0.30, mid: 0.68, treble: 0.66, peak: 0.55 },
 };
 
 function emitPulse(moduleId) {
@@ -156,6 +167,17 @@ export const MODULE_REGISTRY = {
   STORY_GEN:       React.lazy(() => import('../engines/StoryGenEngine')),
   SCENE_GEN:       React.lazy(() => import('../engines/SceneGenEngine')),
   STARSEED:        React.lazy(() => import('../engines/StarseedRPGEngine')),
+  // Phase 2 — Divination & Oracle band
+  ORACLE:          React.lazy(() => import('../engines/OracleEngine')),
+  AKASHIC:         React.lazy(() => import('../engines/AkashicEngine')),
+  STAR_CHART:      React.lazy(() => import('../engines/StarChartEngine')),
+  NUMEROLOGY:      React.lazy(() => import('../engines/NumerologyEngine')),
+  MAYAN:           React.lazy(() => import('../engines/MayanEngine')),
+  CARDOLOGY:       React.lazy(() => import('../engines/CardologyEngine')),
+  ANIMAL_TOTEMS:   React.lazy(() => import('../engines/AnimalTotemsEngine')),
+  HEXAGRAM:        React.lazy(() => import('../engines/HexagramEngine')),
+  COSMIC_INSIGHTS: React.lazy(() => import('../engines/CosmicInsightsEngine')),
+  SOUL_REPORTS:    React.lazy(() => import('../engines/SoulReportsEngine')),
 };
 
 export function ProcessorStateProvider({ children }) {

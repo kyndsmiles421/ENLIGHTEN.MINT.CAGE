@@ -1,9 +1,65 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.48)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.61)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
 
+## V68.61 — Navigation Drain · Phase 2 (Divination Band) (29 Feb 2026)
+
+User directive (Final Launch Sequence Step 2): "Convert the
+remaining Hub pillars to pull() dispatchers, ensuring zero
+browser-routing."
+
+### Phase 2 wiring shipped — Divination/Oracle band (10 pillars)
+1. ✅ **10 new `[Name]Engine.js` adapters** in `/app/frontend/src/engines/`:
+   `OracleEngine`, `AkashicEngine`, `StarChartEngine`, `NumerologyEngine`,
+   `MayanEngine`, `CardologyEngine`, `AnimalTotemsEngine`,
+   `HexagramEngine`, `CosmicInsightsEngine`, `SoulReportsEngine`.
+   Each is a thin Direct-State-Substitution wrapper around the
+   existing page (no DOM teardown, no URL change).
+2. ✅ **`MODULE_REGISTRY`** extended with the 10 new module ids and
+   their lazy-loaded adapters; **`MODULE_FREQUENCIES`** signature
+   pulse vectors added so the lattice paints a unique resonance
+   when each is pulled.
+3. ✅ **`ROUTE_TO_MODULE`** map in `SovereignHub.js` updated:
+   `/oracle`, `/akashic-records`, `/star-chart`, `/numerology`,
+   `/mayan`, `/cardology`, `/animal-totems`, `/hexagram-journal`,
+   `/cosmic-insights`, `/soul-reports` now flow through the
+   `pull()` dispatcher instead of `navigate()`.
+4. ✅ **Verified inline** with screenshot tool — clicking the
+   wired `Oracle & Tarot` blade in the Divination pillar drawer
+   sets `window.__sovereignActiveModule = 'ORACLE'`, keeps URL at
+   `/sovereign-hub`, and renders the `matrix-release` pill. The
+   `data-wired="true"` attribute + "CHANNEL" caption confirm the
+   pillar items detect their wiring at render time.
+
+### Total wired pillars now: **17 of ~120**
+- Phase 1 (V68.55): AVATAR_GEN, COSMIC_PORTRAIT, FORECASTS,
+  DREAM_VIZ, STORY_GEN, SCENE_GEN, STARSEED.
+- Phase 2 (V68.61): ORACLE, AKASHIC, STAR_CHART, NUMEROLOGY,
+  MAYAN, CARDOLOGY, ANIMAL_TOTEMS, HEXAGRAM, COSMIC_INSIGHTS,
+  SOUL_REPORTS.
+
+## V68.60 — Resurrection UI (Time Capsule Drawer) (28 Feb 2026)
+
+User directive: "Build the Resurrection UI to close the
+save-game loop opened by the archival pivot."
+
+### Closed loop shipped
+1. ✅ **`/app/frontend/src/components/TimeCapsuleDrawer.js`** —
+   inline expanding drawer (Flatland-compliant, no portal/modal).
+   Lists archived capsules from `GET /api/time-capsules/recent`,
+   shows world / narrative / entity / scene summaries, and
+   resurrects on click by re-committing each populated key to the
+   `ContextBus` (which auto-pulses the lattice) plus pulling the
+   saved `active_module` if non-IDLE.
+2. ✅ **Mounted in `SovereignHub.js`** below the dispatcher row
+   via the **☉ Recall** toggle button (`recall-toggle-btn`).
+3. ✅ **Verified inline** — drawer opens, lists capsules with
+   FLOW/OVERHEATING gauge tints, and resume buttons are
+   keyboard-accessible.
+
 ## V68.59 — Time-Capsule Archival · Save-Game Loop (27 Feb 2026)
+
 
 User directive: "Pivot to Step 3 (Archival). Data Integrity >
 Performance Throttling. If the user closes the tab before session

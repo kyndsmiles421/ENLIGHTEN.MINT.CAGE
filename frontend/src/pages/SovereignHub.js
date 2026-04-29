@@ -272,6 +272,17 @@ const ROUTE_TO_MODULE = {
   '/dreams':              'DREAM_VIZ',
   '/creation-stories':    'STORY_GEN',
   '/starseed-adventure':  'STARSEED',
+  // Phase 2 — Divination & Oracle band
+  '/oracle':              'ORACLE',
+  '/akashic-records':     'AKASHIC',
+  '/star-chart':          'STAR_CHART',
+  '/numerology':          'NUMEROLOGY',
+  '/mayan':               'MAYAN',
+  '/cardology':           'CARDOLOGY',
+  '/animal-totems':       'ANIMAL_TOTEMS',
+  '/hexagram-journal':    'HEXAGRAM',
+  '/cosmic-insights':     'COSMIC_INSIGHTS',
+  '/soul-reports':        'SOUL_REPORTS',
 };
 
 export default function SovereignHub() {
