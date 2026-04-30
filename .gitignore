@@ -327,3 +327,4 @@ build_artifacts/KEYSTORE_*
 frontend/android/*.keystore
 frontend/android/*.jks
 twa/*.keystore
+frontend/node_modules/.cache/default-development/69.pack

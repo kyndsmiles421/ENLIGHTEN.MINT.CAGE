@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { ScriptureVisualizer, VisionModeToggle, detectScenes } from '../components/ScriptureVisualizer';
 import { useSensory } from '../context/SensoryContext';
 import TranslateChip from '../components/TranslateChip';
+import CompanionChip from '../components/CompanionChip';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -271,12 +272,13 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
                   {/* V68.86 — Reader-Translator Bridge. Translates the
                       whole retelling into the active language; sacred
                       mode unlocked for Sovereign tier owners. */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10, gap: 6, flexWrap: 'wrap' }}>
                     <TranslateChip
                       text={chapter.retelling.slice(0, 3500)}
                       sacred
                       onSwap={setTranslatedRetelling}
                     />
+                    <CompanionChip textId={book.id} />
                   </div>
                   {(translatedRetelling || chapter.retelling).split('\n\n').map((p, i) => (
                     <p key={i} className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif', fontSize: '15px' }}>{p}</p>

@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { FixedSizeList } from 'react-window';
 import TranslateChip from '../components/TranslateChip';
+import CompanionChip from '../components/CompanionChip';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
@@ -260,12 +261,13 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
               {/* V68.86 — Reader-Translator chip. Sacred mode unlocks
                   Sovereign-tier etymology overlay. Translates the full
                   retelling so polyglot seekers can study cross-tradition. */}
-              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16, gap: 6, flexWrap: 'wrap', alignItems: 'flex-start' }}>
                 <TranslateChip
                   text={paragraphs.join('\n\n').slice(0, 3500)}
                   sacred
                   onSwap={setTranslatedRetelling}
                 />
+                <CompanionChip textId={text.id} />
               </div>
               {(translatedRetelling
                   ? translatedRetelling.split('\n\n')

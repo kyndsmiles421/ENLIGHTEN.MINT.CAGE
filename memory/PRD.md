@@ -327,5 +327,6 @@ Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, a
 - `/app/backend/tests/test_iteration_v68_86_frequency_dial.py` (useLanguageFrequency hook, phonetic synth lyrical_flow/aloha_breath, TranslateChip wired into Bible) — 6 tests
 - `/app/backend/tests/test_iteration_v68_91_quran_complete.py` (full 114-surah catalog, metadata shape, chronology coverage, no duplicates) — 4 tests
 - `/app/backend/tests/test_iteration_v68_92_pali_polynesian_companions.py` (Pali Canon 10 entries, Polynesian 3, Indigenous 3, Companion Engine concept bridges) — 11 tests
+- `/app/backend/tests/test_iteration_v68_93_companion_ui_catalog.py` (Hindu/Mahayana/Sikh/LDS/Avesta catalog, new concept bridges, CompanionChip frontend wiring) — 13 tests
 - `/app/backend/tests/test_comprehensive_audit.py`
 - `/app/backend/tests/test_iteration261_economy_tiers.py` (prior tier validation)

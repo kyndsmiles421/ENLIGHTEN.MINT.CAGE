@@ -137,6 +137,58 @@ COMPANION_BRIDGES: Dict[str, List[Dict]] = {
         {"id": "old-testament-genesis", "tradition": "Hebrew Bible (Genesis 2)",
          "why": "Adam placed in the Garden 'to till and to keep it' — the original stewardship covenant."},
     ],
+
+    # V68.93 — Emptiness / Non-Self / Form is Emptiness — across schools
+    "emptiness": [
+        {"id": "heart-sutra", "tradition": "Mahayana (Heart Sutra)",
+         "why": "Form is emptiness; emptiness is form — the most concise statement of sunyata."},
+        {"id": "diamond-sutra", "tradition": "Mahayana (Diamond Sutra)",
+         "why": "All conditioned phenomena are like dreams, illusions, dewdrops, lightning."},
+        {"id": "lankavatara-sutra", "tradition": "Yogacara / Zen",
+         "why": "Mind-only (cittamatra) — the 'storehouse consciousness' that projects what we call the world."},
+        {"id": "tao-te-ching", "tradition": "Taoist",
+         "why": "The Tao that can be named is not the eternal Tao — emptiness as the fertile ground."},
+        {"id": "samyutta-nikaya", "tradition": "Theravada (Anattalakkhana Sutta)",
+         "why": "The Buddha's teaching of non-self (anatta) — the original Pali root of the Mahayana view."},
+    ],
+
+    # V68.93 — The Word / Sacred Sound / Logos
+    "sacred_sound": [
+        {"id": "atharva-veda", "chapter": "av-5", "tradition": "Hindu (Mandukya Upanishad)",
+         "why": "Aum — the syllable that contains past, present, future, and the silence beyond."},
+        {"id": "sama-veda", "tradition": "Hindu (Vedic chant)",
+         "why": "The Saman melodies — sacred vibration as the primordial form of revelation."},
+        {"id": "guru-granth-sahib", "chapter": "gg-1", "tradition": "Sikh (Mool Mantar)",
+         "why": "Ik Onkar Sat Naam — One Universal Creator, the True Name. Sound as sovereign reality."},
+        {"id": "new-testament-john", "tradition": "Christian (John 1)",
+         "why": "In the beginning was the Word, and the Word was with God — Logos as creative principle."},
+        {"id": "rumi-masnavi", "tradition": "Sufi (Rumi)",
+         "why": "The reed flute's lament — sound as the voice of separated souls calling home."},
+    ],
+
+    # V68.93 — Dharma / Righteousness / The Path
+    "dharma": [
+        {"id": "bhagavad-gita", "tradition": "Hindu (Bhagavad Gita)",
+         "why": "Krishna's teaching to Arjuna on Kurukshetra — duty without attachment to fruits."},
+        {"id": "mahabharata", "chapter": "mb-4", "tradition": "Hindu (Bhishma Parva)",
+         "why": "The full epic context of dharma in war — the Gita is its philosophical heart."},
+        {"id": "samyutta-nikaya", "chapter": "sn-1", "tradition": "Buddhist (Setting the Wheel of Dharma)",
+         "why": "The Buddha's first sermon — the Four Noble Truths and the Middle Way."},
+        {"id": "guru-granth-sahib", "chapter": "gg-2", "tradition": "Sikh (Asa di Vaar)",
+         "why": "The path of the Gurmukh — daily devotion, honest labor, sharing with others."},
+    ],
+
+    # V68.93 — Purification / Inner Fire / Asha
+    "purification": [
+        {"id": "zend-avesta", "chapter": "za-5", "tradition": "Zoroastrian (Asha vs Druj)",
+         "why": "Asha (truth, righteousness) opposed to Druj (lie, distortion) — the cosmic ethical fire."},
+        {"id": "visuddhimagga", "tradition": "Buddhist (Path of Purification)",
+         "why": "Buddhaghosa's 23-chapter manual — sila, samadhi, panna as the threefold purification."},
+        {"id": "yoga-sutras", "tradition": "Hindu (Patanjali)",
+         "why": "Tapas (austerity) as one of the niyamas — inner heat that refines the practitioner."},
+        {"id": "lakota-seven-rites", "chapter": "ls-1", "tradition": "Lakota (Inipi)",
+         "why": "The purification lodge — sweat, prayer, and rebirth in the womb of the Earth."},
+    ],
 }
 
 # Direct text-ID → companion-list shortcuts. When a user opens any of
@@ -157,6 +209,22 @@ DIRECT_COMPANIONS: Dict[str, List[Dict]] = {
     "lakota-seven-rites":COMPANION_BRIDGES["stewardship"],
     "rumi-masnavi":      COMPANION_BRIDGES["love"],
     "dhammapada":        COMPANION_BRIDGES["mindfulness"],
+    # V68.93 — Direct mappings for the 15 newly catalogued texts.
+    "heart-sutra":       COMPANION_BRIDGES["emptiness"],
+    "diamond-sutra":     COMPANION_BRIDGES["emptiness"],
+    "lankavatara-sutra": COMPANION_BRIDGES["emptiness"],
+    "lotus-sutra":       COMPANION_BRIDGES["mindfulness"],
+    "rig-veda":          COMPANION_BRIDGES["sacred_sound"],
+    "sama-veda":         COMPANION_BRIDGES["sacred_sound"],
+    "yajur-veda":        COMPANION_BRIDGES["sacred_sound"],
+    "atharva-veda":      COMPANION_BRIDGES["sacred_sound"],
+    "mahabharata":       COMPANION_BRIDGES["dharma"],
+    "ramayana":          COMPANION_BRIDGES["dharma"],
+    "brahma-sutras":     COMPANION_BRIDGES["emptiness"],
+    "guru-granth-sahib": COMPANION_BRIDGES["sacred_sound"],
+    "book-of-mormon":    COMPANION_BRIDGES["lineage"],
+    "pearl-of-great-price": COMPANION_BRIDGES["creation"],
+    "zend-avesta":       COMPANION_BRIDGES["purification"],
 }
 
 
