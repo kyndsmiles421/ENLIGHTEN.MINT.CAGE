@@ -228,6 +228,75 @@ DIRECT_COMPANIONS: Dict[str, List[Dict]] = {
 }
 
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V68.94 — "Today's Cross-Tradition Pairing"
+#
+# A deterministic-by-UTC-date pick from COMPANION_BRIDGES so every
+# Sovereign Hub visitor sees the SAME pairing on a given day. Rotates
+# through every concept before repeating, giving organic daily reasons
+# to open the app.
+#
+# IMPORTANT (route-order): this handler MUST be registered BEFORE the
+# `/companions/{text_id}` catch-all below, otherwise FastAPI's
+# declaration-order matching turns "daily" into a text_id lookup and
+# the endpoint silently returns an empty companion list.
+#
+# Why server-side instead of frontend Math.random:
+#   • Single source of truth — adding new concepts auto-extends rotation
+#   • Future-compat: lets us inject curated calendar overrides later
+#     (e.g., Christmas → "maryam", Wesak → "emptiness") without a
+#     frontend release.
+#   • Stable response shape so the test suite can pin it.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+from datetime import datetime, timezone
+
+# Curated calendar overrides — month/day → concept. Empty slots fall
+# through to the deterministic rotation. Keep this small and meaningful;
+# this is NOT a holiday lookup table, it's a "right pairing on the right
+# day" hint that future agents/PMs can extend without code review.
+_DAILY_CALENDAR_OVERRIDES: Dict[str, str] = {
+    "12-25": "maryam",       # Christmas — Annunciation/Mary across traditions
+    "05-23": "emptiness",    # Approx. Wesak — Buddhist enlightenment day
+    "10-24": "dharma",       # United Nations / global covenant resonance
+    "04-22": "stewardship",  # Earth Day — Caring-for-Country across traditions
+}
+
+
+def _pick_daily_concept(today: datetime) -> str:
+    """Deterministic daily concept. Calendar override wins; otherwise
+    rotate by ordinal-day across the available concept bridges so the
+    cycle matches the bridge count exactly."""
+    md_key = today.strftime("%m-%d")
+    if md_key in _DAILY_CALENDAR_OVERRIDES:
+        override = _DAILY_CALENDAR_OVERRIDES[md_key]
+        if override in COMPANION_BRIDGES:
+            return override
+    keys = list(COMPANION_BRIDGES.keys())
+    if not keys:
+        return ""
+    # Day-of-year is stable per-UTC-date and rotates through all concepts.
+    doy = today.timetuple().tm_yday
+    return keys[doy % len(keys)]
+
+
+@router.get("/companions/daily")
+async def get_daily_pairing():
+    """Today's Cross-Tradition Pairing for the Sovereign Hub home view.
+    Returns concept + companions list, plus a date stamp so the client
+    can cache for the rest of the UTC day."""
+    today = datetime.now(timezone.utc)
+    concept = _pick_daily_concept(today)
+    if not concept:
+        # COMPANION_BRIDGES would only be empty during catastrophic edits;
+        # graceful empty response keeps the widget Flatland-compliant.
+        return {"date_utc": today.strftime("%Y-%m-%d"), "concept": None, "companions": []}
+    return {
+        "date_utc": today.strftime("%Y-%m-%d"),
+        "concept": concept,
+        "companions": COMPANION_BRIDGES[concept],
+    }
+
+
 @router.get("/companions/{text_id}")
 async def get_companions(text_id: str):
     """Return ordained cross-tradition companions for a given text id.

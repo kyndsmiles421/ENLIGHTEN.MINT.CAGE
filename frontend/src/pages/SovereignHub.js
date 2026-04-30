@@ -29,6 +29,7 @@ import ComplianceShieldPill from '../components/ComplianceShieldPill';
 import TimeCapsuleDrawer from '../components/TimeCapsuleDrawer';
 // V68.68 — Surface the orphaned worlds + hunt.
 import SeedHuntWidget from '../components/SeedHuntWidget';
+import DailyCrossTraditionPairing from '../components/DailyCrossTraditionPairing';
 import { Telescope, Orbit, Sparkles as SparkleIcon, Globe, Eye, Infinity as InfinityIcon, Moon, Layers, TreePine, Compass } from 'lucide-react';
 import { useProcessorState, MODULE_REGISTRY } from '../state/ProcessorState';
 import SovereignPreferences from '../kernel/SovereignPreferences';
@@ -1071,6 +1072,16 @@ function MatrixModuleDispatcher() {
         width: '100%', maxWidth: 920, margin: '14px auto 0', padding: '0 12px',
       }}>
         <SeedHuntWidget />
+      </div>
+
+      {/* V68.94 — Today's Cross-Tradition Pairing. Deterministic-by-UTC-date
+          showcase of the V68.92/V68.93 cross-tradition engine. Renders
+          nothing if the API is unreachable, the concept is null, or the
+          companion list is empty (Flatland-compliant graceful empty). */}
+      <div style={{
+        width: '100%', maxWidth: 920, margin: '14px auto 0', padding: '0 12px',
+      }}>
+        <DailyCrossTraditionPairing />
       </div>
     </>
   );

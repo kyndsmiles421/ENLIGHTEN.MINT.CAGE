@@ -349,3 +349,12 @@ Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, a
   - `showBackBtn` exclusion list audited: only `/sovereign-hub`, `/landing`, `/auth`, `/intro`, `/`, `/hub`, `/creator-console`, `/apex-creator` are excluded — all justified.
   - "Rockhounder" page referenced in handoff **does not exist** in codebase (handoff narrative-creep flagged for next agent — do not try to wire it).
 - **Regression lock:** `tests/test_iteration_v68_94_never_trapped.py` codifies (a) z-index ≥ 100000 on the strip + dropdown, (b) global mount in App.js, (c) no 3D route may leak into the exclusion list, (d) any new excluded route must come with its own internal exit. This makes the Never-Trapped contract a CI-enforceable invariant.
+
+**Today's Cross-Tradition Pairing (Hub home surface):**
+- New endpoint `GET /api/companions/daily` — deterministic-by-UTC-date concept pick from `COMPANION_BRIDGES`. Same pairing for every visitor on a given day; rotates through every concept before repeating.
+- Curated calendar overrides (`_DAILY_CALENDAR_OVERRIDES`): `12-25 → maryam` (Christmas), `05-23 → emptiness` (Wesak), `10-24 → dharma`, `04-22 → stewardship` (Earth Day). Future PMs can extend without code review.
+- New component `frontend/src/components/DailyCrossTraditionPairing.jsx` — Flatland-inline card. Renders nothing on empty/error (Flatland-compliant graceful empty). Mounted on `SovereignHub.js` immediately below the Seed Hunt strip.
+- Forward-compat hooks already wired: `data-companion-id` on each tradition pill (Tesseract Relic gamification can read), `data-concept` + `data-date-utc` on wrapper (future "did the user study today's pairing?" check), `onCompanionClick` prop slot (future handler attach without prop surgery).
+- **Route-order pitfall caught:** initial `/companions/daily` was being eaten by the `/companions/{text_id}` catch-all because of FastAPI declaration-order matching. Reordered + added `test_daily_route_declared_before_text_id_catchall` to lock the contract.
+- Live verified: today's pairing = **Maryam** → Luke 1 + Quran 19 + Bhagavad Gita 4. Widget rendered on `/sovereign-hub` (DOM box at y:1337, w:896, h:271).
+- 6 additional regression tests added (route registration, declaration order, deterministic-per-date, full-rotation guarantee, override resolution, Christmas → Maryam exemplar). **Total V68.94 tests: 11 passing.**
