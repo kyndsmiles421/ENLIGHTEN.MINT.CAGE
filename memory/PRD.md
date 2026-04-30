@@ -328,5 +328,24 @@ Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, a
 - `/app/backend/tests/test_iteration_v68_91_quran_complete.py` (full 114-surah catalog, metadata shape, chronology coverage, no duplicates) — 4 tests
 - `/app/backend/tests/test_iteration_v68_92_pali_polynesian_companions.py` (Pali Canon 10 entries, Polynesian 3, Indigenous 3, Companion Engine concept bridges) — 11 tests
 - `/app/backend/tests/test_iteration_v68_93_companion_ui_catalog.py` (Hindu/Mahayana/Sikh/LDS/Avesta catalog, new concept bridges, CompanionChip frontend wiring) — 13 tests
+- `/app/backend/tests/test_iteration_v68_94_never_trapped.py` (BackToHub stacking-context lock, global mount, 3D-route exclusion guard) — 5 tests
 - `/app/backend/tests/test_comprehensive_audit.py`
 - `/app/backend/tests/test_iteration261_economy_tiers.py` (prior tier validation)
+
+### V68.94 — Stability & Verification Sweep (2026-04-30) ✅
+**Smoke-test (V68.93 verification):**
+- `/api/companions/concept/maryam` returns 3 ordained traditions (Luke 1, Quran 19, Gita 4) — confirmed
+- `/api/companions/concept/dharma` returns 4 (Gita, Mahabharata, Samyutta Nikaya, Guru Granth Sahib) — confirmed
+- `/api/companions/concept/emptiness` returns 5 (Heart Sutra, Diamond Sutra, Lankavatara, Tao Te Ching, Anattalakkhana) — confirmed
+- `/api/sacred-texts` catalog density = **46 entries** — V68.93 expansion verified live
+- 14 V68.93 backend tests still passing
+
+**3D Hub "Never Trapped" Audit:**
+- **Trap discovered:** On `/tesseract`, the global "Hub" back button at (32, 13) was visually occluded by the Source-State widget. DOM `elementFromPoint` returned a sibling DIV instead of `[data-testid="back-to-hub"]`, confirmed via Playwright. Root cause: `BackToHub` outer strip was `z-10` while the page's lattice/HUD widgets pushed to `z:9999 / z:10001` in the same stacking context (parent `page-enter` z:1).
+- **Fix:** `BackToHub.js` outer strip + related-dropdown bumped to `zIndex: 100000`. Single-line fix, Flatland-compliant.
+- **Verified live across 5 R3F-heavy routes:** `/tesseract`, `/fractal-engine`, `/lab`, `/meditation`, `/starseed-adventure` → ALL `CLICKABLE` post-fix. Screenshot confirms "Hub" button rendered above Source-State widget.
+- **Audit findings (no other traps):**
+  - All 11 R3F-bearing pages either inherit the global `BackToHub` (10 of them) OR carry their own internal exit (`/creator-console` → `creator-exit` button in `UnifiedCreatorConsole.js:456`). Zero pages without an exit hook.
+  - `showBackBtn` exclusion list audited: only `/sovereign-hub`, `/landing`, `/auth`, `/intro`, `/`, `/hub`, `/creator-console`, `/apex-creator` are excluded — all justified.
+  - "Rockhounder" page referenced in handoff **does not exist** in codebase (handoff narrative-creep flagged for next agent — do not try to wire it).
+- **Regression lock:** `tests/test_iteration_v68_94_never_trapped.py` codifies (a) z-index ≥ 100000 on the strip + dropdown, (b) global mount in App.js, (c) no 3D route may leak into the exclusion list, (d) any new excluded route must come with its own internal exit. This makes the Never-Trapped contract a CI-enforceable invariant.

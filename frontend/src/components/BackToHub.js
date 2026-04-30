@@ -417,8 +417,10 @@ export default function BackToHub() {
 
   return (
     <>
-      {/* Back + Related */}
-      <div className="sticky top-0 left-0 right-0 z-10 flex items-center gap-1.5 px-3 pt-3 pb-2" style={{ background: 'linear-gradient(to bottom, rgba(10,10,18,0.95), rgba(10,10,18,0.8), transparent)' }} data-testid="nav-controls">
+      {/* Back + Related — z-[100000] so 3D pages (Tesseract, Fractal, Lab)
+          that push UI to z:9999/10001 cannot occlude the Hub exit. The
+          Never-Trapped guarantee depends on this stacking-context win. */}
+      <div className="sticky top-0 left-0 right-0 flex items-center gap-1.5 px-3 pt-3 pb-2" style={{ zIndex: 100000, background: 'linear-gradient(to bottom, rgba(10,10,18,0.95), rgba(10,10,18,0.8), transparent)' }} data-testid="nav-controls">
         <button
           onClick={() => navigate('/sovereign-hub')}
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all active:scale-95"
@@ -462,7 +464,7 @@ export default function BackToHub() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             className="absolute top-full left-0 mt-2 flex flex-wrap gap-1.5 max-w-[300px]"
-            style={{ zIndex: 4 }}
+            style={{ zIndex: 100000 }}
             data-testid="related-modules"
           >
             {related.map((item) => (
