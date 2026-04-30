@@ -185,3 +185,21 @@ def test_arsenal_top_dwell_shape():
     for t in body["top_dwell"]:
         assert t.get("unit") in ("generator", "engine")
         assert t.get("dwell_seconds", 0) > 0
+
+
+def test_arsenal_v68_83_suggested_next_present():
+    """V68.83 — Suggest Next chip. Backend must always provide a
+    suggestion (uses fallback if user has no signal yet) so the UI
+    chip never disappears mid-session."""
+    tok = _owner_token()
+    body = requests.get(
+        f"{API}/arsenal/index",
+        headers={"Authorization": f"Bearer {tok}"},
+        timeout=15,
+    ).json()
+    assert "suggested_next" in body
+    sn = body["suggested_next"]
+    assert sn is not None, "suggested_next must always be present (fallback)"
+    assert sn.get("unit") in ("generator", "engine")
+    assert sn.get("name")
+    assert sn.get("reason"), "Every suggestion must carry a reason for the UI"

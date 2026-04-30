@@ -15,7 +15,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { useProcessorState, MODULE_REGISTRY } from '../state/ProcessorState';
-import { Zap, Play, Search, Flame, Cpu, Clock } from 'lucide-react';
+import { Zap, Play, Search, Flame, Cpu, Clock, Target } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -169,6 +169,38 @@ export default function SovereignArsenal() {
           ))}
         </div>
       </div>
+
+      {/* 🎯 Suggest Next — silent-collaborator chip */}
+      {data.suggested_next && (
+        <section data-testid="arsenal-suggest-next" style={{ marginBottom: 16 }}>
+          <h2 style={{ fontSize: 12, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#F472B6', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'monospace' }}>
+            <Target size={12} /> Suggest Next <span style={{ color: '#64748B', fontWeight: 400 }}>· {data.suggested_next.reason || 'a quiet next move'}</span>
+          </h2>
+          <button
+            data-testid={`arsenal-suggest-${data.suggested_next.id}`}
+            onClick={() => {
+              const item = data.suggested_next;
+              if (item.unit === 'generator') fireGenerator(item);
+              else fireEngine(item);
+            }}
+            style={{
+              padding: '10px 16px', borderRadius: 999,
+              background: 'rgba(244,114,182,0.10)',
+              border: '1px solid rgba(244,114,182,0.45)',
+              color: '#F9A8D4', cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 10,
+              fontSize: 13, fontWeight: 500,
+            }}
+          >
+            <Target size={12} />
+            <span>{data.suggested_next.name}</span>
+            <span style={{ fontSize: 10, color: '#64748B', fontFamily: 'monospace', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+              {data.suggested_next.kind || data.suggested_next.category}
+            </span>
+            <Play size={11} style={{ opacity: 0.7 }} />
+          </button>
+        </section>
+      )}
 
       {/* Most-Fired strip — self-organizing workshop dashboard */}
       {data.top_fired && data.top_fired.length > 0 && (

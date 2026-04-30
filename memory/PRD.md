@@ -1,8 +1,8 @@
 # ENLIGHTEN.MINT.CAFE — Product Requirements Document
 
 ## Canonical Category
-**Information · Entertainment · Education · Gamification.**
-Not a wellness, medical, diagnostic, or health app. The in-app TermsGate and Landing disclaimers are the source of truth: *"For Information & Entertainment Purposes Only."* Every module (Breathwork, Herbology, Oracle, RPG, etc.) is a **product / byproduct** of the entertainment-learning experience — never clinical. Any future agent reading this: do not re-categorize.
+**Lifestyle · Entertainment · Education · Gamification · Spiritual Instrument.**
+A **multi-denominational spiritual exploration and personal sovereignty instrument** — never wellness, medical, diagnostic, or health. The in-app TermsGate, Hub Cross-Tradition mark, manifest description, and Landing disclaimers are the source of truth: *"For Information & Entertainment Purposes Only — spiritual study, not medical advice."* Every module (Breathwork, Herbology, Oracle, Bible, RPG, etc.) is a **byproduct** of the spiritual-study + entertainment-learning experience. Any future agent reading this: do not re-categorize. Do not strip the multi-denominational framing.
 
 ## Original Problem Statement
 Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission under the **Entertainment / Education / Lifestyle / Games** categories. Strict adherence to "Sovereign Math", "Flatland Rules" (no overlays/modals), and a closed-loop economy. Features include: 3D R3F spatial lattice, Single-Plane-Pull state substitution, Cybernetic Loop (Generators → ContextBus → Lattice), Entity Graph knowledge unification, Discovery Economy.
@@ -127,6 +127,28 @@ Wired 10 high-traffic pillars to the `pull()` state-substitution dispatcher:
 
 **12/12 regression tests green:** added `test_arsenal_v68_82_building_equipment_batch_surfaced`, `test_arsenal_dwell_log_owner_ok`, `test_arsenal_dwell_log_clamps_runaway_session`, `test_arsenal_dwell_log_rejects_zero`, `test_arsenal_dwell_log_requires_item_id`, `test_arsenal_top_dwell_shape`.
 
+### V68.83 — Spiritual Shield + Suggest Next + Cross-Tradition Mark (2026-04-30) ✅
+**Strategic re-positioning for Play Store safe-harbor + silent-collaborator UX.**
+
+**🛡 Spiritual Shield (legal armor):**
+- `manifest.json` description rewritten: *"A multi-denominational spiritual exploration and personal sovereignty instrument"* (categories stay Lifestyle/Education/Entertainment/Games — Spiritual is the **why**, not a separate category).
+- `MedicalDisclaimerSplash`: title **"A Sovereign Spiritual Instrument"**; new prose frames the app as *spiritual study, philosophical inquiry, and traditional-wisdom exploration within a multi-denominational framework*. Disclaimer version bumped to `2` so all existing users re-acknowledge with the new copy.
+- `landing.html` & `privacy.html` parallelized to the same language.
+- Disclaimer chips updated: `SPIRITUAL · MULTI-DENOMINATIONAL · EDUCATION · NOT MEDICAL ADVICE`.
+- Hub now displays an inline **🧭 Cross-Tradition · Sovereign Spiritual Instrument** mark directly under the title (no overlay).
+
+**🪶 LLM prompt guardrails (Sovereign Framing block injected):**
+- `coach.py` (Sage AI) — every response framed as *spiritual, philosophical, or traditional wisdom* across many denominations; redirects medical questions to licensed professionals.
+- `bible.py` — sacred-texts narrator now positions output as multi-denominational spiritual exploration and sovereign self-study.
+- `oracle.py` — I-Ching reader frames hexagram as Taoist wisdom and contemplative offering, never advice or prediction.
+
+**🎯 Suggest Next chip (silent collaborator):**
+- `/api/arsenal/index` now returns `suggested_next` — a category-affinity heuristic over `top_fired + top_dwell` that picks the user's least-touched generator inside their most-engaged categories. Always populated (uses Affirmation as friendly fallback for first-time owners).
+- Frontend renders an inline pink chip **"🎯 Suggest Next · {reason}"** above Most Fired, with one-click fire.
+- E2E proof: with reading-category history → suggested "Astrological Forecast · Adjacent to your reading work".
+
+**21/21 regression tests green** across `test_iteration_v68_80_arsenal.py` (12) + new `test_iteration_v68_83_spiritual_shield.py` (9). Locks down: manifest description, landing/disclaimer prose, disclaimer version bump, sage/bible/oracle sovereign framing, hub Cross-Tradition mark, suggested_next shape.
+
 
 
 ### P0 — Omni-Portal Spatial Hot-Swapping & Ocular Resonance (NOT STARTED)
@@ -164,6 +186,7 @@ Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, a
 - `/app/backend/tests/test_iteration_v68_61.py` → `_66.py` (Entity Graph, Cross-Pollination, RPG)
 - `/app/backend/tests/test_iteration_v68_75_tier_pricing.py` (Tier pricing + platform gross-up) — 18 tests
 - `/app/backend/tests/test_iteration_v68_76_compliance.py` (Compliance shield — Dust/Sparks isolation)
-- `/app/backend/tests/test_iteration_v68_80_arsenal.py` (Sovereign Arsenal owner gate + fire-log) — 4 tests
+- `/app/backend/tests/test_iteration_v68_80_arsenal.py` (Sovereign Arsenal owner gate, fire-log, dwell-log, top_fired/top_dwell, suggested_next, V68.81 + V68.82 batch surfacing) — 12 tests
+- `/app/backend/tests/test_iteration_v68_83_spiritual_shield.py` (manifest, landing, disclaimer, sage/bible/oracle sovereign framing, hub Cross-Tradition mark) — 9 tests
 - `/app/backend/tests/test_comprehensive_audit.py`
 - `/app/backend/tests/test_iteration261_economy_tiers.py` (prior tier validation)

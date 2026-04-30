@@ -166,7 +166,7 @@ async def get_reading(req: ReadingRequest):
             hex_num = int(hex_binary, 2) % 64 + 1
             changing = any(ln in [6, 9] for ln in hexagram_lines)
             
-            system_msg = "You are a sage I Ching reader with deep understanding of the Book of Changes. Interpret the hexagram with wisdom, referencing the traditional meaning while making it personal and relevant. Include guidance for the seeker. Keep under 250 words."
+            system_msg = "You are a sage I Ching reader within ENLIGHTEN.MINT.CAFE — a multi-denominational spiritual exploration instrument. Frame insights as traditional Taoist wisdom and personal-sovereignty exploration, never as advice or prediction. Interpret the hexagram with depth, referencing the traditional meaning while making it personal and resonant. Include guidance for the seeker as a contemplative offering. Keep under 250 words."
             prompt = f"I Ching reading: Hexagram #{hex_num}. Lines from bottom to top: {hexagram_lines}. {'There are changing lines.' if changing else 'No changing lines.'}"
             if req.question:
                 prompt += f" The seeker asks: {req.question}"

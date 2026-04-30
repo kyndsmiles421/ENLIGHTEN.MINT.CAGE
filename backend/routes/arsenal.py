@@ -210,6 +210,30 @@ async def arsenal_index(user=Depends(get_current_user)):
         reverse=True,
     )[:6]
 
+    # V68.83 — 🎯 Suggest Next. Reads the owner's top-fired + top-dwell
+    # signal and proposes one untouched (or least-touched) item from a
+    # category they've already shown affinity for. This turns the
+    # Arsenal into a silent collaborator that quietly mirrors patterns.
+    affinity_cats = [c.get("category") for c in top_fired if c.get("unit") == "generator" and c.get("category")]
+    affinity_cats += [c.get("category") for c in top_dwell if c.get("unit") == "generator" and c.get("category")]
+    suggested = None
+    if affinity_cats:
+        # Score each unfired/least-fired generator that shares a category
+        # with the user's recent affinity. Lower fire_count > prefer.
+        # Stable sort: by fire_count asc, then by name.
+        cat_set = set(affinity_cats)
+        candidates = [g for g in gens if g.get("category") in cat_set]
+        if candidates:
+            untouched = [g for g in candidates if g.get("fire_count", 0) == 0]
+            pool = untouched if untouched else sorted(candidates, key=lambda g: g.get("fire_count", 0))
+            if pool:
+                pick = pool[0]
+                suggested = {**pick, "unit": "generator", "reason": f"Adjacent to your {pick.get('category', 'recent')} work"}
+    # Fallback: if user hasn't fired anything yet, suggest a starter generator.
+    if not suggested and gens:
+        starter = next((g for g in gens if g["id"] == "gen-affirmation"), gens[0])
+        suggested = {**starter, "unit": "generator", "reason": "A simple first spark"}
+
     return {
         "generators": gens,
         "engines": engs,
@@ -217,6 +241,7 @@ async def arsenal_index(user=Depends(get_current_user)):
         "engine_layers": ["frontend", "backend"],
         "top_fired": top_fired,
         "top_dwell": top_dwell,
+        "suggested_next": suggested,
         "totals": {
             "generators": len(GENERATORS),
             "engines": len(ACTIVE_ENGINES),

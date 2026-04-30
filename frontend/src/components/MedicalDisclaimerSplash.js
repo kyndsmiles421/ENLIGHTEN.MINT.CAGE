@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Shield, Check } from 'lucide-react';
+import { Shield, Check, Compass } from 'lucide-react';
 
 /**
  * MedicalDisclaimerSplash — Flatland-compliant inline banner.
@@ -16,7 +16,7 @@ import { Shield, Check } from 'lucide-react';
  *   disclaimer_version            = integer (bump to force re-ack)
  */
 
-const DISCLAIMER_VERSION = 1;
+const DISCLAIMER_VERSION = 2;
 const STORAGE_KEY = 'disclaimer_acknowledged';
 const STORAGE_VERSION_KEY = 'disclaimer_version';
 const STORAGE_DATE_KEY = 'disclaimer_acknowledged_at';
@@ -81,6 +81,30 @@ export default function MedicalDisclaimerSplash() {
           <Shield size={24} style={{ color: '#FCD34D' }} />
         </div>
 
+        {/* V68.83 — Cross-Tradition mark. Signals multi-denominational
+            framing at first glance. Inline, no overlay. */}
+        <div
+          aria-hidden="true"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '4px 10px',
+            borderRadius: 999,
+            background: 'rgba(244,114,182,0.08)',
+            border: '1px solid rgba(244,114,182,0.32)',
+            color: '#F9A8D4',
+            fontFamily: 'monospace',
+            fontSize: 9,
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            marginBottom: 10,
+          }}
+        >
+          <Compass size={10} />
+          Cross-Tradition · Multi-Denominational
+        </div>
+
         <p
           style={{
             color: '#FBBF24',
@@ -91,7 +115,7 @@ export default function MedicalDisclaimerSplash() {
             margin: '0 0 6px 0',
           }}
         >
-          A Sovereign Entertainment Instrument
+          A Sovereign Spiritual Instrument
         </p>
 
         <h2
@@ -116,9 +140,11 @@ export default function MedicalDisclaimerSplash() {
             margin: '0 0 8px 0',
           }}
         >
-          ENLIGHTEN.MINT.CAFE is an entertainment, education, and gamification
-          platform. It is <em>not</em> a medical device, diagnostic tool, or
-          substitute for professional care.
+          ENLIGHTEN.MINT.CAFE is a multi-denominational spiritual
+          exploration and personal sovereignty instrument — for
+          entertainment, education, and gamified self-study. It is{' '}
+          <em>not</em> a medical device, diagnostic tool, or substitute
+          for professional care.
         </p>
 
         <p
@@ -131,10 +157,11 @@ export default function MedicalDisclaimerSplash() {
           }}
         >
           The Reflexology maps, herbology data, acupressure guides, and Sage AI
-          interactions are provided for entertainment, education, and
-          gamification purposes. Do not use this app to diagnose, treat, cure,
-          or prevent any condition. For medical concerns, consult a licensed
-          professional.
+          interactions are provided as <em>spiritual study, philosophical
+          inquiry, and traditional-wisdom exploration</em> within a
+          multi-denominational framework. Do not use this app to diagnose,
+          treat, cure, or prevent any condition. For medical concerns,
+          consult a licensed professional.
         </p>
 
         <div
@@ -147,7 +174,7 @@ export default function MedicalDisclaimerSplash() {
             opacity: 0.78,
           }}
         >
-          {['INFORMATION', 'ENTERTAINMENT', 'NOT MEDICAL ADVICE'].map(tag => (
+          {['SPIRITUAL', 'MULTI-DENOMINATIONAL', 'EDUCATION', 'NOT MEDICAL ADVICE'].map(tag => (
             <span
               key={tag}
               style={{

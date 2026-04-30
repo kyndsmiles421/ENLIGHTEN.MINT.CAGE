@@ -453,6 +453,36 @@ export default function SovereignHub() {
         >
           ENLIGHTEN.MINT.CAFE
         </h1>
+        {/* V68.83 — Cross-Tradition mark. Inline, sub-title spec.
+            Signals multi-denominational framing without an overlay. */}
+        <div
+          data-testid="hub-cross-tradition-mark"
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: 6,
+          }}
+        >
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '3px 10px',
+              borderRadius: 999,
+              background: 'rgba(244,114,182,0.06)',
+              border: '1px solid rgba(244,114,182,0.22)',
+              color: '#F9A8D4',
+              fontFamily: 'monospace',
+              fontSize: 8,
+              letterSpacing: '0.24em',
+              textTransform: 'uppercase',
+            }}
+          >
+            <Compass size={9} />
+            Cross-Tradition · Sovereign Spiritual Instrument
+          </span>
+        </div>
       </div>
 
       {/* V68.5 — Sovereign Wallet: RANK (Merit/Sparks) + DUST (Economy) pills */}
