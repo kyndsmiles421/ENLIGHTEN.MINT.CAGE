@@ -3,8 +3,71 @@ from deps import db, get_current_user, create_activity, logger
 from datetime import datetime, timezone
 import uuid
 import os
+import math
+
+# Reuse the canonical 4-tier discount matrix defined in economy.py
+# (discovery 0% / resonance 5% / sovereign 15% / architect 30%).
+# No duplicate tier tables anywhere — economy.SUBSCRIPTION_TIERS is the source of truth.
+from routes.economy import SUBSCRIPTION_TIERS
 
 STRIPE_API_KEY = os.environ.get("STRIPE_API_KEY", "")
+
+# ─── Platform Fee Gross-Up ───────────────────────────────────
+# Protects net margin when users pay via stores that take a cut.
+# Applied BEFORE the subscription-tier discount so Tier 4 users still
+# save 30% off the platform-adjusted price, not the raw base.
+PLATFORM_FEES = {
+    # Web rail = the "best price" channel. Stripe fees are absorbed by the
+    # house (~2.9% + 30¢). Displayed final_cents == base_cents so users see
+    # the lowest price on the web, matching the "encourage web payment" spec.
+    "web":         {"pct": 0.0,  "flat_cents": 0,  "label": "Stripe (Web)"},
+    "google_play": {"pct": 0.30, "flat_cents": 0,  "label": "Google Play"},
+    "apple":       {"pct": 0.30, "flat_cents": 0,  "label": "Apple App Store"},
+}
+
+TIER_DISPLAY = {
+    "discovery": {"ordinal": 1, "badge": "Lead",   "greeting": "Welcome, Traveler"},
+    "resonance": {"ordinal": 2, "badge": "Silver", "greeting": "Welcome, Practitioner"},
+    "sovereign": {"ordinal": 3, "badge": "Gold",   "greeting": "Welcome, Architect"},
+    "architect": {"ordinal": 4, "badge": "Gilded", "greeting": "Welcome, Sovereign"},
+}
+
+
+async def _resolve_user_tier(user_id: str) -> dict:
+    """Pull the user's subscription tier (defaults to discovery) and merge
+    the canonical SUBSCRIPTION_TIERS config with the Lead/Silver/Gold/Gilded
+    display badge."""
+    sub = await db.subscriptions.find_one({"user_id": user_id}, {"_id": 0, "tier": 1})
+    tier_id = (sub or {}).get("tier", "discovery")
+    if tier_id not in SUBSCRIPTION_TIERS:
+        tier_id = "discovery"
+    cfg = SUBSCRIPTION_TIERS[tier_id]
+    display = TIER_DISPLAY.get(tier_id, TIER_DISPLAY["discovery"])
+    return {
+        "tier_id": tier_id,
+        "tier_name": cfg["name"],
+        "badge": display["badge"],
+        "ordinal": display["ordinal"],
+        "greeting": display["greeting"],
+        "discount_pct": cfg["marketplace_discount"],
+        "ratio": round(1 - cfg["marketplace_discount"] / 100.0, 4),
+        "color": cfg.get("color", "#6B7280"),
+    }
+
+
+def _apply_ratio_credits(base_credits: int, ratio: float) -> int:
+    """Tier-discount a credit cost. Rounds UP so the house never under-charges."""
+    if base_credits <= 0:
+        return 0
+    return max(1, math.ceil(base_credits * ratio))
+
+
+def _gross_up_cents(base_cents: int, platform: str) -> int:
+    """Inflate cents so the merchant nets ≈ base_cents after platform fees."""
+    fee = PLATFORM_FEES.get(platform, PLATFORM_FEES["web"])
+    if fee["pct"] >= 1:
+        return base_cents
+    return int(math.ceil((base_cents + fee["flat_cents"]) / (1 - fee["pct"])))
 
 router = APIRouter()
 
@@ -572,7 +635,8 @@ RESONANCE_FEE_PCT = 5  # 5%
 
 @router.get("/trade-circle/ai-merchant")
 async def ai_merchant_catalog(user=Depends(get_current_user)):
-    """AI Merchant — the stabilized storefront. All items have fixed server-set prices."""
+    """AI Merchant — the stabilized storefront. Prices are shown per user's
+    subscription tier (Lead/Silver/Gold/Gilded → 0/5/15/30% off)."""
     user_id = user["id"]
     u = await db.users.find_one(
         {"id": user_id},
@@ -581,15 +645,29 @@ async def ai_merchant_catalog(user=Depends(get_current_user)):
     credits = u.get("user_credit_balance", 0) if u else 0
     dust = u.get("user_dust_balance", 0) if u else 0
 
+    tier = await _resolve_user_tier(user_id)
+
+    # Augment catalog with the user's tier-discounted price per item.
+    augmented = []
+    for item in AI_MERCHANT_CATALOG:
+        your_price = _apply_ratio_credits(item["price_credits"], tier["ratio"])
+        augmented.append({
+            **item,
+            "your_price_credits": your_price,
+            "your_savings_credits": max(0, item["price_credits"] - your_price),
+        })
+
     return {
-        "catalog": AI_MERCHANT_CATALOG,
+        "catalog": augmented,
         "your_credits": credits,
         "your_dust": dust,
         "your_gilded_tier": (u or {}).get("gilded_tier"),
         "your_gilded_purchased_at": (u or {}).get("gilded_purchased_at"),
         "gilded_tier_order": GILDED_TIER_ORDER,
         "resonance_fee_pct": RESONANCE_FEE_PCT,
-        "merchant_message": "Welcome, Traveler. I trade in certainties. My prices are fixed, my stock unlimited.",
+        "your_tier": tier,
+        "advisor_greeting": tier["greeting"],
+        "merchant_message": f"{tier['greeting']}. Your Trade Circle rate is {tier['discount_pct']}% off.",
     }
 
 
@@ -603,8 +681,19 @@ async def ai_merchant_buy(data: dict = Body(...), user=Depends(get_current_user)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found in Merchant catalog")
 
-    total_cost = item["price_credits"] * quantity
     user_id = user["id"]
+
+    # Tier discount — Lead(0%) / Silver(5%) / Gold(15%) / Gilded(30%)
+    # Tier-unlock items (Gilded Path itself) are NOT discounted — you don't
+    # get a discount on the thing that grants the discount.
+    tier = await _resolve_user_tier(user_id)
+    if item["type"] == "tier_unlock":
+        unit_cost = item["price_credits"]
+        tier_discount_applied = 0
+    else:
+        unit_cost = _apply_ratio_credits(item["price_credits"], tier["ratio"])
+        tier_discount_applied = tier["discount_pct"]
+    total_cost = unit_cost * quantity
 
     # Check credits
     u = await db.users.find_one({"id": user_id}, {"_id": 0, "user_credit_balance": 1})
@@ -676,6 +765,9 @@ async def ai_merchant_buy(data: dict = Body(...), user=Depends(get_current_user)
         "item_id": item_id,
         "item_name": item["name"],
         "quantity": quantity,
+        "base_price_credits": item["price_credits"] * quantity,
+        "tier_id": tier["tier_id"],
+        "tier_discount_pct": tier_discount_applied,
         "total_credits": total_cost,
         "delivery": delivery,
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -686,6 +778,10 @@ async def ai_merchant_buy(data: dict = Body(...), user=Depends(get_current_user)
     return {
         "purchased": item["name"],
         "quantity": quantity,
+        "base_price_credits": item["price_credits"] * quantity,
+        "tier_id": tier["tier_id"],
+        "tier_badge": tier["badge"],
+        "tier_discount_pct": tier_discount_applied,
         "credits_spent": total_cost,
         "delivered": delivery,
         "remaining_credits": current_credits - total_cost,
@@ -976,17 +1072,80 @@ async def get_wallet(user=Depends(get_current_user)):
 
 @router.get("/trade-circle/broker/packs")
 async def broker_packs(user=Depends(get_current_user)):
-    """Get available credit packs from the Cosmic Broker."""
-    return {"packs": BROKER_CREDIT_PACKS}
+    """Get available credit packs from the Cosmic Broker, annotated with the
+    user's tier-specific price on each supported platform."""
+    tier = await _resolve_user_tier(user["id"])
+    platforms = list(PLATFORM_FEES.keys())
+
+    packs = []
+    for p in BROKER_CREDIT_PACKS:
+        per_platform = {}
+        for pf in platforms:
+            grossed = _gross_up_cents(p["price_cents"], pf)
+            final = max(1, int(round(grossed * tier["ratio"])))
+            per_platform[pf] = {
+                "grossed_cents": grossed,
+                "final_cents": final,
+                "display": f"${final/100:.2f}",
+            }
+        packs.append({**p, "platforms": per_platform})
+
+    return {
+        "packs": packs,
+        "your_tier": tier,
+        "platforms": [{"id": k, **v} for k, v in PLATFORM_FEES.items()],
+    }
+
+
+@router.get("/trade-circle/tier-map")
+async def public_tier_map(user=Depends(get_current_user)):
+    """Public 4-tier discount matrix for the Advisor UI.
+    Lead 1.0 · Silver 0.95 · Gold 0.85 · Gilded 0.70."""
+    me = await _resolve_user_tier(user["id"])
+    rows = []
+    for tid, cfg in SUBSCRIPTION_TIERS.items():
+        disp = TIER_DISPLAY.get(tid, {"ordinal": 99, "badge": tid, "greeting": ""})
+        rows.append({
+            "tier_id": tid,
+            "tier_name": cfg["name"],
+            "badge": disp["badge"],
+            "ordinal": disp["ordinal"],
+            "ratio": round(1 - cfg["marketplace_discount"] / 100.0, 4),
+            "discount_pct": cfg["marketplace_discount"],
+            "price_monthly": cfg.get("price_monthly", 0),
+            "color": cfg.get("color", "#6B7280"),
+            "label": cfg.get("label", ""),
+            "greeting": disp.get("greeting", ""),
+            "features_summary": cfg.get("features", [])[:2],
+        })
+    rows.sort(key=lambda r: r["ordinal"])
+    return {
+        "tiers": rows,
+        "you_are": me,
+        "platforms": [{"id": k, **v} for k, v in PLATFORM_FEES.items()],
+    }
 
 
 @router.post("/trade-circle/broker/buy-credits")
 async def broker_buy_credits(data: dict = Body(...), user=Depends(get_current_user)):
-    """Purchase Resonance Credits from the Cosmic Broker via Stripe."""
+    """Purchase Resonance Credits from the Cosmic Broker via Stripe.
+
+    Supports platform gross-up (`platform=web|google_play|apple`) so your net
+    receipt is constant across rails, and applies the user's Trade Circle
+    tier discount on top (Lead/Silver/Gold/Gilded → 0/5/15/30% off)."""
     pack_id = data.get("pack_id", "")
+    platform = data.get("platform", "web")
+    if platform not in PLATFORM_FEES:
+        platform = "web"
     pack = BROKER_PACK_MAP.get(pack_id)
     if not pack:
         raise HTTPException(status_code=400, detail="Invalid credit pack")
+
+    # 1. Gross-up base price to protect net margin on Play/Apple.
+    grossed_cents = _gross_up_cents(pack["price_cents"], platform)
+    # 2. Apply the user's tier discount on top.
+    tier = await _resolve_user_tier(user["id"])
+    final_cents = max(1, int(round(grossed_cents * tier["ratio"])))
 
     try:
         from emergentintegrations.payments.stripe.checkout import StripeCheckout
@@ -998,8 +1157,8 @@ async def broker_buy_credits(data: dict = Body(...), user=Depends(get_current_us
         session = await stripe_checkout.create_session(
             line_items=[{
                 "name": f"Cosmic Broker: {pack['name']}",
-                "description": f"{total_credits} Resonance Credits" + (f" (includes {pack['bonus']} bonus)" if pack["bonus"] else ""),
-                "amount": pack["price_cents"],
+                "description": f"{total_credits} Resonance Credits ({tier['badge']} rate · {tier['discount_pct']}% off)" + (f" +{pack['bonus']} bonus" if pack["bonus"] else ""),
+                "amount": final_cents,
                 "quantity": 1,
             }],
             success_url=data.get("success_url", ""),
@@ -1011,13 +1170,28 @@ async def broker_buy_credits(data: dict = Body(...), user=Depends(get_current_us
             "user_id": user["id"],
             "pack_id": pack_id,
             "credits": total_credits,
-            "amount_cents": pack["price_cents"],
+            "base_cents": pack["price_cents"],
+            "platform": platform,
+            "grossed_cents": grossed_cents,
+            "tier_id": tier["tier_id"],
+            "tier_discount_pct": tier["discount_pct"],
+            "amount_cents": final_cents,
             "session_id": session.session_id,
             "payment_status": "pending",
             "created_at": datetime.now(timezone.utc).isoformat(),
         })
 
-        return {"checkout_url": session.checkout_url, "session_id": session.session_id}
+        return {
+            "checkout_url": session.checkout_url,
+            "session_id": session.session_id,
+            "platform": platform,
+            "base_cents": pack["price_cents"],
+            "grossed_cents": grossed_cents,
+            "final_cents": final_cents,
+            "tier_id": tier["tier_id"],
+            "tier_badge": tier["badge"],
+            "tier_discount_pct": tier["discount_pct"],
+        }
     except Exception as e:
         logger.error(f"Broker Stripe error: {e}")
         raise HTTPException(status_code=500, detail="Payment service unavailable")
