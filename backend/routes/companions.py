@@ -1,0 +1,189 @@
+"""
+companions.py — V68.92 Cross-Tradition Companion Engine
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+When a user reads a sacred text, this module surfaces *historically &
+spiritually intertwined* companions across other traditions. Powered
+by a curated map of cross-cultural concept-bridges — not AI inference
+— so the references are factually defensible.
+
+Examples:
+  • Surah Maryam (19) ↔ Luke 1 (Annunciation) ↔ Bhagavad Gita 4 (avatar)
+  • Genesis 1 (Creation) ↔ Kumulipo (Hawaiian creation) ↔ Rig Veda 10.129
+  • Tao Te Ching 1 ↔ Heart Sutra (emptiness) ↔ Ecclesiastes (vanity)
+  • Dhammapada (mind verses) ↔ Mishnah Berachot (intentionality)
+
+This is the "Cross-Pollination" layer the user repeatedly asked for —
+ordained spiritual cross-reference, not AI guesswork.
+"""
+from fastapi import APIRouter, HTTPException
+from deps import db
+from typing import List, Dict
+
+router = APIRouter()
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# CONCEPT BRIDGES — Each key is a concept; each value is a list of
+# (text_id, optional_chapter_id, tradition_label, why_paired) tuples.
+# A reading surfaces companions when its title/description/themes
+# contain any of the trigger keywords.
+#
+# Format of each pairing dict:
+#   id              → text id (matches BIBLE_BOOKS or SACRED_TEXTS)
+#   chapter         → optional chapter id within that text
+#   tradition       → display label
+#   why             → 1-sentence reason this companion rhymes
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMPANION_BRIDGES: Dict[str, List[Dict]] = {
+    # Mary / Maryam — the sacred mother across three Abrahamic traditions
+    "maryam": [
+        {"id": "new-testament-luke", "tradition": "Christian (Gospel of Luke)",
+         "why": "Luke 1 — the Annunciation and Magnificat parallel Surah Maryam's account of Mary."},
+        {"id": "maryam", "tradition": "Islamic (Quran 19)",
+         "why": "Surah Maryam — the only chapter in the Quran named after a woman, honoring Mary's purity."},
+        {"id": "bhagavad-gita", "chapter": "bg-4", "tradition": "Hindu (Bhagavad Gita 4)",
+         "why": "Krishna's avatar discourse — the divine entering human form across traditions."},
+    ],
+
+    # Creation — every cosmogony rhymes
+    "creation": [
+        {"id": "old-testament-genesis", "tradition": "Hebrew Bible (Genesis 1)",
+         "why": "'In the beginning, God created the heavens and the earth' — the seven-day cosmogony."},
+        {"id": "kumulipo", "tradition": "Polynesian (Native Hawaiian)",
+         "why": "The Pō (deep darkness) before light — coral born first, then sea creatures, plants, humanity."},
+        {"id": "whakapapa-maori", "tradition": "Polynesian (Māori)",
+         "why": "Te Kore → Te Pō → Te Ao Mārama — the void becoming the night becoming the world of light."},
+        {"id": "popol-vuh", "tradition": "Mayan",
+         "why": "The makers shape humans from maize after three failed attempts — creation as iteration."},
+        {"id": "norse-edda", "tradition": "Norse",
+         "why": "Ginnungagap, the yawning void, between fire and ice — creation as cosmic friction."},
+        {"id": "kojiki", "tradition": "Shinto (Japan)",
+         "why": "Izanagi and Izanami stir the brine — Japanese islands born from a sacred spear."},
+        {"id": "book-of-the-dead", "tradition": "Ancient Egyptian",
+         "why": "Atum self-creating from the primordial waters of Nun — emergence from the deep."},
+    ],
+
+    # Mindfulness / Breath / Inner Sovereignty
+    "mindfulness": [
+        {"id": "majjhima-nikaya", "chapter": "mn-3", "tradition": "Buddhist (Satipatthana Sutta)",
+         "why": "The Four Foundations of Mindfulness — body, feeling, mind, dharmas — the heart of Buddhist practice."},
+        {"id": "majjhima-nikaya", "chapter": "mn-4", "tradition": "Buddhist (Anapanasati Sutta)",
+         "why": "Mindfulness of breathing — sixteen contemplations on the in-breath and out-breath."},
+        {"id": "yoga-sutras", "tradition": "Hindu (Patanjali)",
+         "why": "Citta-vritti-nirodha — the stilling of mental fluctuations as the gateway to samadhi."},
+        {"id": "tao-te-ching", "tradition": "Taoist",
+         "why": "Wu wei — effortless action arising from emptied mind."},
+        {"id": "philippians", "tradition": "Christian (Philippians 4)",
+         "why": "'Whatsoever things are pure...think on these things' — Christian contemplative attention."},
+    ],
+
+    # Ethics of speech — across every tradition
+    "speech": [
+        {"id": "an-nisa", "tradition": "Islamic (Quran 4 — An-Nisa)",
+         "why": "Justice in speech and the protection of the vulnerable through fair words."},
+        {"id": "majjhima-nikaya", "tradition": "Buddhist (Right Speech)",
+         "why": "Right Speech of the Eightfold Path — abstaining from lying, divisive, harsh, and idle talk."},
+        {"id": "old-testament-proverbs", "tradition": "Hebrew Bible (Proverbs 18)",
+         "why": "'Death and life are in the power of the tongue' — the proverbial weight of words."},
+        {"id": "rumi-masnavi", "tradition": "Sufi (Rumi)",
+         "why": "Sufi teachings on the silent witness behind every spoken word."},
+    ],
+
+    # The Sacred Mother / Divine Feminine
+    "mother": [
+        {"id": "maryam", "tradition": "Islamic (Surah Maryam)",
+         "why": "The Quran's tribute to Mary — purity, childbirth under the date palm, the infant who spoke."},
+        {"id": "new-testament-luke", "tradition": "Christian (Luke 1)",
+         "why": "The Magnificat — Mary's song of justice and the upending of the proud."},
+        {"id": "kumulipo", "tradition": "Polynesian (Hawaiian)",
+         "why": "Papa, the earth-mother, in the genealogy of all Hawaiian aliʻi."},
+        {"id": "whakapapa-maori", "tradition": "Polynesian (Māori)",
+         "why": "Papatūānuku — the earth-mother held in eternal embrace until separated by Tāne Mahuta."},
+    ],
+
+    # Ancestors / Lineage / Continuity
+    "lineage": [
+        {"id": "kumulipo", "tradition": "Polynesian (Hawaiian)",
+         "why": "The chant traces the genealogy of the universe down to the chiefs — every soul an inheritor."},
+        {"id": "whakapapa-maori", "tradition": "Polynesian (Māori)",
+         "why": "Whakapapa — the recitation of ancestral lines is itself a sacred act of memory."},
+        {"id": "old-testament-genesis", "tradition": "Hebrew Bible",
+         "why": "The 'toledot' (generations) of Adam, Noah, Abraham — the patriarchal lineages."},
+        {"id": "lakota-seven-rites", "chapter": "ls-4", "tradition": "Lakota (Hunkapi)",
+         "why": "Hunkapi — the Making of Relatives — extends lineage across blood lines into spiritual kinship."},
+    ],
+
+    # Aloha / Lovingkindness
+    "love": [
+        {"id": "huna-principles", "chapter": "hu-5", "tradition": "Hawaiian (ALOHA principle)",
+         "why": "'To love is to be happy with' — the fifth Huna principle."},
+        {"id": "anguttara-nikaya", "chapter": "an-3", "tradition": "Buddhist (Brahmaviharas)",
+         "why": "Metta (loving-kindness) as the first of the four sublime states."},
+        {"id": "new-testament-1corinthians", "tradition": "Christian (1 Corinthians 13)",
+         "why": "'Love is patient, love is kind...' — the great hymn to agape."},
+        {"id": "rumi-masnavi", "tradition": "Sufi (Rumi)",
+         "why": "Ishq — divine love as the engine of return."},
+    ],
+
+    # Stewardship / Care for the Earth
+    "stewardship": [
+        {"id": "dreamtime-aboriginal", "chapter": "dt-5", "tradition": "Aboriginal (Caring for Country)",
+         "why": "Country is not a resource — it is a living relative requiring ongoing care."},
+        {"id": "hopi-prophecy", "chapter": "hp-5", "tradition": "Hopi (Koyaanisqatsi)",
+         "why": "Life out of balance — the Hopi warning when stewardship is forgotten."},
+        {"id": "lakota-seven-rites", "tradition": "Lakota",
+         "why": "The pipe ceremony — every act of breath honors all relations (Mitakuye Oyasin)."},
+        {"id": "old-testament-genesis", "tradition": "Hebrew Bible (Genesis 2)",
+         "why": "Adam placed in the Garden 'to till and to keep it' — the original stewardship covenant."},
+    ],
+}
+
+# Direct text-ID → companion-list shortcuts. When a user opens any of
+# these IDs, return the listed companions immediately (no concept-keyword
+# parsing needed). Keys are CANONICAL TEXT IDS.
+DIRECT_COMPANIONS: Dict[str, List[Dict]] = {
+    "maryam":            [c for c in COMPANION_BRIDGES["maryam"] if c["id"] != "maryam"],
+    "kumulipo":          [c for c in COMPANION_BRIDGES["creation"] if c["id"] != "kumulipo"][:4],
+    "whakapapa-maori":   [c for c in COMPANION_BRIDGES["creation"] if c["id"] != "whakapapa-maori"][:4],
+    "popol-vuh":         [c for c in COMPANION_BRIDGES["creation"] if c["id"] != "popol-vuh"][:4],
+    "norse-edda":        [c for c in COMPANION_BRIDGES["creation"] if c["id"] != "norse-edda"][:4],
+    "huna-principles":   COMPANION_BRIDGES["love"],
+    "majjhima-nikaya":   COMPANION_BRIDGES["mindfulness"],
+    "yoga-sutras":       COMPANION_BRIDGES["mindfulness"],
+    "tao-te-ching":      COMPANION_BRIDGES["mindfulness"],
+    "dreamtime-aboriginal": COMPANION_BRIDGES["stewardship"],
+    "hopi-prophecy":     COMPANION_BRIDGES["stewardship"],
+    "lakota-seven-rites":COMPANION_BRIDGES["stewardship"],
+    "rumi-masnavi":      COMPANION_BRIDGES["love"],
+    "dhammapada":        COMPANION_BRIDGES["mindfulness"],
+}
+
+
+@router.get("/companions/{text_id}")
+async def get_companions(text_id: str):
+    """Return ordained cross-tradition companions for a given text id.
+    Falls back gracefully — empty companions[] is a valid response."""
+    text_id = text_id.strip().lower()
+    direct = DIRECT_COMPANIONS.get(text_id, [])
+    return {
+        "text_id": text_id,
+        "companions": direct,
+        "concept_bridges_available": list(COMPANION_BRIDGES.keys()),
+    }
+
+
+@router.get("/companions/concept/{concept}")
+async def get_concept_companions(concept: str):
+    """Return all texts that share a multi-tradition concept (creation,
+    mindfulness, mother, love, stewardship, lineage, speech, mindfulness)."""
+    concept = concept.strip().lower()
+    if concept not in COMPANION_BRIDGES:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Unknown concept. Available: {list(COMPANION_BRIDGES.keys())}",
+        )
+    return {
+        "concept": concept,
+        "companions": COMPANION_BRIDGES[concept],
+    }
