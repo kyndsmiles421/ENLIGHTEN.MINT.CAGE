@@ -519,6 +519,33 @@ const SovereignStreamline = {
     } catch (e) {}
   },
 
+  // V68.78 — Sovereign Signature Tone
+  // Short solfeggio chime fired on Tier-4 events (Advisor open, mastery unlock).
+  // Default 963 Hz = crown activation. Zero LLM credits — pure oscillator.
+  playSovereignSignature(frequency = 963, duration = 1.2) {
+    if (!this.ctx) this.initAudio();
+    if (!this.ctx || this.ctx.state !== 'running') {
+      try { this.ctx && this.ctx.resume(); } catch (e) {}
+      if (!this.ctx || this.ctx.state !== 'running') return;
+    }
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = frequency;
+      // Attack → sustain → release envelope (soft, non-startling)
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.12, now + 0.08);
+      gain.gain.setTargetAtTime(0.06, now + 0.2, 0.3);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + duration + 0.05);
+    } catch (e) {}
+  },
+
   playHarmonicChord(duration = 3) {
     if (!this.ctx || this.ctx.state !== 'running') return;
 

@@ -23,7 +23,7 @@ const LS_KEY = 'sovereign_preferences_v1';
 
 const DEFAULTS = Object.freeze({
   audio:    { frequency: 'silence' },
-  visual:   { skin: 'neo-kyoto', crystalFidelity: '2d', gamerMode: false },
+  visual:   { skin: 'neo-kyoto', crystalFidelity: '2d', gamerMode: false, scholarMode: true },
   motion:   { reduce: false },
   learning: {
     difficulty: 'adaptive',
@@ -79,6 +79,8 @@ function writeRaw(next) {
   if (typeof document !== 'undefined') {
     document.documentElement.setAttribute('data-sov-skin', next.visual.skin);
     document.documentElement.setAttribute('data-gamer-mode', next.visual.gamerMode ? 'true' : 'false');
+    document.documentElement.setAttribute('data-scholar-mode', next.visual.scholarMode ? 'true' : 'false');
+    document.documentElement.setAttribute('data-omni-mode', (next.visual.gamerMode && next.visual.scholarMode) ? 'true' : 'false');
   }
 }
 
@@ -147,6 +149,15 @@ function setGamerMode(value) {
   writeRaw({ ...cache, visual: { ...cache.visual, gamerMode: !!value } });
 }
 
+function setScholarMode(value) {
+  writeRaw({ ...cache, visual: { ...cache.visual, scholarMode: !!value } });
+}
+
+/** V68.78 — Omni-Mode helpers. Both modes can be ON simultaneously.
+ *  isOmniMode === scholar && gamer (deep-dive text + cinematic gameplay).
+ *  isScholarOnly / isGamerOnly are mutually exclusive with isOmniMode. */
+function isOmniMode() { return !!(cache.visual.scholarMode && cache.visual.gamerMode); }
+
 function subscribe(fn) {
   listeners.add(fn);
   return () => listeners.delete(fn);
@@ -156,6 +167,8 @@ function subscribe(fn) {
 if (typeof document !== 'undefined') {
   document.documentElement.setAttribute('data-sov-skin', cache.visual.skin);
   document.documentElement.setAttribute('data-gamer-mode', cache.visual.gamerMode ? 'true' : 'false');
+  document.documentElement.setAttribute('data-scholar-mode', cache.visual.scholarMode ? 'true' : 'false');
+  document.documentElement.setAttribute('data-omni-mode', (cache.visual.gamerMode && cache.visual.scholarMode) ? 'true' : 'false');
 }
 if (typeof window !== 'undefined') {
   window.__sovereignPreferences = { get, setAudioFrequency, setVisualSkin, setReduceMotion, subscribe };
@@ -165,7 +178,7 @@ export const SovereignPreferences = {
   get, getAudioFrequency, getVisualSkin, getReduceMotion, getCalibration,
   setAudioFrequency, setVisualSkin, setReduceMotion,
   setDifficulty, setLearningWeighting, setCrystalFidelity, setCalibration,
-  setGamerMode,
+  setGamerMode, setScholarMode, isOmniMode,
   subscribe,
 };
 

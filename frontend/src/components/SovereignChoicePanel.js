@@ -168,44 +168,86 @@ export default function SovereignChoicePanel() {
         </div>
       </div>
 
-      {/* Gamer Mode toggle — stealth education */}
+      {/* Interface Mode — Omni multi-select.
+          Scholar and Gamer are independent; turning BOTH on = Sovereign Omni. */}
       <div className="mb-4">
         <div className="flex items-center gap-1.5 mb-2">
           <Gamepad2 size={12} style={{ color: 'var(--text-muted)' }} />
           <p className="text-[10px] uppercase tracking-[0.24em]" style={{ color: 'var(--text-muted)' }}>
             Interface Mode
           </p>
+          {prefs.visual.scholarMode && prefs.visual.gamerMode && (
+            <span
+              data-testid="omni-mode-indicator"
+              className="ml-2 text-[9px] font-bold uppercase tracking-[0.2em] px-2 py-0.5 rounded-full"
+              style={{
+                background: 'linear-gradient(90deg, #38BDF822, #F472B622)',
+                border: '1px solid #EAB30866',
+                color: '#EAB308',
+              }}
+            >
+              ✦ Sovereign Omni
+            </span>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-2">
           {[
-            { id: false, label: 'Scholar Mode', hint: 'Full telemetry · JetBrains Mono readouts', color: '#38BDF8' },
-            { id: true,  label: 'Gamer Mode',   hint: 'Cinematic only · numbers hidden',         color: '#F472B6' },
-          ].map(opt => {
-            const active = prefs.visual.gamerMode === opt.id;
-            return (
-              <motion.button
-                key={String(opt.id)}
-                whileHover={{ y: -1 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => SovereignPreferences.setGamerMode(opt.id)}
-                data-testid={`mode-${opt.id ? 'gamer' : 'scholar'}`}
-                className="px-3 py-2.5 rounded-xl text-left transition-all"
-                style={{
-                  background: active ? `${opt.color}18` : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${active ? opt.color + '66' : 'rgba(255,255,255,0.08)'}`,
-                  boxShadow: active ? `0 0 24px ${opt.color}33` : 'none',
-                }}
-              >
-                <div className="text-[12px] font-bold" style={{ color: active ? opt.color : 'var(--text-primary)' }}>
+            {
+              key: 'scholar',
+              label: 'Scholar Mode',
+              hint: 'Full telemetry · readouts · tradition tabs',
+              color: '#38BDF8',
+              isActive: prefs.visual.scholarMode,
+              toggle: () => SovereignPreferences.setScholarMode(!prefs.visual.scholarMode),
+              testid: 'mode-scholar',
+            },
+            {
+              key: 'gamer',
+              label: 'Gamer Mode',
+              hint: 'Cinematic · avatar · collectibles',
+              color: '#F472B6',
+              isActive: prefs.visual.gamerMode,
+              toggle: () => SovereignPreferences.setGamerMode(!prefs.visual.gamerMode),
+              testid: 'mode-gamer',
+            },
+          ].map(opt => (
+            <motion.button
+              key={opt.key}
+              whileHover={{ y: -1 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={opt.toggle}
+              data-testid={opt.testid}
+              aria-pressed={opt.isActive}
+              className="px-3 py-2.5 rounded-xl text-left transition-all"
+              style={{
+                background: opt.isActive ? `${opt.color}18` : 'rgba(255,255,255,0.03)',
+                border: `1px solid ${opt.isActive ? opt.color + '66' : 'rgba(255,255,255,0.08)'}`,
+                boxShadow: opt.isActive ? `0 0 24px ${opt.color}33` : 'none',
+              }}
+            >
+              <div className="flex items-center justify-between mb-0.5">
+                <div className="text-[12px] font-bold" style={{ color: opt.isActive ? opt.color : 'var(--text-primary)' }}>
                   {opt.label}
                 </div>
-                <div className="text-[10px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                  {opt.hint}
+                <div
+                  className="text-[9px] font-mono"
+                  style={{
+                    color: opt.isActive ? opt.color : 'var(--text-muted)',
+                    opacity: opt.isActive ? 1 : 0.5,
+                  }}
+                >
+                  {opt.isActive ? 'ON' : 'OFF'}
                 </div>
-              </motion.button>
-            );
-          })}
+              </div>
+              <div className="text-[10px]" style={{ color: 'var(--text-muted)' }}>
+                {opt.hint}
+              </div>
+            </motion.button>
+          ))}
         </div>
+        <p className="mt-2 text-[9px]" style={{ color: 'var(--text-muted)', opacity: 0.7 }}>
+          Toggle both for Omni-Mode · Scholar's data layered over Gamer's cinematic world.
+        </p>
       </div>
 
       {/* Difficulty row */}

@@ -205,6 +205,17 @@ export default function CosmicBroker({ authHeaders }) {
       setCatalog(catRes.data);
       setWallet(walletRes.data);
       setPacks(packsRes.data.packs || []);
+
+      // V68.78 — Sovereign Signature · 963 Hz chime fires only for Tier-4
+      // users when the Advisor storefront opens. Pure oscillator, zero credits.
+      const tierId = catRes?.data?.your_tier?.tier_id;
+      if (tierId === 'sovereign') {
+        try {
+          if (window.SovereignStreamline?.playSovereignSignature) {
+            window.SovereignStreamline.playSovereignSignature(963, 1.4);
+          }
+        } catch {}
+      }
     } catch {}
     setLoading(false);
   }, [authHeaders]);
