@@ -11,37 +11,48 @@ router = APIRouter()
 #  Maps subscription tier to marketplace discount %
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-TIER_DISCOUNT = {
-    "free": 0,
-    "starter": 0,
-    "plus": 15,       # Premium = 15% off
-    "premium": 30,    # Elite = 30% off
-    "super_user": 30,
-}
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#  DEFRAG V68.77 — Single Source of Truth
+#  Pricing + discounts live ONLY in economy.SUBSCRIPTION_TIERS.
+#  Legacy `users.credits.tier` values map to canonical tier IDs below
+#  for backward compatibility with older client docs.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+from routes.economy import SUBSCRIPTION_TIERS
 
-TIER_LABEL = {
-    "free": "Base",
-    "starter": "Base",
-    "plus": "Premium",
-    "premium": "Elite",
-    "super_user": "Elite",
+# Legacy credits.tier → canonical subscription tier.
+LEGACY_CREDITS_TIER_MAP = {
+    "free":       "discovery",
+    "starter":    "discovery",
+    "plus":       "resonance",   # was 15% → now correctly 5% (Silver)
+    "premium":    "architect",   # was 30% → now correctly 15% (Gold)
+    "super_user": "sovereign",   # 30% peak (Gilded)
 }
 
 
 async def get_user_tier(user_id: str) -> dict:
-    """Get user's subscription tier, discount rate, and fidelity status."""
-    u = await db.users.find_one({"id": user_id}, {
-        "_id": 0, "credits": 1, "fidelity_boost": 1,
-    })
-    credits_doc = u.get("credits", {}) if u else {}
+    """Canonical tier resolver. Reads `subscriptions.tier` first; falls back
+    to legacy `users.credits.tier` with mapping. Always returns the canonical
+    discount from SUBSCRIPTION_TIERS — no duplicate tables."""
+    # 1. Preferred: live subscription
+    sub = await db.subscriptions.find_one({"user_id": user_id}, {"_id": 0, "tier": 1})
+    canonical_tier = (sub or {}).get("tier")
+
+    # 2. Fallback: legacy credits.tier
+    u = await db.users.find_one({"id": user_id}, {"_id": 0, "credits": 1, "fidelity_boost": 1})
+    credits_doc = (u or {}).get("credits") or {}
     if not isinstance(credits_doc, dict):
         credits_doc = {}
-    tier_id = credits_doc.get("tier", "free")
-    discount = TIER_DISCOUNT.get(tier_id, 0)
-    label = TIER_LABEL.get(tier_id, "Base")
+    if not canonical_tier:
+        legacy = credits_doc.get("tier", "free")
+        canonical_tier = LEGACY_CREDITS_TIER_MAP.get(legacy, "discovery")
+    if canonical_tier not in SUBSCRIPTION_TIERS:
+        canonical_tier = "discovery"
+
+    cfg = SUBSCRIPTION_TIERS[canonical_tier]
+    discount = cfg["marketplace_discount"]
 
     # Check active fidelity boost
-    boost = u.get("fidelity_boost", {}) if u else {}
+    boost = (u or {}).get("fidelity_boost") or {}
     boost_active = False
     boost_remaining = 0
     if boost and boost.get("expires_at"):
@@ -51,8 +62,8 @@ async def get_user_tier(user_id: str) -> dict:
             boost_remaining = int((expires - datetime.now(timezone.utc)).total_seconds() / 3600)
 
     return {
-        "tier_id": tier_id,
-        "tier_label": label,
+        "tier_id": canonical_tier,
+        "tier_label": cfg["name"],
         "discount_pct": discount,
         "fidelity_boost_active": boost_active,
         "fidelity_boost_hours_remaining": boost_remaining,

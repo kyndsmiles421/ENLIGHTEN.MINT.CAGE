@@ -25,6 +25,7 @@ import ActiveMissionHUD from '../components/ActiveMissionHUD';
 import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
 import SageEngineGauge from '../components/SageEngineGauge';
+import ComplianceShieldPill from '../components/ComplianceShieldPill';
 import TimeCapsuleDrawer from '../components/TimeCapsuleDrawer';
 // V68.68 — Surface the orphaned worlds + hunt.
 import SeedHuntWidget from '../components/SeedHuntWidget';
@@ -862,6 +863,10 @@ function MatrixModuleDispatcher() {
             (back off, let the field settle). Inline · Flatland · no
             fixed positioning. */}
         <SageEngineGauge size={64} />
+        {/* V68.77 — Compliance Pill · sits next to Sage Gauge so legal
+            and cognitive health are visible in one glance. Inline flex,
+            expands in-place (zero overlay / fixed / z-index). */}
+        <ComplianceShieldPill />
         {/* V68.60 — Recall · opens the inline TimeCapsuleDrawer below
             so the user can resurrect any prior session. */}
         <button

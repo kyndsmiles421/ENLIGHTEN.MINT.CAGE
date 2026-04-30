@@ -7,8 +7,18 @@ import {
   ChevronRight, Minus, Plus, Sparkles, CreditCard, Lock
 } from 'lucide-react';
 import { guardCheckoutForTWA } from '../../utils/paymentGate';
+import { getPlatform } from '../../utils/HardwareAestheticLock';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// V68.77 — Revenue Shim: map Capacitor platform → billing rail.
+// 'android' / 'ios' grosses up the price so the merchant nets ≈ base.
+const checkoutPlatform = () => {
+  const p = getPlatform();
+  if (p === 'android') return 'google_play';
+  if (p === 'ios') return 'apple';
+  return 'web';
+};
 
 function CreditPackCard({ pack, onBuy, buying }) {
   return (
@@ -208,6 +218,7 @@ export default function CosmicBroker({ authHeaders }) {
       const baseUrl = window.location.origin;
       const res = await axios.post(`${API}/trade-circle/broker/buy-credits`, {
         pack_id: packId,
+        platform: checkoutPlatform(),
         success_url: `${baseUrl}/trade-circle?payment=success&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${baseUrl}/trade-circle?payment=cancelled`,
         webhook_url: `${process.env.REACT_APP_BACKEND_URL}/api/webhook/stripe`,

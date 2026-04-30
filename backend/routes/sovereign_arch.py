@@ -85,7 +85,7 @@ SOVEREIGN_TIERS = {
         "asset_generation": False,
         "agent_coordination": False,
         "browser_automation": False,
-        "marketplace_discount": 0,
+        "marketplace_discount": 5,
         "credits_monthly": 150,
         "mixer_layer_cap": 8,
         "mixer_ai_credits": 40,
