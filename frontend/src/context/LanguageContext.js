@@ -107,6 +107,32 @@ const KINETIC_PROFILES = {
       lineToggle: [13, 7],
     },
   },
+  yue: {
+    // V68.85 — Cantonese / 粵語. Six-tone, percussive — sharper than
+    // Mandarin's four tones. Tighter haptic envelope to honor that.
+    characterDensity: 0.55,
+    kineticFeel: 'percussive',
+    haptics: {
+      tap: [22],
+      flick: [25, 6, 25, 6, 25],
+      supernova: [55, 12, 55, 12, 55, 12, 130],
+      collapse: [130, 25, 130],
+      lineToggle: [18, 6],
+    },
+  },
+  ur: {
+    // V68.85 — Urdu / اُردُو. Same Hindustani spoken root as Hindi but
+    // Nastaliq script + RTL flow. Soft, lyrical — closer to Persian.
+    characterDensity: 0.92,
+    kineticFeel: 'lyrical',
+    haptics: {
+      tap: [18],
+      flick: [22, 12, 22],
+      supernova: [52, 28, 52, 28, 105],
+      collapse: [105, 44, 105],
+      lineToggle: [14, 8],
+    },
+  },
 };
 
 // RECODE_UI Event for system-wide language sync
@@ -120,15 +146,17 @@ const dispatchRecodeUI = (fromLang, toLang) => {
 };
 
 export const LANGUAGES = [
-  { code: 'en', label: 'English', flag: 'EN', native: 'English' },
-  { code: 'haw', label: 'Hawaiian', flag: 'HAW', native: 'ʻŌlelo Hawaiʻi' },
-  { code: 'zh', label: 'Chinese', flag: 'ZH', native: '中文' },
-  { code: 'es', label: 'Spanish', flag: 'ES', native: 'Español' },
-  { code: 'fr', label: 'French', flag: 'FR', native: 'Français' },
-  { code: 'hi', label: 'Hindi', flag: 'HI', native: 'हिंदी' },
-  { code: 'ja', label: 'Japanese', flag: 'JA', native: '日本語' },
-  { code: 'ar', label: 'Arabic', flag: 'AR', native: 'العربية' },
-  { code: 'pt', label: 'Portuguese', flag: 'PT', native: 'Português' },
+  { code: 'en',  label: 'English',            flag: 'EN',  native: 'English' },
+  { code: 'haw', label: 'Hawaiian',           flag: 'HAW', native: 'ʻŌlelo Hawaiʻi' },
+  { code: 'zh',  label: 'Chinese (Mandarin)', flag: 'ZH',  native: '普通话' },
+  { code: 'yue', label: 'Chinese (Cantonese)',flag: 'YUE', native: '粵語' },
+  { code: 'hi',  label: 'Hindi',              flag: 'HI',  native: 'हिन्दी' },
+  { code: 'ur',  label: 'Urdu',               flag: 'UR',  native: 'اُردُو' },
+  { code: 'es',  label: 'Spanish',            flag: 'ES',  native: 'Español' },
+  { code: 'fr',  label: 'French',             flag: 'FR',  native: 'Français' },
+  { code: 'ja',  label: 'Japanese',           flag: 'JA',  native: '日本語' },
+  { code: 'ar',  label: 'Arabic',             flag: 'AR',  native: 'العربية' },
+  { code: 'pt',  label: 'Portuguese',         flag: 'PT',  native: 'Português' },
 ];
 
 // Static translations for core UI
@@ -339,7 +367,7 @@ export function LanguageProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('cosmic_lang', language);
     document.documentElement.lang = language;
-    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.dir = (language === 'ar' || language === 'ur') ? 'rtl' : 'ltr';
   }, [language]);
   
   // Enhanced setLanguage with RECODE_UI broadcast and haptics
