@@ -243,6 +243,46 @@ Now any pillar / lattice / synthesizer can read the deep profile of the current 
 - ✅ Bridge `useLanguageFrequency()` into `useHubAudio` so the Hub's ambient hum literally retunes when language flips (~10-line edit).
 - ✅ Tuning Fork micro-animation on the language picker (~30-line CSS-only addition).
 
+### V68.86b — SacredTexts Chip Wiring + Honest Scripture Catalog Audit (2026-04-30) ✅
+**User asked:** *"shouldn't we do that tip method for all the large books like the Torah and the Quran and like the Pali Canon... I'd like to be able to access that whole things"*
+
+**Audit-first answer (hard numbers, not narrative):**
+
+| Tradition | Catalogued | Status |
+|---|---|---|
+| Bible OT/NT | 66/66 | ✅ Complete |
+| Deuterocanonical | 7 | ✅ Solid |
+| Lost & Apocryphal | 17 (Enoch, Thomas, Mary, Philip, Judas, Pistis Sophia, Jubilees, Hermas, Didache, etc.) | ✅ Strong |
+| **Torah / Talmud / Midrash** | 12 (Pirke Avot, Mishnah Berachot/Shabbat, Talmud Sanhedrin/Bava Metzia/Berakhot, Midrash Genesis/Exodus, Mekhilta, Sifra, Tanya, Derech Hashem) | ✅ Foundational |
+| **Kabbalah** | 10 (Zohar, Sefer Yetzirah, Bahir, Etz Chaim, Tikkunei Zohar, Sefer Raziel, Pardes Rimonim, Sha'arei Orah, Sefer HaTemunah, Nefesh HaChaim) | ✅ Strong |
+| **Quran** | **24 of 114 surahs** | ⚠️ ~21% — missing ~90 surahs |
+| Hindu | Bhagavad Gita, Upanishads, Yoga Sutras | ⚠️ Missing **Vedas (Rig/Sama/Yajur/Atharva), Mahabharata, Ramayana, Puranas, Brahma Sutras** |
+| **Buddhist Pali Canon** | **Only Dhammapada** (1 of ~50 volumes) | ❌ Missing entire **Sutta Pitaka** (Digha/Majjhima/Samyutta/Anguttara/Khuddaka Nikayas), **Vinaya Pitaka**, **Abhidhamma Pitaka**, **Visuddhimagga**, **Milindapanha** |
+| Mahayana | Tibetan Book of the Dead | ⚠️ Missing **Lotus Sutra, Heart Sutra, Diamond Sutra, Lankavatara Sutra** |
+| Taoist | Tao Te Ching, I Ching | ✅ Foundational |
+| **Sikh** | None | ❌ Missing **Guru Granth Sahib** |
+| **Zoroastrian** | None | ❌ Missing **Avesta · Gathas** |
+| **LDS** | None | ❌ Missing **Book of Mormon · D&C · Pearl of Great Price** |
+| Other | Egyptian Book of the Dead · Popol Vuh · Norse Edda · Kojiki · Odu Ifa · Kalevala · Rumi Masnavi · Emerald Tablet | ✅ Solid |
+
+**Critical insight that makes expansion cheap:** all chapter content is **AI-generated on demand** by the existing `/api/sacred-texts/{text_id}/chapters/{chapter_id}/generate` endpoint. So expanding the catalog = adding metadata entries (title, tradition, region, era, themes, chapter list); the retellings auto-generate when a user opens a chapter. **No content shipped, just structured prompts.**
+
+**What V68.86b actually shipped:**
+- ✅ Dropped `<TranslateChip>` into `SacredTexts.js` retelling section. Same pattern as Bible.js — **one edit covers all 15 currently-catalogued traditions** (Bhagavad Gita, Tao Te Ching, Dhammapada, Upanishads, Rumi, Norse Edda, Tibetan Book of the Dead, I Ching, Emerald Tablet, Yoga Sutras, Kojiki, Odu Ifa, Kalevala, Egyptian Book of the Dead, Popol Vuh).
+- ✅ Translation state auto-clears on chapter swap so a stale translation never sticks.
+- ✅ New regression test `test_sacred_texts_pillar_imports_translate_chip` locks the wiring in.
+- **47/47 tests green** across V68.80–V68.86b.
+
+**P1 Scripture Catalog Expansion (NOT done — needs scoping):**
+The catalog gaps above represent ~120 high-value missing entries. Priority order proposed (user direction needed before any implementation):
+1. **Quran completion** — add the missing 90 surahs (~30 min of catalog work, opens the entire Quran to the chip).
+2. **Pali Canon proper** — 4-6 entries: Sutta Pitaka summary + Digha/Majjhima/Samyutta/Anguttara/Khuddaka Nikaya highlights, Vinaya Pitaka summary, Abhidhamma summary. (Adding all 10,000+ suttas individually is overkill — curated representative selections is the right scope.)
+3. **Mahayana sutras** — Lotus, Heart, Diamond, Lankavatara (~4 entries).
+4. **Hindu epics + Vedas** — Mahabharata (18 parvas), Ramayana (7 kandas), Rig/Sama/Yajur/Atharva Vedas, Vishnu/Shiva/Devi Bhagavata Puranas (~13 entries).
+5. **Sikh / Zoroastrian / LDS** — Guru Granth Sahib (10 sub-sections), Avesta + Gathas (~5 entries), Book of Mormon (15 books) + D&C + PGP (~17 entries).
+
+**Total estimated work: ~150 catalog entries across 5 traditions, ~3-4 focused sessions.**
+
 
 
 ### P0 — Omni-Portal Spatial Hot-Swapping & Ocular Resonance (NOT STARTED)

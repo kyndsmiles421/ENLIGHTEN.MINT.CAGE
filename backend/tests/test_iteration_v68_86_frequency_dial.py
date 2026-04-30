@@ -89,3 +89,16 @@ def test_translate_chip_does_not_introduce_parallel_translator_route():
     # Should call the helper, not axios directly.
     assert "axios" not in js, \
         "TranslateChip must use translate() helper, not raw axios"
+
+
+def test_sacred_texts_pillar_imports_translate_chip():
+    """V68.86 — the chip pattern was extended from Bible.js to
+    SacredTexts.js so all 15 traditions (Bhagavad Gita, Tao Te Ching,
+    Dhammapada, Rumi, Norse Edda, etc.) get the same Reader-Translator
+    Bridge with one search-replace, not 15."""
+    js = _read("frontend/src/pages/SacredTexts.js")
+    assert "import TranslateChip from '../components/TranslateChip'" in js
+    assert "<TranslateChip" in js
+    assert "translatedRetelling" in js, "translation state must exist"
+    # Reset on chapter swap so a stale translation doesn't follow the user.
+    assert "setTranslatedRetelling(null)" in js

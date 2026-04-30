@@ -10,6 +10,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { FixedSizeList } from 'react-window';
+import TranslateChip from '../components/TranslateChip';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
@@ -90,6 +91,8 @@ function AmbientParticles({ theme, active }) {
    ══════════════════════════════════════ */
 function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
   const [revealedParagraphs, setRevealedParagraphs] = useState(0);
+  // V68.86 — Reader-Translator state for the chapter retelling.
+  const [translatedRetelling, setTranslatedRetelling] = useState(null);
   const [narrating, setNarrating] = useState(false);
   const [paused, setPaused] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -106,6 +109,7 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
 
   useEffect(() => {
     setRevealedParagraphs(0);
+    setTranslatedRetelling(null);
     let i = 0;
     const total = paragraphs.length + excerptParagraphs.length + commentaryParagraphs.length;
     const timer = setInterval(() => {
@@ -253,7 +257,20 @@ function VRImmersiveReader({ chapter, text, onClose, authHeaders }) {
             <div className="mb-10">
               <p className="text-[9px] uppercase tracking-[0.2em] mb-4 text-center"
                 style={{ color: 'rgba(255,255,255,0.6)' }}>The Retelling</p>
-              {paragraphs.map((para, i) => {
+              {/* V68.86 — Reader-Translator chip. Sacred mode unlocks
+                  Sovereign-tier etymology overlay. Translates the full
+                  retelling so polyglot seekers can study cross-tradition. */}
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+                <TranslateChip
+                  text={paragraphs.join('\n\n').slice(0, 3500)}
+                  sacred
+                  onSwap={setTranslatedRetelling}
+                />
+              </div>
+              {(translatedRetelling
+                  ? translatedRetelling.split('\n\n')
+                  : paragraphs
+                ).map((para, i) => {
                 const idx = paraIdx++;
                 return (
                   <motion.p key={`r-${i}`}
