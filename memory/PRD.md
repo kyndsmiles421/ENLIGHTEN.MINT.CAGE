@@ -86,7 +86,22 @@ Wired 10 high-traffic pillars to the `pull()` state-substitution dispatcher:
 - `POST /api/trade-circle/broker/buy-credits` — Accepts `platform` param, gross-up + tier applied
 - `GET /api/economy/discount-rate` + `POST /api/economy/apply-discount` — Canonical tier helpers
 
-## 🟡 In-Progress / Next Up
+### V68.80 — Sovereign Arsenal (Owner Control Room) (2026-04-30) ✅
+**P0 bug fix + feature unlock.** The new owner-only `/arsenal` page was built in the prior session but crashed with `KeyError: 'totals'` on load. Root cause: `_require_owner()` compared `user.get("email")` against `CREATOR_EMAIL`, but `get_current_user()` returns a minimal dict (`{id, name, role}`) with no email field — so every owner request 403'd and the UI received an error JSON instead of the expected shape.
+- **Fix (`routes/arsenal.py`):** `_require_owner` is now async, looks up the DB user by id, and accepts either email match OR the `is_owner` flag.
+- **Wellness residue purge** (user demand — recurring regression):
+  - `MedicalDisclaimerSplash.js`: "A Sovereign Wellness Instrument" → **"A Sovereign Entertainment Instrument"**; "wellness, mindfulness, and contemplative-practice platform" → "entertainment, education, and gamification platform".
+  - `public/landing.html`, `public/privacy.html`: all "wellness instrument" strings replaced with "entertainment instrument".
+  - Grep-verified: zero "wellness instrument" or "wellness, mindfulness" occurrences left in frontend.
+- **Arsenal UX already in place** (Flatland-compliant):
+  - 35 generators × Fire buttons (POST/GET) with inline result pane under each card.
+  - 44 engines × click-to-pull() into `MatrixRenderSlot` (no navigation).
+  - Search bar + category filter (avatar · economy · item · reading · storyline).
+  - Fire history logged to `db.arsenal_history` (shows fire_count + last_fired).
+- **E2E verified:** Fired `/api/trade-circle/tier-map` from the UI → real payload (`tier_id: discovery, badge: Lead`) rendered inline below the card.
+- **Regression tests:** `test_iteration_v68_80_arsenal.py` (4 tests, all green).
+
+
 
 ### P0 — Omni-Portal Spatial Hot-Swapping & Ocular Resonance (NOT STARTED)
 "Layered Reality": Flatland → AR (Ocular Resonance camera loop) → Immersive 3D (Meditation-to-Lattice morph)
@@ -122,5 +137,7 @@ Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, a
 ## Test Files of Reference
 - `/app/backend/tests/test_iteration_v68_61.py` → `_66.py` (Entity Graph, Cross-Pollination, RPG)
 - `/app/backend/tests/test_iteration_v68_75_tier_pricing.py` (Tier pricing + platform gross-up) — 18 tests
+- `/app/backend/tests/test_iteration_v68_76_compliance.py` (Compliance shield — Dust/Sparks isolation)
+- `/app/backend/tests/test_iteration_v68_80_arsenal.py` (Sovereign Arsenal owner gate + fire-log) — 4 tests
 - `/app/backend/tests/test_comprehensive_audit.py`
 - `/app/backend/tests/test_iteration261_economy_tiers.py` (prior tier validation)

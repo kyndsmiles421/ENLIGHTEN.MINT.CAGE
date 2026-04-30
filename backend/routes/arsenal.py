@@ -19,9 +19,18 @@ import uuid
 router = APIRouter()
 
 
-def _require_owner(user: dict):
-    if (user.get("email") or "").lower() != CREATOR_EMAIL.lower():
-        raise HTTPException(status_code=403, detail="Owner-only arsenal")
+async def _require_owner(user: dict):
+    """Gate access to the owner. `get_current_user` returns a minimal dict
+    (id, name, role) with no email, so we resolve email from the DB and
+    also accept the `is_owner` flag as a fallback."""
+    doc = await db.users.find_one(
+        {"id": user["id"]},
+        {"_id": 0, "email": 1, "is_owner": 1, "role": 1},
+    ) or {}
+    email = (doc.get("email") or "").lower()
+    if email == CREATOR_EMAIL.lower() or doc.get("is_owner") is True:
+        return
+    raise HTTPException(status_code=403, detail="Owner-only arsenal")
 
 
 # ─── Hand-curated manifest of every fire-able unit ────────────
@@ -132,7 +141,7 @@ ACTIVE_ENGINES = [
 @router.get("/arsenal/index")
 async def arsenal_index(user=Depends(get_current_user)):
     """Owner-only unified index of every fire-able generator + active engine."""
-    _require_owner(user)
+    await _require_owner(user)
 
     # Read fire-history so the UI can show last-used timestamps
     history = {}
@@ -162,7 +171,7 @@ async def arsenal_fire_log(data: dict = Body(...), user=Depends(get_current_user
     """Record a "fire" event — called client-side after a user clicks Fire.
     The actual API call happens client-side hitting the item's real endpoint;
     this just logs history so the index shows last-fired timestamps."""
-    _require_owner(user)
+    await _require_owner(user)
     item_id = data.get("item_id", "").strip()
     outcome = data.get("outcome", "ok")  # ok | error
     if not item_id:

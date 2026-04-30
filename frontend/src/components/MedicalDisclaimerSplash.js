@@ -91,7 +91,7 @@ export default function MedicalDisclaimerSplash() {
             margin: '0 0 6px 0',
           }}
         >
-          A Sovereign Wellness Instrument
+          A Sovereign Entertainment Instrument
         </p>
 
         <h2
@@ -116,7 +116,7 @@ export default function MedicalDisclaimerSplash() {
             margin: '0 0 8px 0',
           }}
         >
-          ENLIGHTEN.MINT.CAFE is a wellness, mindfulness, and contemplative-practice
+          ENLIGHTEN.MINT.CAFE is an entertainment, education, and gamification
           platform. It is <em>not</em> a medical device, diagnostic tool, or
           substitute for professional care.
         </p>
@@ -131,9 +131,10 @@ export default function MedicalDisclaimerSplash() {
           }}
         >
           The Reflexology maps, herbology data, acupressure guides, and Sage AI
-          interactions are provided for educational and entertainment purposes.
-          Do not use this app to diagnose, treat, cure, or prevent any
-          condition. For medical concerns, consult a licensed professional.
+          interactions are provided for entertainment, education, and
+          gamification purposes. Do not use this app to diagnose, treat, cure,
+          or prevent any condition. For medical concerns, consult a licensed
+          professional.
         </p>
 
         <div
