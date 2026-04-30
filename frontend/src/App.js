@@ -244,6 +244,7 @@ const TradeCircleOrbital = lazy(() => import('./pages/TradeCircleOrbital'));
 const CodexOrbital = lazy(() => import('./pages/CodexOrbital'));
 const MasteryPath = lazy(() => import('./pages/MasteryPath'));
 const SovereignDashboard = lazy(() => import('./pages/SovereignDashboard'));
+const SovereignArsenal = lazy(() => import('./pages/SovereignArsenal'));
 const AcademyPage = lazy(() => import('./pages/AcademyPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
@@ -608,6 +609,7 @@ function AnimatedRoutes() {
         <Route path="/codex-orbital" element={<CodexOrbital />} />
         <Route path="/mastery-path" element={<MasteryPath />} />
         <Route path="/sovereign-admin" element={<SovereignDashboard />} />
+        <Route path="/arsenal" element={<SovereignArsenal />} />
         <Route path="/academy" element={<AcademyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
