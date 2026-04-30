@@ -41,10 +41,21 @@ def test_single_source_of_truth():
 
 
 def test_four_tier_discount_matrix():
-    """Canonical 0 / 5 / 15 / 30 split."""
-    expected = {"discovery": 0, "resonance": 5, "sovereign": 15, "architect": 30}
+    """Canonical 0 / 5 / 15 / 30 split — Sovereign is the peak (Tier 4)."""
+    expected = {"discovery": 0, "resonance": 5, "architect": 15, "sovereign": 30}
     for tid, pct in expected.items():
         assert SUBSCRIPTION_TIERS[tid]["marketplace_discount"] == pct
+
+
+def test_sovereign_is_peak():
+    """Sovereign must be Tier 4 (highest ordinal, highest discount)."""
+    assert TIER_DISPLAY["sovereign"]["ordinal"] == 4
+    assert TIER_DISPLAY["sovereign"]["badge"] == "Gilded"
+    assert SUBSCRIPTION_TIERS["sovereign"]["marketplace_discount"] == 30
+    # And Architect is mid-tier (Tier 3)
+    assert TIER_DISPLAY["architect"]["ordinal"] == 3
+    assert TIER_DISPLAY["architect"]["badge"] == "Gold"
+    assert SUBSCRIPTION_TIERS["architect"]["marketplace_discount"] == 15
 
 
 def test_tier_display_badges():

@@ -6,8 +6,9 @@ import os
 import math
 
 # Reuse the canonical 4-tier discount matrix defined in economy.py
-# (discovery 0% / resonance 5% / sovereign 15% / architect 30%).
-# No duplicate tier tables anywhere — economy.SUBSCRIPTION_TIERS is the source of truth.
+# (Lead / Silver / Gold / Gilded = discovery / resonance / architect / sovereign).
+# Hierarchy (low→peak): discovery 0% → resonance 5% → architect 15% → SOVEREIGN 30%.
+# Sovereign is the peak — never mid-tier. No duplicate tier tables anywhere.
 from routes.economy import SUBSCRIPTION_TIERS
 
 STRIPE_API_KEY = os.environ.get("STRIPE_API_KEY", "")
@@ -28,8 +29,8 @@ PLATFORM_FEES = {
 TIER_DISPLAY = {
     "discovery": {"ordinal": 1, "badge": "Lead",   "greeting": "Welcome, Traveler"},
     "resonance": {"ordinal": 2, "badge": "Silver", "greeting": "Welcome, Practitioner"},
-    "sovereign": {"ordinal": 3, "badge": "Gold",   "greeting": "Welcome, Architect"},
-    "architect": {"ordinal": 4, "badge": "Gilded", "greeting": "Welcome, Sovereign"},
+    "architect": {"ordinal": 3, "badge": "Gold",   "greeting": "Welcome, Architect"},
+    "sovereign": {"ordinal": 4, "badge": "Gilded", "greeting": "Welcome, Sovereign"},
 }
 
 

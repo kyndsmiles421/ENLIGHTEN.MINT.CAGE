@@ -59,9 +59,9 @@ SUBSCRIPTION_TIERS = {
         "beacon": True,
         "color": "#818CF8",
     },
-    "sovereign": {
-        "id": "sovereign",
-        "name": "Sovereign",
+    "architect": {
+        "id": "architect",
+        "name": "Architect",
         "label": "Alchemist",
         "price_monthly": 49.00,
         "education_level": "Specialist",
@@ -83,9 +83,9 @@ SUBSCRIPTION_TIERS = {
         "beacon": True,
         "color": "#2DD4BF",
     },
-    "architect": {
-        "id": "architect",
-        "name": "Architect",
+    "sovereign": {
+        "id": "sovereign",
+        "name": "Sovereign",
         "label": "Infrastructure Partner",
         "price_monthly": 89.00,
         "education_level": "Professional",

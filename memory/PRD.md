@@ -23,11 +23,12 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission a
 
 ### V68.75 — Sovereign Tier Pricing + Platform Gross-Up (2026-04-30) ✅
 **Audit-first finding:** Tier discount logic already existed in `routes/economy.py::SUBSCRIPTION_TIERS` — not duplicated.
-- **Lead/Silver/Gold/Gilded** mapping (badges only — DB keys `discovery/resonance/sovereign/architect` unchanged)
-  - Lead (discovery) — 1.00 ratio, 0% off, Free, "Welcome, Traveler"
-  - Silver (resonance) — 0.95 ratio, 5% off, $27/mo, "Welcome, Practitioner"
-  - Gold (sovereign) — 0.85 ratio, 15% off, $49/mo, "Welcome, Architect"
-  - Gilded (architect) — 0.70 ratio, 30% off, $89/mo, "Welcome, Sovereign"
+- **Lead/Silver/Gold/Gilded** mapping — Sovereign is the peak (Tier 4), not mid.
+  - Tier 1 · Lead (discovery) — 1.00 ratio, 0% off, Free, "Welcome, Traveler"
+  - Tier 2 · Silver (resonance) — 0.95 ratio, 5% off, $27/mo, "Welcome, Practitioner"
+  - Tier 3 · Gold (architect) — 0.85 ratio, 15% off, $49/mo, "Welcome, Architect"
+  - **Tier 4 · Gilded (sovereign) — 0.70 ratio, 30% off, $89/mo, "Welcome, Sovereign"** ← PEAK
+- V68.75.1 correction (same day): original draft had Sovereign at Tier 3. Hierarchy restored per user directive: Sovereign = top. Config swap in `SUBSCRIPTION_TIERS` + `TIER_DISPLAY`. No paid subscribers were on the affected tiers (verified: 1 user on discovery only), so no data migration needed.
 - Single source of truth preserved (`economy.SUBSCRIPTION_TIERS`); no `TIER_MAP` duplication
 - **Platform gross-up** added for Play/Apple (30% cut) — Web stays at base price
 - `ai_merchant_catalog` now returns `your_price_credits` + `advisor_greeting` per user tier
@@ -35,7 +36,7 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission a
 - `broker/buy-credits` accepts `platform=web|google_play|apple`, grosses up + applies tier
 - `broker/packs` returns per-platform `final_cents` for all 4 rails
 - NEW endpoint: `GET /api/trade-circle/tier-map` → 4-row matrix for Advisor UI
-- 18 pytest assertions in `/app/backend/tests/test_iteration_v68_75_tier_pricing.py` — ALL PASS
+- 19 pytest assertions in `/app/backend/tests/test_iteration_v68_75_tier_pricing.py` — ALL PASS (includes `test_sovereign_is_peak` guard)
 - Live verified: $9.99 web → $14.28 Play (matches spec's "$10 → $13" rule)
 
 ### V68.76 — Compliance Anchor: Monetary vs Merit Firewall (2026-04-30) ✅
