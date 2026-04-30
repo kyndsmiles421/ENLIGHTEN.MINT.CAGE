@@ -73,6 +73,17 @@ const MODULE_FREQUENCIES = {
   HEXAGRAM:        { bass: 0.38, mid: 0.72, treble: 0.42, peak: 0.55 },
   COSMIC_INSIGHTS: { bass: 0.24, mid: 0.60, treble: 0.74, peak: 0.50 },
   SOUL_REPORTS:    { bass: 0.30, mid: 0.68, treble: 0.66, peak: 0.55 },
+  // V68.79 — Wellness core band (Play Store Wellness/Mental Acuity pillars)
+  BREATHWORK:      { bass: 0.72, mid: 0.32, treble: 0.20, peak: 0.40 },
+  MEDITATION:      { bass: 0.62, mid: 0.28, treble: 0.18, peak: 0.28 },
+  YOGA:            { bass: 0.56, mid: 0.48, treble: 0.30, peak: 0.40 },
+  AFFIRMATIONS:    { bass: 0.40, mid: 0.58, treble: 0.44, peak: 0.52 },
+  MOOD_TRACKER:    { bass: 0.34, mid: 0.56, treble: 0.48, peak: 0.38 },
+  SOUNDSCAPES:     { bass: 0.68, mid: 0.52, treble: 0.60, peak: 0.45 },
+  FREQUENCIES:     { bass: 0.48, mid: 0.70, treble: 0.82, peak: 0.58 },
+  JOURNAL:         { bass: 0.28, mid: 0.46, treble: 0.38, peak: 0.30 },
+  HERBOLOGY:       { bass: 0.44, mid: 0.62, treble: 0.40, peak: 0.42 },
+  CRYSTALS:        { bass: 0.36, mid: 0.54, treble: 0.72, peak: 0.50 },
 };
 
 function emitPulse(moduleId) {
@@ -189,6 +200,20 @@ const MODULE_CONSUMES = {
   HEXAGRAM:        'narrativeContext',
   COSMIC_INSIGHTS: null,
   SOUL_REPORTS:    null,
+  // V68.79 — Wellness core. Breathwork/meditation/yoga drive `entityState`
+  // (body + mood); affirmations/journal commit `narrativeContext`;
+  // herbology/crystals own `entityState` so selections propagate to
+  // the Chamber mini-game and Starseed avatar.
+  BREATHWORK:      'entityState',
+  MEDITATION:      'entityState',
+  YOGA:            'entityState',
+  AFFIRMATIONS:    'narrativeContext',
+  MOOD_TRACKER:    'entityState',
+  SOUNDSCAPES:     null,
+  FREQUENCIES:     null,
+  JOURNAL:         'narrativeContext',
+  HERBOLOGY:       'entityState',
+  CRYSTALS:        'entityState',
 };
 
 function publishPrimer(moduleId) {
@@ -233,6 +258,17 @@ export const MODULE_REGISTRY = {
   HEXAGRAM:        React.lazy(() => import('../engines/HexagramEngine')),
   COSMIC_INSIGHTS: React.lazy(() => import('../engines/CosmicInsightsEngine')),
   SOUL_REPORTS:    React.lazy(() => import('../engines/SoulReportsEngine')),
+  // V68.79 — Wellness core pillar batch
+  BREATHWORK:      React.lazy(() => import('../engines/BreathworkEngine')),
+  MEDITATION:      React.lazy(() => import('../engines/MeditationEngine')),
+  YOGA:            React.lazy(() => import('../engines/YogaEngine')),
+  AFFIRMATIONS:    React.lazy(() => import('../engines/AffirmationsEngine')),
+  MOOD_TRACKER:    React.lazy(() => import('../engines/MoodTrackerEngine')),
+  SOUNDSCAPES:     React.lazy(() => import('../engines/SoundscapesEngine')),
+  FREQUENCIES:     React.lazy(() => import('../engines/FrequenciesEngine')),
+  JOURNAL:         React.lazy(() => import('../engines/JournalEngine')),
+  HERBOLOGY:       React.lazy(() => import('../engines/HerbologyEngine')),
+  CRYSTALS:        React.lazy(() => import('../engines/CrystalsEngine')),
 };
 
 export function ProcessorStateProvider({ children }) {

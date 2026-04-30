@@ -53,6 +53,16 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission a
 - Single-source-of-truth guard test confirms no duplicate `MONETARY_ASSETS` definitions anywhere in codebase.
 
 ## Key DB Schema
+
+### V68.79 — Wellness Core Pillar Batch (2026-04-30) ✅
+Wired 10 core Wellness/Mental Acuity pillars to `pull()` adapter (Play Store category alignment):
+- **Breathwork, Meditation, Yoga, Affirmations, Mood Tracker, Soundscapes, Frequencies, Journal, Herbology, Crystals**
+- Pattern: one tiny adapter per page in `engines/*Engine.js` (6-line file each, just re-exports the page component) → registered in `MODULE_REGISTRY`, `MODULE_FREQUENCIES`, `MODULE_CONSUMES`, `ROUTE_TO_MODULE`.
+- Each emits a unique `sovereign:pulse` vector (Breathwork heavy bass, Frequencies heavy treble, etc.) so the CrystallineLattice3D visibly shifts spectral region when user activates the pillar.
+- Playwright verified: clicking "Breathwork" pillar sets `window.__sovereignActiveModule = "BREATHWORK"`, URL stays at `/sovereign-hub` (zero navigate), zero page errors.
+- 27 pillars now wired (17 prior + 10 this batch). ~93 remaining on legacy `navigate()`.
+
+## Key DB Schema
 - `users` — `user_credit_balance`, `user_dust_balance`, `gilded_tier` (one-time marketplace unlocks: seed/artisan/sovereign/gilded)
 - `subscriptions` — `tier` (discovery/resonance/sovereign/architect) — drives marketplace discount
 - `merchant_transactions` — augmented with `base_price_credits`, `tier_id`, `tier_discount_pct`

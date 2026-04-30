@@ -307,6 +307,17 @@ const ROUTE_TO_MODULE = {
   '/hexagram-journal':    'HEXAGRAM',
   '/cosmic-insights':     'COSMIC_INSIGHTS',
   '/soul-reports':        'SOUL_REPORTS',
+  // V68.79 — Wellness core pillar batch (Play Store Mental Acuity)
+  '/breathing':           'BREATHWORK',
+  '/meditation':          'MEDITATION',
+  '/yoga':                'YOGA',
+  '/affirmations':        'AFFIRMATIONS',
+  '/mood':                'MOOD_TRACKER',
+  '/soundscapes':         'SOUNDSCAPES',
+  '/frequencies':         'FREQUENCIES',
+  '/journal':             'JOURNAL',
+  '/herbology':           'HERBOLOGY',
+  '/crystals':            'CRYSTALS',
 };
 
 export default function SovereignHub() {
