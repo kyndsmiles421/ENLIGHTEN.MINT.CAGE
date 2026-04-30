@@ -286,6 +286,11 @@ export function usePhoneticSynthesizer(options = {}) {
       case 'nasal_resonance':
       case 'rhythmic_flow':
       case 'balanced':
+      // V68.86 — Lyrical (Urdu) + Aloha-breath (Hawaiian) reuse the
+      // balanced sine generator with their own baseFrequency/peaks
+      // already shifted by the deep registry. No new generator needed.
+      case 'lyrical_flow':
+      case 'aloha_breath':
       default:
         return createBalancedSine(ctx, profile);
     }

@@ -10,6 +10,7 @@ import {
 import { toast } from 'sonner';
 import { ScriptureVisualizer, VisionModeToggle, detectScenes } from '../components/ScriptureVisualizer';
 import { useSensory } from '../context/SensoryContext';
+import TranslateChip from '../components/TranslateChip';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -118,6 +119,10 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
   const [speaking, setSpeaking] = useState(false);
   const [visionMode, setVisionMode] = useState(false);
   const [detectedScenes, setDetectedScenes] = useState([]);
+  // V68.86 — Reader-Translator state. null = show original.
+  const [translatedRetelling, setTranslatedRetelling] = useState(null);
+  const [translatedVerses, setTranslatedVerses] = useState(null);
+  const [translatedCommentary, setTranslatedCommentary] = useState(null);
   const color = CAT_COLORS[book.category] || '#A78BFA';
 
   useEffect(() => {
@@ -125,6 +130,11 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
     setLoading(true);
     setChapter(null);
     setActiveTab('retelling');
+    // V68.86 — clear translations whenever chapter swaps so user
+    // doesn't see a stale translation glued to fresh source text.
+    setTranslatedRetelling(null);
+    setTranslatedVerses(null);
+    setTranslatedCommentary(null);
     axios.post(`${API}/bible/books/${book.id}/chapters/${chapterNum}/generate`, {}, { headers: authHeaders })
       .then(r => {
         setChapter(r.data);
@@ -258,14 +268,31 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
               className="rounded-2xl p-6" style={{ background: visionMode ? 'rgba(6,6,18,0.75)' : 'rgba(248,250,252,0.02)', border: `1px solid ${visionMode ? 'rgba(248,250,252,0.08)' : 'rgba(248,250,252,0.05)'}`, backdropFilter: visionMode ? 'blur(8px)' : 'none' }}>
               {activeTab === 'retelling' && chapter.retelling && (
                 <div className="prose prose-invert max-w-none">
-                  {chapter.retelling.split('\n\n').map((p, i) => (
+                  {/* V68.86 — Reader-Translator Bridge. Translates the
+                      whole retelling into the active language; sacred
+                      mode unlocked for Sovereign tier owners. */}
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
+                    <TranslateChip
+                      text={chapter.retelling.slice(0, 3500)}
+                      sacred
+                      onSwap={setTranslatedRetelling}
+                    />
+                  </div>
+                  {(translatedRetelling || chapter.retelling).split('\n\n').map((p, i) => (
                     <p key={i} className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.9)', fontFamily: 'Cormorant Garamond, serif', fontSize: '15px' }}>{p}</p>
                   ))}
                 </div>
               )}
               {activeTab === 'key_verses' && chapter.key_verses && (
                 <div className="space-y-4">
-                  {chapter.key_verses.split('\n\n').map((v, i) => (
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 4 }}>
+                    <TranslateChip
+                      text={chapter.key_verses.slice(0, 3500)}
+                      sacred
+                      onSwap={setTranslatedVerses}
+                    />
+                  </div>
+                  {(translatedVerses || chapter.key_verses).split('\n\n').map((v, i) => (
                     <div key={i} className="pl-4" style={{ borderLeft: `2px solid ${color}40` }}>
                       <p className="text-sm italic leading-relaxed" style={{ color: 'rgba(255,255,255,0.85)', fontFamily: 'Cormorant Garamond, serif', fontSize: '14px' }}>{v}</p>
                     </div>
@@ -274,7 +301,13 @@ function ChapterReader({ book, chapterNum, onBack, onNav }) {
               )}
               {activeTab === 'commentary' && chapter.commentary && (
                 <div>
-                  {chapter.commentary.split('\n\n').map((p, i) => (
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 10 }}>
+                    <TranslateChip
+                      text={chapter.commentary.slice(0, 3500)}
+                      onSwap={setTranslatedCommentary}
+                    />
+                  </div>
+                  {(translatedCommentary || chapter.commentary).split('\n\n').map((p, i) => (
                     <p key={i} className="text-sm leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.85)' }}>{p}</p>
                   ))}
                 </div>

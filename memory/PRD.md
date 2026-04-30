@@ -217,6 +217,32 @@ Now any pillar / lattice / synthesizer can read the deep profile of the current 
 
 **11/11 V68.85 regression tests green** + **40/40 green total across V68.80–V68.85.** Tests assert: both translator files carry the dual-path disclaimer; both share the supported set; tier-features lists all 11; Cantonese returns CJK; Urdu returns Arabic-script; LanguageContext imports the deep registry; `getDeepProfile` is exposed; deep registry now carries `ur` + `haw`; Urdu is RTL; SYNTH_LANG_MAP has `yue`/`ur`.
 
+### V68.86 — Frequency Dial + Reader-Translator Pillar Bridge (2026-04-30) ✅
+**Audit-first execution honored.** Found and used existing infrastructure rather than building parallel systems. Corrected my own prior audit when the user pushed back ("most everything should be there") — discovered:
+- Stripe is **deeply intermingled** across 8 backend modules (`economy.py`, `subscriptions.py`, `marketplace.py`, `workshop.py`, `cosmetic_bundles.py`, `rpg.py`, `trade_circle.py`, `compliance_shield.py`) via `emergentintegrations.payments.stripe.checkout` — there's no separate `stripe.py` because each route owns its own checkout flow.
+- `entity_graph.py` (625 lines) **already** federates herbology + botany + aromatherapy + sovereign_library into a single ENTITY_INDEX with alias resolution at `/api/entity/{id}` + circuit-breaker LLM synthesis. The "silo collapse" the user requested was already done.
+- `usePhoneticSynthesizer.js` (492 lines) **already** consumes `LANGUAGE_REGISTRY` + `PHONETIC_PROFILES` and generates real Web-Audio buffers for granular noise, tonal glides, precise staccato, balanced sine.
+- `V_ENGINE_P0.js` is real — defines orbital physics with Phi-expansion @1155.0 base + Radical Scaling Root.
+
+**🎵 Frequency Dial (used the existing synthesizer, no rebuild):**
+- New `useLanguageFrequency()` hook in `LanguageContext` — single-line consumer returning `{ baseFrequency, waveform, resonantPeaks, character, flickerGlyph }` for the active language. Components like the lattice / R3F audio listener can now tune to the current cultural pitch with one import.
+- Extended `usePhoneticSynthesizer.generateBuffer()` switch to recognize the V68.85 phonetic characters `lyrical_flow` (Urdu) and `aloha_breath` (Hawaiian). They share the balanced-sine generator but with their own `baseFrequency` + `resonantPeaks` + `attackTime` + `releaseTime` already shifted in the deep registry, so the synth picks up the cultural pitch automatically when the language flips.
+
+**📖 Reader-Translator Pillar Bridge:**
+- New `<TranslateChip>` component (`components/TranslateChip.jsx`) — small inline pill that drops next to any text block. Toggles between original ↔ translation ↔ original on each tap, includes loading spinner + sacred-mode etymology pill (Sovereign-only) + auto-narration via `useVoiceInteraction.speak()`.
+- Uses ONLY existing helpers: `useLanguage()` for active language + flicker glyph, `useVoiceInteraction()` for translate + speak. **No new backend route** — flows through the V68.84 sovereign translator path. Audit-trail enforced by `test_translate_chip_does_not_introduce_parallel_translator_route`.
+- Wired into `Bible.js` for all three section tabs (Retelling, Key Verses, Commentary) with separate translation state per tab so swapping tabs preserves the user's choices. Translations clear on chapter swap so a stale translation never sticks to fresh source text.
+- Flatland-compliant: inline `<span>`, no overlay/portal/z-index. Honors the founding architecture rule.
+
+**6/6 V68.86 regression tests green** + **46/46 total across V68.80–V68.86.** Tests assert: `useLanguageFrequency` exported with correct shape; `usePhoneticSynthesizer` recognizes `lyrical_flow` + `aloha_breath`; `TranslateChip` exists and uses the existing pipeline (no axios, no `/api/translate` bypass); Bible imports the chip with 3 instances; chapter-swap clears stale translations.
+
+**Honest macro-roadmap (NOT implemented this session — documented for the next pass):**
+- ⚠️ "Aloha Living" — exists only as language-level kineticFeel + phonetic profile. No business node, no e-commerce wiring, no content silo. **Pure narrative; needs scoping before build.**
+- ⚠️ "Sovereign Trust" — concept-level only, no dedicated module. Needs design before implementation.
+- ✅ Drop `<TranslateChip>` into Sacred Texts + Oracle pillars — pattern is set, ~1 search-replace per pillar.
+- ✅ Bridge `useLanguageFrequency()` into `useHubAudio` so the Hub's ambient hum literally retunes when language flips (~10-line edit).
+- ✅ Tuning Fork micro-animation on the language picker (~30-line CSS-only addition).
+
 
 
 ### P0 — Omni-Portal Spatial Hot-Swapping & Ocular Resonance (NOT STARTED)
@@ -258,5 +284,6 @@ Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, a
 - `/app/backend/tests/test_iteration_v68_83_spiritual_shield.py` (manifest, landing, disclaimer, sage/bible/oracle sovereign framing, hub Cross-Tradition mark) — 9 tests
 - `/app/backend/tests/test_iteration_v68_84_translator.py` (Universal Translator middleware, Voice tier-features, Hawaiian, sacred mode) — 8 tests
 - `/app/backend/tests/test_iteration_v68_85_deep_bridge.py` (audit-first reconciliation: dual-translator disclaimer, deep-registry bridge, Cantonese yue, Urdu ur RTL, SYNTH_LANG_MAP) — 11 tests
+- `/app/backend/tests/test_iteration_v68_86_frequency_dial.py` (useLanguageFrequency hook, phonetic synth lyrical_flow/aloha_breath, TranslateChip wired into Bible) — 6 tests
 - `/app/backend/tests/test_comprehensive_audit.py`
 - `/app/backend/tests/test_iteration261_economy_tiers.py` (prior tier validation)

@@ -539,7 +539,29 @@ export function useLanguage() {
       getHaptic: () => [15],
       vibrate: () => {},
       isRecoding: false,
+      deepProfile: null,
+      getDeepProfile: () => null,
     };
   }
   return ctx;
+}
+
+// V68.86 — Frequency-Dial helper. Returns the base Hz / waveform /
+// resonant peaks of the active language so any consumer (lattice,
+// synth, R3F audio listener) can tune to the current cultural pitch
+// without re-deriving from the deep registry. Returns sensible
+// English defaults if the language isn't deep-registered.
+export function useLanguageFrequency() {
+  const { language, deepProfile } = useLanguage();
+  return useMemo(() => {
+    const phonetic = deepProfile?.phoneticProfile;
+    return {
+      language,
+      baseFrequency: phonetic?.baseFrequency ?? 261.63,    // C4 fallback
+      waveform:      phonetic?.waveform      ?? 'sine',
+      resonantPeaks: phonetic?.resonantPeaks ?? null,
+      character:     phonetic?.character     ?? 'balanced',
+      flickerGlyph:  deepProfile?.zeroPoint?.flickerGlyph ?? null,
+    };
+  }, [language, deepProfile]);
 }
