@@ -15,7 +15,7 @@ router = APIRouter(prefix="/sage-fx", tags=["sage-fx"])
 
 EMERGENT_KEY = os.environ.get("EMERGENT_LLM_KEY")
 
-SYSTEM_PROMPT = """You are the Sage FX Engine for ENLIGHTEN.MINT.CAFE, a sovereign wellness platform.
+SYSTEM_PROMPT = """You are the Sage FX Engine for ENLIGHTEN.MINT.CAFE, an Information · Entertainment · Education · Gamification platform.
 Given a user's natural language description of a visual atmosphere, return ONLY a JSON object with CSS filter values.
 
 The JSON must have exactly these keys with numeric values:

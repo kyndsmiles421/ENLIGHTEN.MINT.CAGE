@@ -1,7 +1,11 @@
 # ENLIGHTEN.MINT.CAFE — Product Requirements Document
 
+## Canonical Category
+**Information · Entertainment · Education · Gamification.**
+Not a wellness, medical, diagnostic, or health app. The in-app TermsGate and Landing disclaimers are the source of truth: *"For Information & Entertainment Purposes Only."* Every module (Breathwork, Herbology, Oracle, RPG, etc.) is a **product / byproduct** of the entertainment-learning experience — never clinical. Any future agent reading this: do not re-categorize.
+
 ## Original Problem Statement
-Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission as a Wellness/Mental Acuity app. Strict adherence to "Sovereign Math", "Flatland Rules" (no overlays/modals), and a closed-loop economy. Features include: 3D R3F spatial lattice, Single-Plane-Pull state substitution, Cybernetic Loop (Generators → ContextBus → Lattice), Entity Graph knowledge unification, Discovery Economy.
+Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission under the **Entertainment / Education / Lifestyle / Games** categories. Strict adherence to "Sovereign Math", "Flatland Rules" (no overlays/modals), and a closed-loop economy. Features include: 3D R3F spatial lattice, Single-Plane-Pull state substitution, Cybernetic Loop (Generators → ContextBus → Lattice), Entity Graph knowledge unification, Discovery Economy.
 
 ## Architecture Pillars
 - **State-Driven Processor** — `ProcessorState.js` swaps `MatrixRenderSlot`, no react-router for tools
@@ -54,9 +58,10 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission a
 
 ## Key DB Schema
 
-### V68.79 — Wellness Core Pillar Batch (2026-04-30) ✅
-Wired 10 core Wellness/Mental Acuity pillars to `pull()` adapter (Play Store category alignment):
+### V68.79 — Pillar Batch (Entertainment / Education / Gamification core) ✅
+Wired 10 high-traffic pillars to the `pull()` state-substitution dispatcher:
 - **Breathwork, Meditation, Yoga, Affirmations, Mood Tracker, Soundscapes, Frequencies, Journal, Herbology, Crystals**
+  (These are **entertainment-learning modules** — products of the app experience, NOT medical tools.)
 - Pattern: one tiny adapter per page in `engines/*Engine.js` (6-line file each, just re-exports the page component) → registered in `MODULE_REGISTRY`, `MODULE_FREQUENCIES`, `MODULE_CONSUMES`, `ROUTE_TO_MODULE`.
 - Each emits a unique `sovereign:pulse` vector (Breathwork heavy bass, Frequencies heavy treble, etc.) so the CrystallineLattice3D visibly shifts spectral region when user activates the pillar.
 - Playwright verified: clicking "Breathwork" pillar sets `window.__sovereignActiveModule = "BREATHWORK"`, URL stays at `/sovereign-hub` (zero navigate), zero page errors.

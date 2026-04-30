@@ -307,7 +307,9 @@ const ROUTE_TO_MODULE = {
   '/hexagram-journal':    'HEXAGRAM',
   '/cosmic-insights':     'COSMIC_INSIGHTS',
   '/soul-reports':        'SOUL_REPORTS',
-  // V68.79 — Wellness core pillar batch (Play Store Mental Acuity)
+  // V68.79 — Entertainment / Education / Gamification core batch
+  // (these modules are products of the entertainment-learning app,
+  // not medical/wellness tools — see TermsGate "Info & Entertainment")
   '/breathing':           'BREATHWORK',
   '/meditation':          'MEDITATION',
   '/yoga':                'YOGA',

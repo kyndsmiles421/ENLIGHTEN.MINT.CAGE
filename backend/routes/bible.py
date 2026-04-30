@@ -258,7 +258,7 @@ async def generate_bible_chapter(book_id: str, chapter_num: int, user=Depends(ge
     elif is_quran:
         tradition_note = "This is a Surah from the Holy Quran. Present with deep reverence for Islamic scripture. Use 'peace be upon him' after prophets' names. Include the Arabic transliteration of key phrases where meaningful."
 
-    system_msg = f"""You are a scholar of world sacred texts and spiritual narrator for The ENLIGHTEN.MINT.CAFE, a spiritual wellness platform.
+    system_msg = f"""You are a scholar of world sacred texts and spiritual narrator for The ENLIGHTEN.MINT.CAFE, an Information · Entertainment · Education · Gamification platform (not a medical or wellness product).
 
 You are generating content for Chapter/Section {chapter_num} of {book['title']}.
 {tradition_note}

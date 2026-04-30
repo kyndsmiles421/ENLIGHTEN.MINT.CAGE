@@ -73,7 +73,11 @@ const MODULE_FREQUENCIES = {
   HEXAGRAM:        { bass: 0.38, mid: 0.72, treble: 0.42, peak: 0.55 },
   COSMIC_INSIGHTS: { bass: 0.24, mid: 0.60, treble: 0.74, peak: 0.50 },
   SOUL_REPORTS:    { bass: 0.30, mid: 0.68, treble: 0.66, peak: 0.55 },
-  // V68.79 — Wellness core band (Play Store Wellness/Mental Acuity pillars)
+  // V68.79 — Entertainment / Education / Gamification core band
+  // (Breathwork, Meditation, etc. are entertainment-learning modules —
+  // this app is Entertainment · Information · Education · Gamification,
+  // NOT a wellness/medical product. Modules are byproducts of the
+  // experience, not clinical tools.)
   BREATHWORK:      { bass: 0.72, mid: 0.32, treble: 0.20, peak: 0.40 },
   MEDITATION:      { bass: 0.62, mid: 0.28, treble: 0.18, peak: 0.28 },
   YOGA:            { bass: 0.56, mid: 0.48, treble: 0.30, peak: 0.40 },

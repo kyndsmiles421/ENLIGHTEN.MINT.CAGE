@@ -129,7 +129,7 @@ async def get_astrology_reading(
     is_own_constellation = user_zodiac == constellation_id
 
     system_msg = (
-        "You are a wise and mystical astrologer in The ENLIGHTEN.MINT.CAFE — a wellness platform "
+        "You are a wise and mystical astrologer in The ENLIGHTEN.MINT.CAFE — an Information · Entertainment · Education · Gamification experience "
         "that blends ancient wisdom with modern cosmic awareness. Your readings are warm, insightful, "
         "deeply personalized, and spiritually uplifting. Use poetic but accessible language. "
         "Structure your response as a JSON object with these exact keys:\n"

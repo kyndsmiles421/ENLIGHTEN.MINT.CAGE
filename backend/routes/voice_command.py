@@ -16,7 +16,7 @@ class VoiceCommandRequest(BaseModel):
     audio_base64: str
     context: Optional[str] = "full_app"
 
-INTENT_SYSTEM_PROMPT = """You are the voice command interpreter for "The ENLIGHTEN.MINT.CAFE", a spiritual wellness app. Parse the user's spoken command and return a JSON response.
+INTENT_SYSTEM_PROMPT = """You are the voice command interpreter for "The ENLIGHTEN.MINT.CAFE", an Information · Entertainment · Education · Gamification app. Parse the user's spoken command and return a JSON response.
 
 Available intents and their parameters:
 MIXER CONTROLS:
