@@ -36,10 +36,20 @@ const DEFAULT_FEATURES = {
 };
 
 // Browser SpeechSynthesis voice-language hint map.
+// Browsers don't ship native Hawaiian/Cantonese/Urdu voices on most
+// devices — fallbacks chosen to give the closest pronunciation envelope.
 const SYNTH_LANG_MAP = {
-  en: 'en-US', haw: 'en-US', // browsers don't ship native Hawaiian voices yet
-  zh: 'zh-CN', es: 'es-ES', fr: 'fr-FR', hi: 'hi-IN',
-  ja: 'ja-JP', ar: 'ar-SA', pt: 'pt-BR',
+  en:  'en-US',
+  haw: 'en-US', // closest Polynesian-English approximation
+  zh:  'zh-CN', // Mandarin — Simplified
+  yue: 'zh-HK', // Cantonese — Traditional, Hong Kong locale
+  hi:  'hi-IN',
+  ur:  'ur-PK', // Urdu — Pakistan locale (Nastaliq)
+  es:  'es-ES',
+  fr:  'fr-FR',
+  ja:  'ja-JP',
+  ar:  'ar-SA',
+  pt:  'pt-BR',
 };
 
 export function VoiceInteractionProvider({ children }) {

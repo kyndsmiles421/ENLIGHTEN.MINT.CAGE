@@ -178,6 +178,45 @@ Wired 10 high-traffic pillars to the `pull()` state-substitution dispatcher:
 
 **8/8 regression tests** green in `test_iteration_v68_84_translator.py`: tier-features sovereign for owner, all 9 languages listed, English passthrough, Hawaiian round-trip, unknown-lang rejection, missing-text 400, oversized-text 400, sacred-mode sovereign returns note. **29/29 green** total across V68.80–V68.84.
 
+### V68.85 — Deep-Registry Bridge + Cantonese + Urdu (2026-04-30) ✅
+**Audit-first execution** — user explicitly directed: *"I always look to see what's there first before you start."* Three pre-existing systems found and properly bridged.
+
+**🔍 Audit findings (and how each was honored):**
+1. `routes/translation.py` exists as **public Plus-tier credit-gated translator** with SHA-256 cache + Gemini-3-Flash. My V68.84 `routes/translator.py` was a parallel build. **Reconciled** — both files now carry an explicit "TWO TRANSLATORS — DO NOT MERGE" header documenting purpose split (public/paid/cached vs sovereign/sacred-mode/uncached) so future agents can't rebuild either by accident. Both share the unified 11-language SUPPORTED set.
+2. `config/languageRegistry.js` (541 lines) — **deep plugin registry** with phonetic synthesis (Web Audio waveforms, base frequencies, harmonic peaks, attack/release envelopes), Zero-Point flicker glyphs, and haptic categories. Already had `zh-cmn` (Mandarin) + `zh-yue` (Cantonese). Used by RecursiveLattice, GhostingOverlay, usePhoneticSynthesizer, useZeroPointFlicker, useTesseractCore, useRDive36, useSentientRegistryV2. **Bridged** to `LanguageContext` via new `getDeepProfile(code)` helper + `SHALLOW_TO_DEEP` map (handles `zh ↔ zh-cmn`, `yue ↔ zh-yue`); exposed through `useLanguage().deepProfile`.
+3. `i18n/translations.js` — orphan, no consumers. **Left untouched** (delete candidate in a future cleanup, low priority).
+
+**🌏 Cantonese (yue / 粵語):**
+- Added to shallow `LanguageContext.LANGUAGES` (Traditional script · YUE flag).
+- Kinetic profile: `percussive` (sharper than Mandarin's smooth glide).
+- Static UI translations (nav · common · mixer · auth) in Traditional Cantonese.
+- Bridged to deep registry's pre-existing `zh-yue` entry — `tonal_complex` phonetic profile with sawtooth wave, F#4 base @369.99 Hz, 9-tone harmonic complexity automatically activates when selected.
+- Browser TTS hint: `zh-HK` locale.
+
+**📿 Urdu (ur / اُردُو):**
+- Added to BOTH shallow `LanguageContext.LANGUAGES` and deep `LANGUAGE_REGISTRY` (Nastaliq · UR flag · **RTL**).
+- `<html dir="rtl">` toggles correctly (verified live: `html_dir_after_ur: rtl`).
+- Kinetic profile: `lyrical` (per user direction — "Lyrical/Flowing to match its poetic status").
+- New `urdu` PHONETIC_PROFILE entry: sine wave, C#4 base @277.18 Hz (matches Hindi — shared spoken root), 4-peak harmonic stack, softer attack (0.035s) + longer release (0.28s) than Hindi (0.02 / 0.15) to honor Nastaliq flow.
+- Zero-Point flicker glyph: ﷲ (Allah — multi-denominational respect).
+- Static UI translations (nav · common · mixer · auth) in Urdu Nastaliq.
+- Browser TTS hint: `ur-PK` locale.
+
+**🌺 Hawaiian — also added to deep registry** (was only in shallow): `hawaiian` PHONETIC_PROFILE (sine, C4 @261.63 Hz, breath-of-life), zeroPoint glyph: `ʻ` (ʻokina, sacred Hawaiian glottal mark).
+
+**🔌 Bridge hook in `LanguageContext`:**
+```js
+const { deepProfile, getDeepProfile } = useLanguage();
+// deepProfile.phoneticProfile → waveform, baseFrequency, resonantPeaks
+// deepProfile.zeroPoint → flickerGlyph, weight, glitchIntensity
+// deepProfile.hapticCategory → basePattern, flickerMultiplier, audioProfile
+```
+Now any pillar / lattice / synthesizer can read the deep profile of the current language without importing the registry directly. Single source of truth.
+
+**Final language set (11 first-class):** English · ʻŌlelo Hawaiʻi · 普通话 (Mandarin) · 粵語 (Cantonese) · हिन्दी (Hindi) · اُردُو (Urdu, RTL) · Español · Français · 日本語 · العربية (RTL) · Português.
+
+**11/11 V68.85 regression tests green** + **40/40 green total across V68.80–V68.85.** Tests assert: both translator files carry the dual-path disclaimer; both share the supported set; tier-features lists all 11; Cantonese returns CJK; Urdu returns Arabic-script; LanguageContext imports the deep registry; `getDeepProfile` is exposed; deep registry now carries `ur` + `haw`; Urdu is RTL; SYNTH_LANG_MAP has `yue`/`ur`.
+
 
 
 ### P0 — Omni-Portal Spatial Hot-Swapping & Ocular Resonance (NOT STARTED)
@@ -218,5 +257,6 @@ Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, a
 - `/app/backend/tests/test_iteration_v68_80_arsenal.py` (Sovereign Arsenal owner gate, fire-log, dwell-log, top_fired/top_dwell, suggested_next, V68.81 + V68.82 batch surfacing) — 12 tests
 - `/app/backend/tests/test_iteration_v68_83_spiritual_shield.py` (manifest, landing, disclaimer, sage/bible/oracle sovereign framing, hub Cross-Tradition mark) — 9 tests
 - `/app/backend/tests/test_iteration_v68_84_translator.py` (Universal Translator middleware, Voice tier-features, Hawaiian, sacred mode) — 8 tests
+- `/app/backend/tests/test_iteration_v68_85_deep_bridge.py` (audit-first reconciliation: dual-translator disclaimer, deep-registry bridge, Cantonese yue, Urdu ur RTL, SYNTH_LANG_MAP) — 11 tests
 - `/app/backend/tests/test_comprehensive_audit.py`
 - `/app/backend/tests/test_iteration261_economy_tiers.py` (prior tier validation)

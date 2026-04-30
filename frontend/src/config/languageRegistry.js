@@ -136,6 +136,32 @@ export const PHONETIC_PROFILES = {
     releaseTime: 0.18,
     character: 'tonal_complex', // More tonal complexity
   },
+
+  // V68.85 — Lyrical / Sister-language profiles
+  urdu: {
+    // Sister to Hindi (same Hindustani spoken root) but lyrical /
+    // poetic register. Slightly softer attack + longer release than
+    // Hindi to honor the Nastaliq-script flow.
+    waveform: 'sine',
+    baseFrequency: 277.18, // C#4 - matches Hindi base (shared spoken root)
+    resonantPeaks: [138.59, 207.65, 277.18, 369.99], // 4-peak harmonic stack
+    grainDensity: 0.15, // softer grain than Hindi (0.2)
+    attackTime: 0.035, // longer, softer entry — lyrical
+    releaseTime: 0.28, // longer release — poetic flow
+    character: 'lyrical_flow',
+  },
+  hawaiian: {
+    // V68.84 cross-link — ʻŌlelo Hawaiʻi resonance profile so the
+    // phonetic synthesizer can sing in Hawaiian when the Aloha-flow
+    // language is selected. C5 resonance (Aloha-bright).
+    waveform: 'sine',
+    baseFrequency: 261.63, // C4 — open, breath-of-life
+    resonantPeaks: [130.81, 261.63, 392.0],
+    grainDensity: 0.1,
+    attackTime: 0.04,
+    releaseTime: 0.32,
+    character: 'aloha_breath',
+  },
 };
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -343,6 +369,72 @@ export const LANGUAGE_REGISTRY = {
       'common.peace': 'शांति',
       'common.harmony': 'सामंजस्य',
       'flicker.greeting': 'नमस्ते',
+    },
+  },
+
+  // V68.85 — Urdu (lyrical sister to Hindi, RTL Nastaliq).
+  ur: {
+    code: 'ur',
+    label: 'Urdu',
+    native: 'اُردُو',
+    flag: 'UR',
+    category: 'modern',
+    phonetic: 'urdu',
+    direction: 'rtl',
+    characterDensity: 0.92,
+
+    haptics: {
+      tap: [18],
+      flick: [22, 12, 22],
+      supernova: [52, 28, 52, 28, 105],
+      collapse: [105, 44, 105],
+      lineToggle: [14, 8],
+      zeroPointBurst: [11, 9, 14, 9, 11],
+    },
+
+    zeroPoint: {
+      weight: 1.05,
+      flickerGlyph: 'ﷲ', // Allah glyph — multi-denominational respect
+      glitchIntensity: 0.55,
+    },
+
+    translations: {
+      'common.peace': 'امن',
+      'common.harmony': 'ہم آہنگی',
+      'flicker.greeting': 'السلام علیکم',
+    },
+  },
+
+  // V68.84 — Hawaiian / ʻŌlelo Hawaiʻi (Aloha-flow, breath-of-life).
+  haw: {
+    code: 'haw',
+    label: 'Hawaiian',
+    native: 'ʻŌlelo Hawaiʻi',
+    flag: 'HAW',
+    category: 'modern',
+    phonetic: 'hawaiian',
+    direction: 'ltr',
+    characterDensity: 1.05,
+
+    haptics: {
+      tap: [16],
+      flick: [22, 12, 22, 12],
+      supernova: [55, 30, 55, 30, 110],
+      collapse: [110, 50, 110],
+      lineToggle: [13, 7],
+      zeroPointBurst: [10, 7, 13, 7, 10],
+    },
+
+    zeroPoint: {
+      weight: 1.0,
+      flickerGlyph: 'ʻ', // ʻOkina — sacred Hawaiian glottal mark
+      glitchIntensity: 0.5,
+    },
+
+    translations: {
+      'common.peace': 'Maluhia',
+      'common.harmony': 'Lōkahi',
+      'flicker.greeting': 'Aloha',
     },
   },
   

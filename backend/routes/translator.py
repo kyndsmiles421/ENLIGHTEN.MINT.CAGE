@@ -1,6 +1,21 @@
 """
-translator.py — Universal Translator Middleware (V68.84)
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+translator.py — SOVEREIGN translator (V68.84 + V68.85 reconciliation)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔══════════════════════════════════════════════════════════════════╗
+║  TWO TRANSLATORS — DO NOT MERGE, DO NOT DUPLICATE                ║
+╠══════════════════════════════════════════════════════════════════╣
+║  THIS FILE   → POST /api/translator/translate                    ║
+║                Sovereign-tier extras: sacred-mode etymology,     ║
+║                multi-denominational sovereign framing,           ║
+║                NO credit cost for owner. gpt-4o-mini.            ║
+║                                                                  ║
+║  routes/translation.py → POST /api/translate                     ║
+║                Plus-tier+ public path. SHA-256 cached.           ║
+║                Per-translation credit cost. gemini-3-flash.      ║
+║                                                                  ║
+║  Both share the same SUPPORTED_LANGS set (V68.85).               ║
+╚══════════════════════════════════════════════════════════════════╝
 
 Multi-denominational spiritual exploration cuts across language. This
 endpoint translates ad-hoc text (verses, generator output, UI strings)
@@ -16,8 +31,8 @@ Tier policy:
                        brief contextual note, used by the Bible /
                        Sacred Texts engines to teach as it translates.
 
-Hawaiian (haw / ʻŌlelo Hawaiʻi) is supported as a first-class language
-to honor the Aloha framing.
+Hawaiian (haw / ʻŌlelo Hawaiʻi), Mandarin (zh), Cantonese (yue), and
+Urdu (ur, RTL) are first-class languages.
 """
 import asyncio
 from fastapi import APIRouter, Body, Depends, HTTPException
@@ -28,13 +43,17 @@ import uuid
 router = APIRouter()
 
 
+# V68.85 — Single source of truth for both translator endpoints.
+# Mirrored in routes/translation.py::SUPPORTED_LANGUAGES.
 SUPPORTED_LANGS = {
     "en":  "English",
     "haw": "Hawaiian (ʻŌlelo Hawaiʻi)",
     "zh":  "Chinese (Mandarin)",
+    "yue": "Chinese (Cantonese)",
     "es":  "Spanish",
     "fr":  "French",
     "hi":  "Hindi",
+    "ur":  "Urdu",
     "ja":  "Japanese",
     "ar":  "Arabic",
     "pt":  "Portuguese",

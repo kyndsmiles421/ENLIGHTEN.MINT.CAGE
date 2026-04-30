@@ -1,3 +1,23 @@
+"""
+translation.py — PUBLIC translator (V68.85 reconciliation header)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔══════════════════════════════════════════════════════════════════╗
+║  TWO TRANSLATORS — DO NOT MERGE, DO NOT DUPLICATE                ║
+╠══════════════════════════════════════════════════════════════════╣
+║  THIS FILE   → POST /api/translate                               ║
+║                Plus-tier+ users · per-translation credit cost    ║
+║                · SHA-256 cached translations · gemini-3-flash    ║
+║                · audience: paying public, hi-volume general use  ║
+║                                                                  ║
+║  routes/translator.py → POST /api/translator/translate           ║
+║                Owner / Sovereign-tier · sacred-mode etymology    ║
+║                · NO cache · gpt-4o-mini · audience: ELIT path    ║
+║                                                                  ║
+║  Both share SUPPORTED_LANGUAGES set so a language added here     ║
+║  is automatically supported there. See V68.85 commit.            ║
+╚══════════════════════════════════════════════════════════════════╝
+"""
 from fastapi import APIRouter, Depends, Body, HTTPException
 from deps import db, get_current_user, EMERGENT_LLM_KEY
 from routes.subscriptions import get_user_credits, tier_level, deduct_credits
@@ -6,9 +26,20 @@ from datetime import datetime, timezone
 
 router = APIRouter()
 
+# V68.85 — Unified language set across BOTH translator endpoints.
+# Hawaiian, Mandarin, Cantonese, and Urdu added so paid users get the
+# same coverage as the sovereign owner-tier translator.
 SUPPORTED_LANGUAGES = {
-    "es": "Spanish", "fr": "French", "hi": "Hindi",
-    "ja": "Japanese", "ar": "Arabic", "pt": "Portuguese",
+    "haw": "Hawaiian (ʻŌlelo Hawaiʻi)",
+    "zh":  "Chinese (Mandarin)",
+    "yue": "Chinese (Cantonese)",
+    "es":  "Spanish",
+    "fr":  "French",
+    "hi":  "Hindi",
+    "ur":  "Urdu",
+    "ja":  "Japanese",
+    "ar":  "Arabic",
+    "pt":  "Portuguese",
 }
 
 

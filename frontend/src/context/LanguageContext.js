@@ -1,6 +1,41 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useMemo } from 'react';
+import { LANGUAGE_REGISTRY, PHONETIC_PROFILES, HAPTIC_CATEGORIES } from '../config/languageRegistry';
 
 const LanguageContext = createContext(null);
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// V68.85 — DEEP-REGISTRY BRIDGE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// LanguageContext (this file) holds the *shallow* picker view (UI
+// strings + simple kinetic haptics). languageRegistry.js holds the
+// *deep* view (phonetic synthesis profiles, Zero-Point flicker glyphs,
+// haptic category metadata). Consumers like RecursiveLattice,
+// usePhoneticSynthesizer, useZeroPointFlicker rely on the deep view.
+//
+// Some codes diverge between the two registries — historically the
+// deep registry uses `zh-cmn` / `zh-yue` while the shallow picker uses
+// `zh` / `yue`. This map bridges them.
+const SHALLOW_TO_DEEP = {
+  zh:  'zh-cmn',
+  yue: 'zh-yue',
+};
+function deepCodeFor(shallow) {
+  return SHALLOW_TO_DEEP[shallow] || shallow;
+}
+
+/**
+ * Resolve the deep registry profile for a shallow language code.
+ * Returns `null` if the code is not registered in the deep registry —
+ * consumers should treat that as "use sensible defaults".
+ */
+export function getDeepProfile(shallowCode) {
+  const deepCode = deepCodeFor(shallowCode);
+  const entry = LANGUAGE_REGISTRY[deepCode];
+  if (!entry) return null;
+  const phonetic = PHONETIC_PROFILES[entry.phonetic] || null;
+  const haptics = HAPTIC_CATEGORIES[entry.category] || null;
+  return { ...entry, phoneticProfile: phonetic, hapticCategory: haptics };
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // KINETIC HAPTIC PROFILES — Language-aware haptics
@@ -352,6 +387,46 @@ const translations = {
     'auth.email': 'Leka Uila', 'auth.password': 'Hua ʻŌlelo Huna', 'auth.login': 'Komo',
     'auth.register': 'Hana i ka Moʻokāki', 'auth.logout': 'Haʻalele',
   },
+  yue: {
+    // V68.85 — Cantonese / 粵語. Six-tone, Traditional script. Bridges
+    // to deep registry's `zh-yue` phonetic profile (sawtooth wave,
+    // F#4 base, 9-tone harmonic complexity).
+    'nav.dashboard': '儀表板', 'nav.mixer': '宇宙混音', 'nav.frequencies': '頻率',
+    'nav.meditation': '冥想', 'nav.journal': '日誌', 'nav.oracle': '神諭',
+    'nav.starChart': '星圖', 'nav.tradeCircle': '貿易圈', 'nav.settings': '設定',
+    'nav.pricing': '價格', 'nav.mood': '心情追蹤', 'nav.breathing': '呼吸',
+    'common.save': '儲存', 'common.cancel': '取消', 'common.delete': '刪除',
+    'common.share': '分享', 'common.loading': '載入緊...', 'common.search': '搜尋',
+    'common.back': '返', 'common.next': '下一個', 'common.play': '播放', 'common.stop': '停止',
+    'common.close': '閂', 'common.upgrade': '升級', 'common.signIn': '登入',
+    'mixer.masterVol': '主音量', 'mixer.mute': '靜音', 'mixer.stopAll': '全部停止',
+    'mixer.frequencies': 'Solfeggio 頻率', 'mixer.sounds': '環境聲音',
+    'mixer.instruments': '世界樂器', 'mixer.mantras': '咒語',
+    'mixer.generateBlend': '生成我嘅混音', 'mixer.analyzing': '分析緊你嘅心情...',
+    'dashboard.forYou': '為你而設', 'dashboard.suggestedForYou': '為你推薦',
+    'auth.email': '電郵', 'auth.password': '密碼', 'auth.login': '登入',
+    'auth.register': '建立帳戶', 'auth.logout': '登出',
+  },
+  ur: {
+    // V68.85 — اُردُو / Urdu. Nastaliq script, RTL. Same Hindustani
+    // spoken root as Hindi but lyrical/poetic register. Sister to
+    // Persian. Bridges to deep registry's `ur` lyrical phonetic profile.
+    'nav.dashboard': 'ڈیش بورڈ', 'nav.mixer': 'کائناتی مکسر', 'nav.frequencies': 'تعدد',
+    'nav.meditation': 'مراقبہ', 'nav.journal': 'روزنامچہ', 'nav.oracle': 'الہام',
+    'nav.starChart': 'ستارہ نقشہ', 'nav.tradeCircle': 'تجارتی حلقہ', 'nav.settings': 'ترتیبات',
+    'nav.pricing': 'قیمت', 'nav.mood': 'مزاج کا نقش', 'nav.breathing': 'سانس',
+    'common.save': 'محفوظ کریں', 'common.cancel': 'منسوخ', 'common.delete': 'حذف',
+    'common.share': 'شیئر', 'common.loading': 'لوڈ ہو رہا ہے...', 'common.search': 'تلاش',
+    'common.back': 'واپس', 'common.next': 'اگلا', 'common.play': 'چلائیں', 'common.stop': 'روکیں',
+    'common.close': 'بند کریں', 'common.upgrade': 'بہتر بنائیں', 'common.signIn': 'سائن ان',
+    'mixer.masterVol': 'بنیادی آواز', 'mixer.mute': 'خاموش', 'mixer.stopAll': 'سب روکیں',
+    'mixer.frequencies': 'سولفیجیو تعدد', 'mixer.sounds': 'محیطی آوازیں',
+    'mixer.instruments': 'عالمی ساز', 'mixer.mantras': 'منتر',
+    'mixer.generateBlend': 'میرا مکس بنائیں', 'mixer.analyzing': 'آپ کے مزاج کا تجزیہ...',
+    'dashboard.forYou': 'آپ کے لیے', 'dashboard.suggestedForYou': 'آپ کے لیے تجویز',
+    'auth.email': 'ای میل', 'auth.password': 'پاس ورڈ', 'auth.login': 'داخل ہوں',
+    'auth.register': 'اکاؤنٹ بنائیں', 'auth.logout': 'باہر نکلیں',
+  },
 };
 
 export function LanguageProvider({ children }) {
@@ -409,6 +484,9 @@ export function LanguageProvider({ children }) {
     return dict[key] || translations.en[key] || fallback || key;
   }, [language]);
 
+  // V68.85 — Deep registry bridge. Re-evaluated when language flips.
+  const deepProfile = useMemo(() => getDeepProfile(language), [language]);
+
   const value = useMemo(() => ({
     language,
     previousLanguage,
@@ -416,13 +494,19 @@ export function LanguageProvider({ children }) {
     setLanguage,
     t,
     languages: LANGUAGES,
-    // Kinetic properties
+    // Kinetic properties (shallow)
     kineticProfile,
     characterDensity: kineticProfile.characterDensity,
     kineticFeel: kineticProfile.kineticFeel,
     getHaptic,
     vibrate,
-  }), [language, previousLanguage, isRecoding, setLanguage, t, kineticProfile, getHaptic, vibrate]);
+    // V68.85 — deep-registry bridge. Consumers (lattice, phonetic
+    // synth, zero-point flicker) read from this when they want the
+    // full plugin metadata: phoneticProfile, hapticCategory,
+    // zeroPoint glyph, etc.
+    deepProfile,
+    getDeepProfile,
+  }), [language, previousLanguage, isRecoding, setLanguage, t, kineticProfile, getHaptic, vibrate, deepProfile]);
 
   return (
     <LanguageContext.Provider value={value}>
