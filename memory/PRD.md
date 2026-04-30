@@ -1,7 +1,74 @@
-# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.67)
+# ENLIGHTEN.MINT.CAFE — Product Requirements Document (V68.68)
 
 ## Vision
 Sovereign Unified Engine / PWA targeting Google Play Store submission as an **Apps → Entertainment** app with Information & Entertainment content purpose. Not medical. Not diagnostic.
+
+## V68.68 — Surface the Orphaned Universe (29 Feb 2026)
+
+User complaint: *"Where is the game where you go find things in
+my app? I don't see any of the 3D gaming world pictures anywhere
+like I literally built a whole universe. I'm tired of f****** asking
+the same f****** question — stop having essential features hiding."*
+
+### Audit-first finding
+The 3D universe + find-game were **fully built** but orphaned:
+  • `components/SeedHuntWidget.js` (363 lines — target hints, timer,
+    leaderboard preview, XP, proximity glow) was only rendered
+    inside `TesseractExperience.js`. If you never visited /tesseract
+    you never saw the hunt.
+  • 10 immersive experiences sitting in `/app/frontend/src/pages/`:
+      TesseractExperience (4D canvas) · CelestialDome (VR sky) ·
+      FractalEngine (R3F Mandelbrot) · Observatory (sonified sky) ·
+      DimensionalSpace · MultiverseRealms (portal map) ·
+      StarseedWorlds (RPG portal) · DreamRealms · PlanetaryDepths ·
+      RealmsGallery.
+    Each fully built (1,000+ lines on heaviest), each only
+    reachable via the 120+ un-wired nav-drain items.
+  • 3 of them (CelestialDome, PlanetaryDepths — StarseedAdventure
+    already had one via GameScene) had no inline exit, trapping users.
+
+### Bridges shipped — ALL inline/flow-compliant (NO overlays)
+1. ✅ **Worlds Strip in Hub** — `SovereignHub.js` now renders a
+   horizontal scroll of 10 world tiles beneath the pillar dispatcher.
+   Each tile = icon + KIND label (4D Canvas / VR Deep Sky / R3F
+   World / etc.) + title + 1-line blurb. Tap = `<Link to=...>` into
+   the full experience. `data-testid="worlds-strip"` +
+   `data-testid="world-tile-<id>"` for each of the 10.
+2. ✅ **Hunt widget in Hub** — `SeedHuntWidget` now mounts beneath
+   the Worlds strip. Self-hides gracefully when no active hunt.
+3. ✅ **CelestialDome inline Exit** — absolute-positioned Hub
+   return INSIDE the 3D canvas container (same pattern as the
+   pre-existing FractalEngine/TesseractExperience Exit HUDs —
+   legitimate 3D canvas HUD, not a global floating overlay).
+4. ✅ **PlanetaryDepths inline Exit** — in-flow flex button at the
+   top of the scrolling page (true Flatland: `display: flex`,
+   `marginBottom: 4`, no absolute positioning).
+5. ❌ **Global floating overlay attempted then reverted** — user
+   correctly flagged this as a Flatland violation. Deleted the
+   `ReturnToHubOverlay` component; kept only in-flow exits.
+
+### Verification
+**Playwright smoke**:
+  • Hub: worlds-strip rendered, all 10 world-tile test-ids present.
+  • Hub: sage gauge shows "3/70 CELLS" (V68.65 depth live).
+  • Hub: all 7 pillar dispatchers + RECALL still visible.
+  • `/tesseract` loads, no error boundary. Global overlay = 0 (correct).
+  • `/vr/celestial-dome` — inline exit button present.
+  • `/planetary-depths` — inline exit button present.
+
+### Flatland compliance note
+Fixed-position floating overlays on every page are banned by user's
+Flatland rule. The ONLY acceptable "positioned" exit buttons are
+the ones INSIDE a full-screen 3D canvas page (Tesseract / Fractal /
+CelestialDome), because there is no flex in-flow to attach to —
+these match the pattern the app was already using. All 2D pages
+use true in-flow flex button placement.
+
+### Issues sealed
+- ✅ "Where is the find-things game?" → Now on the Hub.
+- ✅ "Where is the 3D universe?" → Now a 10-tile strip on the Hub.
+- ✅ "Am I trapped in the 3D world?" → No — inline exits added
+  where missing. FractalEngine / Tesseract already had theirs.
 
 ## V68.67 — Mixer + Screen Record Bug Fixes (29 Feb 2026)
 

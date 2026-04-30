@@ -26,6 +26,9 @@ import WalletPills from '../components/WalletPills';
 import MiniLattice from '../components/MiniLattice';
 import SageEngineGauge from '../components/SageEngineGauge';
 import TimeCapsuleDrawer from '../components/TimeCapsuleDrawer';
+// V68.68 — Surface the orphaned worlds + hunt.
+import SeedHuntWidget from '../components/SeedHuntWidget';
+import { Telescope, Orbit, Sparkles as SparkleIcon, Globe, Eye, Infinity as InfinityIcon, Moon, Layers, TreePine, Compass } from 'lucide-react';
 import { useProcessorState, MODULE_REGISTRY } from '../state/ProcessorState';
 import SovereignPreferences from '../kernel/SovereignPreferences';
 
@@ -264,6 +267,26 @@ const PILLAR_VERB = {
  * A miss falls back to navigate() so the 123+ unwired pillars keep
  * working until their adapters land — phased drain, not big-bang.
  */
+// V68.68 — Worlds Strip. The 10 immersive experiences you've
+// built. Previously only reachable via the 120+ un-wired nav-drain
+// items; now one tap from the Hub. Each tile navigates to its
+// full-screen experience (R3F canvas or gallery).
+const WORLD_NODES = [
+  { id: 'tesseract',       route: '/tesseract',        label: 'Tesseract Core',     kind: '4D Canvas',  color: '#A78BFA', Icon: InfinityIcon, blurb: 'Four-dimensional hypercube rotation.' },
+  { id: 'celestial-dome',  route: '/vr/celestial-dome', label: 'Celestial Dome',     kind: 'VR Deep Sky',color: '#60A5FA', Icon: Telescope,    blurb: 'Deep-sky sonified planetarium.' },
+  { id: 'fractal-engine',  route: '/fractal-engine',    label: 'Fractal Engine',     kind: 'R3F World',  color: '#F472B6', Icon: SparkleIcon,  blurb: 'Mandelbrot / Julia set explorer.' },
+  { id: 'observatory',     route: '/observatory',       label: 'Observatory',        kind: 'Live Sky',   color: '#FBBF24', Icon: Orbit,        blurb: 'Real-time sonified astronomy.' },
+  { id: 'dim-space',       route: '/dimensional-space', label: 'Dimensional Space',  kind: 'Lattice',    color: '#34D399', Icon: Layers,       blurb: 'Step through dimensional veils.' },
+  { id: 'multiverse',      route: '/multiverse-realms', label: 'Multiverse',         kind: 'Portal Map', color: '#C084FC', Icon: Compass,      blurb: 'Gateway to 6 realm scenes.' },
+  { id: 'starseed-worlds', route: '/starseed-worlds',   label: 'Starseed Worlds',    kind: 'RPG Portal', color: '#FB923C', Icon: Compass,      blurb: 'Realm-anchored branching RPG.' },
+  { id: 'dream-realms',    route: '/dream-realms',      label: 'Dream Realms',       kind: 'Vision',     color: '#818CF8', Icon: Moon,         blurb: 'Your dreams as traversable worlds.' },
+  { id: 'planetary',       route: '/planetary-depths',  label: 'Planetary Depths',   kind: 'Gallery',    color: '#22D3EE', Icon: Globe,        blurb: 'Deep-core planetary archetypes.' },
+  { id: 'realms-gallery',  route: '/realms',            label: 'Realms Gallery',     kind: 'Overview',   color: '#A3E635', Icon: TreePine,     blurb: 'Browse every realm you\u2019ve touched.' },
+];
+
+// V68.63 — Multiverse slot-machine → real RPG bridge. Routes that
+// previously triggered /starseed/worlds/explore now flow through the
+// pull() dispatcher so the narrative engine is the default.
 const ROUTE_TO_MODULE = {
   '/avatar':              'AVATAR_GEN',
   '/avatar-creator':      'AVATAR_GEN',
@@ -875,6 +898,100 @@ function MatrixModuleDispatcher() {
         ))}
       </div>
       <TimeCapsuleDrawer open={capsuleOpen} onClose={() => setCapsuleOpen(false)} />
+
+      {/* V68.68 — Worlds Strip. The 3D universe you built was
+          only reachable via the 120+ un-wired nav-drain items.
+          These 10 experiences are now one tap away from the hub.
+          Flatland-compliant inline scroll-strip, no modal. */}
+      <div
+        style={{
+          width: '100%', maxWidth: 920, margin: '14px auto 0',
+          padding: '0 12px',
+        }}
+        data-testid="worlds-strip"
+      >
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          fontFamily: 'monospace', fontSize: 9,
+          letterSpacing: '0.28em', color: 'rgba(255,255,255,0.35)',
+          textTransform: 'uppercase', marginBottom: 6,
+        }}>
+          <Globe size={10} /> Worlds · Step Inside
+          <span style={{ marginLeft: 'auto', opacity: 0.55, letterSpacing: '0.15em' }}>
+            10 Environments
+          </span>
+        </div>
+        <div style={{
+          display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4,
+          scrollbarWidth: 'thin',
+        }}>
+          {WORLD_NODES.map((w) => (
+            <Link
+              key={w.route}
+              to={w.route}
+              data-testid={`world-tile-${w.id}`}
+              style={{
+                flex: '0 0 auto',
+                width: 132,
+                padding: '10px 10px 8px',
+                borderRadius: 10,
+                background: `${w.color}0C`,
+                border: `1px solid ${w.color}33`,
+                color: 'rgba(255,255,255,0.78)',
+                textDecoration: 'none',
+                fontFamily: 'monospace',
+                fontSize: 10,
+                transition: 'transform 150ms ease, border-color 200ms ease, background 200ms ease',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.background = `${w.color}1A`;
+                e.currentTarget.style.borderColor = `${w.color}77`;
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.background = `${w.color}0C`;
+                e.currentTarget.style.borderColor = `${w.color}33`;
+              }}
+            >
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 6, color: w.color,
+                marginBottom: 6,
+              }}>
+                <w.Icon size={12} />
+                <span style={{
+                  fontSize: 8, letterSpacing: '0.22em', textTransform: 'uppercase',
+                  opacity: 0.85,
+                }}>
+                  {w.kind}
+                </span>
+              </div>
+              <div style={{
+                fontSize: 11, color: '#fff', letterSpacing: '0.04em',
+                fontWeight: 600, lineHeight: 1.2, marginBottom: 3,
+              }}>
+                {w.label}
+              </div>
+              <div style={{
+                fontSize: 8.5, color: 'rgba(255,255,255,0.45)',
+                letterSpacing: '0.02em', lineHeight: 1.3,
+              }}>
+                {w.blurb}
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* V68.68 — Seed Hunt Widget. The daily find-it game was
+          only rendered inside the Tesseract page. Now it lives on
+          the Hub where everyone lands. Only shows if the backend
+          has an active hunt. */}
+      <div style={{
+        width: '100%', maxWidth: 920, margin: '14px auto 0', padding: '0 12px',
+      }}>
+        <SeedHuntWidget />
+      </div>
     </>
   );
 }

@@ -398,6 +398,24 @@ export default function PlanetaryDepths() {
 
   return (
     <div className="min-h-screen px-4 pt-20 pb-32 max-w-2xl mx-auto space-y-5" data-testid="planetary-depths-page">
+      {/* V68.68 — Inline Hub-return (Flatland: in-flow flex, not overlay) */}
+      <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 4 }}>
+        <button
+          type="button"
+          onClick={() => navigate('/sovereign-hub')}
+          data-testid="planetary-depths-exit"
+          style={{
+            fontFamily: 'monospace', fontSize: 10, letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            padding: '5px 11px', borderRadius: 6,
+            background: 'rgba(167,139,250,0.08)',
+            border: '1px solid rgba(167,139,250,0.28)',
+            color: '#C4B5FD', cursor: 'pointer',
+          }}
+        >
+          ← Hub
+        </button>
+      </div>
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center space-y-1">
         <h1 className="text-xl font-light tracking-wide"

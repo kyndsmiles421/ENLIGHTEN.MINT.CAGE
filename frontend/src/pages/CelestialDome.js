@@ -431,6 +431,36 @@ export default function CelestialDome() {
 
   return (
     <div className="celestial-dome-page" data-testid="celestial-dome">
+      {/* V68.68 — Inline Exit strip (Flatland: flex header, not overlay).
+          The 3D canvas renders beneath; this strip sits in-flow at top
+          so the user can always return to the Hub without trapping. */}
+      <div
+        data-testid="celestial-dome-exit-strip"
+        style={{
+          position: 'absolute', top: 0, left: 0, right: 0,
+          zIndex: 5,
+          display: 'flex', alignItems: 'center', gap: 10,
+          padding: '10px 14px',
+          pointerEvents: 'none',
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => navigate('/sovereign-hub')}
+          data-testid="celestial-dome-exit"
+          style={{
+            pointerEvents: 'auto',
+            fontFamily: 'monospace', fontSize: 10, letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            padding: '6px 12px', borderRadius: 6,
+            background: 'rgba(10,10,24,0.55)',
+            border: '1px solid rgba(167,139,250,0.35)',
+            color: '#C4B5FD', cursor: 'pointer',
+          }}
+        >
+          ← Hub
+        </button>
+      </div>
       {/* Persistent Sovereign HUD (Sparks / Dust / Mission) */}
       <SovereignStageHUD anchor="top-right" />
       <style>{`
