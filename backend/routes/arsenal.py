@@ -117,6 +117,22 @@ ACTIVE_ENGINES = [
     {"id": "JOURNAL",          "name": "Journal",               "layer": "frontend", "kind": "render-adapter"},
     {"id": "HERBOLOGY",        "name": "Herbology",             "layer": "frontend", "kind": "render-adapter"},
     {"id": "CRYSTALS",         "name": "Crystals",              "layer": "frontend", "kind": "render-adapter"},
+    # V68.81 — Entertainment/Education pillar batch (+15)
+    {"id": "ACUPRESSURE",      "name": "Acupressure",           "layer": "frontend", "kind": "render-adapter"},
+    {"id": "AROMATHERAPY",     "name": "Aromatherapy",          "layer": "frontend", "kind": "render-adapter"},
+    {"id": "REFLEXOLOGY",      "name": "Reflexology",           "layer": "frontend", "kind": "render-adapter"},
+    {"id": "BIBLE",            "name": "Bible",                 "layer": "frontend", "kind": "render-adapter"},
+    {"id": "BLESSINGS",        "name": "Blessings",             "layer": "frontend", "kind": "render-adapter"},
+    {"id": "DAILY_RITUAL",     "name": "Daily Ritual",          "layer": "frontend", "kind": "render-adapter"},
+    {"id": "ELIXIRS",          "name": "Elixirs",               "layer": "frontend", "kind": "render-adapter"},
+    {"id": "ENCYCLOPEDIA",     "name": "Encyclopedia",          "layer": "frontend", "kind": "render-adapter"},
+    {"id": "COSMIC_CALENDAR",  "name": "Cosmic Calendar",       "layer": "frontend", "kind": "render-adapter"},
+    {"id": "SACRED_TEXTS",     "name": "Sacred Texts",          "layer": "frontend", "kind": "render-adapter"},
+    {"id": "MANTRAS",          "name": "Mantras",               "layer": "frontend", "kind": "render-adapter"},
+    {"id": "MUDRAS",           "name": "Mudras",                "layer": "frontend", "kind": "render-adapter"},
+    {"id": "RITUALS",          "name": "Rituals",               "layer": "frontend", "kind": "render-adapter"},
+    {"id": "TEACHINGS",        "name": "Teachings",             "layer": "frontend", "kind": "render-adapter"},
+    {"id": "ZEN_GARDEN",       "name": "Zen Garden",            "layer": "frontend", "kind": "render-adapter"},
     # Backend active engines (surfaced for transparency — most are auto-wired)
     {"id": "compliance_shield",  "name": "Compliance Shield",    "layer": "backend",  "kind": "firewall"},
     {"id": "crystal_seal",       "name": "Crystal Seal",         "layer": "backend",  "kind": "hash"},
@@ -154,11 +170,25 @@ async def arsenal_index(user=Depends(get_current_user)):
     def annotate(lst):
         return [{**item, **history.get(item["id"], {"last_fired": None, "fire_count": 0})} for item in lst]
 
+    gens = annotate(GENERATORS)
+    engs = annotate(ACTIVE_ENGINES)
+
+    # Top-fired combined list (both generators + engines) sorted by fire_count desc.
+    # Used for the "Most-Fired" strip at the top of the Arsenal UI — turns the
+    # Workshop into a self-organizing dashboard.
+    combined = [{**g, "unit": "generator"} for g in gens] + [{**e, "unit": "engine"} for e in engs]
+    top_fired = sorted(
+        [c for c in combined if c.get("fire_count", 0) > 0],
+        key=lambda c: (c.get("fire_count", 0), c.get("last_fired") or ""),
+        reverse=True,
+    )[:6]
+
     return {
-        "generators": annotate(GENERATORS),
-        "engines": annotate(ACTIVE_ENGINES),
+        "generators": gens,
+        "engines": engs,
         "categories": sorted({g["category"] for g in GENERATORS}),
         "engine_layers": ["frontend", "backend"],
+        "top_fired": top_fired,
         "totals": {
             "generators": len(GENERATORS),
             "engines": len(ACTIVE_ENGINES),

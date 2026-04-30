@@ -273,6 +273,22 @@ export const MODULE_REGISTRY = {
   JOURNAL:         React.lazy(() => import('../engines/JournalEngine')),
   HERBOLOGY:       React.lazy(() => import('../engines/HerbologyEngine')),
   CRYSTALS:        React.lazy(() => import('../engines/CrystalsEngine')),
+  // V68.81 — Entertainment/Education pillar batch (+15)
+  ACUPRESSURE:     React.lazy(() => import('../engines/AcupressureEngine')),
+  AROMATHERAPY:    React.lazy(() => import('../engines/AromatherapyEngine')),
+  REFLEXOLOGY:     React.lazy(() => import('../engines/ReflexologyEngine')),
+  BIBLE:           React.lazy(() => import('../engines/BibleEngine')),
+  BLESSINGS:       React.lazy(() => import('../engines/BlessingsEngine')),
+  DAILY_RITUAL:    React.lazy(() => import('../engines/DailyRitualEngine')),
+  ELIXIRS:         React.lazy(() => import('../engines/ElixirsEngine')),
+  ENCYCLOPEDIA:    React.lazy(() => import('../engines/EncyclopediaEngine')),
+  COSMIC_CALENDAR: React.lazy(() => import('../engines/CosmicCalendarEngine')),
+  SACRED_TEXTS:    React.lazy(() => import('../engines/SacredTextsEngine')),
+  MANTRAS:         React.lazy(() => import('../engines/MantrasEngine')),
+  MUDRAS:          React.lazy(() => import('../engines/MudrasEngine')),
+  RITUALS:         React.lazy(() => import('../engines/RitualsEngine')),
+  TEACHINGS:       React.lazy(() => import('../engines/TeachingsEngine')),
+  ZEN_GARDEN:      React.lazy(() => import('../engines/ZenGardenEngine')),
 };
 
 export function ProcessorStateProvider({ children }) {

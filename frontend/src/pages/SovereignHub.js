@@ -319,7 +319,23 @@ const ROUTE_TO_MODULE = {
   '/frequencies':         'FREQUENCIES',
   '/journal':             'JOURNAL',
   '/herbology':           'HERBOLOGY',
-  '/crystals':            'CRYSTALS',
+  '/crystals':             'CRYSTALS',
+  // V68.81 — Entertainment/Education pillar batch (+15)
+  '/acupressure':          'ACUPRESSURE',
+  '/aromatherapy':         'AROMATHERAPY',
+  '/reflexology':          'REFLEXOLOGY',
+  '/bible':                'BIBLE',
+  '/blessings':            'BLESSINGS',
+  '/daily-ritual':         'DAILY_RITUAL',
+  '/elixirs':              'ELIXIRS',
+  '/encyclopedia':         'ENCYCLOPEDIA',
+  '/cosmic-calendar':      'COSMIC_CALENDAR',
+  '/sacred-texts':         'SACRED_TEXTS',
+  '/mantras':              'MANTRAS',
+  '/mudras':               'MUDRAS',
+  '/rituals':              'RITUALS',
+  '/teachings':            'TEACHINGS',
+  '/zen-garden':           'ZEN_GARDEN',
 };
 
 export default function SovereignHub() {

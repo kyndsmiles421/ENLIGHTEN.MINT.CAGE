@@ -170,6 +170,44 @@ export default function SovereignArsenal() {
         </div>
       </div>
 
+      {/* Most-Fired strip — self-organizing workshop dashboard */}
+      {data.top_fired && data.top_fired.length > 0 && (
+        <section data-testid="arsenal-top-fired" style={{ marginBottom: 28 }}>
+          <h2 style={{ fontSize: 12, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#EAB308', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'monospace' }}>
+            <Flame size={12} /> Most Fired <span style={{ color: '#64748B', fontWeight: 400 }}>· your workshop remembers</span>
+          </h2>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {data.top_fired.map(item => {
+              const isGen = item.unit === 'generator';
+              const color = isGen ? (CAT_COLOR[item.category] || '#EAB308') : '#A78BFA';
+              const onClick = () => {
+                if (isGen) fireGenerator(item);
+                else fireEngine(item);
+              };
+              return (
+                <button
+                  key={`top-${item.id}`}
+                  data-testid={`arsenal-top-${item.id}`}
+                  onClick={onClick}
+                  style={{
+                    padding: '8px 12px', borderRadius: 999,
+                    background: `${color}18`,
+                    border: `1px solid ${color}55`,
+                    color: 'inherit', cursor: 'pointer',
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    fontSize: 12, fontWeight: 500,
+                  }}
+                >
+                  <span style={{ color, fontFamily: 'monospace', fontSize: 10 }}>{item.fire_count}×</span>
+                  <span>{item.name}</span>
+                  <Play size={10} style={{ opacity: 0.6 }} />
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       {/* Generators grid */}
       <section style={{ marginBottom: 40 }}>
         <h2 style={{ fontSize: 14, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#CBD5E1', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>

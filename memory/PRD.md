@@ -101,6 +101,16 @@ Wired 10 high-traffic pillars to the `pull()` state-substitution dispatcher:
 - **E2E verified:** Fired `/api/trade-circle/tier-map` from the UI → real payload (`tier_id: discovery, badge: Lead`) rendered inline below the card.
 - **Regression tests:** `test_iteration_v68_80_arsenal.py` (4 tests, all green).
 
+### V68.81 — Most-Fired Strip + Pillar Batch (+15) (2026-04-30) ✅
+**Living-Lab enhancement.** Arsenal now surfaces a self-organizing "🔥 Most Fired" strip at the top — top 6 generators/engines by `fire_count`, one-click re-fire. Backend extends `/api/arsenal/index` with `top_fired` array (sorted desc by count, then last_fired). Frontend renders it as inline pill buttons just below the header, Flatland-compliant.
+
+**Pillar batch (15 new engines, 27 → 42 wired / 156 total):**
+- Entertainment/Education band: Acupressure, Aromatherapy, Reflexology, Bible, Blessings, Daily Ritual, Elixirs, Encyclopedia, Cosmic Calendar, Sacred Texts, Mantras, Mudras, Rituals, Teachings, Zen Garden.
+- Each wired via thin `/engines/[Name]Engine.js` adapter (4 lines each — the existing page is already the source of truth, no duplication).
+- Registered in `MODULE_REGISTRY` (lazy-loaded), `ROUTE_TO_MODULE` (Hub dispatch), and `ACTIVE_ENGINES` (Arsenal index).
+- **Verified Flatland:** Click in Arsenal → `pull()` swaps render-mode → URL stays at `/arsenal` (Playwright check: `url_unchanged_after_pull: True`).
+- 6/6 regression tests pass (added `test_arsenal_v68_81_pillar_batch_surfaced` + `test_arsenal_top_fired_shape`).
+
 
 
 ### P0 — Omni-Portal Spatial Hot-Swapping & Ocular Resonance (NOT STARTED)
@@ -111,8 +121,8 @@ Wired 10 high-traffic pillars to the `pull()` state-substitution dispatcher:
 ### P0 — Local AAB Build Execution (USER ACTION)
 User runs `./gradlew bundleRelease` using `/app/frontend/android/BUILD_RUNBOOK.md`
 
-### P1 — 103 Unwired Hub Pillars
-Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, add to `MODULE_REGISTRY`, wire to ContextBus `pull()`. Agent has already wired 17/~120.
+### P1 — 88 Unwired Hub Pillars
+Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, add to `MODULE_REGISTRY`, wire to ContextBus `pull()`. Agent has wired 42/156.
 
 ### P1 — Play Console Metadata & Internal Track Deployment
 

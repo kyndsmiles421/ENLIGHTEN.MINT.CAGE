@@ -62,3 +62,39 @@ def test_arsenal_fire_log_requires_item_id():
         timeout=15,
     )
     assert r.status_code == 400
+
+
+def test_arsenal_v68_81_pillar_batch_surfaced():
+    """V68.81 — the 15 newly-wired Entertainment/Education pillars must
+    appear in the Arsenal engines list so the owner can fire them
+    directly from the control room."""
+    tok = _owner_token()
+    body = requests.get(
+        f"{API}/arsenal/index",
+        headers={"Authorization": f"Bearer {tok}"},
+        timeout=15,
+    ).json()
+    engine_ids = {e["id"] for e in body["engines"]}
+    expected = {
+        "ACUPRESSURE", "AROMATHERAPY", "REFLEXOLOGY", "BIBLE", "BLESSINGS",
+        "DAILY_RITUAL", "ELIXIRS", "ENCYCLOPEDIA", "COSMIC_CALENDAR",
+        "SACRED_TEXTS", "MANTRAS", "MUDRAS", "RITUALS", "TEACHINGS", "ZEN_GARDEN",
+    }
+    missing = expected - engine_ids
+    assert not missing, f"V68.81 pillar batch missing from Arsenal: {missing}"
+
+
+def test_arsenal_top_fired_shape():
+    """top_fired must be a list (possibly empty) and every entry must
+    carry a `unit` discriminator so the UI can route clicks correctly."""
+    tok = _owner_token()
+    body = requests.get(
+        f"{API}/arsenal/index",
+        headers={"Authorization": f"Bearer {tok}"},
+        timeout=15,
+    ).json()
+    assert "top_fired" in body
+    assert isinstance(body["top_fired"], list)
+    for t in body["top_fired"]:
+        assert t.get("unit") in ("generator", "engine")
+        assert t.get("fire_count", 0) > 0
