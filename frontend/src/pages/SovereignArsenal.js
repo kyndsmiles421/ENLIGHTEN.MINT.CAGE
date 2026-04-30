@@ -15,7 +15,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { useProcessorState, MODULE_REGISTRY } from '../state/ProcessorState';
-import { Zap, Play, Search, ChevronDown, ChevronRight, Flame, Cpu } from 'lucide-react';
+import { Zap, Play, Search, Flame, Cpu, Clock } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -172,7 +172,7 @@ export default function SovereignArsenal() {
 
       {/* Most-Fired strip — self-organizing workshop dashboard */}
       {data.top_fired && data.top_fired.length > 0 && (
-        <section data-testid="arsenal-top-fired" style={{ marginBottom: 28 }}>
+        <section data-testid="arsenal-top-fired" style={{ marginBottom: 16 }}>
           <h2 style={{ fontSize: 12, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#EAB308', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'monospace' }}>
             <Flame size={12} /> Most Fired <span style={{ color: '#64748B', fontWeight: 400 }}>· your workshop remembers</span>
           </h2>
@@ -199,6 +199,46 @@ export default function SovereignArsenal() {
                   }}
                 >
                   <span style={{ color, fontFamily: 'monospace', fontSize: 10 }}>{item.fire_count}×</span>
+                  <span>{item.name}</span>
+                  <Play size={10} style={{ opacity: 0.6 }} />
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
+      {/* Most-Time strip — V68.82 Time-in-Engine signal */}
+      {data.top_dwell && data.top_dwell.length > 0 && (
+        <section data-testid="arsenal-top-dwell" style={{ marginBottom: 28 }}>
+          <h2 style={{ fontSize: 12, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#22D3EE', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'monospace' }}>
+            <Clock size={12} /> Most Time <span style={{ color: '#64748B', fontWeight: 400 }}>· where you actually live</span>
+          </h2>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {data.top_dwell.map(item => {
+              const isGen = item.unit === 'generator';
+              const color = isGen ? (CAT_COLOR[item.category] || '#EAB308') : '#22D3EE';
+              const secs = item.dwell_seconds || 0;
+              const label = secs >= 3600 ? `${(secs / 3600).toFixed(1)}h` : secs >= 60 ? `${Math.round(secs / 60)}m` : `${secs}s`;
+              const onClick = () => {
+                if (isGen) fireGenerator(item);
+                else fireEngine(item);
+              };
+              return (
+                <button
+                  key={`dwell-${item.id}`}
+                  data-testid={`arsenal-dwell-${item.id}`}
+                  onClick={onClick}
+                  style={{
+                    padding: '8px 12px', borderRadius: 999,
+                    background: `${color}18`,
+                    border: `1px solid ${color}55`,
+                    color: 'inherit', cursor: 'pointer',
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    fontSize: 12, fontWeight: 500,
+                  }}
+                >
+                  <span style={{ color, fontFamily: 'monospace', fontSize: 10 }}>{label}</span>
                   <span>{item.name}</span>
                   <Play size={10} style={{ opacity: 0.6 }} />
                 </button>

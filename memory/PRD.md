@@ -111,6 +111,22 @@ Wired 10 high-traffic pillars to the `pull()` state-substitution dispatcher:
 - **Verified Flatland:** Click in Arsenal → `pull()` swaps render-mode → URL stays at `/arsenal` (Playwright check: `url_unchanged_after_pull: True`).
 - 6/6 regression tests pass (added `test_arsenal_v68_81_pillar_batch_surfaced` + `test_arsenal_top_fired_shape`).
 
+### V68.82 — Time-in-Engine + Building-Equipment Batch (+15) (2026-04-30) ✅
+**The Workshop now learns from how you actually use it.**
+
+**⏱ Time-in-Engine dwell tracking:**
+- New endpoint `POST /api/arsenal/dwell-log` accepts `{item_id, seconds}` and atomically `$inc`'s `dwell_seconds` on the history row. Server clamps each session to 1h max so a forgotten tab can't pollute rankings.
+- `ProcessorState.pull()` and `release()` flush dwell on every state-swap; `pagehide` and `visibilitychange` listeners flush on tab-close (uses `fetch` with `keepalive` so the request survives the unload).
+- `/api/arsenal/index` now returns `top_dwell[]` alongside `top_fired[]`.
+- Frontend renders a **⏱ MOST TIME · where you actually live** strip (cyan, beside the gold MOST FIRED strip). Each chip shows human-friendly duration (s / m / h) + name and re-pulls on click.
+
+**Building-Equipment pillar batch (+15, 42 → 57 wired):**
+- Workshop, Trade Circle, Trade Passport, Music Lounge, Tesseract, Multiverse Map, Multiverse Realms, Master View, SmartDock, Sanctuary, Silent Sanctuary, Refinement Lab, Recursive Dive, Quantum Field, Quantum Loom.
+- All thin lazy adapters; registered in `MODULE_REGISTRY`, `ROUTE_TO_MODULE`, and Arsenal `ACTIVE_ENGINES`. Arsenal: **35 generators + 74 engines**.
+- **Verified Flatland:** `pull()` swaps render mode in place, no URL change, no DOM teardown.
+
+**12/12 regression tests green:** added `test_arsenal_v68_82_building_equipment_batch_surfaced`, `test_arsenal_dwell_log_owner_ok`, `test_arsenal_dwell_log_clamps_runaway_session`, `test_arsenal_dwell_log_rejects_zero`, `test_arsenal_dwell_log_requires_item_id`, `test_arsenal_top_dwell_shape`.
+
 
 
 ### P0 — Omni-Portal Spatial Hot-Swapping & Ocular Resonance (NOT STARTED)
@@ -121,8 +137,8 @@ Wired 10 high-traffic pillars to the `pull()` state-substitution dispatcher:
 ### P0 — Local AAB Build Execution (USER ACTION)
 User runs `./gradlew bundleRelease` using `/app/frontend/android/BUILD_RUNBOOK.md`
 
-### P1 — 88 Unwired Hub Pillars
-Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, add to `MODULE_REGISTRY`, wire to ContextBus `pull()`. Agent has wired 42/156.
+### P1 — 73 Unwired Hub Pillars
+Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, add to `MODULE_REGISTRY`, wire to ContextBus `pull()`. Agent has wired 57/156.
 
 ### P1 — Play Console Metadata & Internal Track Deployment
 

@@ -289,17 +289,74 @@ export const MODULE_REGISTRY = {
   RITUALS:         React.lazy(() => import('../engines/RitualsEngine')),
   TEACHINGS:       React.lazy(() => import('../engines/TeachingsEngine')),
   ZEN_GARDEN:      React.lazy(() => import('../engines/ZenGardenEngine')),
+  // V68.82 — Building-Equipment / Workshop pillar batch (+15)
+  WORKSHOP:          React.lazy(() => import('../engines/WorkshopEngine')),
+  TRADE_CIRCLE:      React.lazy(() => import('../engines/TradeCircleEngine')),
+  TRADE_PASSPORT:    React.lazy(() => import('../engines/TradePassportEngine')),
+  MUSIC_LOUNGE:      React.lazy(() => import('../engines/MusicLoungeEngine')),
+  TESSERACT:         React.lazy(() => import('../engines/TesseractEngine')),
+  MULTIVERSE_MAP:    React.lazy(() => import('../engines/MultiverseMapEngine')),
+  MULTIVERSE_REALMS: React.lazy(() => import('../engines/MultiverseRealmsEngine')),
+  MASTER_VIEW:       React.lazy(() => import('../engines/MasterViewEngine')),
+  SMARTDOCK:         React.lazy(() => import('../engines/SmartDockEngine')),
+  SANCTUARY:         React.lazy(() => import('../engines/SanctuaryEngine')),
+  SILENT_SANCTUARY:  React.lazy(() => import('../engines/SilentSanctuaryEngine')),
+  REFINEMENT_LAB:    React.lazy(() => import('../engines/RefinementLabEngine')),
+  RECURSIVE_DIVE:    React.lazy(() => import('../engines/RecursiveDiveEngine')),
+  QUANTUM_FIELD:     React.lazy(() => import('../engines/QuantumFieldEngine')),
+  QUANTUM_LOOM:      React.lazy(() => import('../engines/QuantumLoomEngine')),
 };
 
 export function ProcessorStateProvider({ children }) {
   // Single source of truth for the engine's active render-mode.
   const [activeModule, setActiveModule] = useState('IDLE');
 
+  // V68.82 — Time-in-Engine. We stamp when a module is pulled and POST
+  // the elapsed seconds back to /api/arsenal/dwell-log on each swap or
+  // release. Owner-gated server-side, fire-and-forget client-side, so
+  // a network blip never blocks a state swap. We use sendBeacon on
+  // page-hide to capture dwell when the tab closes mid-session.
+  const dwellStartRef = React.useRef({ moduleId: 'IDLE', startedAt: Date.now() });
+
+  const flushDwell = useCallback(() => {
+    try {
+      const { moduleId, startedAt } = dwellStartRef.current;
+      if (!moduleId || moduleId === 'IDLE') return;
+      const seconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+      if (seconds <= 0) return;
+      const token = localStorage.getItem('zen_token');
+      if (!token || token === 'guest_token') return;
+      const url = `${process.env.REACT_APP_BACKEND_URL}/api/arsenal/dwell-log`;
+      const body = JSON.stringify({ item_id: moduleId, seconds });
+      // sendBeacon survives page-hide; fall back to fetch otherwise.
+      const blob = new Blob([body], { type: 'application/json' });
+      if (navigator.sendBeacon) {
+        // sendBeacon can't set auth headers, so use fetch with keepalive.
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body,
+          keepalive: true,
+        }).catch(() => {});
+      } else {
+        fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body,
+        }).catch(() => {});
+      }
+      // Avoid silencing of `blob` lint without using it
+      void blob;
+    } catch { /* noop */ }
+  }, []);
+
   const pull = useCallback((moduleId) => {
     if (!Object.prototype.hasOwnProperty.call(MODULE_REGISTRY, moduleId)) {
       // Unknown module — stay IDLE, no-op.
       return;
     }
+    flushDwell();
+    dwellStartRef.current = { moduleId, startedAt: Date.now() };
     setActiveModule(moduleId);
     emitPulse(moduleId);
     // V68.59 — publish the active module to a global so the
@@ -310,14 +367,29 @@ export function ProcessorStateProvider({ children }) {
     // the newly active module so its first generation already sees
     // the engine's accumulated state from other modules.
     publishPrimer(moduleId);
-  }, []);
+  }, [flushDwell]);
 
   const release = useCallback(() => {
+    flushDwell();
+    dwellStartRef.current = { moduleId: 'IDLE', startedAt: Date.now() };
     setActiveModule('IDLE');
     emitPulse('IDLE');
     try { window.__sovereignActiveModule = 'IDLE'; } catch { /* noop */ }
     publishPrimer('IDLE');
-  }, []);
+  }, [flushDwell]);
+
+  // Flush dwell when the tab is hidden or unloaded so we don't lose
+  // the final session window.
+  useEffect(() => {
+    const handler = () => flushDwell();
+    window.addEventListener('pagehide', handler);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') flushDwell();
+    });
+    return () => {
+      window.removeEventListener('pagehide', handler);
+    };
+  }, [flushDwell]);
 
   // V68.61 — Keep the published primer fresh while a module is open.
   // Any commit to the bus (from any module) re-publishes the primer

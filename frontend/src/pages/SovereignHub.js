@@ -336,6 +336,22 @@ const ROUTE_TO_MODULE = {
   '/rituals':              'RITUALS',
   '/teachings':            'TEACHINGS',
   '/zen-garden':           'ZEN_GARDEN',
+  // V68.82 — Building-Equipment / Workshop pillar batch (+15)
+  '/workshop':             'WORKSHOP',
+  '/trade-circle':         'TRADE_CIRCLE',
+  '/trade-passport':       'TRADE_PASSPORT',
+  '/music-lounge':         'MUSIC_LOUNGE',
+  '/tesseract':            'TESSERACT',
+  '/multiverse-map':       'MULTIVERSE_MAP',
+  '/multiverse-realms':    'MULTIVERSE_REALMS',
+  '/master-view':          'MASTER_VIEW',
+  '/smartdock':            'SMARTDOCK',
+  '/sanctuary':            'SANCTUARY',
+  '/silent-sanctuary':     'SILENT_SANCTUARY',
+  '/refinement-lab':       'REFINEMENT_LAB',
+  '/recursive-dive':       'RECURSIVE_DIVE',
+  '/quantum-field':        'QUANTUM_FIELD',
+  '/quantum-loom':         'QUANTUM_LOOM',
 };
 
 export default function SovereignHub() {

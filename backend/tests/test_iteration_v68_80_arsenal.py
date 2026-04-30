@@ -98,3 +98,90 @@ def test_arsenal_top_fired_shape():
     for t in body["top_fired"]:
         assert t.get("unit") in ("generator", "engine")
         assert t.get("fire_count", 0) > 0
+
+
+def test_arsenal_v68_82_building_equipment_batch_surfaced():
+    """V68.82 — the 15 newly-wired Workshop/Building-Equipment pillars
+    must appear in the Arsenal engines list."""
+    tok = _owner_token()
+    body = requests.get(
+        f"{API}/arsenal/index",
+        headers={"Authorization": f"Bearer {tok}"},
+        timeout=15,
+    ).json()
+    engine_ids = {e["id"] for e in body["engines"]}
+    expected = {
+        "WORKSHOP", "TRADE_CIRCLE", "TRADE_PASSPORT", "MUSIC_LOUNGE", "TESSERACT",
+        "MULTIVERSE_MAP", "MULTIVERSE_REALMS", "MASTER_VIEW", "SMARTDOCK",
+        "SANCTUARY", "SILENT_SANCTUARY", "REFINEMENT_LAB", "RECURSIVE_DIVE",
+        "QUANTUM_FIELD", "QUANTUM_LOOM",
+    }
+    missing = expected - engine_ids
+    assert not missing, f"V68.82 building-equipment batch missing: {missing}"
+
+
+def test_arsenal_dwell_log_owner_ok():
+    """V68.82 — Time-in-Engine dwell-log endpoint."""
+    tok = _owner_token()
+    r = requests.post(
+        f"{API}/arsenal/dwell-log",
+        headers={"Authorization": f"Bearer {tok}"},
+        json={"item_id": "WORKSHOP", "seconds": 30},
+        timeout=15,
+    )
+    assert r.status_code == 200, r.text
+    data = r.json()
+    assert data["logged"] is True
+    assert data["added_seconds"] == 30
+
+
+def test_arsenal_dwell_log_clamps_runaway_session():
+    """A 24h forgotten-tab dwell must be clamped to 1h to keep rankings honest."""
+    tok = _owner_token()
+    r = requests.post(
+        f"{API}/arsenal/dwell-log",
+        headers={"Authorization": f"Bearer {tok}"},
+        json={"item_id": "BIBLE", "seconds": 86400},
+        timeout=15,
+    )
+    assert r.status_code == 200
+    assert r.json()["added_seconds"] == 3600
+
+
+def test_arsenal_dwell_log_rejects_zero():
+    """Zero/negative seconds must not pollute the ledger."""
+    tok = _owner_token()
+    r = requests.post(
+        f"{API}/arsenal/dwell-log",
+        headers={"Authorization": f"Bearer {tok}"},
+        json={"item_id": "WORKSHOP", "seconds": 0},
+        timeout=15,
+    )
+    assert r.status_code == 200
+    assert r.json()["logged"] is False
+
+
+def test_arsenal_dwell_log_requires_item_id():
+    tok = _owner_token()
+    r = requests.post(
+        f"{API}/arsenal/dwell-log",
+        headers={"Authorization": f"Bearer {tok}"},
+        json={"seconds": 30},
+        timeout=15,
+    )
+    assert r.status_code == 400
+
+
+def test_arsenal_top_dwell_shape():
+    """top_dwell must echo the same shape as top_fired with dwell_seconds."""
+    tok = _owner_token()
+    body = requests.get(
+        f"{API}/arsenal/index",
+        headers={"Authorization": f"Bearer {tok}"},
+        timeout=15,
+    ).json()
+    assert "top_dwell" in body
+    assert isinstance(body["top_dwell"], list)
+    for t in body["top_dwell"]:
+        assert t.get("unit") in ("generator", "engine")
+        assert t.get("dwell_seconds", 0) > 0

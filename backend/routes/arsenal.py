@@ -133,6 +133,22 @@ ACTIVE_ENGINES = [
     {"id": "RITUALS",          "name": "Rituals",               "layer": "frontend", "kind": "render-adapter"},
     {"id": "TEACHINGS",        "name": "Teachings",             "layer": "frontend", "kind": "render-adapter"},
     {"id": "ZEN_GARDEN",       "name": "Zen Garden",            "layer": "frontend", "kind": "render-adapter"},
+    # V68.82 — Building-Equipment / Workshop pillar batch (+15)
+    {"id": "WORKSHOP",         "name": "Workshop",              "layer": "frontend", "kind": "render-adapter"},
+    {"id": "TRADE_CIRCLE",     "name": "Trade Circle",          "layer": "frontend", "kind": "render-adapter"},
+    {"id": "TRADE_PASSPORT",   "name": "Trade Passport",        "layer": "frontend", "kind": "render-adapter"},
+    {"id": "MUSIC_LOUNGE",     "name": "Music Lounge",          "layer": "frontend", "kind": "render-adapter"},
+    {"id": "TESSERACT",        "name": "Tesseract",             "layer": "frontend", "kind": "render-adapter"},
+    {"id": "MULTIVERSE_MAP",   "name": "Multiverse Map",        "layer": "frontend", "kind": "render-adapter"},
+    {"id": "MULTIVERSE_REALMS","name": "Multiverse Realms",     "layer": "frontend", "kind": "render-adapter"},
+    {"id": "MASTER_VIEW",      "name": "Master View",           "layer": "frontend", "kind": "render-adapter"},
+    {"id": "SMARTDOCK",        "name": "SmartDock",             "layer": "frontend", "kind": "render-adapter"},
+    {"id": "SANCTUARY",        "name": "Sanctuary",             "layer": "frontend", "kind": "render-adapter"},
+    {"id": "SILENT_SANCTUARY", "name": "Silent Sanctuary",      "layer": "frontend", "kind": "render-adapter"},
+    {"id": "REFINEMENT_LAB",   "name": "Refinement Lab",        "layer": "frontend", "kind": "render-adapter"},
+    {"id": "RECURSIVE_DIVE",   "name": "Recursive Dive",        "layer": "frontend", "kind": "render-adapter"},
+    {"id": "QUANTUM_FIELD",    "name": "Quantum Field",         "layer": "frontend", "kind": "render-adapter"},
+    {"id": "QUANTUM_LOOM",     "name": "Quantum Loom",          "layer": "frontend", "kind": "render-adapter"},
     # Backend active engines (surfaced for transparency — most are auto-wired)
     {"id": "compliance_shield",  "name": "Compliance Shield",    "layer": "backend",  "kind": "firewall"},
     {"id": "crystal_seal",       "name": "Crystal Seal",         "layer": "backend",  "kind": "hash"},
@@ -165,10 +181,11 @@ async def arsenal_index(user=Depends(get_current_user)):
         history[row["item_id"]] = {
             "last_fired": row.get("last_fired"),
             "fire_count": row.get("fire_count", 0),
+            "dwell_seconds": int(row.get("dwell_seconds", 0)),
         }
 
     def annotate(lst):
-        return [{**item, **history.get(item["id"], {"last_fired": None, "fire_count": 0})} for item in lst]
+        return [{**item, **history.get(item["id"], {"last_fired": None, "fire_count": 0, "dwell_seconds": 0})} for item in lst]
 
     gens = annotate(GENERATORS)
     engs = annotate(ACTIVE_ENGINES)
@@ -183,12 +200,23 @@ async def arsenal_index(user=Depends(get_current_user)):
         reverse=True,
     )[:6]
 
+    # V68.82 — Time-in-Engine. Surfaces the units the owner actually
+    # *dwells* in (vs. just clicks). Engines accumulate dwell when
+    # pull()'d into the matrix slot; generators don't dwell so they
+    # only show here if a user manually paged through their result.
+    top_dwell = sorted(
+        [c for c in combined if c.get("dwell_seconds", 0) > 0],
+        key=lambda c: c.get("dwell_seconds", 0),
+        reverse=True,
+    )[:6]
+
     return {
         "generators": gens,
         "engines": engs,
         "categories": sorted({g["category"] for g in GENERATORS}),
         "engine_layers": ["frontend", "backend"],
         "top_fired": top_fired,
+        "top_dwell": top_dwell,
         "totals": {
             "generators": len(GENERATORS),
             "engines": len(ACTIVE_ENGINES),
@@ -217,3 +245,35 @@ async def arsenal_fire_log(data: dict = Body(...), user=Depends(get_current_user
         upsert=True,
     )
     return {"logged": True, "item_id": item_id, "at": now}
+
+
+@router.post("/arsenal/dwell-log")
+async def arsenal_dwell_log(data: dict = Body(...), user=Depends(get_current_user)):
+    """V68.82 — Time-in-Engine. Frontend posts elapsed seconds when an
+    engine is released or another module is pulled. Server clamps the
+    value to a sane window (0..3600s) so a forgotten tab can't inflate
+    rankings, then atomically increments dwell_seconds on the history
+    row. Used to power the "⏱ Most Time" strip alongside Most Fired."""
+    await _require_owner(user)
+    item_id = (data.get("item_id") or "").strip()
+    seconds = data.get("seconds", 0)
+    try:
+        seconds = int(seconds)
+    except (TypeError, ValueError):
+        seconds = 0
+    if not item_id:
+        raise HTTPException(status_code=400, detail="item_id required")
+    if seconds <= 0:
+        return {"logged": False, "reason": "non-positive duration"}
+    seconds = min(seconds, 3600)  # cap at 1h per session
+    now = datetime.now(timezone.utc).isoformat()
+    await db.arsenal_history.update_one(
+        {"user_id": user["id"], "item_id": item_id},
+        {
+            "$inc": {"dwell_seconds": seconds},
+            "$set": {"last_dwell_at": now},
+            "$setOnInsert": {"id": str(uuid.uuid4()), "created_at": now},
+        },
+        upsert=True,
+    )
+    return {"logged": True, "item_id": item_id, "added_seconds": seconds}
