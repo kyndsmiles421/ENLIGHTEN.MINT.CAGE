@@ -855,9 +855,16 @@ ESCROW_STATES = ["committed", "shipped", "received", "released", "disputed", "ca
 
 @router.post("/trade-circle/escrow/create")
 async def create_escrow(data: dict = Body(...), user=Depends(get_current_user)):
-    """Create an escrow for a physical-digital trade. Locks digital assets server-side."""
+    """Create an escrow for a physical-digital trade.
+
+    COMPLIANCE LOCKDOWN (V68.76): monetary assets (credits/dust/gems) may
+    NOT be locked in P2P escrow — they are closed-loop User↔Advisor only.
+    Use `asset_type='sparks'` for merit-based barter, or leave the trade
+    as a direct listing exchange with no digital leg."""
+    from engines.compliance_shield import assert_closed_loop, is_monetary
+
     offer_id = data.get("offer_id", "")
-    digital_asset_type = data.get("digital_asset_type", "credits")  # credits, dust, gems, component
+    digital_asset_type = data.get("digital_asset_type", "sparks")
     digital_amount = data.get("digital_amount", 0)
     physical_description = data.get("physical_description", "").strip()
 
@@ -880,23 +887,33 @@ async def create_escrow(data: dict = Body(...), user=Depends(get_current_user)):
     else:
         raise HTTPException(status_code=403, detail="You are not part of this trade")
 
-    # Lock the digital assets from the RECEIVER (they pay digital for the physical item)
-    balance_field = {"credits": "user_credit_balance", "dust": "user_dust_balance", "gems": "user_gem_balance"}.get(digital_asset_type)
-    if not balance_field:
-        raise HTTPException(status_code=400, detail="Invalid digital asset type")
+    # ━━━ Compliance Shield ━━━
+    # Block monetary assets from flowing between two user IDs.
+    assert_closed_loop(digital_asset_type, receiver_id, sender_id)
 
-    u = await db.users.find_one({"id": receiver_id}, {"_id": 0, balance_field: 1})
-    current = u.get(balance_field, 0) if u else 0
+    # Only Sparks (merit) may be locked between users via escrow.
+    if digital_asset_type != "sparks":
+        raise HTTPException(
+            status_code=400,
+            detail=f"digital_asset_type must be 'sparks' for P2P escrow. '{digital_asset_type}' is {'monetary (closed-loop)' if is_monetary(digital_asset_type) else 'unsupported'}.",
+        )
 
-    # Apply resonance fee
+    # Lock Sparks from the RECEIVER (they pay merit for the physical item)
+    wallet = await db.spark_wallets.find_one({"user_id": receiver_id}, {"_id": 0, "sparks": 1})
+    current = int((wallet or {}).get("sparks", 0))
+
+    # Apply resonance fee in Sparks
     fee = max(1, int(digital_amount * RESONANCE_FEE_PCT / 100))
     total_locked = digital_amount + fee
 
     if current < total_locked:
-        raise HTTPException(status_code=400, detail=f"Receiver needs {total_locked} {digital_asset_type} (incl. {fee} Resonance Fee). Has {current}.")
+        raise HTTPException(status_code=400, detail=f"Receiver needs {total_locked} Sparks (incl. {fee} Resonance Fee). Has {current}.")
 
-    # Deduct from receiver and lock in escrow
-    await db.users.update_one({"id": receiver_id}, {"$inc": {balance_field: -total_locked}})
+    # Deduct from receiver's spark wallet and lock in escrow
+    await db.spark_wallets.update_one(
+        {"user_id": receiver_id},
+        {"$inc": {"sparks": -total_locked, "total_spent": total_locked}},
+    )
 
     escrow_id = str(uuid.uuid4())
     resonance_code = f"RC-{escrow_id[:8].upper()}"
@@ -907,7 +924,7 @@ async def create_escrow(data: dict = Body(...), user=Depends(get_current_user)):
         "sender_id": sender_id,
         "receiver_id": receiver_id,
         "physical_description": physical_description[:500],
-        "digital_asset_type": digital_asset_type,
+        "digital_asset_type": "sparks",
         "digital_amount": digital_amount,
         "resonance_fee": fee,
         "total_locked": total_locked,
@@ -926,7 +943,7 @@ async def create_escrow(data: dict = Body(...), user=Depends(get_current_user)):
     return {
         "escrow": escrow,
         "resonance_code": resonance_code,
-        "message": f"Digital assets locked. {digital_amount} {digital_asset_type} + {fee} fee held in Cosmic Escrow.",
+        "message": f"Sparks locked. {digital_amount} Sparks + {fee} fee held in Cosmic Escrow (merit-only, Google-Play compliant).",
     }
 
 
@@ -972,9 +989,13 @@ async def escrow_confirm_receipt(data: dict = Body(...), user=Depends(get_curren
 
     now = datetime.now(timezone.utc).isoformat()
 
-    # Release digital assets to sender (minus the fee — fee goes to the Central Bank / burned)
-    balance_field = {"credits": "user_credit_balance", "dust": "user_dust_balance", "gems": "user_gem_balance"}.get(escrow["digital_asset_type"])
-    await db.users.update_one({"id": escrow["sender_id"]}, {"$inc": {balance_field: escrow["digital_amount"]}})
+    # Release Sparks to sender (minus the fee — fee burned to Central Bank).
+    # Post-V68.76 escrow is merit-only, so we always credit spark_wallets.
+    await db.spark_wallets.update_one(
+        {"user_id": escrow["sender_id"]},
+        {"$inc": {"sparks": escrow["digital_amount"], "total_earned": escrow["digital_amount"]}},
+        upsert=True,
+    )
 
     # Mark escrow as released
     await db.escrows.update_one({"id": escrow_id}, {"$set": {
@@ -986,13 +1007,13 @@ async def escrow_confirm_receipt(data: dict = Body(...), user=Depends(get_curren
     await award_karma(escrow["sender_id"], "trade_completed", escrow_id)
     await award_karma(escrow["receiver_id"], "trade_completed", escrow_id)
 
-    await create_activity(escrow["sender_id"], "escrow_released", f"Escrow released! +{escrow['digital_amount']} {escrow['digital_asset_type']}")
+    await create_activity(escrow["sender_id"], "escrow_released", f"Escrow released! +{escrow['digital_amount']} Sparks")
     await create_activity(escrow["receiver_id"], "escrow_released", "Physical item confirmed received")
 
     return {
         "state": "released",
         "released_to_sender": escrow["digital_amount"],
-        "asset_type": escrow["digital_asset_type"],
+        "asset_type": "sparks",
         "resonance_fee_burned": escrow["resonance_fee"],
         "message": "Cosmic Escrow released! Trade complete.",
     }
@@ -1061,13 +1082,34 @@ BROKER_PACK_MAP = {p["id"]: p for p in BROKER_CREDIT_PACKS}
 
 @router.get("/trade-circle/wallet")
 async def get_wallet(user=Depends(get_current_user)):
-    """Get user's Trade Circle wallet — credits, dust, gems."""
+    """Get user's Trade Circle wallet — credits, dust, gems (monetary, closed-loop)
+    plus sparks (merit, tradable). Each balance is tagged with `is_monetary`
+    so the UI can enforce the Google-Play-compliant firewall."""
+    from engines.compliance_shield import is_monetary, policy_manifest
     u = await db.users.find_one({"id": user["id"]}, {"_id": 0, "user_credit_balance": 1, "user_dust_balance": 1, "user_gem_balance": 1})
+    sw = await db.spark_wallets.find_one({"user_id": user["id"]}, {"_id": 0, "sparks": 1})
     return {
+        "balances": {
+            "credits": {"amount": u.get("user_credit_balance", 0) if u else 0, "is_monetary": is_monetary("credits"), "transferable": False},
+            "dust":    {"amount": u.get("user_dust_balance", 0)   if u else 0, "is_monetary": is_monetary("dust"),    "transferable": False},
+            "gems":    {"amount": u.get("user_gem_balance", 0)    if u else 0, "is_monetary": is_monetary("gems"),    "transferable": False},
+            "sparks":  {"amount": (sw or {}).get("sparks", 0),                  "is_monetary": is_monetary("sparks"),  "transferable": True},
+        },
+        # Legacy flat fields (kept for backward compatibility with older clients).
         "credits": u.get("user_credit_balance", 0) if u else 0,
         "dust": u.get("user_dust_balance", 0) if u else 0,
         "gems": u.get("user_gem_balance", 0) if u else 0,
+        "sparks": (sw or {}).get("sparks", 0),
+        "policy": policy_manifest(),
     }
+
+
+@router.get("/trade-circle/compliance")
+async def compliance_policy():
+    """Public compliance manifest — declares the closed-loop model to the
+    frontend, Play Console review, and auditors."""
+    from engines.compliance_shield import policy_manifest
+    return policy_manifest()
 
 
 @router.get("/trade-circle/broker/packs")

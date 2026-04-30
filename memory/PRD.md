@@ -38,6 +38,19 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission a
 - 18 pytest assertions in `/app/backend/tests/test_iteration_v68_75_tier_pricing.py` — ALL PASS
 - Live verified: $9.99 web → $14.28 Play (matches spec's "$10 → $13" rule)
 
+### V68.76 — Compliance Anchor: Monetary vs Merit Firewall (2026-04-30) ✅
+**Audit-first finding:** No `send_funds()` / `Economy_Engine.py` existed. Real P2P monetary leaks were in `trade_circle.py::create_escrow` (dust/credits/gems between users) and `revenue.py::purchase_content` (buyer credits → creator_id). Both closed.
+- NEW `/app/backend/engines/compliance_shield.py` — canonical firewall:
+  - `MONETARY_ASSETS = {"credits", "dust", "gems"}` — User↔Advisor only
+  - `MERIT_ASSETS = {"sparks"}` — freely transferable
+  - `assert_closed_loop(asset, from, to)` guard — raises 403 on monetary P2P
+  - `policy_manifest()` → published at `GET /api/trade-circle/compliance`
+- **Escrow lockdown**: `create_escrow` now only accepts `digital_asset_type="sparks"`. Monetary types → 400 with "monetary/closed-loop" error. Release path credits Sparks, not Credits.
+- **Content broker re-wired**: `purchase_content` still charges buyer credits (User→Advisor, legal), but creator now earns **Sparks** (merit) instead of Credits — converts a P2P monetary flow into a P2P merit flow. Ledger field renamed `creator_cut` → `creator_sparks_awarded`.
+- **Wallet tags**: `GET /api/trade-circle/wallet` response now tags each balance with `is_monetary` + `transferable`. UI can disable transfer buttons on closed-loop assets.
+- 17 pytest assertions in `/app/backend/tests/test_iteration_v68_76_compliance.py` — ALL PASS
+- Single-source-of-truth guard test confirms no duplicate `MONETARY_ASSETS` definitions anywhere in codebase.
+
 ## Key DB Schema
 - `users` — `user_credit_balance`, `user_dust_balance`, `gilded_tier` (one-time marketplace unlocks: seed/artisan/sovereign/gilded)
 - `subscriptions` — `tier` (discovery/resonance/sovereign/architect) — drives marketplace discount

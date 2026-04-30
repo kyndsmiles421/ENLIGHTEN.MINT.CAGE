@@ -373,13 +373,23 @@ async def purchase_content(data: dict = Body(...), user=Depends(get_current_user
     if credits < cost:
         raise HTTPException(status_code=400, detail=f"Need {cost} Credits. Have {credits}.")
 
-    # Deduct credits from buyer, credit creator (minus resonance fee)
+    # Deduct credits from buyer (User → Advisor, closed-loop).
+    # Post-V68.76: creators earn SPARKS (merit) instead of Credits so no
+    # user-to-user monetary transfer takes place. The resonance fee is
+    # burned by the Central Bank; the rest converts to Sparks at 1:1.
+    from engines.compliance_shield import assert_closed_loop, ADVISOR
+    assert_closed_loop("credits", user_id, ADVISOR)  # sanity — always passes
+
     resonance_fee = max(1, int(cost * 0.05))
-    creator_cut = cost - resonance_fee
+    creator_sparks = cost - resonance_fee  # 1 Credit of net = 1 Spark of merit
 
     await db.users.update_one({"id": user_id}, {"$inc": {"user_credit_balance": -cost}})
     if asset.get("creator_id"):
-        await db.users.update_one({"id": asset["creator_id"]}, {"$inc": {"user_credit_balance": creator_cut}})
+        await db.spark_wallets.update_one(
+            {"user_id": asset["creator_id"]},
+            {"$inc": {"sparks": creator_sparks, "total_earned": creator_sparks}},
+            upsert=True,
+        )
 
     await db.content_assets.update_one({"id": asset_id}, {"$inc": {"purchases": 1}})
 
@@ -391,7 +401,7 @@ async def purchase_content(data: dict = Body(...), user=Depends(get_current_user
         "cost": cost,
         "tier_discount": tier["discount_pct"],
         "resonance_fee": resonance_fee,
-        "creator_cut": creator_cut,
+        "creator_sparks_awarded": creator_sparks,
         "created_at": datetime.now(timezone.utc).isoformat(),
     })
 
@@ -399,6 +409,7 @@ async def purchase_content(data: dict = Body(...), user=Depends(get_current_user
         "purchased": asset["name"],
         "cost": cost,
         "discount_applied": tier["discount_pct"],
+        "creator_sparks_awarded": creator_sparks,
         "content": asset["content"],
     }
 
