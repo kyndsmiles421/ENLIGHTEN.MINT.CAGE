@@ -149,6 +149,35 @@ Wired 10 high-traffic pillars to the `pull()` state-substitution dispatcher:
 
 **21/21 regression tests green** across `test_iteration_v68_80_arsenal.py` (12) + new `test_iteration_v68_83_spiritual_shield.py` (9). Locks down: manifest description, landing/disclaimer prose, disclaimer version bump, sage/bible/oracle sovereign framing, hub Cross-Tradition mark, suggested_next shape.
 
+### V68.84 — Universal Translator + Voice Interaction Bridge + Hawaiian (2026-04-30) ✅
+**Audit-first finding:** `LanguageContext.js` already shipped 8-language UI strings + RTL + haptic kinetic profiles. Did NOT rebuild — bridged.
+
+**🌐 Universal Translator middleware:**
+- New endpoint `POST /api/translator/translate` powered by Emergent LLM Key (gpt-4o-mini). Accepts `{text, target_lang, sacred?}`. Validates target_lang against the supported set, caps text at 4000 chars, English passthrough skips the LLM.
+- Sovereign-tier **Sacred Mode** returns a `sacred_note` carrying the original-tradition root (Sanskrit / Hebrew / Greek / Hawaiian / etc.) + 1-sentence context. Used by Bible/Sacred-Texts engines to teach as it translates.
+- **System prompt locks in multi-denominational spiritual framing** — model is instructed never to medicalize, prescribe, or diagnose during translation.
+- Hawaiian (`haw` / **ʻŌlelo Hawaiʻi**) is a first-class supported language. E2E proof: *"Honor your body. Honor your spirit. Walk gently."* → **"E hoʻomanaʻo i kāu kino. E hoʻomanaʻo i kāu ʻuhane. E holo me ke aloha."** Sacred mode on "Aloha" returned: *"Aloha embodies love, affection, peace, compassion, and mercy — a deep connection between individuals."*
+
+**🔊 Voice Interaction Bridge (Tactile / Narrative / Interactive):**
+- New endpoint `GET /api/voice/tier-features` returns the entitlement matrix the UI consumes: `voice_modes`, `tts_quality`, `translation_text`, `translation_voice`, `sacred_language_mode`, `stt_listening`, plus the `supported_languages` list and a `locked_features` upsell hint.
+- Tier feature matrix codified in `routes/translator.py::TIER_FEATURE_MATRIX` (single source of truth; backend gate + frontend render share it):
+  - **Discovery (free):** Tactile + Narrative · browser TTS · text translation
+  - **Resonance (Silver):** + Interactive mode · STT listening
+  - **Architect (Gold):** + High-quality TTS · real-time voice translation
+  - **Sovereign (Gilded):** + Sacred-language nuance mode
+- New `VoiceInteractionContext` + `useVoiceInteraction()` hook — manages `voiceMode` (persisted to localStorage), exposes `speak(text, lang)` (browser SpeechSynthesis with per-language hint map), `stopSpeaking()`, `translate()`, plus `tier`, `features`, `supportedLangs`. Provider wraps the app inside `App.js`.
+- **Auto-narration wired into Arsenal generator fires:** when Narrative or Interactive mode is on and `target_lang` is non-English, the result string is translated → spoken in the target language. Tactile mode stays silent (accessibility-first).
+
+**🎛 Arsenal Voice + Lang nodule (inline, Flatland):**
+- Tactile / Narrative / Interactive mode pills with tier-locked styling (locked modes show 🔒 + tier-upsell toast).
+- Language `<select>` populated with all 9 supported languages including Hawaiian.
+- Sovereign-only **"SACRED MODE · SOVEREIGN"** pink pill announces the unlock to the owner.
+- Stop button appears only while speech is in flight.
+
+**+1 language UI catalog:** `LanguageContext.LANGUAGES` and `KINETIC_PROFILES` extended with Hawaiian (kineticFeel: `aloha`). Static UI translations added: `nav.*`, `common.*`, `mixer.*`, `dashboard.*`, `auth.*` in ʻŌlelo Hawaiʻi.
+
+**8/8 regression tests** green in `test_iteration_v68_84_translator.py`: tier-features sovereign for owner, all 9 languages listed, English passthrough, Hawaiian round-trip, unknown-lang rejection, missing-text 400, oversized-text 400, sacred-mode sovereign returns note. **29/29 green** total across V68.80–V68.84.
+
 
 
 ### P0 — Omni-Portal Spatial Hot-Swapping & Ocular Resonance (NOT STARTED)
@@ -188,5 +217,6 @@ Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, a
 - `/app/backend/tests/test_iteration_v68_76_compliance.py` (Compliance shield — Dust/Sparks isolation)
 - `/app/backend/tests/test_iteration_v68_80_arsenal.py` (Sovereign Arsenal owner gate, fire-log, dwell-log, top_fired/top_dwell, suggested_next, V68.81 + V68.82 batch surfacing) — 12 tests
 - `/app/backend/tests/test_iteration_v68_83_spiritual_shield.py` (manifest, landing, disclaimer, sage/bible/oracle sovereign framing, hub Cross-Tradition mark) — 9 tests
+- `/app/backend/tests/test_iteration_v68_84_translator.py` (Universal Translator middleware, Voice tier-features, Hawaiian, sacred mode) — 8 tests
 - `/app/backend/tests/test_comprehensive_audit.py`
 - `/app/backend/tests/test_iteration261_economy_tiers.py` (prior tier validation)

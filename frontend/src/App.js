@@ -61,6 +61,7 @@ import { useAmbientSoundscape } from './hooks/useAmbientSoundscape';
 import useWorkAccrual from './hooks/useWorkAccrual';
 import { AuthProvider } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { VoiceInteractionProvider } from './context/VoiceInteractionContext';
 import { TouchLightEngine } from './components/UnifiedFieldEngine';
 import { Toaster } from 'sonner';
 import ProgressionToast from './components/ProgressionToast';
@@ -639,6 +640,7 @@ function App() {
   return (
   <LanguageProvider>
     <AuthProvider>
+      <VoiceInteractionProvider>
       <LatencyProvider>
       <BrowserRouter>
         <Suspense fallback={<div style={{background:'#000',minHeight:'100vh'}} />}>
@@ -651,6 +653,7 @@ function App() {
         </Suspense>
       </BrowserRouter>
       </LatencyProvider>
+      </VoiceInteractionProvider>
     </AuthProvider>
   </LanguageProvider>
   );

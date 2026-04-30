@@ -95,6 +95,18 @@ const KINETIC_PROFILES = {
       lineToggle: [10, 5],
     },
   },
+  haw: {
+    // V68.84 — Hawaiian / ʻŌlelo Hawaiʻi. Resonant, Aloha-flowing.
+    characterDensity: 1.05,
+    kineticFeel: 'aloha',
+    haptics: {
+      tap: [16],
+      flick: [22, 12, 22, 12],
+      supernova: [55, 30, 55, 30, 110],
+      collapse: [110, 50, 110],
+      lineToggle: [13, 7],
+    },
+  },
 };
 
 // RECODE_UI Event for system-wide language sync
@@ -109,6 +121,7 @@ const dispatchRecodeUI = (fromLang, toLang) => {
 
 export const LANGUAGES = [
   { code: 'en', label: 'English', flag: 'EN', native: 'English' },
+  { code: 'haw', label: 'Hawaiian', flag: 'HAW', native: 'ʻŌlelo Hawaiʻi' },
   { code: 'zh', label: 'Chinese', flag: 'ZH', native: '中文' },
   { code: 'es', label: 'Spanish', flag: 'ES', native: 'Español' },
   { code: 'fr', label: 'French', flag: 'FR', native: 'Français' },
@@ -291,6 +304,25 @@ const translations = {
     'dashboard.forYou': 'Para Voce', 'dashboard.suggestedForYou': 'Sugerido Para Voce',
     'auth.email': 'E-mail', 'auth.password': 'Senha', 'auth.login': 'Entrar',
     'auth.register': 'Criar Conta', 'auth.logout': 'Sair',
+  },
+  haw: {
+    // V68.84 — ʻŌlelo Hawaiʻi. Multi-denominational spiritual instrument
+    // framing carries through. "Aloha" honored as core greeting energy.
+    'nav.dashboard': 'Papa Hōʻike', 'nav.mixer': 'Hui Kani', 'nav.frequencies': 'Pinepine',
+    'nav.meditation': 'Noʻonoʻo', 'nav.journal': 'Puke Moʻolelo', 'nav.oracle': 'Kilokilo',
+    'nav.starChart': 'Palapala Hōkū', 'nav.tradeCircle': 'Pōʻai Kūʻai', 'nav.settings': 'Hoʻonohonoho',
+    'nav.pricing': 'Kumu Kūʻai', 'nav.mood': 'Kuhi Manaʻo', 'nav.breathing': 'Hanu',
+    'common.save': 'Mālama', 'common.cancel': 'Kāpae', 'common.delete': 'Holoi',
+    'common.share': 'Kaʻana Like', 'common.loading': 'Hoʻouka...', 'common.search': 'ʻImi',
+    'common.back': 'Hoʻi', 'common.next': 'Aʻe', 'common.play': 'Hoʻokani', 'common.stop': 'Hoʻōki',
+    'common.close': 'Pani', 'common.upgrade': 'Hoʻonui', 'common.signIn': 'Komo Mai',
+    'mixer.masterVol': 'Leo Nui', 'mixer.mute': 'Hāmau', 'mixer.stopAll': 'Hoʻōki Pau',
+    'mixer.frequencies': 'Pinepine Solfeggio', 'mixer.sounds': 'Kani Hoʻopuni',
+    'mixer.instruments': 'Mea Kani Honua', 'mixer.mantras': 'ʻŌlelo Hoʻomana',
+    'mixer.generateBlend': 'Hana i Kaʻu Hui', 'mixer.analyzing': 'Hoʻokolokolo i Kou Manaʻo...',
+    'dashboard.forYou': 'No ʻOe', 'dashboard.suggestedForYou': 'Manaʻo No ʻOe',
+    'auth.email': 'Leka Uila', 'auth.password': 'Hua ʻŌlelo Huna', 'auth.login': 'Komo',
+    'auth.register': 'Hana i ka Moʻokāki', 'auth.logout': 'Haʻalele',
   },
 };
 

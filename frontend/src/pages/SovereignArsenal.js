@@ -15,7 +15,9 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import { useProcessorState, MODULE_REGISTRY } from '../state/ProcessorState';
-import { Zap, Play, Search, Flame, Cpu, Clock, Target } from 'lucide-react';
+import { useVoiceInteraction } from '../context/VoiceInteractionContext';
+import { useLanguage } from '../context/LanguageContext';
+import { Zap, Play, Search, Flame, Cpu, Clock, Target, Volume2, VolumeX, Globe, Lock } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -40,6 +42,8 @@ function fillPathParams(path, hint) {
 export default function SovereignArsenal() {
   const { authHeaders, user } = useAuth();
   const { pull } = useProcessorState();
+  const { language, setLanguage, languages } = useLanguage();
+  const { voiceMode, setVoiceMode, speak, stopSpeaking, speaking, translate, tier, features } = useVoiceInteraction();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState('');
@@ -80,6 +84,28 @@ export default function SovereignArsenal() {
       setResults(prev => ({ ...prev, [gen.id]: { status: 'ok', payload: res.data, at: Date.now() } }));
       axios.post(`${API}/arsenal/fire-log`, { item_id: gen.id, outcome: 'ok' }, { headers: authHeaders }).catch(() => {});
       toast.success(`Fired: ${gen.name}`);
+      // V68.84 — Narrative / Interactive voice modes auto-speak the
+      // most-readable string in the response. Tactile stays silent.
+      if (voiceMode !== 'tactile') {
+        const blob = typeof res.data === 'string' ? res.data : JSON.stringify(res.data);
+        // Pick the first humane string field if available.
+        const candidate = (() => {
+          if (typeof res.data !== 'object' || !res.data) return blob.slice(0, 600);
+          for (const k of ['text', 'message', 'affirmation', 'translation', 'retelling', 'story', 'title', 'name']) {
+            if (typeof res.data[k] === 'string' && res.data[k].length > 4) return res.data[k];
+          }
+          return blob.slice(0, 600);
+        })();
+        // Translate first if a non-English target lang is selected and translator is unlocked.
+        try {
+          let toSpeak = candidate;
+          if (language !== 'en' && features.translation_text) {
+            const t = await translate(candidate, language, features.sacred_language_mode);
+            if (t && t.translation) toSpeak = t.translation;
+          }
+          speak(toSpeak, language).catch(() => {});
+        } catch { /* swallow — narration is best-effort */ }
+      }
     } catch (err) {
       const detail = err.response?.data?.detail || err.message;
       setResults(prev => ({ ...prev, [gen.id]: { status: 'error', payload: detail, at: Date.now() } }));
@@ -87,7 +113,7 @@ export default function SovereignArsenal() {
       toast.error(`${gen.name}: ${String(detail).slice(0, 80)}`);
     }
     setFiring('');
-  }, [authHeaders]);
+  }, [authHeaders, voiceMode, language, features.translation_text, features.sacred_language_mode, translate, speak]);
 
   const fireEngine = useCallback((engine) => {
     if (engine.layer === 'frontend' && MODULE_REGISTRY[engine.id] !== undefined) {
@@ -135,6 +161,103 @@ export default function SovereignArsenal() {
         <p style={{ fontSize: 13, color: '#94A3B8', margin: 0 }}>
           {data.totals.generators} generators · {data.totals.engines} active engines · owner-only
         </p>
+      </div>
+
+      {/* V68.84 — Voice & Language nodule. Inline, tier-aware,
+          Flatland-compliant. Three voice modes, language switcher,
+          and a small "Speak Last Result" button when narrative is on. */}
+      <div data-testid="arsenal-voice-bar" style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 16, alignItems: 'center' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'monospace', fontSize: 10, letterSpacing: '0.18em', color: '#94A3B8', textTransform: 'uppercase' }}>
+          <Volume2 size={11} /> Voice
+        </div>
+        {[
+          { id: 'tactile', label: 'Tactile', tip: 'Silent · text only' },
+          { id: 'narrative', label: 'Narrative', tip: 'Speaks results aloud' },
+          { id: 'interactive', label: 'Interactive', tip: 'Listens back · Tier 1+' },
+        ].map(m => {
+          const enabled = features.voice_modes.includes(m.id);
+          const active = voiceMode === m.id;
+          return (
+            <button
+              key={m.id}
+              data-testid={`arsenal-voice-${m.id}`}
+              onClick={() => {
+                if (!enabled) {
+                  toast.info(`${m.label} mode unlocks at a higher gilded tier (current: ${tier})`);
+                  return;
+                }
+                setVoiceMode(m.id);
+              }}
+              title={m.tip}
+              style={{
+                padding: '6px 12px', borderRadius: 999,
+                background: active ? 'rgba(34,211,238,0.18)' : 'rgba(255,255,255,0.04)',
+                border: `1px solid ${active ? 'rgba(34,211,238,0.45)' : enabled ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.04)'}`,
+                color: active ? '#22D3EE' : enabled ? '#CBD5E1' : '#475569',
+                fontFamily: 'monospace', fontSize: 10, letterSpacing: '0.14em',
+                textTransform: 'uppercase', cursor: enabled ? 'pointer' : 'not-allowed',
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+                opacity: enabled ? 1 : 0.55,
+              }}
+            >
+              {!enabled && <Lock size={9} />}
+              {m.label}
+            </button>
+          );
+        })}
+        {speaking && (
+          <button
+            data-testid="arsenal-voice-stop"
+            onClick={stopSpeaking}
+            style={{
+              padding: '6px 12px', borderRadius: 999,
+              background: 'rgba(239,68,68,0.14)',
+              border: '1px solid rgba(239,68,68,0.42)',
+              color: '#FCA5A5', fontFamily: 'monospace', fontSize: 10,
+              letterSpacing: '0.14em', textTransform: 'uppercase',
+              cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            <VolumeX size={11} /> Stop
+          </button>
+        )}
+        <div style={{ width: 1, height: 18, background: 'rgba(255,255,255,0.10)', margin: '0 4px' }} />
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'monospace', fontSize: 10, letterSpacing: '0.18em', color: '#94A3B8', textTransform: 'uppercase' }}>
+          <Globe size={11} /> Lang
+        </div>
+        <select
+          data-testid="arsenal-lang-select"
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          style={{
+            padding: '6px 10px', borderRadius: 8,
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.10)',
+            color: '#CBD5E1', fontFamily: 'monospace', fontSize: 11,
+            cursor: 'pointer', minWidth: 140,
+          }}
+        >
+          {languages.map(l => (
+            <option key={l.code} value={l.code} style={{ background: '#0F172A' }}>
+              {l.native} · {l.flag}
+            </option>
+          ))}
+        </select>
+        {features.sacred_language_mode && (
+          <span
+            data-testid="arsenal-sacred-mode-pill"
+            style={{
+              padding: '4px 10px', borderRadius: 999,
+              background: 'rgba(244,114,182,0.10)',
+              border: '1px solid rgba(244,114,182,0.42)',
+              color: '#F9A8D4', fontFamily: 'monospace', fontSize: 9,
+              letterSpacing: '0.18em', textTransform: 'uppercase',
+            }}
+            title="Sovereign tier · sacred-language nuance unlocked"
+          >
+            Sacred Mode · Sovereign
+          </span>
+        )}
       </div>
 
       {/* Search + Category filter */}
