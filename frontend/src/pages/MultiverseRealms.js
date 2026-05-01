@@ -1,14 +1,55 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Globe, Play, Volume2, Lock, Sparkles, ChevronRight, Orbit } from 'lucide-react';
+import {
+  ArrowLeft, Globe, Volume2, Sparkles, ChevronRight, Orbit,
+  TreeDeciduous, Waves, Flame, Wind,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useMixer, FREQUENCIES as MIXER_FREQUENCIES, SOUNDS as MIXER_SOUNDS, INSTRUMENT_DRONES } from '../context/MixerContext';
 import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../components/CosmicFeedback';
+import { commit as busCommit } from '../state/ContextBus';
+import CompanionChip from '../components/CompanionChip';
 import { toast } from 'sonner';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// V68.95 — ELEMENT → COMPANION CONCEPT BRIDGE.
+// Each realm carries an `element` from the backend. The Companion
+// Engine (V68.92/V68.93) groups ordained cross-tradition scriptures
+// by concept. We map element → concept so the realm view auto-surfaces
+// the multi-tradition substrate beneath it. Mapping is grounded in
+// what the bridges actually contain — verified, not inferred:
+//
+//   earth  → stewardship  (Genesis 2 garden, Hopi Koyaanisqatsi,
+//                          Lakota Mitakuye Oyasin, Aboriginal Country)
+//   water  → creation     (Genesis 1 deep, Kumulipo Pō, Atum from Nun,
+//                          Norse Ginnungagap, Popol Vuh primordial sea)
+//   fire   → purification (Asha vs Druj, Tapas, Inipi sweat lodge,
+//                          Buddhaghosa Visuddhimagga)
+//   ether  → emptiness    (Heart Sutra, Diamond Sutra, Tao, Anatta)
+//   air    → sacred_sound (Aum, Saman melodies, Mool Mantar, Logos
+//                          John 1, Rumi reed flute)
+const ELEMENT_CONCEPT_MAP = {
+  earth: 'stewardship',
+  water: 'creation',
+  fire:  'purification',
+  ether: 'emptiness',
+  air:   'sacred_sound',
+};
+
+// V68.95 — Distinct iconography per element. Replaces the generic
+// <Globe> facade so users SEE which world they're stepping into
+// before they tap. Names map to lucide-react components.
+const ELEMENT_ICON_MAP = {
+  earth: TreeDeciduous,
+  water: Waves,
+  fire:  Flame,
+  ether: Sparkles,
+  air:   Wind,
+};
+const elementIcon = (el) => ELEMENT_ICON_MAP[el] || Globe;
 
 // V68.5 — Realm → 3D Scene portal mapping.
 // Each realm launches its actual THREE.js / WebGL experience.
@@ -74,6 +115,26 @@ export default function MultiverseRealms() {
       const drone = INSTRUMENT_DRONES.find(d => d.id === realm.drone);
       if (drone && !activeDrones.has(realm.drone)) await toggleDrone(drone);
 
+      // V68.95 — Lattice ripple. The Hub's CrystallineLattice3D listens
+      // for `sovereign:pulse` events fired by ContextBus.commit. By
+      // committing the realm's metadata here, the analyzer derives a
+      // pulse vector from the realm's name + element + description
+      // (ResonanceAnalyzer's lexicon catches "void", "fire", "light",
+      // "crystal", etc.). Result: entering Void Sanctum → bass+sacred
+      // surge → dark sparse lattice. Entering Astral Garden → treble
+      // surge → bright luminous lattice. No special-casing needed —
+      // the existing analyzer + listener chain does all the work.
+      try {
+        busCommit('worldMetadata', {
+          biome: realm.element,
+          locale: realm.name,
+          frequency: realm.frequency,
+          ambient: realm.ambient,
+          desc: realm.desc,
+          color: realm.color,
+        }, { moduleId: 'MULTIVERSE_REALMS' });
+      } catch { /* graceful — bus is best-effort */ }
+
       toast(`Entered ${realm.name}`, { description: realm.subtitle });
 
       // Refresh stats
@@ -131,6 +192,7 @@ export default function MultiverseRealms() {
               <div className="space-y-3" style={{ opacity: entering ? 0.4 : 1, transition: 'opacity 0.3s' }}>
                 {realms.map((realm, i) => {
                   const visits = getVisitCount(realm.id);
+                  const RealmIcon = elementIcon(realm.element);
                   return (
                     <motion.button key={realm.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
                       onClick={() => enterRealm(realm)} disabled={entering}
@@ -140,11 +202,12 @@ export default function MultiverseRealms() {
                         border: `1px solid ${realm.color}15`,
                       }}
                       data-testid={`realm-${realm.id}`}
+                      data-element={realm.element}
                     >
                       <div className="flex items-start gap-3.5">
                         <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
                           style={{ background: `${realm.color}12`, border: `1px solid ${realm.color}20` }}>
-                          <Globe size={20} style={{ color: realm.color }} />
+                          <RealmIcon size={20} style={{ color: realm.color }} data-testid={`realm-icon-${realm.element}`} />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-0.5">
@@ -182,6 +245,41 @@ export default function MultiverseRealms() {
                   {activeRealm.realm.desc}
                 </p>
               </div>
+
+              {/* V68.95 — Cross-Tradition Substrate. Maps the realm's
+                  `element` to a Companion Engine concept and surfaces
+                  ordained scriptures from across traditions. Earth →
+                  stewardship, Water → creation, Fire → purification,
+                  Ether → emptiness, Air → sacred_sound. CompanionChip
+                  hides itself if the API returns no matches (Flatland
+                  graceful empty), so the realm view degrades cleanly
+                  when offline. */}
+              {ELEMENT_CONCEPT_MAP[activeRealm.realm.element] && (
+                <div
+                  className="p-4 rounded-xl mb-4"
+                  style={{
+                    background: 'rgba(168,85,247,0.05)',
+                    border: '1px solid rgba(168,85,247,0.15)',
+                  }}
+                  data-testid="realm-cross-tradition"
+                  data-element={activeRealm.realm.element}
+                  data-concept={ELEMENT_CONCEPT_MAP[activeRealm.realm.element]}
+                >
+                  <p
+                    className="text-[9px] uppercase tracking-widest mb-2"
+                    style={{ color: '#C4B5FD' }}
+                  >
+                    Cross-Tradition · {activeRealm.realm.element}
+                  </p>
+                  {/* CompanionChip's `textId` accepts a concept name and
+                      reuses the same /api/companions/{id} fetch pattern.
+                      We reach the multi-tradition list via the concept-
+                      bridge endpoint by passing the concept directly. */}
+                  <CompanionChip
+                    textId={ELEMENT_CONCEPT_MAP[activeRealm.realm.element]}
+                  />
+                </div>
+              )}
 
               {/* Active Soundscape */}
               <div className="p-4 rounded-xl mb-4" style={{ background: `${activeRealm.realm.color}08`, border: `1px solid ${activeRealm.realm.color}12` }}>

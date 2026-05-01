@@ -300,9 +300,17 @@ async def get_daily_pairing():
 @router.get("/companions/{text_id}")
 async def get_companions(text_id: str):
     """Return ordained cross-tradition companions for a given text id.
-    Falls back gracefully — empty companions[] is a valid response."""
+    Falls back gracefully — empty companions[] is a valid response.
+
+    V68.95 — Concept-name fallback. If the requested id is not a known
+    text id but IS a registered concept (e.g. "stewardship", "emptiness"),
+    return the concept's companion list. This lets the same endpoint
+    serve realm-element substrate surfacing without a separate fetch
+    helper on the frontend."""
     text_id = text_id.strip().lower()
     direct = DIRECT_COMPANIONS.get(text_id, [])
+    if not direct and text_id in COMPANION_BRIDGES:
+        direct = COMPANION_BRIDGES[text_id]
     return {
         "text_id": text_id,
         "companions": direct,

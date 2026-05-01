@@ -358,3 +358,29 @@ Still using legacy `navigate()` routes. Convert to `[Name]Engine.js` adapters, a
 - **Route-order pitfall caught:** initial `/companions/daily` was being eaten by the `/companions/{text_id}` catch-all because of FastAPI declaration-order matching. Reordered + added `test_daily_route_declared_before_text_id_catchall` to lock the contract.
 - Live verified: today's pairing = **Maryam** → Luke 1 + Quran 19 + Bhagavad Gita 4. Widget rendered on `/sovereign-hub` (DOM box at y:1337, w:896, h:271).
 - 6 additional regression tests added (route registration, declaration order, deterministic-per-date, full-rotation guarantee, override resolution, Christmas → Maryam exemplar). **Total V68.94 tests: 11 passing.**
+
+### V68.95 — The Sentient Portal Batch (2026-05-01) ✅
+Realms transformed from facade ("wall of identical globe icons") into a sentient portal layer connected to the rest of the engine.
+
+**Three pillars wired (audit-first — every bridge proven before code):**
+
+**(a) Element → Companion concept bridge.**
+- `routes/companions.py::get_companions` extended with concept-name fallback: when `text_id` matches a `COMPANION_BRIDGES` key, returns the bridge instead of empty `[]`. Backwards-compatible — every existing direct-id path still works.
+- `pages/MultiverseRealms.js::ELEMENT_CONCEPT_MAP` maps each backend element to a real bridge: `earth → stewardship`, `water → creation`, `fire → purification`, `ether → emptiness`, `air → sacred_sound`. Every value verified against `COMPANION_BRIDGES.keys()`.
+- Live verified: entering Astral Garden (earth) surfaces 4 ordained traditions (Aboriginal "Caring for Country", Hopi Koyaanisqatsi, Lakota, Genesis 2). Entering Void Sanctum (ether) → Heart Sutra + Diamond Sutra + Tao + Anatta.
+- Reuses existing `<CompanionChip>` (V68.93) — zero new fetch helpers, single source of truth.
+
+**(d) Lattice ripple via ContextBus.**
+- `enterRealm` now calls `busCommit('worldMetadata', { biome: realm.element, locale, frequency, ambient, desc, color }, { moduleId: 'MULTIVERSE_REALMS' })`.
+- The pre-existing `CrystallineLattice3D::sovereign:pulse` listener picks up the auto-derived burst from `ResonanceAnalyzer`. No special-casing per element needed — the analyzer's lexicon (HEAVY_RX/LIGHT_RX/SACRED_RX/ACTION_RX) catches `void`/`fire`/`light`/`crystal`/`sacred` natively in each realm's `desc` string.
+- Live verified: 48 `sovereign:pulse` events fired after Astral Garden entry; ContextBus event captured with `biome: "earth", locale: "Astral Garden", moduleId: "MULTIVERSE_REALMS"`.
+- Forward-compat: any future realm with a new element automatically rides this rail — no code change needed for the lattice ripple.
+
+**(e) Element-distinct iconography.**
+- New `ELEMENT_ICON_MAP`: earth → `TreeDeciduous`, water → `Waves`, fire → `Flame`, ether → `Sparkles`, air → `Wind`. All from already-installed `lucide-react`.
+- Card list now uses `elementIcon(realm.element)` instead of the generic `<Globe>`. Live verified: all 6 realms render with element-distinct icons (`data-testid="realm-icon-{element}"` on each).
+- `data-element` attribute added to each card — future agents can attach element-specific behaviors (locks, particle hints, generators) without prop surgery.
+
+**Tests:** `/app/backend/tests/test_iteration_v68_95_sentient_portal.py` — 7 grep-locked invariants (CompanionChip + ContextBus imports, every backend element has a concept mapping, mappings target real bridges, backend has concept fallback branch, enterRealm commits worldMetadata, ELEMENT_ICON_MAP has ≥4 distinct icons, no `<Globe>` in card render). **All 7 passing. 43 V68.92→V68.95 tests passing total.**
+
+**Ether/Void special-casing answered:** None needed. `ResonanceAnalyzer.HEAVY_RX` already includes `void` and `abyss`; Void Sanctum's `desc` contains "void", "abyss", "infinite" → bass-heavy, sacred-flagged pulse → naturally produces a sparser/darker lattice burst than Astral Garden's `desc` ("luminous", "light", "breath") → treble-heavy. The differentiation is automatic.
