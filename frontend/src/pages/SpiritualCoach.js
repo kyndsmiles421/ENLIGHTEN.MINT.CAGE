@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { MessageCircle, Loader2, Send, Plus, Trash2, ChevronLeft, Sparkles, Moon, Eye, Star, X, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import { toast } from 'sonner';
+import { readKey as busReadKey } from '../state/ContextBus';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -410,9 +411,16 @@ export default function SpiritualCoach() {
     const userMsg = { role: 'user', text, timestamp: new Date().toISOString() };
     setMessages(prev => [...prev, userMsg]);
     setSending(true);
+    // V68.96 — Realm-aware Sage. Read the active realm snapshot from
+    // ContextBus.worldMetadata (committed by MultiverseRealms.enterRealm)
+    // and pass it through. Backend coach.py inlines biome/locale/freq
+    // into the system prompt so Sage colors its tone with the realm.
+    // Graceful empty: no realm → no payload → Sage acts as before.
+    const realmContext = busReadKey('worldMetadata') || null;
     try {
       const r = await axios.post(`${API}/coach/chat`, {
         session_id: activeSession, message: text,
+        realm_context: realmContext,
       }, { headers: authHeaders });
       const assistantMsg = { role: 'assistant', text: r.data.reply, timestamp: new Date().toISOString() };
       setMessages(prev => [...prev, assistantMsg]);

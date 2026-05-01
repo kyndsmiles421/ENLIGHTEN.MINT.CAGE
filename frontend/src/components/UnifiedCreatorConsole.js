@@ -224,7 +224,7 @@ export function MixerProvider({ children }) {
   }, [navigate]);
 
   const handleBroadcast = useCallback(async () => {
-    const shareData = { title: 'ENLIGHTEN.MINT.CAFE', text: 'Sovereign Wellness Engine', url: window.location.origin };
+    const shareData = { title: 'ENLIGHTEN.MINT.CAFE', text: 'Sovereign Spiritual Instrument', url: window.location.origin };
     try {
       if (navigator.share) await navigator.share(shareData);
       else { await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`); toast.success('Link copied'); }

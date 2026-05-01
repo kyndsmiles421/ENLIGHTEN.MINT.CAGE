@@ -212,6 +212,10 @@ async def get_session(session_id: str, user=Depends(get_current_user)):
 async def chat(data: dict = Body(...), user=Depends(get_current_user)):
     session_id = data.get("session_id")
     message = data.get("message", "").strip()
+    # V68.96 — Realm awareness. Frontend may pass the active realm
+    # snapshot from ContextBus.read().worldMetadata so Sage speaks in
+    # the tone of the current realm without breaking existing callers.
+    realm_context = data.get("realm_context") or {}
     if not message:
         raise HTTPException(status_code=400, detail="Message required")
 
@@ -228,6 +232,27 @@ async def chat(data: dict = Body(...), user=Depends(get_current_user)):
     profile = await _get_user_profile(user["id"])
     system_prompt = _build_system_prompt(profile, mode)
 
+    # V68.96 — Inline realm context into the system prompt so Sage
+    # opens with realm-aware framing (Astral Garden → grounded, lush;
+    # Void Sanctum → minimal, spacious; Solar Temple → fierce, refining).
+    # We pass through the raw realm metadata; the LLM does the tone work.
+    realm_block = ""
+    if realm_context and isinstance(realm_context, dict):
+        biome = realm_context.get("biome") or realm_context.get("element")
+        locale = realm_context.get("locale") or realm_context.get("name")
+        freq = realm_context.get("frequency")
+        if biome or locale:
+            realm_block = (
+                "\n\nACTIVE REALM CONTEXT:\n"
+                f"  • Realm: {locale or 'unknown'}\n"
+                f"  • Element/biome: {biome or 'unspecified'}\n"
+                f"  • Frequency: {freq or 'n/a'} Hz\n"
+                "Open your reply with one short line that acknowledges the seeker is in this realm "
+                "before answering. Match the realm's tone (earthy/grounded for earth, fluid/contemplative "
+                "for water, fierce/refining for fire, sparse/silent for ether, breath/songlike for air). "
+                "Do NOT preach about the realm — just let it color your voice."
+            )
+
     # Build chat with history context in system message
     try:
         # Include recent conversation in system prompt for context
@@ -243,7 +268,7 @@ async def chat(data: dict = Body(...), user=Depends(get_current_user)):
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=f"coach-{session_id}-{uuid.uuid4().hex[:8]}",
-            system_message=system_prompt + history_text,
+            system_message=system_prompt + realm_block + history_text,
         )
         chat.with_model("gemini", "gemini-3-flash-preview")
 

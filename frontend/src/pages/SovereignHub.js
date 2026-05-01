@@ -413,7 +413,7 @@ export default function SovereignHub() {
   const handleBroadcast = async () => {
     const shareData = {
       title: 'ENLIGHTEN.MINT.CAFE',
-      text: 'Sovereign Wellness Engine — breathwork, divination, alchemy, and more.',
+      text: 'Sovereign Spiritual Instrument — breathwork, divination, alchemy, and more.',
       url: window.location.origin,
     };
     try {

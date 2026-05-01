@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const STEPS = [
   {
     title: 'Welcome to ENLIGHTEN.MINT.CAFE',
-    text: 'Your sovereign wellness engine is divided into 7 core pillars. Tap any pillar to expand, then tap a module to dive deep.',
+    text: 'Your sovereign spiritual instrument is divided into 7 core pillars. Tap any pillar to expand, then tap a module to dive deep.',
   },
   {
     title: 'The Mixer Controls Everything',
