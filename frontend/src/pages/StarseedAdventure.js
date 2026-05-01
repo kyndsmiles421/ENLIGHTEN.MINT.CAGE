@@ -85,6 +85,17 @@ export default function StarseedAdventure() {
   }, [buildHeaders]);
 
   const startNewAdventure = useCallback(async (originId, characterName) => {
+    // V1.0.8 — Pre-flight auth check. The previous version flipped to
+    // the game view optimistically and then rolled back on 401, which
+    // looked like a "dead button" to users with stale/guest tokens.
+    // Now we verify auth FIRST and route to /auth with a clear message
+    // instead of a silent rollback.
+    const headers = buildHeaders();
+    if (!headers.Authorization) {
+      toast.error('Sign in to begin your adventure', { duration: 3500 });
+      navigate('/auth?next=/starseed-adventure');
+      return;
+    }
     setLoading(true);
     setSceneImage(null);
     // V68.31: fire the Sovereign Kernel interact event (Layer 4) AND lock
@@ -105,10 +116,10 @@ export default function StarseedAdventure() {
     try {
       await axios.post(`${API}/starseed/create-character`, {
         origin_id: originId, character_name: characterName,
-      }, { headers: buildHeaders() });
+      }, { headers });
       const sceneRes = await axios.post(`${API}/starseed/generate-scene`, {
         origin_id: originId, choice_index: null, realm_id: realmFromUrl || undefined,
-      }, { headers: buildHeaders() });
+      }, { headers });
       setCurrentScene(sceneRes.data.scene);
       setCharacterState(sceneRes.data.character);
       toast.success(`${origin.name} adventure begins!`);
@@ -130,8 +141,16 @@ export default function StarseedAdventure() {
           'STARSEED',
         );
       } catch { /* noop */ }
-    } catch {
-      toast.error('Could not start adventure');
+    } catch (err) {
+      // V1.0.8 — Specific 401 handling. If the token expired mid-flow,
+      // tell the user instead of silently bouncing them back.
+      const status = err?.response?.status;
+      if (status === 401) {
+        toast.error('Session expired — please sign in again', { duration: 4000 });
+        navigate('/auth?next=/starseed-adventure');
+      } else {
+        toast.error(err?.response?.data?.detail || 'Could not start adventure. Try again.');
+      }
       // Roll back to select on failure
       setView('select');
       setActiveOrigin(null);
@@ -139,7 +158,7 @@ export default function StarseedAdventure() {
       setLoading(false);
       SovereignKernel.unlockAudio();
     }
-  }, [buildHeaders, origins, generateSceneImage, realmFromUrl]);
+  }, [buildHeaders, origins, generateSceneImage, realmFromUrl, navigate, starseedResonance]);
 
   const resumeAdventure = useCallback(async (originId) => {
     setLoading(true);

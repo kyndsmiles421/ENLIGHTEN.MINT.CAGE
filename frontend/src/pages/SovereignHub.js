@@ -575,85 +575,16 @@ export default function SovereignHub() {
         )}
       </div>
 
-      {/* V56.1 — Daily Elemental Challenges */}
-      <div className="px-4 pb-4">
-        <DailyChallenges compact />
-      </div>
-
-      {/* V68.31 — Sovereign Choice Protocol Panel (audio frequency + visual skin) */}
-      <div className="px-4 pb-4">
-        <SovereignChoicePanel />
-      </div>
-
-      {/* V68.32 — Blade Signature pill (live truth or pinned) */}
-      <div className="px-4 pb-3 flex flex-col items-center gap-1">
-        <TrialCountdown />
-        <SignaturePill />
-      </div>
-
-      {/* V68.31 — Sovereign Arsenal (Swiss Army Knife) opener */}
-      <div className="px-4 pb-4 flex flex-wrap gap-3 justify-center">
-        <button
-          onClick={() => setToolDrawerOpen(true)}
-          data-testid="open-tool-drawer"
-          className="group px-5 py-2.5 rounded-full text-[11px] uppercase tracking-[0.28em] font-bold transition-all"
-          style={{
-            background: 'rgba(192, 132, 252, 0.12)',
-            border: '1px solid rgba(192, 132, 252, 0.35)',
-            color: '#E9D5FF',
-            boxShadow: '0 0 24px rgba(192,132,252,0.15)',
-          }}
-        >
-          ⌁ Open the Sovereign Arsenal
-        </button>
-        <button
-          onClick={() => setLensOpen(true)}
-          data-testid="open-calibration-lens"
-          className="group px-5 py-2.5 rounded-full text-[11px] uppercase tracking-[0.28em] font-bold transition-all"
-          style={{
-            background: 'rgba(251, 191, 36, 0.10)',
-            border: '1px solid rgba(251, 191, 36, 0.35)',
-            color: '#FDE68A',
-            boxShadow: '0 0 24px rgba(251, 191, 36, 0.12)',
-          }}
-        >
-          ✧ Living Lens · Calibrate
-        </button>
-        <button
-          onClick={() => setBuyTimeOpen(true)}
-          data-testid="open-buy-time"
-          className="group px-5 py-2.5 rounded-full text-[11px] uppercase tracking-[0.28em] font-bold transition-all"
-          style={{
-            background: 'linear-gradient(135deg, rgba(251, 191, 36, 0.16), rgba(234, 179, 8, 0.12))',
-            border: '1px solid rgba(251, 191, 36, 0.55)',
-            color: '#FEF3C7',
-            boxShadow: '0 0 28px rgba(251, 191, 36, 0.22)',
-          }}
-        >
-          ⌂ Gilded Path · Buy Time
-        </button>
-        <button
-          onClick={() => setVisitorOpen(true)}
-          data-testid="open-visitor-shield"
-          className="group px-5 py-2.5 rounded-full text-[11px] uppercase tracking-[0.28em] font-bold transition-all"
-          style={{
-            background: 'rgba(244, 114, 182, 0.08)',
-            border: '1px solid rgba(244, 114, 182, 0.35)',
-            color: '#FBCFE8',
-            boxShadow: '0 0 22px rgba(244, 114, 182, 0.12)',
-          }}
-        >
-          ⌘ Visitor Shield
-        </button>
-      </div>
+      {/* V1.0.8 — Sleek Hub. The home page is intentionally minimal:
+          title + lattice + utility row + 10 pillars. Every module and
+          function is reachable through its pillar (Challenges →
+          Practice, Oracle → Divination, Settings/Arsenal/Lens/Visitor
+          Shield → Sovereign Council, Worlds → Cosmos & Physics, etc.).
+          Modals open inline when invoked from a pillar item. No forced
+          widgets on the front page. */}
       <ToolDrawer open={toolDrawerOpen} onClose={() => setToolDrawerOpen(false)} />
       <CalibrationLens open={lensOpen} onClose={() => setLensOpen(false)} />
       <BuyTimePanel open={buyTimeOpen} onClose={() => setBuyTimeOpen(false)} />
-
-      {/* V64.1 — Oracle: Intent-Based Neural Search */}
-      <div className="px-4 pb-4">
-        <OracleSearch onActiveDomains={handleActiveDomains} />
-      </div>
 
       {/* V68.32 — 7 Pillars · Sacred Geometry Crystalline Grid
           (killed the flat accordion bars. Each pillar is now a faceted
@@ -937,20 +868,15 @@ function MatrixRenderSlot() {
   );
 }
 
-/* PILL ROW — visible only in IDLE. Tapping a pill issues a PULL into
-   that module's render-mode. No navigation, no URL change. */
+/* PILL ROW — visible only in IDLE. V1.0.8 sleek pass: reduced to the
+   minimum heads-up indicators (Sage gauge + compliance + recall).
+   Module pulls happen through their pillar items (Creators &
+   Generators → Avatar/Story/Scene Gen, Divination → Forecasts, etc.)
+   so this row no longer duplicates them. No worlds strip, no badge,
+   no seed hunt, no pairing — every one of those is reachable through
+   its proper pillar. */
 function MatrixModuleDispatcher() {
-  const { pull } = useProcessorState();
   const [capsuleOpen, setCapsuleOpen] = useState(false);
-  const modules = [
-    { id: 'AVATAR_GEN',      label: 'Avatar',          color: '#C084FC' },
-    { id: 'COSMIC_PORTRAIT', label: 'Cosmic Portrait', color: '#FBBF24' },
-    { id: 'FORECASTS',       label: 'Forecasts',       color: '#38BDF8' },
-    { id: 'DREAM_VIZ',       label: 'Dream Viz',       color: '#818CF8' },
-    { id: 'STORY_GEN',       label: 'Story Gen',       color: '#F472B6' },
-    { id: 'SCENE_GEN',       label: 'Scene Gen',       color: '#2DD4BF' },
-    { id: 'STARSEED',        label: 'Starseed RPG',    color: '#EF4444' },
-  ];
   return (
     <>
       <div
@@ -960,19 +886,11 @@ function MatrixModuleDispatcher() {
         }}
         data-testid="matrix-dispatcher"
       >
-        {/* V68.58 — Cognitive Voltmeter sits inline with the dispatcher
-            row. The user keeps the AI TIME gauge in peripheral vision
-            while pulling tools so they can FEEL when the engine is
-            cold (need to feed it), in flow (gold zone), or overheating
-            (back off, let the field settle). Inline · Flatland · no
-            fixed positioning. */}
+        {/* AI Time gauge — peripheral cognitive readout */}
         <SageEngineGauge size={64} />
-        {/* V68.77 — Compliance Pill · sits next to Sage Gauge so legal
-            and cognitive health are visible in one glance. Inline flex,
-            expands in-place (zero overlay / fixed / z-index). */}
+        {/* Compliance pill — multi-denominational / not-medical mark */}
         <ComplianceShieldPill />
-        {/* V68.60 — Recall · opens the inline TimeCapsuleDrawer below
-            so the user can resurrect any prior session. */}
+        {/* Recall — opens TimeCapsuleDrawer to resurrect prior sessions */}
         <button
           type="button"
           onClick={() => setCapsuleOpen(v => !v)}
@@ -988,141 +906,10 @@ function MatrixModuleDispatcher() {
         >
           ☉ Recall
         </button>
-        {modules.map(m => (
-          <button
-            key={m.id}
-            type="button"
-            onClick={() => pull(m.id)}
-            data-testid={`pull-${m.id.toLowerCase()}`}
-            style={{
-              padding: '6px 12px', borderRadius: 999,
-              background: `${m.color}14`, border: `1px solid ${m.color}55`,
-              color: m.color, fontFamily: 'monospace',
-              fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase',
-              cursor: 'pointer',
-            }}
-          >
-            ✦ Pull · {m.label}
-          </button>
-        ))}
       </div>
       <TimeCapsuleDrawer open={capsuleOpen} onClose={() => setCapsuleOpen(false)} />
 
-      {/* V68.68 — Worlds Strip. The 3D universe you built was
-          only reachable via the 120+ un-wired nav-drain items.
-          These 10 experiences are now one tap away from the hub.
-          Flatland-compliant inline scroll-strip, no modal. */}
-      <div
-        style={{
-          width: '100%', maxWidth: 920, margin: '14px auto 0',
-          padding: '0 12px',
-        }}
-        data-testid="worlds-strip"
-      >
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          fontFamily: 'monospace', fontSize: 9,
-          letterSpacing: '0.28em', color: 'rgba(255,255,255,0.35)',
-          textTransform: 'uppercase', marginBottom: 6,
-        }}>
-          <Globe size={10} /> Worlds · Step Inside
-          <span style={{ marginLeft: 'auto', opacity: 0.55, letterSpacing: '0.15em' }}>
-            10 Environments
-          </span>
-        </div>
-        <div style={{
-          display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4,
-          scrollbarWidth: 'thin',
-        }}>
-          {WORLD_NODES.map((w) => (
-            <Link
-              key={w.route}
-              to={w.route}
-              data-testid={`world-tile-${w.id}`}
-              style={{
-                flex: '0 0 auto',
-                width: 132,
-                padding: '10px 10px 8px',
-                borderRadius: 10,
-                background: `${w.color}0C`,
-                border: `1px solid ${w.color}33`,
-                color: 'rgba(255,255,255,0.78)',
-                textDecoration: 'none',
-                fontFamily: 'monospace',
-                fontSize: 10,
-                transition: 'transform 150ms ease, border-color 200ms ease, background 200ms ease',
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.background = `${w.color}1A`;
-                e.currentTarget.style.borderColor = `${w.color}77`;
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.background = `${w.color}0C`;
-                e.currentTarget.style.borderColor = `${w.color}33`;
-              }}
-            >
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: 6, color: w.color,
-                marginBottom: 6,
-              }}>
-                <w.Icon size={12} />
-                <span style={{
-                  fontSize: 8, letterSpacing: '0.22em', textTransform: 'uppercase',
-                  opacity: 0.85,
-                }}>
-                  {w.kind}
-                </span>
-              </div>
-              <div style={{
-                fontSize: 11, color: '#fff', letterSpacing: '0.04em',
-                fontWeight: 600, lineHeight: 1.2, marginBottom: 3,
-              }}>
-                {w.label}
-              </div>
-              <div style={{
-                fontSize: 8.5, color: 'rgba(255,255,255,0.45)',
-                letterSpacing: '0.02em', lineHeight: 1.3,
-              }}>
-                {w.blurb}
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* V69.2 — Architect's Badge (owner-only). Hidden from regular
-          users by the backend's is_owner gate; renders nothing on
-          403/error. Provides a real-time SLO readout so the owner can
-          see at a glance whether sentience is rising or regressing. */}
-      <ArchitectBadgeMount />
-
-      {/* V68.68 — Seed Hunt Widget. The daily find-it game was
-          only rendered inside the Tesseract page. Now it lives on
-          the Hub where everyone lands. Only shows if the backend
-          has an active hunt. */}
-      <div style={{
-        width: '100%', maxWidth: 920, margin: '14px auto 0', padding: '0 12px',
-      }}>
-        <SeedHuntWidget />
-      </div>
-
-      {/* V68.94 — Today's Cross-Tradition Pairing. Deterministic-by-UTC-date
-          showcase of the V68.92/V68.93 cross-tradition engine. Renders
-          nothing if the API is unreachable, the concept is null, or the
-          companion list is empty (Flatland-compliant graceful empty). */}
-      <div style={{
-        width: '100%', maxWidth: 920, margin: '14px auto 0', padding: '0 12px',
-      }}>
-        <DailyCrossTraditionPairing />
-      </div>
-
-      {/* V1.0.7 — Sovereign Version Stamp. Public, build-time-injected
-          version footer. Reviewers can see at a glance which build
-          they're testing; every screenshot becomes a self-dating
-          artifact. Reads from REACT_APP_VERSION (CRA injects it from
-          package.json on `yarn build`). */}
+      {/* Sovereign Version Stamp — public build-stamp footer */}
       <SovereignVersionStamp />
     </>
   );

@@ -143,8 +143,19 @@ CHAPTERS = {
 @router.get("/origins")
 async def get_origins():
     # Delegate to the full starseed_adventure origins with complete data
-    from routes.starseed_adventure import STARSEED_ORIGINS
-    return {"origins": [{k: v for k, v in o.items() if k != "starting_stats"} for o in STARSEED_ORIGINS]}
+    # V1.0.8 — Apply Spiritual Shield (Play Store framing). The legacy
+    # static lore in STARSEED_ORIGINS contains "healer/healing" verbiage
+    # that we substitute with spiritual-mythic alternatives before the
+    # client ever sees it. Mirrors the shielding in
+    # routes/starseed_adventure.get_starseed_origins so this duplicate
+    # route (registered first by alphabetical module load order) never
+    # leaks the unshielded copy.
+    from routes.starseed_adventure import STARSEED_ORIGINS, _shield_obj
+    cleaned = []
+    for o in STARSEED_ORIGINS:
+        item = {k: v for k, v in o.items() if k != "starting_stats"}
+        cleaned.append(_shield_obj(item))
+    return {"origins": cleaned}
 
 
 @router.get("/chapter/{chapter_id}")

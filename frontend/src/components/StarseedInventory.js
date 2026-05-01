@@ -251,6 +251,14 @@ export function AvatarGenerator({ originId, authHeaders, onAvatarGenerated }) {
 
   useEffect(() => {
     if (!originId) return;
+    // V1.0.8 — Skip fetch when there's no auth header. The previous
+    // version fired GET /api/starseed/avatar/:id with empty headers
+    // for guest/trial users, producing a stream of silent 401s in the
+    // network tab. Now we render the placeholder avatar and exit.
+    if (!authHeaders || !authHeaders.Authorization) {
+      setLoading(false);
+      return;
+    }
     axios.get(`${API}/starseed/avatar/${originId}`, { headers: authHeaders })
       .then(r => {
         if (r.data.avatar_base64) setAvatar(`data:image/png;base64,${r.data.avatar_base64}`);
@@ -325,6 +333,8 @@ export function AvatarBadge({ originId, authHeaders, size = 32, className = '' }
 
   useEffect(() => {
     if (!originId) return;
+    // V1.0.8 — Skip fetch when there's no auth header (guest/trial).
+    if (!authHeaders || !authHeaders.Authorization) return;
     axios.get(`${API}/starseed/avatar/${originId}`, { headers: authHeaders })
       .then(r => { if (r.data.avatar_base64) setAvatar(`data:image/png;base64,${r.data.avatar_base64}`); })
       .catch(() => {});

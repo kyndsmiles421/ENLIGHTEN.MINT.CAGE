@@ -3,6 +3,7 @@ import uuid
 import json
 import base64
 import random
+import re
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Body, HTTPException
 from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
@@ -15,6 +16,79 @@ from emergentintegrations.llm.openai.image_generation import OpenAIImageGenerati
 from routes.starseed_worlds import MULTIVERSE_REALMS
 
 router = APIRouter()
+
+# V1.0.8 — Spiritual Shield: Play Store framing requires this product be
+# treated as ENTERTAINMENT/EDUCATION, never as wellness/medical. The LLM
+# is instructed in the system prompt to avoid clinical language, but as
+# defense-in-depth we run every narrative string through this case-
+# preserving substitution map before it reaches the client. This guards
+# against LLM drift on regenerations and against legacy static lore that
+# still contains "healer/healing" verbiage.
+_SHIELD_SUBSTITUTIONS = [
+    # (pattern, replacement) — order matters; longer phrases first.
+    (r"\bgreat healers\b",       "great harmonizers"),
+    (r"\bcosmic healers\b",      "cosmic harmonizers"),
+    (r"\bhealing chamber\b",     "resonance chamber"),
+    (r"\bhealing hands\b",       "kindled hands"),
+    (r"\bhealing light\b",       "harmonic light"),
+    (r"\bhealing path(s)?\b",    r"harmonic path\1"),
+    (r"\bhealing arts?\b",       "harmonic arts"),
+    (r"\bhealing energy\b",      "resonant energy"),
+    (r"\bhealing power\b",       "harmonic power"),
+    (r"\bhealing\b",             "harmonizing"),
+    (r"\bhealers\b",             "harmonizers"),
+    (r"\bhealer\b",              "harmonizer"),
+    (r"\bheal(s|ed|ing)?\b",     r"harmonize\1"),
+    (r"\bcure(s|d)?\b",          r"kindle\1"),
+    (r"\btreatment(s)?\b",       r"ritual\1"),
+    (r"\btreat(s|ed|ing)?\b",    r"attend\1"),
+    (r"\btherap(y|ies|ist|ists|eutic)\b", "ritual practice"),
+    (r"\bmedical\b",             "mythic"),
+    (r"\bmedicinal\b",           "ritual"),
+    (r"\bmedicine\b",            "ritual"),
+    (r"\bdiagnos(e|es|ed|ing|is|tic)\b", r"recogniz\1"),
+    (r"\bprescri(be|bes|bed|bing|ption)\b", r"offer\1"),
+    (r"\bpatient(s)?\b",         r"seeker\1"),
+    (r"\bdoctor(s)?\b",          r"sage\1"),
+    (r"\bwellness\b",            "harmony"),
+    (r"\bremed(y|ies)\b",        r"rite\1"),
+    (r"\bailment(s)?\b",         r"discord\1"),
+]
+_SHIELD_COMPILED = [(re.compile(p, re.IGNORECASE), r) for p, r in _SHIELD_SUBSTITUTIONS]
+
+
+def _shield_text(s):
+    """Return s with banned wellness/medical vocabulary replaced by
+    spiritual-mythic alternatives. Idempotent. Case-insensitive on the
+    pattern; replacement preserves the original sentence's first-letter
+    capitalization at sentence-start positions."""
+    if not isinstance(s, str) or not s:
+        return s
+    out = s
+    for pat, repl in _SHIELD_COMPILED:
+        # Capitalization-preserving replacement: if the matched span
+        # starts uppercase, the replacement is title-cased so traits
+        # like "Healing" → "Attunement" (not "attunement").
+        def _r(m, _repl=repl):
+            replaced = m.expand(_repl) if "\\" in _repl else _repl
+            matched = m.group(0)
+            if matched and matched[0].isupper():
+                return replaced[:1].upper() + replaced[1:]
+            return replaced
+        out = pat.sub(_r, out)
+    return out
+
+
+def _shield_obj(obj):
+    """Recursively apply _shield_text to every string in a dict/list."""
+    if isinstance(obj, str):
+        return _shield_text(obj)
+    if isinstance(obj, dict):
+        return {k: _shield_obj(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [_shield_obj(v) for v in obj]
+    return obj
+
 
 STARSEED_ORIGINS = [
     {
@@ -118,7 +192,14 @@ STARSEED_ORIGINS = [
 
 @router.get("/starseed/origins")
 async def get_starseed_origins():
-    return {"origins": [{k: v for k, v in o.items() if k != "starting_stats"} for o in STARSEED_ORIGINS]}
+    # V1.0.8 — Shield static origin lore/descriptions before they leave
+    # the server so the legacy "healer/healing" copy never reaches the
+    # client (Play Store framing).
+    cleaned = []
+    for o in STARSEED_ORIGINS:
+        item = {k: v for k, v in o.items() if k != "starting_stats"}
+        cleaned.append(_shield_obj(item))
+    return {"origins": cleaned}
 
 
 @router.post("/starseed/create-character")
@@ -356,6 +437,21 @@ RULES:
 - Make the {origin['element']} element central to the narrative
 - Include an "image_prompt" field: a 1-sentence cinematic scene description for AI art generation (cosmic, painterly, no text/words)
 - Return ONLY valid JSON with no markdown formatting
+
+SPIRITUAL SHIELD (CRITICAL — Play Store compliance):
+This is an entertainment, education, and gamified spiritual exploration product.
+It is NOT a wellness, medical, therapy, or healthcare app. NEVER use these words
+or any clinical/medicinal framing in narrative, choices, or image prompts:
+- BANNED: heal, healing, healer, cure, treat, treatment, therapy, therapist,
+  medical, medicine, medicinal, wellness, diagnose, diagnosis, prescription,
+  patient, doctor, recovery (in a medical sense), remedy, ailment.
+- ALTERNATIVES: instead of "healing", say "harmonize", "attune", "balance",
+  "restore the field", "realign frequency", "mend the cosmic weave", "soothe
+  the resonance", "calibrate", "kindle", "weave light", or "anchor".
+- Keep all language in the spiritual-mythic-entertainment register: cosmic,
+  archetypal, mythic, sovereign, resonant, woven, kindled, attuned. Treat
+  the narrative as fiction/myth — never as advice or instruction for the
+  body or mind.
 {resonance_prompt}{realm_prompt}
 
 JSON format:
@@ -399,6 +495,12 @@ Generate the next scene for Chapter {chapter}, Scene {scene + 1} of the {origin[
     # Ensure valid structure
     if "choices" not in scene_data or len(scene_data["choices"]) < 2:
         scene_data = _fallback_scene(origin, chapter, scene, stats)
+
+    # V1.0.8 — Defense-in-depth: shield the LLM output and any fallback
+    # scene against banned wellness/medical vocabulary before persisting
+    # to memory or returning to the client. The system prompt already
+    # forbids these words, but LLMs occasionally drift on regenerations.
+    scene_data = _shield_obj(scene_data)
 
     xp_earned = scene_data.get("xp_earned", 15)
     new_xp = char.get("xp", 0) + xp_earned
