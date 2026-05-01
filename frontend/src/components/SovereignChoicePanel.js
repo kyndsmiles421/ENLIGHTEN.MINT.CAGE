@@ -30,6 +30,7 @@ export default function SovereignChoicePanel() {
   ];
   const WEIGHT = [
     { id: 'precision', label: 'Precision-Weighted', hint: 'Mastery = 70% precision · 30% speed', color: '#38BDF8' },
+    { id: 'balanced',  label: 'Sovereign Balanced', hint: 'Mastery = 50% precision · 50% speed', color: '#A78BFA' },
     { id: 'speed',     label: 'Speed-Weighted',     hint: 'Mastery = 30% precision · 70% speed', color: '#FBBF24' },
   ];
   const FIDEL = [
@@ -295,7 +296,7 @@ export default function SovereignChoicePanel() {
             Adaptive Weighting
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {WEIGHT.map(opt => {
             const active = prefs.learning.weighting === opt.id;
             return (

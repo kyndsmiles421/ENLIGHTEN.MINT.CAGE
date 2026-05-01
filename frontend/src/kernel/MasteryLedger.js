@@ -66,7 +66,10 @@ function record({ toolId, domain, correct = true, durationSec = null, targetSec 
   const speed = avgTime === null ? 0.5 : Math.max(0, 1 - Math.min(1, avgTime / targetSec));
 
   const prefs = SovereignPreferences.get();
-  const wPrecision = prefs.learning.weighting === 'speed' ? 0.30 : 0.70;
+  // V1.0.7 — 'balanced' weights precision and speed equally (Sovereign
+  // Omni pattern). 'speed' weights speed-heavy. Default 'precision'.
+  const w = prefs.learning.weighting;
+  const wPrecision = w === 'speed' ? 0.30 : w === 'balanced' ? 0.50 : 0.70;
   const wSpeed = 1 - wPrecision;
   const score = wPrecision * precision + wSpeed * speed;
 

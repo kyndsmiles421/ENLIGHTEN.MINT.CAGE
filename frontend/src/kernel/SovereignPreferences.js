@@ -115,7 +115,7 @@ function setDifficulty(value) {
 }
 
 function setLearningWeighting(value) {
-  if (!['precision', 'speed'].includes(value)) {
+  if (!['precision', 'speed', 'balanced'].includes(value)) {
     throw new Error(`[SovereignPreferences] invalid learning.weighting: ${value}`);
   }
   writeRaw({ ...cache, learning: { ...cache.learning, weighting: value } });
