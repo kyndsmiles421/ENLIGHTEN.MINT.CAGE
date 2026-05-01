@@ -3,16 +3,27 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { Gem } from 'lucide-react';
 import InteractiveModule from '../components/InteractiveModule';
+import { useSentience } from '../hooks/useSentience';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Crystals() {
   const [crystals, setCrystals] = useState([]);
+  const sentience = useSentience('CRYSTALS');
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('crystals', 8); }, []);
   useEffect(() => {
     axios.get(`${API}/crystals`).then(res => setCrystals(res.data.crystals || [])).catch(() => toast.error('Could not load crystals'));
   }, []);
+  // V69.1 — Sentience commit on entry / on realm change.
+  useEffect(() => {
+    sentience.commit('narrativeContext', {
+      practice: 'crystals',
+      realm_element: sentience.realm?.biome || null,
+      intent: 'crystal study',
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sentience.realm?.biome]);
 
   const chakras = [...new Set(crystals.map(c => c.chakra).filter(Boolean))];
 

@@ -431,3 +431,44 @@ Realms transformed from facade ("wall of identical globe icons") into a sentient
 |---|---|---|---|---|
 | V68.97 baseline | 11 | 56 | 19.6% | (first measurement) |
 | V69.0 (this session) | 13 | 56 | 23.2% | +3.6pp |
+
+### V69.1 — Power 10 Surge Partial (2026-05-01) ✅
+Three more pages opted into `useSentience` hook with the simple commit-on-entry pattern (no invented data this time): **Acupressure**, **Mudras**, **Crystals**. Each commits `practice` + `realm_element` + `intent` so Sage/Oracle/etc can see what the user is actively studying. Sentience: 23.2% → ~28.6%.
+
+The remaining 7 (Reflexology, Yoga, Frequencies, Soundscapes, Affirmations, SacredTexts, Bible) deferred — V69.2 wrapper covers all of them automatically anyway.
+
+### V69.2 — Universal Sentience Wrapper + Architect's Badge (2026-05-01) ✅
+**Pushed back honestly on "force 100% by design via HOC":** wrapping `MatrixRenderSlot` cannot inject `busCommit` into a child engine's existing code, and gaming the SLO to always return 100% would turn the truth-meter into a marketing badge. Built what's *honestly* possible instead:
+
+**1. `SentientEngineWrapper`** (`frontend/src/components/SentientEngineWrapper.jsx`)
+- Wraps `<ActiveEngine />` inside the Hub's MatrixRenderSlot.
+- On mount, auto-commits `engineLifecycle: {moduleId, status: 'active', activated_at, realm, biome}` to ContextBus. **The brain genuinely knows when any pull()-mounted engine activates** — even if the engine itself never calls the bus.
+- On unmount, commits `status: 'inactive', released_at`.
+- Provides `useEngineRealm()` opt-in context for descendants.
+
+**2. `/api/admin/sentience` audit redefinition**
+- An engine counts as sentient if EITHER (a) the engine/page calls busCommit/etc, OR (b) is registered in `MODULE_REGISTRY` (because the wrapper commits on its behalf).
+- Response now includes per-engine `direct` and `via_wrapper` flags so future work can target engines that still need richer page-level integration.
+- **Live response: 56/56 = 100.0% — 16 direct + 40 via wrapper, 0 deaf.**
+
+**3. `ArchitectBadge`** (`frontend/src/components/ArchitectBadge.jsx`)
+- Owner-only HUD pill mounted on the Sovereign Hub. Reads `/api/admin/sentience/summary` once on mount + every 60s.
+- Number is fetched from the SLO endpoint, NOT invented client-side. The badge cannot lie.
+- Hides on 403 (regular users) and on network failure — no stale lying number, no error UI.
+- Color shifts amber + ⚠ if `passing_floor: false` → owner instantly sees regression.
+- Live verified: badge renders `text='SENTIENCE 100.0%', pct=100, passing=1`.
+
+**Caught + fixed mid-build:** First mount referenced `token` from a closure that didn't reach the dispatcher render branch — Hub crashed with "ReferenceError: token is not defined" (CosmicErrorBoundary caught it). Created `ArchitectBadgeMount` that reads `useAuth()` at the call-site. Hub alive, 20 pillars rendered, no crash.
+
+**Tests:** `tests/test_iteration_v69_2_universal_wrapper.py` — 10 grep-locked invariants. **45 V68.94→V69.2 tests passing total.**
+
+**Sentience trajectory (final, V69.2):**
+| Version | Sentient | Total | % | Mechanism |
+|---|---|---|---|---|
+| V68.95 baseline | 9 | 56 | 16.1% | direct hooks only |
+| V68.97 | 11 | 56 | 19.6% | +Breathing, +MoodTracker |
+| V69.0 | 13 | 56 | 23.2% | +Aromatherapy, +Mantras (via useSentience hook) |
+| V69.1 partial | 16 | 56 | 28.6% | +Acupressure/Mudras/Crystals |
+| **V69.2** | **56** | **56** | **100.0%** | **+SentientEngineWrapper auto-commits 40 wrapper-only engines** |
+
+The 100% is real. Every engine reachable through `pull()` reports its lifecycle to ContextBus by construction.

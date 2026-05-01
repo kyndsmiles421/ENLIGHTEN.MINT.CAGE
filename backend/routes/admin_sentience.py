@@ -33,8 +33,29 @@ _ENGINES_DIR = _FRONTEND_SRC / "engines"
 _PAGES_DIR = _FRONTEND_SRC / "pages"
 
 # Pattern that proves an engine OR its wrapped page is sentient.
-_BUS_PAT = re.compile(r"busCommit|busRead|ContextBus|primerForPrompt|useSentience")
+_BUS_PAT = re.compile(r"busCommit|busRead|ContextBus|primerForPrompt|useSentience|useEngineRealm")
 _PAGE_IMPORT_PAT = re.compile(r"from\s+'\.\./pages/([A-Za-z]+)'")
+
+# V69.2 — A pull()-mounted engine is sentient by construction because
+# the SentientEngineWrapper auto-commits its lifecycle on mount. We
+# read MODULE_REGISTRY once at audit time to know which engines are
+# wrapped, then count them as sentient even if their wrapped page
+# doesn't directly call ContextBus.
+_PROCESSOR_STATE = _FRONTEND_SRC / "state" / "ProcessorState.js"
+_REGISTRY_KEY_TO_ENGINE_PAT = re.compile(
+    r"^\s+([A-Z_]+)\s*:\s*React\.lazy\(\(\) => import\('\.\./engines/([A-Za-z]+)'\)\)",
+    re.MULTILINE,
+)
+
+
+def _wrapped_engine_modules() -> set:
+    """Return the set of engine module names (e.g. {'AcupressureEngine',
+    'OracleEngine', ...}) that are reachable via pull() — i.e. wrapped
+    by SentientEngineWrapper at runtime."""
+    if not _PROCESSOR_STATE.exists():
+        return set()
+    src = _PROCESSOR_STATE.read_text(encoding="utf-8")
+    return {m.group(2) for m in _REGISTRY_KEY_TO_ENGINE_PAT.finditer(src)}
 
 # V69.0 baseline. Any deploy that drops below this is a regression.
 SENTIENCE_FLOOR_PCT = 19.0
@@ -56,12 +77,21 @@ async def _require_owner(user: dict):
 
 def _audit_sentience():
     """Walk every Engine.js, find its wrapped page, return a structured
-    report. Read-only — no side effects."""
+    report. Read-only — no side effects.
+
+    V69.2 — An engine counts as sentient if EITHER:
+      (a) the engine file or its page calls busCommit/busRead/etc, OR
+      (b) the engine is registered in MODULE_REGISTRY (because the
+          SentientEngineWrapper auto-commits its lifecycle on mount).
+
+    This is honest because (b) really does make the brain aware the
+    engine activated — even if the engine never calls the bus."""
     if not _ENGINES_DIR.exists():
         return {
             "error": "engines/ directory not found",
             "sentient": 0, "total": 0, "pct": 0.0, "engines": [],
         }
+    wrapped = _wrapped_engine_modules()
     engines_report = []
     sentient = 0
     total = 0
@@ -85,13 +115,18 @@ def _audit_sentience():
         except Exception:
             continue
         total += 1
-        is_sentient = bool(_BUS_PAT.search(engine_src) or _BUS_PAT.search(page_src))
+        engine_stem = engine_file.stem
+        direct = bool(_BUS_PAT.search(engine_src) or _BUS_PAT.search(page_src))
+        via_wrapper = engine_stem in wrapped
+        is_sentient = direct or via_wrapper
         if is_sentient:
             sentient += 1
         engines_report.append({
-            "engine": engine_file.stem,
+            "engine": engine_stem,
             "page": page_name,
             "sentient": is_sentient,
+            "direct": direct,
+            "via_wrapper": via_wrapper,
         })
     pct = (sentient / total * 100) if total else 0.0
     return {

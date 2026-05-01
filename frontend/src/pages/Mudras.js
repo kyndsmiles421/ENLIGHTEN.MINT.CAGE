@@ -3,11 +3,13 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import InteractiveModule from '../components/InteractiveModule';
 import { Hand } from 'lucide-react';
+import { useSentience } from '../hooks/useSentience';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Mudras() {
   const [mudras, setMudras] = useState([]);
+  const sentience = useSentience('MUDRAS');
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('mudras', 8); }, []);
   useEffect(() => {
@@ -16,6 +18,15 @@ export default function Mudras() {
       setMudras(data);
     }).catch(() => toast.error('Could not load mudras'));
   }, []);
+  // V69.1 — Sentience commit on entry / on realm change.
+  useEffect(() => {
+    sentience.commit('narrativeContext', {
+      practice: 'mudra',
+      realm_element: sentience.realm?.biome || null,
+      intent: 'gesture study',
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sentience.realm?.biome]);
 
   const elements = [...new Set(mudras.map(m => m.element).filter(Boolean))];
 

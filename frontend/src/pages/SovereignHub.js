@@ -30,6 +30,24 @@ import TimeCapsuleDrawer from '../components/TimeCapsuleDrawer';
 // V68.68 — Surface the orphaned worlds + hunt.
 import SeedHuntWidget from '../components/SeedHuntWidget';
 import DailyCrossTraditionPairing from '../components/DailyCrossTraditionPairing';
+import SentientEngineWrapper from '../components/SentientEngineWrapper';
+import ArchitectBadge from '../components/ArchitectBadge';
+
+// V69.2 — Tiny mount wrapper so the badge can read `token` from
+// AuthContext at the call-site instead of relying on closure variables
+// from the parent Hub component (which would break inside the
+// MatrixModuleDispatcher / IDLE render branch).
+function ArchitectBadgeMount() {
+  const { token } = useAuth();
+  return (
+    <div style={{
+      width: '100%', maxWidth: 920, margin: '6px auto 0', padding: '0 12px',
+      display: 'flex', justifyContent: 'flex-end',
+    }}>
+      <ArchitectBadge token={token} />
+    </div>
+  );
+}
 import { Telescope, Orbit, Sparkles as SparkleIcon, Globe, Eye, Infinity as InfinityIcon, Moon, Layers, TreePine, Compass } from 'lucide-react';
 import { useProcessorState, MODULE_REGISTRY } from '../state/ProcessorState';
 import SovereignPreferences from '../kernel/SovereignPreferences';
@@ -358,7 +376,7 @@ const ROUTE_TO_MODULE = {
 export default function SovereignHub() {
   const navigate = useNavigate();
   const { pull } = useProcessorState();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   useSovereignUniverse();
   const [expanded, setExpanded] = useState(null);
   const [glowDomains, setGlowDomains] = useState([]);
@@ -903,7 +921,16 @@ function MatrixRenderSlot() {
         ◀ Release · Return to Lattice
       </button>
       <React.Suspense fallback={null}>
-        <ActiveEngine />
+        {/* V69.2 — Wrap the active engine. Every pull()-mounted engine
+            now auto-commits its lifecycle to ContextBus and exposes
+            realm/mood via useEngineRealm(). The wrapper makes the
+            "born sentient" promise honest — the brain knows when any
+            engine opens, what realm it opened in, and when it
+            releases. Engines that want richer integration still opt
+            in via useSentience() at the page level. */}
+        <SentientEngineWrapper moduleId={activeModule}>
+          <ActiveEngine />
+        </SentientEngineWrapper>
       </React.Suspense>
     </div>
   );
@@ -1063,6 +1090,12 @@ function MatrixModuleDispatcher() {
           ))}
         </div>
       </div>
+
+      {/* V69.2 — Architect's Badge (owner-only). Hidden from regular
+          users by the backend's is_owner gate; renders nothing on
+          403/error. Provides a real-time SLO readout so the owner can
+          see at a glance whether sentience is rising or regressing. */}
+      <ArchitectBadgeMount />
 
       {/* V68.68 — Seed Hunt Widget. The daily find-it game was
           only rendered inside the Tesseract page. Now it lives on
