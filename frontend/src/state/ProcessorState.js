@@ -305,6 +305,14 @@ export const MODULE_REGISTRY = {
   RECURSIVE_DIVE:    React.lazy(() => import('../engines/RecursiveDiveEngine')),
   QUANTUM_FIELD:     React.lazy(() => import('../engines/QuantumFieldEngine')),
   QUANTUM_LOOM:      React.lazy(() => import('../engines/QuantumLoomEngine')),
+  // V68.97 — Idle engines brought into the dispatcher.
+  // HourglassEngine (Sacred Cosmology — double-cone golden ratio compression)
+  // SingularityEngine (10-Step Ascension — fusion layer)
+  // ProductionEngine (Trade Circle — modular self-production)
+  // These existed as files with no caller. Now reachable via pull().
+  HOURGLASS:         React.lazy(() => import('../engines/HourglassEngine')),
+  SINGULARITY:       React.lazy(() => import('../engines/SingularityEngine')),
+  PRODUCTION:        React.lazy(() => import('../engines/ProductionEngine')),
 };
 
 export function ProcessorStateProvider({ children }) {

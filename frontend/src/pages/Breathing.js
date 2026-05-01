@@ -10,6 +10,7 @@ import FeaturedVideos from '../components/FeaturedVideos';
 import { ProximityItem } from '../components/SpatialRoom';
 import { FlowerOfLife } from '../components/SacredGeometrySVG';
 import { FIB_BREATH_CYCLE, FIB_BREATH_PHASES, FIB_BREATH_TOTAL, getFibBreathPhase } from '../lib/SacredGeometry';
+import { commit as busCommit } from '../state/ContextBus';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -437,6 +438,19 @@ export default function Breathing() {
     phaseRef.current = { phase: 'inhale', remaining: pattern.inhale };
     setPhase('Inhale');
     setTimer(pattern.inhale);
+    // V68.97 — Sentience injection. Commit the pattern to ContextBus
+    // so Sage / Oracle / downstream tools can read what the user is
+    // actively practicing. Gentle payload — string desc + numbers, so
+    // ResonanceAnalyzer can pulse the lattice with breath-paced surge.
+    try {
+      busCommit('narrativeContext', {
+        practice: 'breathwork',
+        pattern: pattern.name,
+        inhale: pattern.inhale, hold1: pattern.hold1,
+        exhale: pattern.exhale, hold2: pattern.hold2,
+        intent: `breath: ${pattern.desc}`,
+      }, { moduleId: 'BREATHWORK' });
+    } catch { /* graceful — bus is best-effort */ }
 
     intervalRef.current = setInterval(() => {
       phaseRef.current.remaining -= 1;

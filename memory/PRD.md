@@ -384,3 +384,25 @@ Realms transformed from facade ("wall of identical globe icons") into a sentient
 **Tests:** `/app/backend/tests/test_iteration_v68_95_sentient_portal.py` — 7 grep-locked invariants (CompanionChip + ContextBus imports, every backend element has a concept mapping, mappings target real bridges, backend has concept fallback branch, enterRealm commits worldMetadata, ELEMENT_ICON_MAP has ≥4 distinct icons, no `<Globe>` in card render). **All 7 passing. 43 V68.92→V68.95 tests passing total.**
 
 **Ether/Void special-casing answered:** None needed. `ResonanceAnalyzer.HEAVY_RX` already includes `void` and `abyss`; Void Sanctum's `desc` contains "void", "abyss", "infinite" → bass-heavy, sacred-flagged pulse → naturally produces a sparser/darker lattice burst than Astral Garden's `desc` ("luminous", "light", "breath") → treble-heavy. The differentiation is automatic.
+
+### V68.96 — Honest Sweep (Word-shield + Sage realm-awareness) (2026-05-01) ✅
+**Audit pushed back on narrative-creep:** "Hidden 70" doesn't exist (Chamber, Botany, Apothecary already routed; "Aloha Living" = zero files, ghost). Blanket wellness purge would break legal safe-harbor (`WellnessDisclaimer.js` MUST keep "wellness" — it's the Play Store armor).
+- Surgical 3-string fix: Onboarding tour, Hub share text, UnifiedCreatorConsole share — all "Sovereign Wellness Engine" → "Sovereign Spiritual Instrument". Disclaimer + WellnessReports page UNTOUCHED (legal/feature reasons).
+- **Sage realm-awareness wired:** `SpiritualCoach.js` reads `worldMetadata` from ContextBus via `busReadKey('worldMetadata')` and passes it as `realm_context` on every `/api/coach/chat` call. Backend `routes/coach.py` accepts the optional payload and inlines `ACTIVE REALM CONTEXT` (realm name, biome, frequency) into the system prompt. Live verified: same question in Astral Garden (earth) → Sage opens *"Welcome to the Astral Garden, where the 528 Hz frequency resonates through the roots of your being..."*; same question with no realm → Sage opens with generic *"Welcome, traveler..."*. The brain remembers.
+
+### V68.97 — Sentient Cleanup (2026-05-01) ✅
+**Honest baseline established:** sentience audit corrected. First pass measured engines only (0/63 = 0%) — wrong, because engines are 6-line adapters that wrap pages. Re-audited at the layer where logic lives: **9/56 = 16.1% sentient** (engines whose underlying page reads or writes ContextBus).
+
+**Two precision injections lifted the number to 19.6%:**
+- `pages/Breathing.js::start()` — commits `narrativeContext` with pattern name + breath ratios + intent to ContextBus on session start. Sage / Oracle / Forecasts can now read what the user is actively breathing.
+- `pages/MoodTracker.js` — commits `entityState` with primary mood, group, intensity, frequency stack to ContextBus on mood log. Mood is upstream-relevant for every other tool — this colors Sage's tone, Forecasts' palette, Oracle's draws.
+
+**3 truly-idle engines wired into MODULE_REGISTRY** (HOURGLASS, SINGULARITY, PRODUCTION) — they had `export default` + React-compatible returns but no caller. Now reachable via `pull()`. Registry size: 57 → 60.
+
+**Honest counts (corrected):**
+- 173 page files · 192 routes · 168 lazy-imported · **only 1 truly orphan page** (`Dashboard.js` — `/dashboard` redirects to `/sovereign-hub`). The "Suanpan trio" (`SuanpanCore`, `SuanpanPhysics`, `SuanpanSovereign`, `SuanpanVfx`) live in `pages/` but are SUPPORT LIBRARIES used by 4-5 components — NOT orphans. `/suanpan` is routed via `SuanpanMixer.js`.
+- 63 engines · 60 in MODULE_REGISTRY · 3 used elsewhere (ResonanceEngine, SovereignMasterEngine, SpatialAudioEngine — these import from utility paths but don't ride pull(), kept intentionally).
+- 207 backend routes · all auto-mounted by `server.py:44-52` pkgutil iterator. **Zero dark backend routes.**
+- **Sentience: 11/56 engines = 19.6%** (V68.97 baseline). The other 45 deaf engines are knowable, named, and migratable one at a time.
+
+**Tests:** `tests/test_iteration_v68_97_sentient_cleanup.py` — 7 grep-locked invariants (sentience ≥ 19%, known sentient pages keep their busCommit, Hourglass/Singularity/Production stay registered, MODULE_REGISTRY size ≥ 60, coach.py keeps realm_context, SpiritualCoach.js keeps busReadKey + realm_context). **24 V68.94→V68.97 tests passing total.**

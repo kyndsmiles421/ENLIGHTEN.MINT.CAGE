@@ -6,6 +6,7 @@ import { useSensory } from '../context/SensoryContext';
 import { toast } from 'sonner';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import CelebrationBurst from '../components/CelebrationBurst';
+import { commit as busCommit } from '../state/ContextBus';
 import {
   Sparkles, Sun, Zap, Heart, Target, Lightbulb, Sunrise, Shield,
   Brain, Wind, Battery, Frown, Moon, Angry, CloudRain, Waves,
@@ -131,6 +132,23 @@ export default function MoodTracker() {
       setSearch('');
       setCelebrating(true);
       playCelebration();
+      // V68.97 — Sentience injection. Mood is upstream-relevant for
+      // every other tool. Commit it to ContextBus so Sage / Oracle /
+      // Forecasts can colour their outputs with the user's current
+      // emotional weather without a database round-trip.
+      try {
+        busCommit('entityState', {
+          mood_primary: primary.name,
+          mood_id: primary.id,
+          mood_group: primary.group,
+          mood_color: primary.color,
+          intensity,
+          moods_all: selectedMoods.map(m => m.id),
+          note: note || null,
+          resonance_type: res.data?.resonance_type,
+          frequency_stack: res.data?.frequency_stack,
+        }, { moduleId: 'MOOD_TRACKER' });
+      } catch { /* graceful */ }
       // Refresh recipe
       axios.get(`${API}/moods/frequency-recipe`, { headers: authHeaders })
         .then(r => setRecipe(r.data)).catch(() => {});
