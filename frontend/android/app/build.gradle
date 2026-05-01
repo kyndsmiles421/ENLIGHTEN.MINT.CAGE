@@ -14,8 +14,8 @@ android {
         applicationId "cafe.mint.enlighten"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 7
-        versionName "1.0.6"
+        versionCode 8
+        versionName "1.0.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
             // V68.56 — AAB asset strip. Excludes ~18 MB of marketing /

@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "1.0.5",
+  "version": "1.0.7",
   "private": true,
   "dependencies": {
     "@capacitor/android": "^8.3.0",
@@ -81,8 +81,8 @@
     "zod": "^3.24.4"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
+    "start": "REACT_APP_VERSION=$npm_package_version REACT_APP_BUILD_DATE=$(date +%Y-%m-%d) craco start",
+    "build": "REACT_APP_VERSION=$npm_package_version REACT_APP_BUILD_DATE=$(date +%Y-%m-%d) craco build",
     "test": "craco test",
     "postinstall": "patch-package"
   },

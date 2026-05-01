@@ -32,6 +32,7 @@ import SeedHuntWidget from '../components/SeedHuntWidget';
 import DailyCrossTraditionPairing from '../components/DailyCrossTraditionPairing';
 import SentientEngineWrapper from '../components/SentientEngineWrapper';
 import ArchitectBadge from '../components/ArchitectBadge';
+import SovereignVersionStamp from '../components/SovereignVersionStamp';
 
 // V69.2 — Tiny mount wrapper so the badge can read `token` from
 // AuthContext at the call-site instead of relying on closure variables
@@ -1116,6 +1117,13 @@ function MatrixModuleDispatcher() {
       }}>
         <DailyCrossTraditionPairing />
       </div>
+
+      {/* V1.0.7 — Sovereign Version Stamp. Public, build-time-injected
+          version footer. Reviewers can see at a glance which build
+          they're testing; every screenshot becomes a self-dating
+          artifact. Reads from REACT_APP_VERSION (CRA injects it from
+          package.json on `yarn build`). */}
+      <SovereignVersionStamp />
     </>
   );
 }
