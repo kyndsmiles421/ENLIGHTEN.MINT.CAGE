@@ -261,9 +261,24 @@ export default function ChamberMiniGame({
   // V68.30 — inline lesson state for the LEARN button
   const [lessonLoading, setLessonLoading] = useState(false);
   const [lessonText, setLessonText] = useState(null);
+  // V1.0.8 — track the in-flight axios cancel token so the user can
+  // abort a hung "TEACHING…" request instead of staring at it. The
+  // backend `mode:'quick'` path targets 8-20s but if anything sticks
+  // we let the user reclaim the UI immediately.
+  const lessonAbortRef = useRef(null);
+  const cancelLesson = useCallback(() => {
+    try { lessonAbortRef.current?.abort?.('user-cancel'); } catch { /* noop */ }
+    lessonAbortRef.current = null;
+    setLessonLoading(false);
+  }, []);
   const loadLesson = useCallback(async () => {
     if (!effTeach?.topic) return;
     setLessonLoading(true);
+    setLessonText(null);
+    // Build an AbortController so the user can cancel the in-flight
+    // request and reset the button to its idle state.
+    const ctrl = new AbortController();
+    lessonAbortRef.current = ctrl;
     try {
       const token = localStorage.getItem('zen_token');
       const headers = token && token !== 'guest_token' ? { Authorization: `Bearer ${token}` } : {};
@@ -272,15 +287,25 @@ export default function ChamberMiniGame({
         {
           topic: effTeach.topic,
           category: effTeach.category || 'general',
+          // Chamber-fast path. ~500-word lesson in 8-20s so the user
+          // gets a real teaching inside one breath cycle, not a hung
+          // spinner that gets ingress-killed at 60s.
+          mode: 'quick',
           context: effTeach.context || `Teach this in the context of the ${effZone} chamber activity.`,
         },
-        { headers, timeout: 60000 },
+        { headers, timeout: 30000, signal: ctrl.signal },
       );
       setLessonText(res.data?.content || 'No teaching returned — try again.');
       try { fireBrain('learn', { topic: effTeach.topic }); } catch { /* noop */ }
     } catch (err) {
-      setLessonText('The teaching could not load right now. Your progress is safe — try again in a moment.');
+      // Distinguish user-cancel from a genuine failure so we don't
+      // show an error toast when the user themselves aborted.
+      if (axios.isCancel?.(err) || err?.name === 'CanceledError' || err?.code === 'ERR_CANCELED') {
+        return;
+      }
+      setLessonText('The teaching could not load right now. Tap LEARN again to retry, or move on with the practice — your progress is safe.');
     } finally {
+      lessonAbortRef.current = null;
       setLessonLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -450,12 +475,13 @@ export default function ChamberMiniGame({
 
         {/* V68.64 — Early LEARN button. The lesson is no longer gated
             behind completion; the user can read about THIS herb's
-            technique BEFORE the work, DURING the work, or AFTER. */}
+            technique BEFORE the work, DURING the work, or AFTER.
+            V1.0.8 — flips to a CANCEL affordance while loading so a
+            slow teaching can be aborted instead of trapping the UI. */}
         {effTeach?.topic && !lessonText && !done && (
           <button
             type="button"
-            onClick={loadLesson}
-            disabled={lessonLoading}
+            onClick={lessonLoading ? cancelLesson : loadLesson}
             data-testid={`chamber-learn-first-${effZone}`}
             style={{
               position: 'absolute', top: 56, right: 14,
@@ -466,11 +492,11 @@ export default function ChamberMiniGame({
               fontSize: 9, letterSpacing: 1.5,
               fontFamily: 'monospace',
               cursor: 'pointer',
-              opacity: lessonLoading ? 0.5 : 0.85,
+              opacity: 0.85,
               zIndex: 4,
             }}
           >
-            {lessonLoading ? 'TEACHING\u2026' : '\u2726 TEACH ME FIRST'}
+            {lessonLoading ? 'TEACHING\u2026 \u00B7 TAP TO CANCEL' : '\u2726 TEACH ME FIRST'}
           </button>
         )}
 
@@ -602,8 +628,7 @@ export default function ChamberMiniGame({
               {effTeach?.topic && !lessonText && (
                 <button
                   type="button"
-                  onClick={loadLesson}
-                  disabled={lessonLoading}
+                  onClick={lessonLoading ? cancelLesson : loadLesson}
                   data-testid={`chamber-game-learn-${effZone}`}
                   style={{
                     marginTop: 10,
@@ -612,10 +637,10 @@ export default function ChamberMiniGame({
                     color: '#fff',
                     padding: '6px 14px', borderRadius: 999,
                     fontSize: 9, letterSpacing: 3, cursor: 'pointer',
-                    fontFamily: 'monospace', opacity: lessonLoading ? 0.6 : 1,
+                    fontFamily: 'monospace',
                   }}
                 >
-                  {lessonLoading ? 'TEACHING…' : `LEARN · ${effTeach.topic.toUpperCase()}`}
+                  {lessonLoading ? 'TEACHING\u2026 \u00B7 TAP TO CANCEL' : `LEARN \u00B7 ${effTeach.topic.toUpperCase()}`}
                 </button>
               )}
 

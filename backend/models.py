@@ -102,6 +102,12 @@ class KnowledgeRequest(BaseModel):
     topic: str
     category: str
     context: Optional[str] = None
+    # V1.0.8 — `mode` lets callers request a fast chamber-friendly
+    # lesson (~500 words, gpt-4o-mini, <=25s wall clock) instead of
+    # the full deep-dive (gpt-5.2, ~1500 words, 45-90s). The preview
+    # ingress kills requests at 60s, so the chamber LEARN button hung
+    # at "TEACHING…" forever. mode='quick' is the chamber path.
+    mode: Optional[str] = None
 
 class CustomCreation(BaseModel):
     type: str

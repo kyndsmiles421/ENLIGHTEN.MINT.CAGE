@@ -70,16 +70,46 @@ async def knowledge_deep_dive(req: KnowledgeRequest, user=Depends(get_current_us
     prompt += f"\n\nIMPORTANT: {perspective} This is visit #{seen_count + 1} for this user — they already know the basics. Go deeper, offer something new."
 
     last_error = None
-    for attempt in range(2):
+    # V1.0.8 — Chamber-friendly fast path. When mode='quick', use a
+    # smaller model with a tighter budget so the user gets a real
+    # lesson back inside the 60-second preview-ingress window. The
+    # full deep-dive (gpt-5.2, ~1500 words) regularly exceeds 60s
+    # and the ingress kills it, so the chamber's LEARN button hung
+    # forever showing "TEACHING…" with no recovery. The quick mode
+    # returns a 350-500 word lesson in 8-20 seconds.
+    is_quick = (req.mode or "").lower() == "quick"
+    if is_quick:
+        quick_prompt = (
+            f"Teach me about '{req.topic}' in 350-500 words for a learner "
+            f"actively engaged in a hands-on practice session. Use 4-6 short "
+            f"markdown sections with bold headers. Open with the single most "
+            f"important truth, then move into practical, sensory, embodied "
+            f"detail (what to look for, what to feel, what to try right now). "
+            f"Close with one concrete action they can take in the next 60 "
+            f"seconds. Frame this as spiritual study and traditional-wisdom "
+            f"exploration, not medical advice. "
+        )
+        if req.context:
+            quick_prompt += f"Context: {req.context}"
+        prompt = quick_prompt
+        model_provider, model_name = "openai", "gpt-4o-mini"
+        timeout_s = 22
+        attempts = 1
+    else:
+        model_provider, model_name = "openai", "gpt-5.2"
+        timeout_s = 45
+        attempts = 2
+
+    for attempt in range(attempts):
         try:
             chat = LlmChat(
                 api_key=EMERGENT_LLM_KEY,
                 session_id=f"knowledge-{str(uuid.uuid4())}",
                 system_message="You are a deeply knowledgeable spiritual teacher and wellness expert. Provide thorough, well-structured guides with markdown formatting. Never repeat what the user already knows — always go deeper.",
             )
-            chat.with_model("openai", "gpt-5.2")
+            chat.with_model(model_provider, model_name)
             msg = UserMessage(text=prompt)
-            response = await asyncio.wait_for(chat.send_message(msg), timeout=45)
+            response = await asyncio.wait_for(chat.send_message(msg), timeout=timeout_s)
 
             result = {
                 "topic": req.topic,
