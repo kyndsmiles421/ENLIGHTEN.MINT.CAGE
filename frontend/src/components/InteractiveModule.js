@@ -479,7 +479,7 @@ function StudyPanel({ item, color, category, onClose }) {
               )}
               {item.healing && (
                 <div className="mb-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: '#22C55E' }}>Healing</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1" style={{ color: '#22C55E' }}>Tradition</p>
                   <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>{item.healing}</p>
                 </div>
               )}

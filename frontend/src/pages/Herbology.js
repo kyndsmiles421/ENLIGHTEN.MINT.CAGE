@@ -154,7 +154,7 @@ export default function Herbology() {
       />
 
       <InteractiveModule
-        title="The Healing Herb Garden"
+        title="The Sovereign Herb Garden"
         subtitle="Sacred Herbology · Unified Inlay"
         icon={Leaf}
         color={ACCENT}

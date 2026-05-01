@@ -388,7 +388,7 @@ export default function Frequencies() {
             </motion.div>
           )}
         </AnimatePresence>
-        <FeaturedVideos category="frequencies" color="#8B5CF6" title="Frequency & Sound Healing Videos" />
+        <FeaturedVideos category="frequencies" color="#8B5CF6" title="Frequency & Sound Resonance Videos" />
       </div>
     </div>
   );
