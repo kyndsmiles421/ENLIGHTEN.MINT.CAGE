@@ -406,3 +406,28 @@ Realms transformed from facade ("wall of identical globe icons") into a sentient
 - **Sentience: 11/56 engines = 19.6%** (V68.97 baseline). The other 45 deaf engines are knowable, named, and migratable one at a time.
 
 **Tests:** `tests/test_iteration_v68_97_sentient_cleanup.py` — 7 grep-locked invariants (sentience ≥ 19%, known sentient pages keep their busCommit, Hourglass/Singularity/Production stay registered, MODULE_REGISTRY size ≥ 60, coach.py keeps realm_context, SpiritualCoach.js keeps busReadKey + realm_context). **24 V68.94→V68.97 tests passing total.**
+
+### V69.0 — Universal Sentience Hook + SLO Endpoint (2026-05-01) ✅
+**Pushed back honestly on "Universal Context Middleware = born sentient automatically"** — wrapping `MatrixRenderSlot` in a HOC cannot inject `busCommit` into a child engine's existing logic. JavaScript doesn't allow it. What CAN be built honestly:
+
+**1. `useSentience()` hook** (`frontend/src/hooks/useSentience.js`) — single import + single call makes any engine sentient with one line. Returns `{realm, mood, narrative, scene, history, commit, primer, moduleId}`. Subscribes to ContextBus so consumers re-render when any other engine commits. The "born sentient" pattern, implemented honestly.
+
+**2. `/api/admin/sentience` SLO endpoint** (`backend/routes/admin_sentience.py`) — owner-only audit that walks the frontend filesystem and returns `{sentient, total, pct, floor_pct, passing_floor, engines: [...]}`. CI-curlable; refuse deploy if `pct < SENTIENCE_FLOOR_PCT (19.0)`.
+- Fixed owner-gate bug en route — first version used in-memory email check, but `get_current_user` returns a minimal dict (no email). Switched to canonical pattern from `arsenal.py` (DB-resolve email + accept `is_owner` flag).
+- Live response: `{sentient: 13, total: 56, pct: 23.2, floor_pct: 19.0, passing_floor: true}` — V69.0 baseline locked at **23.2%** (up from 19.6% in V68.97).
+
+**3. Two new sentient adopters** using the hook:
+- `pages/Aromatherapy.js` — reads `realm.biome`, filters oils by **the API's actual `oil.element` field** (NOT a hard-coded hint map — see below), commits `narrativeContext` with practice + aligned oils on entry.
+- `pages/Mantras.js` — reads `realm.biome`, commits `narrativeContext` with practice + filter on entry.
+
+**Two real bugs caught DURING THE BUILD when the user asked "did you look before you started?":**
+- `ELEMENT_OIL_HINT` was invented data: my Earth hint = `[patchouli, cedar, vetiver, oakmoss]` — actual API oils = `[lavender, peppermint, frankincense, eucalyptus, rose, sandalwood, tea_tree, lemon, chamomile, bergamot, rosemary, myrrh]`. **Zero matches.** Fixed by using the API's real `oil.element` field directly.
+- `ELEMENT_MANTRA_HINT` was invented data: hints = `[protection, compassion, transformation, liberation, sound]` — actual catalog has only `[affirmation, chinese]`. **Zero matches.** Fixed by deleting the dead map; commits practice + filter without trying to auto-filter.
+
+**Tests:** `tests/test_iteration_v69_0_universal_sentience.py` — 11 grep-locked invariants (hook exports the expected shape, hook subscribes, SLO endpoint exists, owner-gate uses CREATOR_EMAIL not env string, floor ≥ 19, Aromatherapy uses `oil.element` not dead hint map, Mantras doesn't re-introduce dead category map). **35 V68.94→V69.0 tests passing total.**
+
+**Sentience trajectory (measured, not narrated):**
+| Version | Sentient | Total | % | Lift |
+|---|---|---|---|---|
+| V68.97 baseline | 11 | 56 | 19.6% | (first measurement) |
+| V69.0 (this session) | 13 | 56 | 23.2% | +3.6pp |

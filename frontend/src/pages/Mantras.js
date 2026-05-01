@@ -6,6 +6,7 @@ import { ChevronDown, Sparkles, Music } from 'lucide-react';
 import DeepDive from '../components/DeepDive';
 import NarrationPlayer from '../components/NarrationPlayer';
 import FeaturedVideos from '../components/FeaturedVideos';
+import { useSentience } from '../hooks/useSentience';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -67,11 +68,27 @@ function MantraItem({ mantra, index }) {
 export default function Mantras() {
   const [mantras, setMantras] = useState([]);
   const [filter, setFilter] = useState('all');
+  // V69.0 — Born sentient. Commits the practice + realm so Sage can
+  // weave mantra context into responses. Auto-filter by element is
+  // deferred until the catalog gains element-aligned categories
+  // (current catalog: only 'affirmation' + 'chinese' — too small).
+  const sentience = useSentience('MANTRAS');
+  const realmElement = sentience.realm?.biome || null;
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('mantras', 8); }, []);
   useEffect(() => {
     axios.get(`${API}/mantras`).then(res => setMantras(res.data.mantras || [])).catch(() => toast.error('Could not load mantras'));
   }, []);
+  // V69.0 — Commit on entry / on realm change.
+  useEffect(() => {
+    sentience.commit('narrativeContext', {
+      practice: 'mantra',
+      realm_element: realmElement,
+      filter,
+      intent: realmElement ? `mantra study within ${realmElement} realm` : 'mantra study',
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [realmElement, filter]);
 
   const categories = [...new Set(mantras.map(m => m.category).filter(Boolean))];
   const filtered = filter === 'all' ? mantras : mantras.filter(m => m.category === filter);
