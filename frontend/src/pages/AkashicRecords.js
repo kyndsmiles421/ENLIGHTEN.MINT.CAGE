@@ -4,7 +4,6 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { ArrowLeft, Loader2, Send, Plus, Trash2, ChevronLeft, Compass, Clock, Repeat, Heart, Sparkles, Star, BookOpen, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import TranslateChip from '../components/TranslateChip';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -137,7 +136,7 @@ function ChatView({ session, onSend, onBack, sending }) {
                   <span className="text-[9px] font-medium" style={{ color: '#818CF8' }}>Keeper of Records</span>
                 </div>
               )}
-              <p className="text-xs leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-primary)' }}>{msg.text}{msg.role === 'assistant' && <TranslateChip text={msg.text} compact />}</p>
+              <p className="text-xs leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-primary)' }}>{msg.text}</p>
             </div>
           </motion.div>
         ))}

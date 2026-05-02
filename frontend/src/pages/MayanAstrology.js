@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Sun, Moon, Compass, Heart, Sparkles, RefreshCw, Flame, Droplets, Wind, Mountain, ChevronRight } from 'lucide-react';
-import TranslateChip from '../components/TranslateChip';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -77,8 +76,8 @@ function SignDetails({ data }) {
             <h2 className="text-2xl md:text-3xl font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
               {galactic_signature}
             </h2>
-            <p className="text-sm italic mb-3" style={{ color: sign.color }}>&ldquo;{sign.meaning}&rdquo;<TranslateChip text={sign.meaning} compact /></p>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{sign.desc}<TranslateChip text={sign.desc} compact /></p>
+            <p className="text-sm italic mb-3" style={{ color: sign.color }}>"{sign.meaning}"</p>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{sign.desc}</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { Sparkles, Loader2, RotateCcw, Star, Sun, Moon, Hexagon, Triangle, X } from 'lucide-react';
 import NarrationPlayer from '../components/NarrationPlayer';
 import IChingCoinToss from '../components/IChingCoinToss';
-import TranslateChip from '../components/TranslateChip';
 import { commit as busCommit } from '../state/ContextBus';
 
 
@@ -622,7 +621,6 @@ export default function Oracle() {
                         <p className="text-xs font-bold uppercase tracking-[0.2em] mb-4" style={{ color: 'var(--text-muted)' }}>Interpretation</p>
                         <p className="text-sm leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--text-secondary)' }} data-testid="tarot-interpretation">
                           {reading.interpretation}
-                          <TranslateChip text={reading.interpretation} compact />
                         </p>
                         <div className="mt-4">
                           <NarrationPlayer text={`Your Tarot Reading. ${reading.cards?.map(c => c.name).join(', ')}. ${reading.interpretation}`} label="Hear Your Reading" color="#D8B4FE" context="tarot" />

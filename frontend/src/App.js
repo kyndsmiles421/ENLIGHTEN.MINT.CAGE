@@ -1,6 +1,7 @@
 import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, Link } from 'react-router-dom';
 import BackToHub from './components/BackToHub';
+import LanguageBar from './components/LanguageBar';
 import ResonanceField from './components/ResonanceField';
 import { ProcessorStateProvider } from './state/ProcessorState';
 
@@ -427,6 +428,29 @@ function AnimatedRoutes() {
   return (
     <div className="page-enter" key={location.pathname} style={{ position: 'relative', zIndex: 1 }}>
     {showBackBtn && <BackToHub />}
+    {/* V1.0.8 — Universal Translator. Sticky strip ALWAYS rendered
+        (Hub, Landing, Auth included). Uses pointer-events:none on
+        the wrapper and pointer-events:auto only on the actual
+        button so it never creates a ghost-button capture zone.
+        Position: sticky top-3 right-3 INSIDE the page flow — same
+        plane as everything else, no fixed overlay. */}
+    <div
+      style={{
+        position: 'sticky',
+        top: 12,
+        zIndex: 99999,
+        display: 'flex',
+        justifyContent: 'flex-end',
+        padding: '0 12px',
+        marginTop: showBackBtn ? -36 : 8,
+        marginBottom: 4,
+        pointerEvents: 'none',
+      }}
+    >
+      <div style={{ pointerEvents: 'auto' }}>
+        <LanguageBar />
+      </div>
+    </div>
     <MedicalDisclaimerSplash />
     <CosmicErrorBoundary>
     <Suspense fallback={<PageLoader />}>

@@ -5,7 +5,6 @@ import { RefreshCw, Sparkles, Copy, Check, Wand2, Save, Trash2, Play, Loader2, C
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import NarrationPlayer from '../components/NarrationPlayer';
-import TranslateChip from '../components/TranslateChip';
 import { ProximityItem } from '../components/SpatialRoom';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -320,7 +319,6 @@ function BuildYourOwn() {
                     ) : (
                       <p className="text-sm leading-relaxed flex-1" style={{ color: 'var(--text-secondary)' }}>
                         {a}
-                        <TranslateChip text={a} compact />
                       </p>
                     )}
                   </div>

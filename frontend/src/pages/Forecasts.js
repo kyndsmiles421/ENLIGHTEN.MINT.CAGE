@@ -6,7 +6,6 @@ import { Star, Hash, CreditCard, Globe, Sun, Layers, Loader2, ChevronRight, Spar
 import { toast } from 'sonner';
 import { commit as busCommit } from '../state/ContextBus';
 import { useResonance } from '../hooks/useResonance';
-import TranslateChip from '../components/TranslateChip';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -34,6 +33,32 @@ function ForecastCard({ forecast, onDelete, onShare }) {
   const [genVisual, setGenVisual] = useState(false);
   const { authHeaders } = useAuth();
   const fc = forecast.forecast;
+
+  // V1.0.8 — Auto-generate the cosmic visual the first time the user
+  // expands a forecast card. Cached per-forecast in localStorage so a
+  // re-expand never re-spends. The user wanted forecasts to actually
+  // *show* the celestial scene, not just hide it behind a button.
+  useEffect(() => {
+    if (!expanded || aiVisual || genVisual) return;
+    const cacheKey = `forecast_visual:${forecast.id}`;
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) { setAiVisual(cached); return; }
+    } catch { /* noop */ }
+    setGenVisual(true);
+    axios.post(`${API}/ai-visuals/forecast`, {
+      system: forecast.system_name,
+      period: forecast.period,
+      summary: (fc?.summary || '').slice(0, 200),
+    }, { headers: authHeaders, timeout: 120000 }).then((r) => {
+      if (r.data?.image_b64) {
+        setAiVisual(r.data.image_b64);
+        try { localStorage.setItem(cacheKey, r.data.image_b64); } catch { /* quota */ }
+      }
+    }).catch(() => { /* silent — visual is a bonus */ })
+      .finally(() => setGenVisual(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expanded, aiVisual, genVisual, forecast.id]);
   const color = forecast.system_color || '#C084FC';
   const Icon = SYSTEM_ICONS[Object.values(SYSTEM_ICONS).find(i => i) ? 'star' : 'star'] || Star;
 
@@ -113,7 +138,7 @@ function ForecastCard({ forecast, onDelete, onShare }) {
         </div>
 
         {/* Summary */}
-        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{fc?.summary}<TranslateChip text={fc?.summary || ''} compact /></p>
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{fc?.summary}</p>
 
         {/* Affirmation */}
         {fc?.affirmation && (
@@ -152,7 +177,7 @@ function ForecastCard({ forecast, onDelete, onShare }) {
                       <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{s.heading}</span>
                       <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: `${energy.color}12`, color: energy.color }}>{energy.label}</span>
                     </div>
-                    <p className="text-[12px] leading-relaxed pl-4" style={{ color: 'var(--text-secondary)' }}>{s.content}<TranslateChip text={s.content} compact /></p>
+                    <p className="text-[12px] leading-relaxed pl-4" style={{ color: 'var(--text-secondary)' }}>{s.content}</p>
                   </div>
                 );
               })}

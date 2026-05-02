@@ -44,7 +44,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles } from 'lucide-react';
 import { useSensory } from '../../context/SensoryContext';
 import { useSovereignUniverse } from '../../context/SovereignUniverseContext';
-import TranslateChip from '../TranslateChip';
 // V68.64 — Knowledge-as-Substance bridge. The chamber reads the
 // active entity from ContextBus.entityState (already broadcast by
 // V68.62 InteractiveModule) and replaces abstract leaf/flame
@@ -184,6 +183,16 @@ export default function ChamberMiniGame({
   const [cleared, setCleared] = useState(0);
   const [done, setDone] = useState(false);
   const [flashAt, setFlashAt] = useState(null); // {x,y,key}
+
+  // V1.0.8 — Chamber souvenir. When the user completes a chamber
+  // session we fetch a personal "card" image from /ai-visuals/daily-card
+  // (existing endpoint, already proven for the Daily Briefing flow).
+  // The image is themed by the chamber zone + the active entity (herb,
+  // rock, etc) so each session produces a unique, one-tap souvenir the
+  // user can save or share. Caches to localStorage by (zone, entity)
+  // so re-opening a completed chamber doesn't burn a fresh API call.
+  const [souvenir, setSouvenir] = useState(null);
+  const [souvenirLoading, setSouvenirLoading] = useState(false);
 
   // V68.64 — Read the active entity from ContextBus. When the user
   // opened Mint (or any herb) from the unified Inlay, the InteractiveModule
@@ -351,10 +360,41 @@ export default function ChamberMiniGame({
         }
         fireBrain('complete', { cleared: next, xp_awarded: scaledCompletionXP });
         try { onComplete?.({ level, cleared: next, xp: scaledCompletionXP }); } catch { /* noop */ }
+
+        // V1.0.8 — Generate completion souvenir image. Themed by the
+        // chamber zone + the active entity (herb, rock, etc). Cached
+        // per (zone, entity) so re-completing a chamber re-uses the
+        // existing card instead of burning credits.
+        try {
+          const entityKey = activeEntityName || effTeach?.topic || effZone || 'sovereign';
+          const cacheKey = `chamber_souvenir:${effZone}:${entityKey}`;
+          const cached = localStorage.getItem(cacheKey);
+          if (cached) {
+            setSouvenir(cached);
+          } else {
+            setSouvenirLoading(true);
+            const token = localStorage.getItem('zen_token');
+            const headers = token && token !== 'guest_token'
+              ? { Authorization: `Bearer ${token}` } : {};
+            const theme = `${effZone || 'sovereign'} chamber · ${entityKey}`;
+            const affirmation = `${entityKey} attuned · level ${level} · ${scaledCompletionXP} XP earned`;
+            axios.post(
+              `${API}/ai-visuals/daily-card`,
+              { theme, affirmation: affirmation.slice(0, 150) },
+              { headers, timeout: 60000 },
+            ).then((r) => {
+              if (r.data?.image_b64) {
+                setSouvenir(r.data.image_b64);
+                try { localStorage.setItem(cacheKey, r.data.image_b64); } catch { /* quota */ }
+              }
+            }).catch(() => { /* silent — souvenir is a bonus */ })
+              .finally(() => setSouvenirLoading(false));
+          }
+        } catch { /* noop */ }
       }
       return next;
     });
-  }, [scaledTargetCount, zone, scaledCompletionXP, onComplete, progressive, level, levelKey, maxLevel, fireBrain]);
+  }, [scaledTargetCount, zone, scaledCompletionXP, onComplete, progressive, level, levelKey, maxLevel, fireBrain, activeEntityName, effTeach, effZone]);
 
   // Reset on every open — also re-read the adaptive level so repeated
   // sessions immediately reflect the progression.
@@ -362,6 +402,7 @@ export default function ChamberMiniGame({
     if (open) {
       setXp(0); setCleared(0); setDone(false); setFlashAt(null);
       setLessonText(null); setLessonLoading(false);
+      setSouvenir(null); setSouvenirLoading(false);
       setLevel(readLevel());
       // Announce entry to the brain so quests that require "visit X" fire.
       try {
@@ -626,6 +667,44 @@ export default function ChamberMiniGame({
                 +{scaledCompletionXP} BONUS SPARKS
               </div>
 
+              {/* V1.0.8 — Chamber souvenir card (auto-generated on
+                  completion via /ai-visuals/daily-card). Each card is
+                  unique to this zone × entity. The user can long-press
+                  to save the image just like any other native image. */}
+              {(souvenirLoading || souvenir) && (
+                <div
+                  data-testid={`chamber-game-souvenir-${effZone}`}
+                  style={{
+                    marginTop: 10,
+                    width: 168,
+                    aspectRatio: '3 / 4',
+                    margin: '10px auto 0',
+                    borderRadius: 10,
+                    overflow: 'hidden',
+                    background: 'rgba(255,255,255,0.04)',
+                    border: `1px solid ${effColor}55`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: `0 0 24px ${effColor}33`,
+                  }}
+                >
+                  {souvenirLoading && (
+                    <span style={{
+                      fontSize: 9, letterSpacing: 3, color: 'rgba(255,255,255,0.55)',
+                      fontFamily: 'monospace', textAlign: 'center', padding: 8,
+                    }}>
+                      MINTING<br/>SOUVENIR…
+                    </span>
+                  )}
+                  {!souvenirLoading && souvenir && (
+                    <img
+                      src={souvenir}
+                      alt={`${effZone} souvenir`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  )}
+                </div>
+              )}
+
               {effTeach?.topic && !lessonText && (
                 <button
                   type="button"
@@ -663,9 +742,6 @@ export default function ChamberMiniGame({
                     fontFamily: 'ui-sans-serif, system-ui, sans-serif',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 4 }}>
-                    <TranslateChip text={lessonText} compact />
-                  </div>
                   {lessonText}
                 </div>
               )}
