@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Hash, Heart, Sparkles, Loader2, ChevronRight, Star, ArrowLeft, Compass, Moon } from 'lucide-react';
 import { toast } from 'sonner';
+import TranslateChip from '../components/TranslateChip';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -60,7 +61,7 @@ function ResultView({ result, onBack }) {
             <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>{lp.element} Element</p>
           </div>
         </div>
-        <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-secondary)' }}>{lp.meaning}</p>
+        <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-secondary)' }}>{lp.meaning}<TranslateChip text={lp.meaning} compact /></p>
 
         <div className="grid grid-cols-2 gap-4 mb-5">
           <div className="p-4">

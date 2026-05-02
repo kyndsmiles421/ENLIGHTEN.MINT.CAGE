@@ -44,6 +44,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles } from 'lucide-react';
 import { useSensory } from '../../context/SensoryContext';
 import { useSovereignUniverse } from '../../context/SovereignUniverseContext';
+import TranslateChip from '../TranslateChip';
 // V68.64 — Knowledge-as-Substance bridge. The chamber reads the
 // active entity from ContextBus.entityState (already broadcast by
 // V68.62 InteractiveModule) and replaces abstract leaf/flame
@@ -662,6 +663,9 @@ export default function ChamberMiniGame({
                     fontFamily: 'ui-sans-serif, system-ui, sans-serif',
                   }}
                 >
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 4 }}>
+                    <TranslateChip text={lessonText} compact />
+                  </div>
                   {lessonText}
                 </div>
               )}

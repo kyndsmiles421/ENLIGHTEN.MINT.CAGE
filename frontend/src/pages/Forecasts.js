@@ -6,6 +6,7 @@ import { Star, Hash, CreditCard, Globe, Sun, Layers, Loader2, ChevronRight, Spar
 import { toast } from 'sonner';
 import { commit as busCommit } from '../state/ContextBus';
 import { useResonance } from '../hooks/useResonance';
+import TranslateChip from '../components/TranslateChip';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -112,7 +113,7 @@ function ForecastCard({ forecast, onDelete, onShare }) {
         </div>
 
         {/* Summary */}
-        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{fc?.summary}</p>
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{fc?.summary}<TranslateChip text={fc?.summary || ''} compact /></p>
 
         {/* Affirmation */}
         {fc?.affirmation && (
@@ -151,7 +152,7 @@ function ForecastCard({ forecast, onDelete, onShare }) {
                       <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{s.heading}</span>
                       <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ background: `${energy.color}12`, color: energy.color }}>{energy.label}</span>
                     </div>
-                    <p className="text-[12px] leading-relaxed pl-4" style={{ color: 'var(--text-secondary)' }}>{s.content}</p>
+                    <p className="text-[12px] leading-relaxed pl-4" style={{ color: 'var(--text-secondary)' }}>{s.content}<TranslateChip text={s.content} compact /></p>
                   </div>
                 );
               })}

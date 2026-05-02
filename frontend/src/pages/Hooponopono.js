@@ -4,6 +4,7 @@ import { Play, Pause, RotateCcw, Heart, User, Users, Globe, Sparkles } from 'luc
 import { useSensory } from '../context/SensoryContext';
 import CelebrationBurst from '../components/CelebrationBurst';
 import NarrationPlayer from '../components/NarrationPlayer';
+import TranslateChip from '../components/TranslateChip';
 
 const PHRASES = [
   { text: "I'm sorry", color: '#3B82F6', description: 'Acknowledge responsibility and the pain that exists' },
@@ -244,7 +245,7 @@ export default function Hooponopono() {
               <p className="text-lg font-light mb-2" style={{ fontFamily: 'Cormorant Garamond, serif', color: p.color }}>
                 {p.text}
               </p>
-              <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>{p.description}</p>
+              <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>{p.description}<TranslateChip text={p.description} compact /></p>
             </motion.div>
           ))}
         </div>

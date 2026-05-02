@@ -6,6 +6,7 @@ import NarrationPlayer from '../components/NarrationPlayer';
 import DeepDive from '../components/DeepDive';
 import GuidedExperience from '../components/GuidedExperience';
 import FeaturedVideos from '../components/FeaturedVideos';
+import TranslateChip from '../components/TranslateChip';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -97,7 +98,7 @@ export default function Tantra() {
                     </div>
                   </div>
 
-                  <p className="text-sm leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>{active.description}</p>
+                  <p className="text-sm leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>{active.description}<TranslateChip text={active.description} compact /></p>
 
                   {/* Chakras */}
                   <div className="mb-8">
