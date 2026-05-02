@@ -380,6 +380,19 @@ export default function Settings() {
             testId="toggle-high-contrast"
             icon={Contrast}
           />
+          {/* V1.0.8 — Auto-Visuals toggle. When OFF (or in calm
+              immersion), the app stops auto-generating AI imagery on
+              completions and forecasts; the user only sees images
+              they explicitly request via a Generate button. Default
+              ON so existing behaviour is preserved. */}
+          <Toggle
+            label="Auto-Generate AI Images"
+            description="Allow the app to mint chamber souvenirs, forecast cards, and other AI imagery automatically. Off = images only on explicit request."
+            checked={prefs.autoVisuals !== false}
+            onChange={v => updatePref('autoVisuals', v)}
+            testId="toggle-auto-visuals"
+            icon={Sparkles}
+          />
         </Section>
 
         {/* Accessibility */}

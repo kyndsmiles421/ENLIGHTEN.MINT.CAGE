@@ -6,6 +6,7 @@ import { Star, Hash, CreditCard, Globe, Sun, Layers, Loader2, ChevronRight, Spar
 import { toast } from 'sonner';
 import { commit as busCommit } from '../state/ContextBus';
 import { useResonance } from '../hooks/useResonance';
+import { useSensory } from '../context/SensoryContext';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -32,14 +33,19 @@ function ForecastCard({ forecast, onDelete, onShare }) {
   const [aiVisual, setAiVisual] = useState(null);
   const [genVisual, setGenVisual] = useState(false);
   const { authHeaders } = useAuth();
+  // V1.0.8 — Read the user's auto-visuals preference. When OFF (or in
+  // calm immersion), the cosmic visual is NOT auto-fetched on expand;
+  // the user can still tap the manual "Generate AI Visual" button if
+  // they want one. Default true preserves existing behaviour.
+  const sensory = useSensory() || {};
+  const autoVisualsEnabled = sensory.autoVisualsEnabled !== false;
   const fc = forecast.forecast;
 
   // V1.0.8 — Auto-generate the cosmic visual the first time the user
-  // expands a forecast card. Cached per-forecast in localStorage so a
-  // re-expand never re-spends. The user wanted forecasts to actually
-  // *show* the celestial scene, not just hide it behind a button.
+  // expands a forecast card — only when auto-visuals are enabled.
+  // Cached per-forecast in localStorage so a re-expand never re-spends.
   useEffect(() => {
-    if (!expanded || aiVisual || genVisual) return;
+    if (!expanded || aiVisual || genVisual || !autoVisualsEnabled) return;
     const cacheKey = `forecast_visual:${forecast.id}`;
     try {
       const cached = localStorage.getItem(cacheKey);
@@ -58,7 +64,7 @@ function ForecastCard({ forecast, onDelete, onShare }) {
     }).catch(() => { /* silent — visual is a bonus */ })
       .finally(() => setGenVisual(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded, aiVisual, genVisual, forecast.id]);
+  }, [expanded, aiVisual, genVisual, forecast.id, autoVisualsEnabled]);
   const color = forecast.system_color || '#C084FC';
   const Icon = SYSTEM_ICONS[Object.values(SYSTEM_ICONS).find(i => i) ? 'star' : 'star'] || Star;
 

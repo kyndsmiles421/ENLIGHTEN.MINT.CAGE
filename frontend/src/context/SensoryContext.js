@@ -22,6 +22,14 @@ const DEFAULT_PREFS = {
   highContrast: false,
   sovereignMute: false,  // Global master mute
   audioTier: 'standard', // 'standard' | 'apprentice' | 'artisan' | 'sovereign'
+  // V1.0.8 — Auto-Visuals toggle. When ON, the app auto-generates AI
+  // imagery (chamber souvenirs on completion, forecast cosmic art on
+  // expand, etc.). When OFF, all auto-image fetches are suppressed
+  // and the user only sees imagery they explicitly request via a
+  // "Generate" button. Force-OFF when immersionLevel === 'calm' (the
+  // calm immersion contract is "no surprise media"). Default true so
+  // existing behaviour is preserved.
+  autoVisuals: true,
 };
 
 // ━━━ 4-TIER AUDIO RESOLUTION SYSTEM ━━━
@@ -605,6 +613,12 @@ export function SensoryProvider({ children }) {
   const showVisionMode = immersion === 'full';
   const showFractals = immersion === 'full' && !prefs.reduceParticles;
   const animationSpeed = immersion === 'calm' ? 0 : immersion === 'standard' ? 0.5 : 1;
+  // V1.0.8 — Auto-visuals computed flag. Both checks must be true:
+  //   1) prefs.autoVisuals must NOT be explicitly disabled
+  //   2) immersionLevel must NOT be 'calm' (calm = no surprise media)
+  // Components reading this gate every auto-image fetch on it so the
+  // user is never surprised by a generated image they didn't request.
+  const autoVisualsEnabled = prefs.autoVisuals !== false && immersion !== 'calm';
 
   // Memoize context value to prevent infinite re-renders
   const contextValue = useMemo(() => ({
@@ -613,7 +627,7 @@ export function SensoryProvider({ children }) {
     audioTierConfig: AUDIO_TIERS[prefs.audioTier || 'standard'],
     prefs, updatePref, themes: THEMES,
     immersion, showParticles, showAnimations, showFlashing, showVisualEffects,
-    showVisionMode, showFractals, animationSpeed,
+    showVisionMode, showFractals, animationSpeed, autoVisualsEnabled,
     // Global Audio Engine
     isMuted, sovereignMuteToggle, sovereignKillAll,
     audioSources, registerAudioSource, unregisterAudioSource,
@@ -622,7 +636,7 @@ export function SensoryProvider({ children }) {
     ambientOn, volume, setVolume, toggleAmbient, playClick, playChime, playCelebration,
     playConfirmation, playSingingBowl, setAudioTierFromMastery, prefs, updatePref,
     immersion, showParticles, showAnimations, showFlashing, showVisualEffects,
-    showVisionMode, showFractals, animationSpeed, isMuted, sovereignMuteToggle, 
+    showVisionMode, showFractals, animationSpeed, autoVisualsEnabled, isMuted, sovereignMuteToggle,
     sovereignKillAll, audioSources, registerAudioSource, unregisterAudioSource,
     registerAudioContext, unregisterAudioContext
   ]);

@@ -137,6 +137,11 @@ export default function ChamberMiniGame({
   const brain = useSovereignUniverse();
   const reduceFlashing = !!(sensory.prefs && sensory.prefs.reduceFlashing);
   const reduceMotion   = !!(sensory.prefs && sensory.prefs.reduceMotion);
+  // V1.0.8 — Honor the auto-visuals preference. When OFF (or in calm
+  // immersion), the chamber souvenir card on completion is suppressed
+  // so the user is never surprised by AI-generated imagery they
+  // didn't request. Defaults to true for backwards compatibility.
+  const autoVisualsEnabled = sensory.autoVisualsEnabled !== false;
 
   // V68.29 — Drill-down chain state. If `nextGame` is provided the
   // completion card shows "CONTINUE DEEPER →" which swaps this overlay
@@ -364,37 +369,44 @@ export default function ChamberMiniGame({
         // V1.0.8 — Generate completion souvenir image. Themed by the
         // chamber zone + the active entity (herb, rock, etc). Cached
         // per (zone, entity) so re-completing a chamber re-uses the
-        // existing card instead of burning credits.
+        // existing card instead of burning credits. Gated by the
+        // user's `autoVisuals` preference + immersion level — calm
+        // mode and explicit opt-out both suppress the generation, in
+        // which case the user gets the +XP message alone (no image).
         try {
-          const entityKey = activeEntityName || effTeach?.topic || effZone || 'sovereign';
-          const cacheKey = `chamber_souvenir:${effZone}:${entityKey}`;
-          const cached = localStorage.getItem(cacheKey);
-          if (cached) {
-            setSouvenir(cached);
+          if (!autoVisualsEnabled) {
+            // Respect user preference: no surprise media.
           } else {
-            setSouvenirLoading(true);
-            const token = localStorage.getItem('zen_token');
-            const headers = token && token !== 'guest_token'
-              ? { Authorization: `Bearer ${token}` } : {};
-            const theme = `${effZone || 'sovereign'} chamber · ${entityKey}`;
-            const affirmation = `${entityKey} attuned · level ${level} · ${scaledCompletionXP} XP earned`;
-            axios.post(
-              `${API}/ai-visuals/daily-card`,
-              { theme, affirmation: affirmation.slice(0, 150) },
-              { headers, timeout: 60000 },
-            ).then((r) => {
-              if (r.data?.image_b64) {
-                setSouvenir(r.data.image_b64);
-                try { localStorage.setItem(cacheKey, r.data.image_b64); } catch { /* quota */ }
-              }
-            }).catch(() => { /* silent — souvenir is a bonus */ })
-              .finally(() => setSouvenirLoading(false));
+            const entityKey = activeEntityName || effTeach?.topic || effZone || 'sovereign';
+            const cacheKey = `chamber_souvenir:${effZone}:${entityKey}`;
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+              setSouvenir(cached);
+            } else {
+              setSouvenirLoading(true);
+              const token = localStorage.getItem('zen_token');
+              const headers = token && token !== 'guest_token'
+                ? { Authorization: `Bearer ${token}` } : {};
+              const theme = `${effZone || 'sovereign'} chamber · ${entityKey}`;
+              const affirmation = `${entityKey} attuned · level ${level} · ${scaledCompletionXP} XP earned`;
+              axios.post(
+                `${API}/ai-visuals/daily-card`,
+                { theme, affirmation: affirmation.slice(0, 150) },
+                { headers, timeout: 60000 },
+              ).then((r) => {
+                if (r.data?.image_b64) {
+                  setSouvenir(r.data.image_b64);
+                  try { localStorage.setItem(cacheKey, r.data.image_b64); } catch { /* quota */ }
+                }
+              }).catch(() => { /* silent — souvenir is a bonus */ })
+                .finally(() => setSouvenirLoading(false));
+            }
           }
         } catch { /* noop */ }
       }
       return next;
     });
-  }, [scaledTargetCount, zone, scaledCompletionXP, onComplete, progressive, level, levelKey, maxLevel, fireBrain, activeEntityName, effTeach, effZone]);
+  }, [scaledTargetCount, zone, scaledCompletionXP, onComplete, progressive, level, levelKey, maxLevel, fireBrain, activeEntityName, effTeach, effZone, autoVisualsEnabled]);
 
   // Reset on every open — also re-read the adaptive level so repeated
   // sessions immediately reflect the progression.
