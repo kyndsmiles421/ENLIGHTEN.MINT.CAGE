@@ -9,11 +9,67 @@ import { useAuth } from '../context/AuthContext';
 import { useMixer, FREQUENCIES as MIXER_FREQUENCIES, SOUNDS as MIXER_SOUNDS, INSTRUMENT_DRONES } from '../context/MixerContext';
 import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../components/CosmicFeedback';
 import { commit as busCommit } from '../state/ContextBus';
+import { useProcessorState } from '../state/ProcessorState';
 import CompanionChip from '../components/CompanionChip';
 import { toast } from 'sonner';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// V1.0.8 — Realm Practices → MODULE_REGISTRY map. Each backend practice
+// string (e.g. "void_meditation", "crystal_resonance") resolves to a
+// real engine the user can `pull()` straight into the matrix slot.
+// Practices with no direct 1:1 engine fall back to the closest generic
+// engine (meditation, mantras, etc.) so EVERY practice card is
+// clickable — no dead tiles. Source of truth for engine IDs is
+// MODULE_REGISTRY in state/ProcessorState.js; if an ID ever moves,
+// the `dispatchPractice` fallback below degrades to a navigate().
+const PRACTICE_TO_MODULE = {
+  // Astral Garden — earth
+  grounding:               'MEDITATION',
+  plant_resonance:         'HERBOLOGY',
+  earth_attunement:        'HERBOLOGY',
+  // Crystal Caverns — spirit
+  crystal_resonance:       'CRYSTALS',
+  sound_bath:              'SOUNDSCAPES',
+  past_life:               'AKASHIC',
+  // Celestial Ocean — water
+  water_attunement:        'FREQUENCIES',
+  emotional_release:       'JOURNAL',
+  dream_work:              'DREAM_VIZ',
+  // Solar Temple — fire
+  fire_ceremony:           'RITUALS',
+  transmutation:           'AFFIRMATIONS',
+  willpower:               'AFFIRMATIONS',
+  // Void Sanctum — void
+  void_meditation:         'MEDITATION',
+  ego_death:               'JOURNAL',
+  rebirth:                 'MANTRAS',
+  // Aurora Bridge — light
+  chakra_alignment:        'YOGA',
+  timeline_attunement:     'COSMIC_CALENDAR',
+  interdimensional:        'STAR_CHART',
+};
+const PRACTICE_TO_ROUTE = {
+  grounding: '/meditation',
+  plant_resonance: '/herbology',
+  earth_attunement: '/herbology',
+  crystal_resonance: '/crystals',
+  sound_bath: '/soundscapes',
+  past_life: '/akashic-records',
+  water_attunement: '/frequencies',
+  emotional_release: '/journal',
+  dream_work: '/dreams',
+  fire_ceremony: '/rituals',
+  transmutation: '/affirmations',
+  willpower: '/affirmations',
+  void_meditation: '/meditation',
+  ego_death: '/journal',
+  rebirth: '/mantras',
+  chakra_alignment: '/yoga',
+  timeline_attunement: '/cosmic-calendar',
+  interdimensional: '/star-chart',
+};
 
 // V68.95 — ELEMENT → COMPANION CONCEPT BRIDGE.
 // Each realm carries an `element` from the backend. The Companion
@@ -82,7 +138,9 @@ export default function MultiverseRealms() {
   useEffect(() => {
     setInitialLoading(true);
     setFetchError(null);
-    axios.get(`${API}/realms/`)
+    // V1.0.8 — Pass auth so the backend can compute is_locked per user.
+    // Public fallback still works (is_locked defaults to based on lvl 0).
+    axios.get(`${API}/realms/`, { headers: authHeaders || {} })
       .then(r => setRealms(r.data))
       .catch(err => {
         const cosmic = getCosmicErrorMessage(err);
@@ -99,8 +157,48 @@ export default function MultiverseRealms() {
     return stat?.visits || 0;
   }, [visitStats]);
 
+  // V1.0.8 — Realm practice dispatcher. Resolves a backend practice
+  // string (e.g. "void_meditation") to a real engine via MODULE_REGISTRY
+  // and pull()s it into the matrix slot. Falls back to navigate() for
+  // any practice that lacks a direct engine binding so no practice
+  // card is ever a dead tile. On pull, we also commit the realm's
+  // worldMetadata to the ContextBus so the engine inherits the realm's
+  // element/biome — matches the Starseed adventure pattern.
+  const processor = useProcessorState();
+  const dispatchPractice = useCallback((practiceKey, realm) => {
+    const moduleId = PRACTICE_TO_MODULE[practiceKey];
+    try {
+      busCommit('worldMetadata', {
+        realm_id: realm?.id,
+        realm_name: realm?.name,
+        biome: realm?.element || realm?.name,
+        frequency: realm?.frequency,
+        practice: practiceKey,
+        ts: Date.now(),
+      }, { moduleId: moduleId || 'REALM' });
+    } catch { /* noop */ }
+    if (moduleId && processor && typeof processor.pull === 'function') {
+      processor.pull(moduleId);
+      toast.success(`${practiceKey.replace(/_/g, ' ')} activated`);
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { /* noop */ }
+      return;
+    }
+    const route = PRACTICE_TO_ROUTE[practiceKey];
+    if (route) { navigate(route); return; }
+    toast.info(`${practiceKey.replace(/_/g, ' ')} — practice coming soon`);
+  }, [processor, navigate]);
+
   const enterRealm = useCallback(async (realm) => {
     if (!authHeaders?.Authorization) { toast('Sign in to enter realms'); return; }
+    // V1.0.8 — Client-side lock gate. Server enforces too (returns 403
+    // with realm_locked code), but short-circuiting here avoids the
+    // round-trip and shows a clear, friendly message immediately.
+    if (realm.is_locked) {
+      toast.error(`Locked · unlock at level ${realm.unlock_level}`, {
+        description: `You're at level ${realm.user_level || 0}. Keep practicing to open this realm.`,
+      });
+      return;
+    }
     setEntering(true);
     try {
       const res = await axios.post(`${API}/realms/${realm.id}/enter`, {}, { headers: authHeaders });
@@ -196,14 +294,47 @@ export default function MultiverseRealms() {
                   return (
                     <motion.button key={realm.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
                       onClick={() => enterRealm(realm)} disabled={entering}
-                      className="w-full p-4 rounded-2xl text-left group hover:scale-[1.01] transition-all"
+                      className="w-full p-4 rounded-2xl text-left group transition-all relative overflow-hidden"
                       style={{
                         background: `linear-gradient(135deg, ${realm.gradient[0]}30, ${realm.gradient[1]}20)`,
-                        border: `1px solid ${realm.color}15`,
+                        border: `1px solid ${realm.is_locked ? 'rgba(255,255,255,0.08)' : realm.color + '15'}`,
+                        opacity: realm.is_locked ? 0.6 : 1,
+                        filter: realm.is_locked ? 'saturate(0.4)' : 'none',
+                        cursor: realm.is_locked ? 'not-allowed' : 'pointer',
                       }}
+                      onMouseOver={(e) => { if (!realm.is_locked) e.currentTarget.style.transform = 'scale(1.01)'; }}
+                      onMouseOut={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
                       data-testid={`realm-${realm.id}`}
                       data-element={realm.element}
+                      data-locked={realm.is_locked ? 'true' : 'false'}
+                      aria-disabled={realm.is_locked || undefined}
                     >
+                      {/* V1.0.8 — Locked realm ribbon. Inline, same
+                          plane as the card, respects Flatland rules.
+                          Glass pill in the corner — no overlay, no
+                          fixed positioning, no ghost click capture. */}
+                      {realm.is_locked && (
+                        <div
+                          data-testid={`realm-lock-${realm.id}`}
+                          style={{
+                            position: 'absolute', top: 10, right: 10,
+                            display: 'inline-flex', alignItems: 'center', gap: 5,
+                            padding: '4px 10px',
+                            borderRadius: 999,
+                            background: 'rgba(10,10,18,0.55)',
+                            border: '1px solid rgba(255,255,255,0.14)',
+                            color: 'rgba(255,255,255,0.88)',
+                            fontSize: 9,
+                            letterSpacing: '0.18em',
+                            fontFamily: 'monospace',
+                            textTransform: 'uppercase',
+                            pointerEvents: 'none',
+                          }}
+                        >
+                          <span aria-hidden="true">🔒</span>
+                          LVL {realm.unlock_level}
+                        </div>
+                      )}
                       <div className="flex items-start gap-3.5">
                         <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
                           style={{ background: `${realm.color}12`, border: `1px solid ${realm.color}20` }}>
@@ -300,16 +431,31 @@ export default function MultiverseRealms() {
                 </div>
               </div>
 
-              {/* Practices */}
+              {/* Practices — V1.0.8: each tile is now a real button
+                  that pulls the mapped engine into the matrix slot
+                  (or navigates to the engine's page if the engine
+                  isn't yet registered). No dead tiles. */}
               <div className="mb-6">
                 <p className="text-[9px] uppercase tracking-widest mb-2" style={{ color: 'rgba(255,255,255,0.65)' }}>Realm Practices</p>
                 <div className="grid grid-cols-3 gap-2">
                   {(activeRealm.realm.practices || []).map(p => (
-                    <div key={p} className="p-3 rounded-xl text-center"
-                      style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)' }}>
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => dispatchPractice(p, activeRealm.realm)}
+                      data-testid={`realm-practice-${p}`}
+                      className="p-3 rounded-xl text-center transition-all"
+                      style={{
+                        background: 'rgba(0,0,0,0.2)',
+                        border: `1px solid ${activeRealm.realm.color}33`,
+                        cursor: 'pointer',
+                      }}
+                      onMouseOver={e => { e.currentTarget.style.background = `${activeRealm.realm.color}22`; }}
+                      onMouseOut={e => { e.currentTarget.style.background = 'rgba(0,0,0,0.2)'; }}
+                    >
                       <Sparkles size={14} style={{ color: activeRealm.realm.color }} className="mx-auto mb-1" />
-                      <p className="text-[9px] capitalize" style={{ color: 'rgba(255,255,255,0.5)' }}>{p.replace(/_/g, ' ')}</p>
-                    </div>
+                      <p className="text-[9px] capitalize" style={{ color: 'rgba(255,255,255,0.72)' }}>{p.replace(/_/g, ' ')}</p>
+                    </button>
                   ))}
                 </div>
               </div>
