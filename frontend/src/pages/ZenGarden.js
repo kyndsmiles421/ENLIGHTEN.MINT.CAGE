@@ -744,7 +744,13 @@ function LanternRelease() {
     setLanterns(prev => [...prev, newLantern]);
     setWorry('');
     playChime();
-    setTimeout(() => setLanterns(prev => prev.filter(l => l.id !== newLantern.id)), 10000);
+    // V1.0.8 — Immediate confirmation so the user KNOWS the release
+    // worked. Previously the lantern animation clipped out of the
+    // 320px-tall overflow-hidden container after ~3s (it flew to
+    // bottom:450px of a 320px box), so the user saw a brief flash
+    // and assumed the button was dead.
+    try { toast?.success('Released · let it go', { duration: 2200 }); } catch { /* noop */ }
+    setTimeout(() => setLanterns(prev => prev.filter(l => l.id !== newLantern.id)), 14000);
   };
 
   return (
@@ -755,14 +761,18 @@ function LanternRelease() {
         <AnimatePresence>
           {lanterns.map(l => (
             <motion.div key={l.id}
-              initial={{ bottom: 20, left: `${l.x}%`, opacity: 0, scale: 0.3 }}
+              initial={{ bottom: 10, left: `${l.x}%`, opacity: 0, scale: 0.4 }}
               animate={{
-                bottom: [20, 120, 250, 380, 450],
+                // V1.0.8 — Use percentage bottoms so the lantern stays
+                // inside the clamp(180px, 32vh, 320px) container no
+                // matter the viewport. Previously it flew to
+                // bottom:450px of a 320px box → clipped invisible.
+                bottom: ['5%', '30%', '55%', '78%', '92%'],
                 left: [`${l.x}%`, `${l.x + l.drift * 0.3}%`, `${l.x + l.drift * 0.6}%`, `${l.x + l.drift}%`, `${l.x + l.drift * 1.2}%`],
-                opacity: [0, 0.9, 1, 0.8, 0],
-                scale: [0.3, 1, 1, 0.9, 0.7],
+                opacity: [0, 1, 1, 0.85, 0],
+                scale: [0.4, 1, 1, 0.95, 0.75],
               }}
-              transition={{ duration: 9, ease: 'easeOut', times: [0, 0.15, 0.5, 0.8, 1] }}
+              transition={{ duration: 12, ease: 'easeOut', times: [0, 0.2, 0.55, 0.85, 1] }}
               exit={{ opacity: 0 }}
               className="absolute" style={{ transform: 'translateX(-50%)' }}>
               <div className="relative">
