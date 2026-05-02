@@ -140,6 +140,52 @@ function RegionNode({ region, onExplore }) {
   );
 }
 
+// V1.0.8 — Flatland-safe mobile world tile. Replaces the absolutely-
+// positioned RegionNode on mobile (where percentage coords caused
+// every tile to stack on top of each other at the same visual point
+// and 0.3-opacity un-discovered nodes created ghost-button capture
+// zones). This one is a normal-flow grid cell: solid border, clear
+// lock/level state, no overlap, never a phantom click target.
+function RegionTile({ region, onExplore }) {
+  const accessible = !!region.accessible;
+  const discovered = !!region.discovered;
+  return (
+    <button
+      type="button"
+      onClick={() => accessible && onExplore(region.id)}
+      disabled={!accessible}
+      data-testid={`region-tile-${region.id}`}
+      className="w-full rounded-xl p-3 text-left transition-all active:scale-[0.98]"
+      style={{
+        background: discovered ? `${region.color}0E` : 'rgba(10,10,18,0.5)',
+        border: `1px solid ${discovered ? `${region.color}33` : 'rgba(255,255,255,0.08)'}`,
+        cursor: accessible ? 'pointer' : 'not-allowed',
+        opacity: accessible ? 1 : 0.75,
+      }}
+    >
+      <div className="flex items-center gap-2 mb-1.5">
+        <div
+          className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0"
+          style={{ background: discovered ? `${region.color}22` : 'rgba(255,255,255,0.06)' }}
+        >
+          {discovered
+            ? <Compass size={12} style={{ color: region.color }} />
+            : <Lock size={12} style={{ color: 'rgba(255,255,255,0.45)' }} />}
+        </div>
+        <p
+          className="text-[11px] font-medium leading-tight"
+          style={{ color: discovered ? region.color : 'rgba(255,255,255,0.75)' }}
+        >
+          {discovered ? region.name : '???'}
+        </p>
+      </div>
+      <p className="text-[9px]" style={{ color: 'rgba(255,255,255,0.55)' }}>
+        {accessible ? `Level ${region.level_req}+` : `Locked · Lv ${region.level_req}`}
+      </p>
+    </button>
+  );
+}
+
 function BossCard({ boss, onJoin }) {
   const hpPct = boss.active_encounter ? (boss.active_encounter.current_hp / boss.active_encounter.max_hp * 100) : 100;
   const participants = boss.active_encounter?.participants?.length || 0;
@@ -1064,14 +1110,26 @@ export default function RPGPage() {
           )}
 
 
-          {/* WORLD MAP TAB */}
+          {/* WORLD MAP TAB — V1.0.8 Flatland grid (was absolute-positioned
+              % coords that caused every node to stack/overlap on mobile
+              and created ghost buttons for undiscovered regions at
+              0.3 opacity). Now uses a clean 2-column grid on narrow
+              viewports and the spatial map on ≥ md. Undiscovered
+              regions render as solid placeholder tiles instead of
+              faint phantom rectangles. */}
           {tab === 'world' && (
             <motion.div key="world" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <p className="text-[9px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
                 World Map — {world?.regions?.filter(r => r.discovered).length}/{world?.regions?.length} discovered
               </p>
-              <div className="relative rounded-2xl overflow-hidden" style={{ height: '400px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)' }}>
-                {/* Connection lines */}
+              {/* Mobile: stacked grid · no overlapping nodes, no ghost buttons */}
+              <div className="grid grid-cols-2 gap-3 md:hidden">
+                {world?.regions?.map(r => (
+                  <RegionTile key={r.id} region={r} onExplore={exploreRegion} />
+                ))}
+              </div>
+              {/* Desktop: original spatial map with the dashed connection lines */}
+              <div className="hidden md:block relative rounded-2xl overflow-hidden" style={{ height: '400px', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)' }}>
                 <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
                   {world?.regions?.filter(r => r.discovered).flatMap(r =>
                     r.connections?.map(connId => {
@@ -1085,7 +1143,6 @@ export default function RPGPage() {
                     })
                   )}
                 </svg>
-                {/* Regions */}
                 {world?.regions?.map(r => (
                   <RegionNode key={r.id} region={r} onExplore={exploreRegion} />
                 ))}
