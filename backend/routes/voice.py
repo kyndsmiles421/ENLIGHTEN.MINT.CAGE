@@ -34,10 +34,13 @@ from deps import db, get_current_user, logger
 
 router = APIRouter(prefix="/voice")
 
-# Default Sage voice — neutral female, multilingual ("Rachel" preset).
-# User can override per call by passing voice_id, or globally by
+# Default Sage voice — "River" (neutral, calm, conversational, mid-age,
+# American). Picked because (a) it's labelled `descriptive: calm` which
+# matches our agent persona, (b) neutral gender keeps the Sage genderless,
+# (c) it's a `premade` voice available on all ElevenLabs accounts (free +
+# paid). User can override per call by passing voice_id, or globally by
 # setting SAGE_VOICE_ID in env.
-DEFAULT_VOICE_ID = os.environ.get("SAGE_VOICE_ID", "21m00Tcm4Tlm")
+DEFAULT_VOICE_ID = os.environ.get("SAGE_VOICE_ID", "SAz9YHcvj6GT2YYXdXww")
 DEFAULT_MODEL_ID = "eleven_flash_v2_5"   # ~75ms latency, ENG + multilingual
 MAX_TEXT_LEN = 800   # narrations are short — defensive cap so a runaway
                       # paste can't blow the user's ElevenLabs quota.
@@ -139,10 +142,32 @@ async def sage_narrate(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Sage narrate error: {e}")
-        # Return a structured error the frontend can display in the
-        # HUD without crashing the active ritual chain.
-        raise HTTPException(502, f"Sage voice synthesis failed: {str(e)[:160]}")
+        msg = str(e)
+        logger.error(f"Sage narrate error: {msg}")
+        # Map common ElevenLabs error strings to actionable 503s so the
+        # frontend's existing "unavailable" branch lights up instead of
+        # generic "synth failed".
+        if "detected_unusual_activity" in msg or "Free Tier usage disabled" in msg:
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "Sage Voice unavailable — ElevenLabs blocked the request "
+                    "(free tier disabled for cloud/proxy IPs). Upgrade to any "
+                    "paid plan at https://elevenlabs.io/app/subscription to "
+                    "enable narration from this server."
+                ),
+            )
+        if "voice_not_found" in msg:
+            raise HTTPException(
+                status_code=503,
+                detail="Sage Voice unavailable — voice_id not in your library.",
+            )
+        if "quota" in msg.lower() or "out of credits" in msg.lower():
+            raise HTTPException(
+                status_code=503,
+                detail="Sage Voice unavailable — ElevenLabs character quota exhausted.",
+            )
+        raise HTTPException(502, f"Sage voice synthesis failed: {msg[:160]}")
 
     if not audio_bytes:
         raise HTTPException(502, "Sage voice returned empty audio.")
@@ -228,8 +253,28 @@ async def sage_voice_sample(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Voice sample synth error: {e}")
-        raise HTTPException(502, f"Voice sample synthesis failed: {str(e)[:160]}")
+        msg = str(e)
+        logger.error(f"Voice sample synth error: {msg}")
+        if "detected_unusual_activity" in msg or "Free Tier usage disabled" in msg:
+            raise HTTPException(
+                status_code=503,
+                detail=(
+                    "Sage Voice unavailable — ElevenLabs blocked the request "
+                    "(free tier disabled for cloud/proxy IPs). Upgrade to any "
+                    "paid plan at https://elevenlabs.io/app/subscription."
+                ),
+            )
+        if "voice_not_found" in msg:
+            raise HTTPException(
+                status_code=503,
+                detail="Sage Voice unavailable — voice_id not in your library.",
+            )
+        if "quota" in msg.lower():
+            raise HTTPException(
+                status_code=503,
+                detail="Sage Voice unavailable — ElevenLabs character quota exhausted.",
+            )
+        raise HTTPException(502, f"Voice sample synthesis failed: {msg[:160]}")
 
     if not audio_bytes:
         raise HTTPException(502, "Voice sample returned empty audio.")
