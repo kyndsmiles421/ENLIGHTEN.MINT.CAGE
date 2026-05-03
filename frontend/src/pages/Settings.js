@@ -5,15 +5,76 @@ import { toast } from 'sonner';
 import {
   ArrowLeft, Volume2, VolumeX, Eye, Palette, Sparkles, Monitor,
   Moon, Sun, TreePine, Zap, Shield, Bell, ChevronRight, Type, Contrast, Globe, Check,
-  Trash2, AlertTriangle, LogOut, Loader2, Download, Mail, MailCheck, MailX
+  Trash2, AlertTriangle, LogOut, Loader2, Download, Mail, MailCheck, MailX, Play, Square
 } from 'lucide-react';
 import { useSensory } from '../context/SensoryContext';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import FoundingArchitectPanel from '../components/FoundingArchitect';
+import {
+  previewSample as sagePreview,
+  stop as sageStop,
+  subscribe as sageSubscribe,
+} from '../services/SageVoiceController';
 import axios from 'axios';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// V1.0.12 — Voice preview button. Renders inline in the Sage Voice
+// section; mirrors the SageVoiceController state stream so the same
+// "speaking" indicator the HUD uses applies here too.
+function SageVoicePreviewButton() {
+  const [voiceState, setVoiceState] = useState({ state: 'idle' });
+  useEffect(() => sageSubscribe(setVoiceState), []);
+  const isPlaying = voiceState.state === 'speaking' || voiceState.state === 'loading';
+  const unavailable = voiceState.state === 'unavailable';
+  const handle = () => {
+    if (isPlaying) { sageStop(); return; }
+    if (unavailable) return;
+    sagePreview();
+  };
+  return (
+    <button
+      type="button"
+      onClick={handle}
+      data-testid="sage-voice-preview"
+      data-voice-state={voiceState.state}
+      title={
+        unavailable
+          ? 'Sage Voice unavailable — add ELEVENLABS_API_KEY'
+          : isPlaying ? 'Stop preview' : 'Preview Sage Voice'
+      }
+      style={{
+        marginLeft: 'auto',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        padding: '3px 9px',
+        borderRadius: 999,
+        background: isPlaying
+          ? 'rgba(167,139,250,0.22)'
+          : unavailable
+          ? 'rgba(252,165,165,0.10)'
+          : 'rgba(167,139,250,0.10)',
+        border: `1px solid ${
+          unavailable ? 'rgba(252,165,165,0.35)' : 'rgba(167,139,250,0.40)'
+        }`,
+        color: unavailable ? '#FCA5A5' : '#C4B5FD',
+        fontSize: 9,
+        fontFamily: 'monospace',
+        letterSpacing: '0.10em',
+        cursor: unavailable ? 'not-allowed' : 'pointer',
+      }}
+    >
+      {voiceState.state === 'loading'
+        ? <Loader2 size={9} className="animate-spin" />
+        : isPlaying
+        ? <Square size={9} />
+        : <Play size={9} />}
+      {isPlaying ? 'STOP' : unavailable ? 'NO KEY' : 'PREVIEW'}
+    </button>
+  );
+}
 
 function Section({ title, children }) {
   const { prefs } = useSensory();
@@ -396,14 +457,20 @@ export default function Settings() {
           {/* V1.0.11 — Sage Voice mode. ElevenLabs TTS narration of
               ritual chain steps. 'off' is default so we never surprise
               the user with audio or charge their key budget without
-              consent. Calm immersion forces 'off' regardless. */}
+              consent. V1.0.12: calm immersion now plays at 40% gain
+              with softer voice settings (no hard mute). */}
           <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
             <div className="flex items-center gap-2 mb-2">
               <Volume2 size={14} style={{ color: 'var(--text-muted)' }} />
               <p className="text-xs" style={{ color: 'var(--text-primary)' }}>Sage Voice</p>
+              {/* V1.0.12 — Voice preview button. Cached server-side
+                  so first click burns ~60 chars and every subsequent
+                  click is free. Mirrors the HUD speaker state via
+                  the same SageVoiceController stream. */}
+              <SageVoicePreviewButton />
             </div>
             <p className="text-[10px] mb-2" style={{ color: 'var(--text-muted)' }}>
-              ElevenLabs narration of ritual steps. Forced off in Calm immersion. Requires ELEVENLABS_API_KEY.
+              ElevenLabs narration of ritual steps. Calm immersion plays at lower gain with softer delivery. Requires ELEVENLABS_API_KEY.
             </p>
             <div className="grid grid-cols-3 gap-2" data-testid="sage-voice-mode-picker">
               {[

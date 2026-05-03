@@ -626,9 +626,11 @@ export function SensoryProvider({ children }) {
   // Components reading this gate every auto-image fetch on it so the
   // user is never surprised by a generated image they didn't request.
   const autoVisualsEnabled = prefs.autoVisuals !== false && immersion !== 'calm';
-  // V1.0.11 — Sage Voice computed mode. Calm immersion forces OFF so
-  // a calm session never hears surprise audio.
-  const sageVoiceMode = immersion === 'calm' ? 'off' : (prefs.sageVoiceMode || 'off');
+  // V1.0.11 — Sage Voice computed mode. V1.0.12: calm immersion no
+  // longer hard-mutes the agent. The audio runs but at 40% gain with
+  // softer ElevenLabs settings (handled inside SageVoiceController +
+  // backend `calm` param). Users can still force OFF explicitly.
+  const sageVoiceMode = prefs.sageVoiceMode || 'off';
 
   // Memoize context value to prevent infinite re-renders
   const contextValue = useMemo(() => ({

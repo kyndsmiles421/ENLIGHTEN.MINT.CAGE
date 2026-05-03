@@ -640,3 +640,55 @@ The 100% is real. Every engine reachable through `pull()` reports its lifecycle 
 3. `sudo supervisorctl restart backend`
 4. Settings → Sage Voice → On Demand or Auto → run a ritual chain
 
+
+### V1.0.12 — Voice Preview · Soft-Calm Refinement (2026-05-03) ✅
+**The Sage gets a "hello" before you hire it.** Voice preview button in Settings; calm immersion no longer hard-mutes — it whispers.
+
+**Backend** (`backend/routes/voice.py`)
+- New `GET /api/voice/sample?voice_id=...&calm=true|false` — synthesizes the fixed `SAMPLE_TEXT` ("Welcome, traveler. I am the Sage…") on first request, caches by `(voice_id, calm)` tuple in `db.voice_samples`. Every subsequent click returns the cached `audio_url` (~0 character cost). Response includes `cached: bool` for budget transparency.
+- `_synthesize_sync` now takes a `calm: bool` flag. When true, applies `VoiceSettings(stability=0.85, similarity_boost=0.85, style=0.0, use_speaker_boost=False)` for breathier, slower delivery. Wrapped in try/except so older/newer SDK shapes degrade silently to defaults.
+- `POST /api/voice/sage-narrate` body extended with optional `calm: bool`. Plumbed through to `_synthesize_sync`.
+
+**Frontend** (`services/SageVoiceController.js`)
+- New `previewSample(opts)` — hits `/api/voice/sample`, plays via the singleton `<audio>` element. Same state stream as `speak()`, so the HUD speaker icon mirrors "speaking" during preview.
+- Added `_isCalm()` helper. Both `speak()` and `previewSample()` auto-detect calm immersion and pass `calm: true` to the backend AND drop the `<audio>.volume` to 0.4. Caller can override with `opts.calm`.
+- Exposed `previewSample` on `window.SageVoice` for console debugging.
+
+**Calm-immersion contract — refined**
+- `SensoryContext.sageVoiceMode` no longer force-`'off'` in calm. Returns the user's chosen mode unchanged. The voice still plays in calm — just at 40% gain with softer timbre. Hard-mute remains available via the explicit "Off" choice.
+- `ProcessorState.js` auto-narration listener simplified: drops the calm-forces-off branch (controller handles it).
+
+**Settings UI** (`pages/Settings.js`)
+- New `<SageVoicePreviewButton>` inline next to the "Sage Voice" header. Three states via the same controller stream:
+  - idle → ▷ PREVIEW
+  - loading → spinner
+  - speaking → ⬛ STOP
+  - unavailable → ▷ NO KEY (red, disabled)
+- `data-testid="sage-voice-preview"` + `data-voice-state` for testing.
+- Description copy updated: "Calm immersion plays at lower gain with softer delivery" (truthful — not "forced off").
+
+**HelpCenter** — FAQ updates
+- Calm immersion entry now says "Sage Voice still plays in Calm — just at 40% volume with softer, breathier delivery."
+- Sage Voice entry mentions the PREVIEW button and its server-side cache.
+
+**Test status**
+- Backend: **16/16 pytest pass** (3 new voice-sample + V1.0.11/10/9 all green).
+- Frontend playwright smoke: PREVIEW button rendered with `data-voice-state=idle`; click → `unavailable` flip with red `▷ NO KEY` text (correct, since key absent in env). All four settings sections (Reduce Motion, Auto-Visuals, Sage Voice, Accessibility) visible inline — no overlay regression.
+
+**Files added/changed**
+- `backend/routes/voice.py` — sample endpoint with cache + calm voice settings
+- `backend/tests/test_iteration_v1_0_12_voice_sample.py` — 3 tests
+- `frontend/src/services/SageVoiceController.js` — `previewSample()` + `_isCalm()` + auto calm gain
+- `frontend/src/context/SensoryContext.js` — calm no longer force-mutes
+- `frontend/src/state/ProcessorState.js` — simplified auto-narration listener
+- `frontend/src/pages/Settings.js` — `<SageVoicePreviewButton>` component + section
+- `frontend/src/pages/HelpCenter.js` — FAQ refresh
+
+**P1/P2 Backlog (next sprint candidates)**
+- 🟡 Per-realm voice tonality (V1.0.13) — 5 voice slots in Settings, voice_id passed at chain start
+- 🟡 LanguageBar "Reader" mode — speaker pill that reads the translated active page
+- 🟡 "Whisper" pulses on dwell (Phase 3 #8)
+- 🟢 Veo/Sora video souvenirs (P2)
+- 🟢 3D Trophy/Relic Vault in Tesseract (P2)
+- ⚪ Muse S Biofeedback (P3)
+

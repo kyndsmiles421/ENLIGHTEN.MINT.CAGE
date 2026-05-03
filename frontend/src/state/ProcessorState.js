@@ -341,15 +341,15 @@ if (typeof window !== 'undefined' && !window.__sageVoiceWired) {
   window.addEventListener('ritual:step-active', (e) => {
     try {
       const prefs = _readSensoryPrefs();
-      const mode = prefs.immersionLevel === 'calm'
-        ? 'off'
-        : (prefs.sageVoiceMode || 'off');
+      const mode = prefs.sageVoiceMode || 'off';
       if (mode !== 'auto') return;
       const step = e.detail?.step;
       const text = step?.narration || step?.label;
       if (!text) return;
       // Lazy require so the bundle splits — avoids loading the audio
       // service when the user never opts into voice.
+      // V1.0.12: SageVoiceController auto-detects calm immersion and
+      // applies softer timbre + 40% gain — no extra logic needed here.
       import('../services/SageVoiceController').then(({ speak }) => {
         speak(text).catch(() => { /* noop */ });
       }).catch(() => { /* noop */ });

@@ -32,6 +32,18 @@ function _audio() {
   return audioEl;
 }
 
+// V1.0.12 — Calm-immersion contract: when user is in calm mode the
+// audio is BOTH (a) synthesized with softer ElevenLabs settings (server
+// side) AND (b) played at 40% gain client side. Both contribute — the
+// server side affects timbre, the client side affects loudness.
+function _isCalm() {
+  try {
+    const raw = localStorage.getItem('cosmic_prefs');
+    if (!raw) return false;
+    return (JSON.parse(raw) || {}).immersionLevel === 'calm';
+  } catch { return false; }
+}
+
 function _setState(next, reason = null) {
   if (STATE.state === next && STATE.reason === reason) return;
   STATE.state = next;
@@ -73,6 +85,10 @@ export async function speak(text, opts = {}) {
   const reqId = ++currentRequestId;
   _setState('loading');
 
+  // V1.0.12 — auto-detect calm so both server-side timbre + client-side
+  // gain drop in lockstep without the caller having to know.
+  const calm = opts.calm !== undefined ? !!opts.calm : _isCalm();
+
   try {
     const url = `${process.env.REACT_APP_BACKEND_URL}/api/voice/sage-narrate`;
     const res = await fetch(url, {
@@ -85,6 +101,7 @@ export async function speak(text, opts = {}) {
         text: txt.slice(0, 800),
         voice_id: opts.voiceId,
         model_id: opts.modelId,
+        calm,
       }),
     });
     if (reqId !== currentRequestId) return; // user moved on, drop
@@ -105,6 +122,7 @@ export async function speak(text, opts = {}) {
     const a = _audio();
     if (!a) { _setState('idle'); return; }
     a.src = data.audio_url;
+    a.volume = calm ? 0.4 : 1.0;
     _setState('speaking');
     try {
       // Browsers may require user-gesture-bound playback. The wand /
@@ -114,6 +132,50 @@ export async function speak(text, opts = {}) {
     } catch {
       _setState('idle');
     }
+  } catch {
+    if (reqId === currentRequestId) _setState('idle');
+  }
+}
+
+// V1.0.12 — Voice sample preview. Reads from the cached
+// /api/voice/sample endpoint so repeat clicks don't burn characters.
+// The HUD subscribes to the same state stream as `speak()`, so the
+// HUD speaker icon mirrors the "speaking" state during preview —
+// keeping visual feedback consistent across the system.
+export async function previewSample(opts = {}) {
+  if (unavailableNoticed) return;
+  let token = null;
+  try { token = localStorage.getItem('zen_token'); } catch { /* noop */ }
+  if (!token || token === 'guest_token') return;
+
+  const reqId = ++currentRequestId;
+  _setState('loading');
+
+  const calm = opts.calm !== undefined ? !!opts.calm : _isCalm();
+  const params = new URLSearchParams();
+  if (opts.voiceId) params.set('voice_id', opts.voiceId);
+  if (calm) params.set('calm', 'true');
+
+  try {
+    const url = `${process.env.REACT_APP_BACKEND_URL}/api/voice/sample?${params.toString()}`;
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+    if (reqId !== currentRequestId) return;
+    if (res.status === 503) {
+      unavailableNoticed = true;
+      _setState('unavailable', 'no-key');
+      return;
+    }
+    if (!res.ok) { _setState('idle'); return; }
+    const data = await res.json();
+    if (reqId !== currentRequestId) return;
+    if (!data?.audio_url) { _setState('idle'); return; }
+
+    const a = _audio();
+    if (!a) { _setState('idle'); return; }
+    a.src = data.audio_url;
+    a.volume = calm ? 0.4 : 1.0;
+    _setState('speaking');
+    try { await a.play(); } catch { _setState('idle'); }
   } catch {
     if (reqId === currentRequestId) _setState('idle');
   }
@@ -134,5 +196,5 @@ export async function checkAvailability() {
 }
 
 if (typeof window !== 'undefined') {
-  window.SageVoice = { speak, stop, getState, subscribe, checkAvailability };
+  window.SageVoice = { speak, previewSample, stop, getState, subscribe, checkAvailability };
 }
