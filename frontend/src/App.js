@@ -2,6 +2,7 @@ import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, Link } from 'react-router-dom';
 import BackToHub from './components/BackToHub';
 import LanguageBar from './components/LanguageBar';
+import ShareButton from './components/ShareButton';
 import ResonanceField from './components/ResonanceField';
 import { ProcessorStateProvider } from './state/ProcessorState';
 
@@ -441,12 +442,22 @@ function AnimatedRoutes() {
         zIndex: 99999,
         display: 'flex',
         justifyContent: 'flex-end',
+        gap: 6,
         padding: '0 12px',
         marginTop: showBackBtn ? -36 : 8,
         marginBottom: 4,
         pointerEvents: 'none',
       }}
     >
+      {/* V1.0.8 — Share button + Language bar share the SAME sticky
+          strip. Both are inline-flex pills, no fixed/absolute on the
+          inner buttons, no overlay capture zones. Share is reachable
+          from EVERY page without scrolling past the lattice — until
+          the Play Store launch this is the user's primary way to
+          spread the app. */}
+      <div style={{ pointerEvents: 'auto' }}>
+        <ShareButton />
+      </div>
       <div style={{ pointerEvents: 'auto' }}>
         <LanguageBar />
       </div>
