@@ -13,16 +13,44 @@
  * Full immersion → 1.
  */
 import React, { useEffect, useState, useCallback } from 'react';
-import { Sparkles, SkipForward, X, Loader2, RotateCcw, CheckCircle2 } from 'lucide-react';
+import { Sparkles, SkipForward, X, Loader2, RotateCcw, CheckCircle2, Volume2, VolumeX, Volume } from 'lucide-react';
 import { useProcessorState } from '../state/ProcessorState';
 import { useSensory } from '../context/SensoryContext';
+import { speak as sageSpeak, stop as sageStop, subscribe as sageSubscribe } from '../services/SageVoiceController';
 
 const RECALL_VISIBLE_MS = 6000;
 
+// V1.0.11 — Voice mode cycle: off → demand → auto → off. The HUD
+// speaker icon is the only surface where this can change so the user
+// always knows where they stand without diving into Settings.
+const VOICE_MODE_CYCLE = ['off', 'demand', 'auto'];
+const VOICE_MODE_LABEL = { off: 'Voice off', demand: 'Voice on demand', auto: 'Voice auto' };
+
 export default function AgentHUD() {
   const { ritualChain, skipRitualStep, abortRitualChain, startRitualChain } = useProcessorState();
-  const { immersion } = useSensory();
+  const { immersion, sageVoiceMode, prefs, updatePref } = useSensory();
   const [recall, setRecall] = useState(null); // {chain, expiresAt}
+  // V1.0.11 — Live voice playback state from SageVoiceController.
+  const [voiceState, setVoiceState] = useState({ state: 'idle', reason: null });
+  useEffect(() => sageSubscribe(setVoiceState), []);
+
+  const cycleVoiceMode = useCallback(() => {
+    const cur = prefs.sageVoiceMode || 'off';
+    const next = VOICE_MODE_CYCLE[(VOICE_MODE_CYCLE.indexOf(cur) + 1) % VOICE_MODE_CYCLE.length];
+    updatePref('sageVoiceMode', next);
+    if (next === 'off') sageStop();
+  }, [prefs.sageVoiceMode, updatePref]);
+
+  const speakCurrentStep = useCallback(() => {
+    const step = ritualChain?.steps?.[ritualChain?.stepIndex | 0];
+    const text = step?.narration || step?.label;
+    if (!text) return;
+    if (voiceState.state === 'speaking' || voiceState.state === 'loading') {
+      sageStop();
+      return;
+    }
+    sageSpeak(text);
+  }, [ritualChain, voiceState.state]);
 
   // V1.0.10 — Listen for chain-complete events and surface a transient
   // "Run again" affordance in the SAME chip slot. Auto-dismisses after
@@ -188,6 +216,59 @@ export default function AgentHUD() {
       >
         {step?.label || step?.module_id || 'ritual'}
       </span>
+      <button
+        type="button"
+        onClick={speakCurrentStep}
+        data-testid="agent-hud-voice"
+        data-voice-mode={sageVoiceMode}
+        data-voice-state={voiceState.state}
+        title={
+          voiceState.state === 'unavailable'
+            ? 'Sage Voice unavailable — add ELEVENLABS_API_KEY'
+            : voiceState.state === 'speaking'
+            ? 'Tap to stop Sage'
+            : `${VOICE_MODE_LABEL[sageVoiceMode] || 'Voice'} · long-press cycles mode`
+        }
+        onContextMenu={(e) => { e.preventDefault(); cycleVoiceMode(); }}
+        onDoubleClick={cycleVoiceMode}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 18,
+          height: 18,
+          borderRadius: 999,
+          background: voiceState.state === 'speaking'
+            ? 'rgba(167,139,250,0.35)'
+            : sageVoiceMode === 'auto'
+            ? 'rgba(167,139,250,0.20)'
+            : sageVoiceMode === 'demand'
+            ? 'rgba(167,139,250,0.10)'
+            : 'rgba(255,255,255,0.04)',
+          border: `1px solid ${
+            voiceState.state === 'unavailable'
+              ? 'rgba(252,165,165,0.35)'
+              : sageVoiceMode === 'off'
+              ? 'rgba(255,255,255,0.12)'
+              : 'rgba(167,139,250,0.55)'
+          }`,
+          color: voiceState.state === 'unavailable'
+            ? '#FCA5A5'
+            : sageVoiceMode === 'off'
+            ? 'rgba(255,255,255,0.55)'
+            : '#C4B5FD',
+          cursor: 'pointer',
+          padding: 0,
+        }}
+      >
+        {voiceState.state === 'loading'
+          ? <Loader2 size={9} className="animate-spin" />
+          : voiceState.state === 'speaking'
+          ? <Volume2 size={10} />
+          : sageVoiceMode === 'off'
+          ? <VolumeX size={10} />
+          : <Volume size={10} />}
+      </button>
       <button
         type="button"
         onClick={skipRitualStep}

@@ -30,6 +30,13 @@ const DEFAULT_PREFS = {
   // calm immersion contract is "no surprise media"). Default true so
   // existing behaviour is preserved.
   autoVisuals: true,
+  // V1.0.11 — Sage Voice mode. ElevenLabs TTS narration of ritual
+  // step descriptions. Three modes:
+  //   'off'    — no audio (default; respects user budget + privacy)
+  //   'demand' — speaker icon in HUD; tap to play current step
+  //   'auto'   — narrate every step automatically on ritual:step-active
+  // Forced to 'off' when immersionLevel === 'calm' (no surprise media).
+  sageVoiceMode: 'off',
 };
 
 // ━━━ 4-TIER AUDIO RESOLUTION SYSTEM ━━━
@@ -619,6 +626,9 @@ export function SensoryProvider({ children }) {
   // Components reading this gate every auto-image fetch on it so the
   // user is never surprised by a generated image they didn't request.
   const autoVisualsEnabled = prefs.autoVisuals !== false && immersion !== 'calm';
+  // V1.0.11 — Sage Voice computed mode. Calm immersion forces OFF so
+  // a calm session never hears surprise audio.
+  const sageVoiceMode = immersion === 'calm' ? 'off' : (prefs.sageVoiceMode || 'off');
 
   // Memoize context value to prevent infinite re-renders
   const contextValue = useMemo(() => ({
@@ -627,7 +637,7 @@ export function SensoryProvider({ children }) {
     audioTierConfig: AUDIO_TIERS[prefs.audioTier || 'standard'],
     prefs, updatePref, themes: THEMES,
     immersion, showParticles, showAnimations, showFlashing, showVisualEffects,
-    showVisionMode, showFractals, animationSpeed, autoVisualsEnabled,
+    showVisionMode, showFractals, animationSpeed, autoVisualsEnabled, sageVoiceMode,
     // Global Audio Engine
     isMuted, sovereignMuteToggle, sovereignKillAll,
     audioSources, registerAudioSource, unregisterAudioSource,
@@ -636,7 +646,7 @@ export function SensoryProvider({ children }) {
     ambientOn, volume, setVolume, toggleAmbient, playClick, playChime, playCelebration,
     playConfirmation, playSingingBowl, setAudioTierFromMastery, prefs, updatePref,
     immersion, showParticles, showAnimations, showFlashing, showVisualEffects,
-    showVisionMode, showFractals, animationSpeed, autoVisualsEnabled, isMuted, sovereignMuteToggle,
+    showVisionMode, showFractals, animationSpeed, autoVisualsEnabled, sageVoiceMode, isMuted, sovereignMuteToggle,
     sovereignKillAll, audioSources, registerAudioSource, unregisterAudioSource,
     registerAudioContext, unregisterAudioContext
   ]);

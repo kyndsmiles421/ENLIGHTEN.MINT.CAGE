@@ -393,6 +393,45 @@ export default function Settings() {
             testId="toggle-auto-visuals"
             icon={Sparkles}
           />
+          {/* V1.0.11 — Sage Voice mode. ElevenLabs TTS narration of
+              ritual chain steps. 'off' is default so we never surprise
+              the user with audio or charge their key budget without
+              consent. Calm immersion forces 'off' regardless. */}
+          <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
+            <div className="flex items-center gap-2 mb-2">
+              <Volume2 size={14} style={{ color: 'var(--text-muted)' }} />
+              <p className="text-xs" style={{ color: 'var(--text-primary)' }}>Sage Voice</p>
+            </div>
+            <p className="text-[10px] mb-2" style={{ color: 'var(--text-muted)' }}>
+              ElevenLabs narration of ritual steps. Forced off in Calm immersion. Requires ELEVENLABS_API_KEY.
+            </p>
+            <div className="grid grid-cols-3 gap-2" data-testid="sage-voice-mode-picker">
+              {[
+                { id: 'off', label: 'Off' },
+                { id: 'demand', label: 'On Demand' },
+                { id: 'auto', label: 'Auto' },
+              ].map(o => {
+                const active = (prefs.sageVoiceMode || 'off') === o.id;
+                return (
+                  <button
+                    key={o.id}
+                    type="button"
+                    onClick={() => updatePref('sageVoiceMode', o.id)}
+                    data-testid={`sage-voice-mode-${o.id}`}
+                    className="px-3 py-2 rounded-lg text-[11px] transition-all"
+                    style={{
+                      background: active ? 'rgba(167,139,250,0.12)' : 'rgba(0,0,0,0.18)',
+                      border: `1px solid ${active ? 'rgba(167,139,250,0.55)' : 'rgba(255,255,255,0.06)'}`,
+                      color: active ? '#C4B5FD' : 'rgba(255,255,255,0.65)',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {o.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </Section>
 
         {/* Accessibility */}

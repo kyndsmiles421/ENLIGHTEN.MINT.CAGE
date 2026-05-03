@@ -581,3 +581,62 @@ The 100% is real. Every engine reachable through `pull()` reports its lifecycle 
 - P2 3D Trophy/Relic Vault in Tesseract for completed chain milestones
 - P3 Muse S Biofeedback via Web Bluetooth API
 
+
+### V1.0.11 — Sage Voice (ElevenLabs TTS) (2026-05-03) ✅
+**The agent now has vocal cords.** ElevenLabs TTS streams ritual step narrations as audio. Default off — never surprises the user; calm immersion forces it off; gracefully degrades when `ELEVENLABS_API_KEY` is absent.
+
+**Backend** (`backend/routes/voice.py`)
+- `POST /api/voice/sage-narrate` — `{text, voice_id?, model_id?}` → returns `{audio_url: "data:audio/mpeg;base64,…", elapsed_ms, char_count}`. Defaults: voice `21m00Tcm4Tlm` (Rachel, neutral multilingual), model `eleven_flash_v2_5` (~75ms latency).
+- `GET /api/voice/sage-narrate/status` — cheap probe used by Settings to render the picker as available vs "Add ELEVENLABS_API_KEY".
+- 503 returned with actionable detail when key missing — frontend reads it and flips speaker state to `unavailable` once, then stays quiet (no 503 spam).
+- Lightweight char-count logging in `db.voice_narrations` for owner budget awareness.
+- Synthesis runs in `run_in_executor` with 20s timeout; defensive 800-char cap on input.
+- Used the `elevenlabs` Python SDK (v2.45.0) per integration playbook from `integration_playbook_expert_v2`.
+
+**Frontend — Three Surfaces**
+1. **`services/SageVoiceController.js`** — singleton audio + state machine (`idle | loading | speaking | unavailable`). Single `<audio>` element, `subscribe(fn)` for React, `speak(text)` / `stop()` / `checkAvailability()`. Drops in-flight requests when stale (request-id pattern) so abort-then-restart doesn't cause overlapping playback.
+2. **`components/AgentHUD.jsx`** — speaker icon between progress and skip buttons. Shows current mode (`VolumeX | Volume | Volume2`), tap-to-play / tap-to-stop in any mode, **double-click or right-click cycles modes** (off → demand → auto → off). Visual states: `data-voice-mode` and `data-voice-state` attributes. Red border + Speaker-X icon when unavailable.
+3. **`pages/Settings.js`** — three-button picker (Off / On Demand / Auto) with `data-testid="sage-voice-mode-{id}"`. Description explicitly mentions calm-immersion override and the API key requirement.
+
+**Auto-narration wiring** (`state/ProcessorState.js`)
+- Added a window-level (one-time) listener for `ritual:step-active`. Reads `cosmic_prefs.sageVoiceMode`. If `auto` (and not calm), lazy-imports `SageVoiceController` and calls `speak(step.narration || step.label)`.
+- Listens for `ritual:chain-abort | chain-aborted | chain-complete` to call `stop()` so audio never outlives the chain.
+- Code-split: the audio service only loads when the user actually opts into voice — zero impact on first-paint for the 95% of users who keep voice off.
+
+**SensoryContext additions**
+- New `prefs.sageVoiceMode` (default `'off'`).
+- New computed `sageVoiceMode` exposed via `useSensory()` — forces `'off'` in calm immersion (no surprise audio).
+
+**Documentation**
+- `pages/HelpCenter.js` — added 7th ritual FAQ explaining all three modes, the long-press shortcut on the HUD speaker, and graceful degradation on missing key.
+
+**Test status**
+- Backend: **13/13 pytest pass** (4 new sage-voice + 3 V1.0.10 recall + 6 V1.0.9 chain).
+- Frontend playwright smoke: HUD speaker rendered with `data-voice-mode=off, data-voice-state=idle`; tap → flipped to `unavailable` (correct, key absent); Settings picker rendered; selecting Auto persisted to `cosmic_prefs.sageVoiceMode='auto'`.
+
+**Files added/changed**
+- `backend/routes/voice.py` — new
+- `backend/.env` — `ELEVENLABS_API_KEY=` placeholder
+- `backend/requirements.txt` — `elevenlabs==2.45.0`
+- `backend/tests/test_iteration_v1_0_11_sage_voice.py` — 4 tests
+- `frontend/src/services/SageVoiceController.js` — new
+- `frontend/src/state/ProcessorState.js` — auto-narration window listener + lazy-import
+- `frontend/src/context/SensoryContext.js` — `sageVoiceMode` pref + computed
+- `frontend/src/components/AgentHUD.jsx` — speaker button + mode cycling + state styling
+- `frontend/src/pages/Settings.js` — Sage Voice picker
+- `frontend/src/pages/HelpCenter.js` — FAQ entry
+
+**P1 Backlog (remaining)**
+- 🟡 Per-realm voice tonality (earth → grounded male, water → flowing female, etc.) — uses existing `voice_id` param
+- 🟡 LanguageBar "Reader" mode — speaker icon next to translator pill that reads the translated active page (deferred per user; scope said Forge-only this sprint)
+- 🟡 "Whisper" pulses on dwell threshold (Phase 3 #8)
+- 🟢 Veo/Sora video souvenirs at chain-complete (P2)
+- 🟢 3D Trophy/Relic Vault in Tesseract (P2)
+- ⚪ Muse S Biofeedback (P3)
+
+**To activate Sage Voice in production:**
+1. Get an ElevenLabs API key at https://elevenlabs.io/app/settings/api-keys
+2. Paste it into `/app/backend/.env` → `ELEVENLABS_API_KEY=sk_...`
+3. `sudo supervisorctl restart backend`
+4. Settings → Sage Voice → On Demand or Auto → run a ritual chain
+

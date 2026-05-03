@@ -331,6 +331,42 @@ function _readSensoryPrefs() {
   } catch { return {}; }
 }
 
+// V1.0.11 — Sage Voice auto-narration. Subscribes to ritual:step-active
+// and, if the user has opted into 'auto' mode, calls the SageVoice
+// controller. Lives outside React because audio is a side effect of
+// ritual events, not UI state. Calm immersion forces OFF (handled in
+// SensoryContext's computed sageVoiceMode).
+if (typeof window !== 'undefined' && !window.__sageVoiceWired) {
+  window.__sageVoiceWired = true;
+  window.addEventListener('ritual:step-active', (e) => {
+    try {
+      const prefs = _readSensoryPrefs();
+      const mode = prefs.immersionLevel === 'calm'
+        ? 'off'
+        : (prefs.sageVoiceMode || 'off');
+      if (mode !== 'auto') return;
+      const step = e.detail?.step;
+      const text = step?.narration || step?.label;
+      if (!text) return;
+      // Lazy require so the bundle splits — avoids loading the audio
+      // service when the user never opts into voice.
+      import('../services/SageVoiceController').then(({ speak }) => {
+        speak(text).catch(() => { /* noop */ });
+      }).catch(() => { /* noop */ });
+    } catch { /* noop */ }
+  });
+  // Stop voice when a ritual aborts/completes so the audio doesn't
+  // outlive the chain.
+  ['ritual:chain-abort', 'ritual:chain-aborted', 'ritual:chain-complete']
+    .forEach((evt) => {
+      window.addEventListener(evt, () => {
+        import('../services/SageVoiceController').then(({ stop }) => {
+          stop();
+        }).catch(() => { /* noop */ });
+      });
+    });
+}
+
 export function ProcessorStateProvider({ children }) {
   // Single source of truth for the engine's active render-mode.
   const [activeModule, setActiveModule] = useState('IDLE');
