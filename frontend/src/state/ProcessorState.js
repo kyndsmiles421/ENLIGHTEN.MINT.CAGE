@@ -590,6 +590,14 @@ export function ProcessorStateProvider({ children }) {
   // its output to the bus, that's the most authoritative "step-complete"
   // signal. We early-advance so the user isn't held hostage to the
   // safety-net timer.
+  //
+  // V1.0.9 fix: enforce a minimum dwell (5s) before bus commits can
+  // trigger advancement. Otherwise an engine's mount-time commit
+  // (e.g. MeditationEngine writing entityState on mount) races the
+  // timestamp check and the chain auto-completes through every step
+  // in milliseconds. The safety-net timer (>=15s) still runs; the bus
+  // path is just gated so the user actually sees each step.
+  const RITUAL_STEP_MIN_DWELL_MS = 5000;
   useEffect(() => {
     const unsub = busSubscribe((snapshot) => {
       const cur = ritualChainRef.current;
@@ -599,8 +607,10 @@ export function ProcessorStateProvider({ children }) {
       const last = (snapshot.history || [])[snapshot.history.length - 1];
       if (!last) return;
       // Only count commits that happened after this step became active
-      // and that originated from this step's module.
-      if (last.t < (cur.stepStartedAt || 0)) return;
+      // AND respect the minimum dwell so engine-mount commits don't
+      // flash through the chain.
+      const dwell = (last.t || 0) - (cur.stepStartedAt || 0);
+      if (dwell < RITUAL_STEP_MIN_DWELL_MS) return;
       if (last.moduleId && last.moduleId !== step.module_id) return;
       try {
         window.dispatchEvent(new CustomEvent('ritual:step-complete', {
