@@ -4,15 +4,187 @@ Behavior-driven triggers create sellable utility assets.
 
 Tool Forge: Resonator Keys, Focus Lenses, Resource Harvesters
 Skill Generator: Passive Buffs, Active Mantras, Skill Bottling
+V1.0.9: Ritual Chain — natural-language Intent → MODULE_REGISTRY chain
 """
 from fastapi import APIRouter, HTTPException, Depends, Body
 from deps import db, get_current_user, EMERGENT_LLM_KEY, logger
 from datetime import datetime, timezone
 from routes.consciousness import get_consciousness, level_from_consciousness_xp
+from emergentintegrations.llm.chat import LlmChat, UserMessage
+import asyncio
+import json
+import re
 import uuid
 import random
 
 router = APIRouter(prefix="/forge")
+
+# V1.0.9 — Ritual Chain allowlist. Only engine IDs the Sage may
+# emit when forging a chain. Stays in sync manually with the
+# frontend MODULE_REGISTRY in state/ProcessorState.js. We expose
+# this list back to the LLM in the system prompt so it can only
+# reference real, mounted engines (no hallucinated module IDs).
+RITUAL_CHAIN_ALLOWED_MODULES = [
+    "BREATHWORK", "MEDITATION", "YOGA", "MANTRAS", "MUDRAS", "RITUALS",
+    "AFFIRMATIONS", "MOOD_TRACKER", "SOUNDSCAPES", "FREQUENCIES",
+    "JOURNAL", "HERBOLOGY", "CRYSTALS", "AROMATHERAPY", "ACUPRESSURE",
+    "REFLEXOLOGY", "ELIXIRS", "DAILY_RITUAL", "SACRED_TEXTS",
+    "BIBLE", "BLESSINGS", "TEACHINGS", "ZEN_GARDEN", "SILENT_SANCTUARY",
+    "ORACLE", "TAROT", "AKASHIC", "STAR_CHART", "NUMEROLOGY", "MAYAN",
+    "CARDOLOGY", "ANIMAL_TOTEMS", "HEXAGRAM", "COSMIC_INSIGHTS",
+    "COSMIC_CALENDAR", "FORECASTS", "DREAM_VIZ", "SOUL_REPORTS",
+    "AVATAR_GEN", "COSMIC_PORTRAIT", "STORY_GEN", "SCENE_GEN",
+    "STARSEED",
+]
+
+
+def _purify_modules(items):
+    """Drop any LLM-emitted module that is not in the allowlist.
+    Defense in depth — the system prompt also forbids non-allowed
+    IDs, but we filter the output too in case of LLM drift."""
+    out = []
+    for it in items or []:
+        mid = (it.get("module_id") or "").upper().replace("-", "_").replace(" ", "_")
+        if mid not in RITUAL_CHAIN_ALLOWED_MODULES:
+            continue
+        out.append({
+            "module_id": mid,
+            "label": (it.get("label") or "").strip()[:80],
+            "duration": int(it.get("duration") or 180),
+            "narration": (it.get("narration") or "").strip()[:240],
+        })
+    return out
+
+
+def _strip_code_fences(s: str) -> str:
+    """Remove ```json ... ``` fences if the LLM wrapped its output."""
+    if not s:
+        return s
+    s = s.strip()
+    s = re.sub(r"^```(?:json)?\s*", "", s)
+    s = re.sub(r"\s*```\s*$", "", s)
+    return s
+
+
+@router.post("/ritual-chain")
+async def forge_ritual_chain(
+    data: dict = Body(...),
+    user=Depends(get_current_user),
+):
+    """V1.0.9 — Intent → Ritual Chain.
+
+    Body: {intent: str, realm_id?: str, biome?: str, max_steps?: int}
+    Returns: {ritual_title, ritual_description, steps: [{module_id, label,
+              duration, narration}, ...]}
+
+    Free to invoke — no Dust cost — because each chain is just one
+    Sage LLM call (already paid for via EMERGENT_LLM_KEY) and the
+    user can refine endlessly until they get a chain they like.
+    The user only spends if they later FORGE the resulting chain
+    into a permanent Arsenal-mounted instrument (separate flow).
+    """
+    intent = (data.get("intent") or "").strip()
+    if not intent or len(intent) < 5:
+        raise HTTPException(400, "Tell the forge what you want — at least 5 characters.")
+    intent = intent[:400]
+    realm_id = (data.get("realm_id") or "").strip()[:60]
+    biome = (data.get("biome") or "").strip()[:60]
+    max_steps = max(2, min(int(data.get("max_steps") or 4), 6))
+
+    allowed = ", ".join(RITUAL_CHAIN_ALLOWED_MODULES)
+    realm_ctx = ""
+    if realm_id or biome:
+        realm_ctx = (
+            f"\nREALM CONTEXT: realm_id='{realm_id}', biome='{biome}'. "
+            "Weave this realm's element/biome into the narration so each step "
+            "feels native to the realm the user is currently inside."
+        )
+
+    system_prompt = (
+        "You are the Sovereign Forge — a Sage agent that translates a user's "
+        "natural-language intent into a sequenced ritual chain of real modules "
+        "available inside the ENLIGHTEN.MINT.CAFE app. "
+        "This is a multi-denominational, entertainment-and-education-first "
+        "spiritual exploration platform. NEVER use medical, wellness, "
+        "therapeutic, healing, or clinical language; use mythic-spiritual "
+        "framing only (attune, harmonize, anchor, weave, kindle, restore "
+        "resonance). "
+        f"You may ONLY emit module_id values from this exact allowlist:\n{allowed}\n"
+        "Return ONLY valid JSON with no markdown, no commentary, exactly this shape:\n"
+        "{\n"
+        '  "ritual_title": "<3-6 word evocative title>",\n'
+        '  "ritual_description": "<1-2 sentence summary>",\n'
+        '  "steps": [\n'
+        '    {"module_id": "<ALLOWED_ID>", "label": "<3-5 words>",\n'
+        '     "duration": <seconds 60-600>, "narration": "<1 sentence guidance>"}\n'
+        "  ]\n"
+        "}"
+    )
+
+    user_msg = (
+        f"User intent: {intent}\n"
+        f"Generate a ritual chain of EXACTLY {max_steps} steps that fulfills this intent. "
+        "Each step should flow into the next; vary the modalities (don't pick the same "
+        "module twice unless deliberate). Sequence matters — order steps from grounding "
+        "to integration." + realm_ctx
+    )
+
+    try:
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"ritual-chain-{uuid.uuid4().hex[:8]}",
+            system_message=system_prompt,
+        )
+        chat.with_model("openai", "gpt-4o-mini")
+        raw = await asyncio.wait_for(chat.send_message(UserMessage(text=user_msg)), timeout=22)
+        clean = _strip_code_fences(raw)
+        parsed = json.loads(clean)
+    except asyncio.TimeoutError:
+        raise HTTPException(504, "The forge is glowing too bright — try a shorter intent.")
+    except (json.JSONDecodeError, ValueError) as e:
+        logger.warning(f"Ritual chain JSON parse failed: {e} :: {raw[:240] if 'raw' in dir() else ''}")
+        raise HTTPException(502, "The forge sparked but the chain didn't crystallize. Rephrase your intent.")
+    except Exception as e:
+        logger.error(f"Ritual chain LLM error: {e}")
+        raise HTTPException(500, "The forge faltered. Try again.")
+
+    steps = _purify_modules(parsed.get("steps") or [])
+    if not steps:
+        raise HTTPException(502, "The Sage couldn't map your intent to any mounted modules. Try rephrasing.")
+
+    chain = {
+        "id": uuid.uuid4().hex,
+        "ritual_title": (parsed.get("ritual_title") or "Sovereign Ritual").strip()[:80],
+        "ritual_description": (parsed.get("ritual_description") or "").strip()[:240],
+        "intent": intent,
+        "realm_id": realm_id or None,
+        "biome": biome or None,
+        "steps": steps,
+        "step_count": len(steps),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "user_id": user["id"],
+    }
+    # Persist for the user's history so they can re-run a chain.
+    try:
+        await db.ritual_chains.insert_one({**chain})
+    except Exception as e:
+        logger.warning(f"ritual_chains persist failed: {e}")
+    chain.pop("_id", None)
+    return chain
+
+
+@router.get("/ritual-chains")
+async def list_ritual_chains(user=Depends(get_current_user), limit: int = 20):
+    """V1.0.9 — Recent ritual chains for the user. Used by the
+    Ritual Chain panel to offer a "Run again" affordance for
+    chains the user has already forged."""
+    cursor = db.ritual_chains.find(
+        {"user_id": user["id"]},
+        {"_id": 0},
+    ).sort("created_at", -1).limit(max(1, min(limit, 100)))
+    items = await cursor.to_list(length=limit)
+    return {"chains": items}
+
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  TOOL DEFINITIONS
