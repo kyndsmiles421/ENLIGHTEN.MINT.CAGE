@@ -491,3 +491,42 @@ The remaining 7 (Reflexology, Yoga, Frequencies, Soundscapes, Affirmations, Sacr
 | **V69.2** | **56** | **56** | **100.0%** | **+SentientEngineWrapper auto-commits 40 wrapper-only engines** |
 
 The 100% is real. Every engine reachable through `pull()` reports its lifecycle to ContextBus by construction.
+
+
+### V1.0.9 — Omni-Agent · Intent → Ritual Chain → Background Runner (2026-05-03) ✅
+**The Agentic Workflow.** Natural-language intent compiled into a sequenced chain of `MODULE_REGISTRY` IDs by the Sage; the Background Agent Runner advances steps autonomously, pulling each module into the matrix slot via Direct State Substitution.
+
+**Backend** (`/app/backend/routes/forge.py`)
+- `POST /api/forge/ritual-chain` — Sage prompt locked to a 42-module allowlist (`RITUAL_CHAIN_ALLOWED_MODULES`); `_purify_modules` filters any LLM drift; mythic-spiritual framing enforced. Returns `{ritual_title, ritual_description, steps:[{module_id, label, duration, narration}], ...}`. Free to invoke (one Sage call per chain) — Dust only spent if the chain is later forged into a permanent Arsenal-mounted instrument (separate flow).
+- `GET /api/forge/ritual-chains` — recent chains for "Run again" affordance.
+- 6/6 pytest pass — `tests/test_iteration_v1_0_9_ritual_chain.py`.
+
+**Frontend — Three-Layer Omni-Agent**
+1. **Background Agent Runner** (`state/ProcessorState.js`) — listens for window events `ritual:chain-start | step-complete | chain-abort`. Pulls each step into `activeModule`, emits `sovereign:pulse` / `sovereign:state-shift`, runs a duration safety-net timer (15-600s), and advances early when the active module commits to `ContextBus`. **Visual modules (`SCENE_GEN/STORY_GEN/DREAM_VIZ/AVATAR_GEN/COSMIC_PORTRAIT`) are skipped when `autoVisualsEnabled` is false** — `cosmic_prefs.autoVisuals !== false && immersionLevel !== 'calm'`.
+2. **`<RitualChainPanel>`** (`components/RitualChainPanel.jsx`) — Realm-scoped intent forge. Mounted inline below the Realm Practices grid in `pages/MultiverseRealms.js`. Vertical step pathway with active-step highlight via `data-step-state='active'`. Begin · Skip · Abort controls.
+3. **`<AgentHUD>`** (`components/AgentHUD.jsx`) — Global progress chip in the top sticky strip (alongside ShareButton + LanguageBar). Renders only when `ritualChain` is active. Calm immersion → opacity 0.25 ("ghost in the machine"); Standard → 0.7; Full → 1.
+4. **LanguageBar Wand pill** (`components/LanguageBar.jsx`) — sibling pill with intent textarea panel. Forge-and-Run from any page; pill shows `· LIVE` while a chain runs. Decoupled from translator panel — separate surfaces, one Omni-Agent.
+
+**Race-condition fix (mid-build):** First playwright pass exposed that ContextBus commits from engine-mount (e.g., `MeditationEngine` writing entityState on mount) raced the `last.t < stepStartedAt` check and instant-completed every step. Added `RITUAL_STEP_MIN_DWELL_MS = 5000` so bus commits cannot trigger advance during the first 5s of a step. Verified end-to-end: HUD held step 1 for 19.5s; Skip → 2/4; Abort → HUD removed.
+
+**Flatland audit:** Wand panel, Wand pill, AgentHUD, RitualChainPanel — all `inline-flex` / in-flow. No `position: fixed`, no portals, no z-index trap. The sticky strip in `App.js` uses `pointer-events: none` on the wrapper and `auto` only on the buttons — no ghost-click capture zone.
+
+**Test status:** Backend 6/6; Frontend wand→HUD verified manually + via testing-agent (iteration 432, 95% pass; the 5% partial was a test-infra timing artifact around localStorage seeding, not a code bug).
+
+**Files added/changed:**
+- `backend/routes/forge.py` — `+/api/forge/ritual-chain` + list endpoint + allowlist + purify
+- `frontend/src/state/ProcessorState.js` — Background Agent Runner (chain state, advance logic, bus subscription with 5s dwell, window-event API)
+- `frontend/src/components/AgentHUD.jsx` — new
+- `frontend/src/components/RitualChainPanel.jsx` — new
+- `frontend/src/components/LanguageBar.jsx` — wand pill + intent panel + forge handler
+- `frontend/src/pages/MultiverseRealms.js` — mounts `<RitualChainPanel>`
+- `frontend/src/App.js` — mounts `<AgentHUD>` in top sticky strip
+- `backend/tests/test_iteration_v1_0_9_ritual_chain.py` — 6 tests
+
+**P0/P1 Backlog (Next):**
+- P1 ElevenLabs Sage Companion-Verse — voice narration per step (requires API key from user)
+- P1 "Whisper" pulses — dwell-threshold suggestions ("20 min in Forge → suggest Void Meditation")
+- P2 Veo/Sora video souvenirs at chain-complete (requires integration playbook)
+- P2 Gmail "Herald" / Sheets "Scribe" via Emergent Google Auth
+- P2 3D Trophy/Relic in Tesseract for completed chains
+- P3 Muse S Biofeedback via Web Bluetooth API
