@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate, Link 
 import BackToHub from './components/BackToHub';
 import LanguageBar from './components/LanguageBar';
 import ShareButton from './components/ShareButton';
+import AgentHUD from './components/AgentHUD';
 import ResonanceField from './components/ResonanceField';
 import { ProcessorStateProvider } from './state/ProcessorState';
 
@@ -457,6 +458,13 @@ function AnimatedRoutes() {
           spread the app. */}
       <div style={{ pointerEvents: 'auto' }}>
         <ShareButton />
+      </div>
+      {/* V1.0.9 — Omni-Agent progress chip. Renders only when a
+          ritual chain is running; otherwise null. Lives in the same
+          sticky strip so the user can skip/abort steps from anywhere
+          without owning a separate overlay. */}
+      <div style={{ pointerEvents: 'auto' }}>
+        <AgentHUD />
       </div>
       <div style={{ pointerEvents: 'auto' }}>
         <LanguageBar />

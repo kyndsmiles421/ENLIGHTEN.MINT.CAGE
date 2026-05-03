@@ -1,0 +1,66 @@
+{
+  "summary": "V1.0.9 Omni-Agent E2E Testing - Backend 6/6 pass, Frontend partial success. RitualChainPanel inside MultiverseRealms works correctly (AgentHUD appears, Skip/Abort work). However, wand forge from LanguageBar (Hub) has a critical bug: chain forges successfully but AgentHUD does NOT appear - chain auto-completes through all steps immediately due to ContextBus subscription triggering rapid step-complete events.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "LanguageBar Wand Forge",
+        "issue": "AgentHUD does not appear after forging from wand panel. Chain auto-completes through all steps immediately (all 4 ritual:step-active events fire in rapid succession). The ContextBus subscription in ProcessorState.js (lines 593-612) appears to trigger ritual:step-complete events immediately after each step becomes active.",
+        "selector": "[data-testid='agent-hud']",
+        "priority": "HIGH"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "Wand Forge → AgentHUD",
+        "issue": "startRitualChain() dispatches ritual:chain-start event correctly, but the chain completes before HUD can render. Console shows all 4 step-active events firing within milliseconds of each other.",
+        "affected_selectors": ["[data-testid='agent-hud']", "[data-testid='language-bar-wand']"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_iteration_v1_0_9_ritual_chain.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "CRITICAL: Fix ContextBus subscription in ProcessorState.js - it's triggering immediate step-complete events causing chain to auto-complete before AgentHUD renders",
+    "Investigate why RitualChainPanel flow works but LanguageBar wand flow doesn't - both call startRitualChain() but only RitualChainPanel shows AgentHUD",
+    "Add debounce or guard to prevent ContextBus commits from triggering step-complete immediately after step becomes active"
+  ],
+  "critical_code_review_comments": [
+    "ProcessorState.js lines 593-612: ContextBus subscription may be firing step-complete events too quickly. The check `if (last.t < (cur.stepStartedAt || 0)) return;` should prevent old commits, but there may be a race condition or the bus has recent commits that trigger immediate advancement.",
+    "The difference between RitualChainPanel and LanguageBar flows needs investigation - both use startRitualChain() but only one works"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100% (6/6 tests pass)",
+    "frontend": "60% - RitualChainPanel works, LanguageBar wand forge does not show AgentHUD"
+  },
+  "test_credentials": "kyndsmiles@gmail.com / Sovereign2026!",
+  "seed_data_creation": "Multiple ritual chains created during testing (visible via GET /api/forge/ritual-chains)",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Backend ritual-chain endpoints work perfectly (6/6 pytest pass). RitualChainPanel inside MultiverseRealms works - AgentHUD appears with progress, Skip and Abort buttons work. The bug is specifically in the LanguageBar wand forge flow - the chain forges successfully (API returns data, toast shows success, panel closes) but AgentHUD never appears because the chain auto-completes through all steps immediately. Console logs show ritual:chain-start and all ritual:step-active events firing within milliseconds. The ContextBus subscription in ProcessorState.js is the likely culprit.",
+  "features_verified": {
+    "backend_POST_ritual_chain": "PASS - Returns ritual_title, ritual_description, steps with valid module_ids",
+    "backend_GET_ritual_chains": "PASS - Lists user's recent chains",
+    "wand_pill_visibility": "PASS - data-testid='language-bar-wand' visible in sticky strip",
+    "wand_panel_open": "PASS - data-testid='language-bar-wand-panel' opens with intent textarea and FORGE & RUN button",
+    "wand_forge_api_call": "PASS - API call succeeds, chain created",
+    "wand_forge_agentHUD": "FAIL - AgentHUD does not appear after forge",
+    "RitualChainPanel_in_realm": "PASS - Renders inline below practice grid",
+    "RitualChainPanel_forge": "PASS - Step list appears after forge",
+    "RitualChainPanel_begin": "PASS - AgentHUD appears after clicking Begin Ritual",
+    "AgentHUD_progress": "PASS (in realm flow) - Shows step 1/N · label",
+    "AgentHUD_skip": "PASS (in realm flow) - Advances step index",
+    "AgentHUD_abort": "PASS (in realm flow) - HUD disappears",
+    "active_step_highlight": "PASS - data-step-state='active' attribute present",
+    "settings_immersion": "PASS - ATMOSPHERE SWITCH with Simplified/Standard/Ultra options exists",
+    "settings_auto_visuals": "PASS - Auto-Generate AI Images toggle exists"
+  },
+  "rca_of_the_issue": "Root Cause: The ContextBus subscription in ProcessorState.js (lines 593-612) listens for bus commits and triggers ritual:step-complete events. When a chain starts from the LanguageBar wand, the bus may already have recent commits from the current session that match the step's module_id, causing immediate advancement. The check `if (last.t < (cur.stepStartedAt || 0)) return;` should prevent this, but there appears to be a timing issue where stepStartedAt is not set before the subscription fires, or the bus has commits with timestamps very close to the current time. Reproduction: Login → Open wand panel → Type intent → Click FORGE & RUN → Observe console logs showing all step-active events firing immediately. Mitigation: Add a small delay (e.g., 100ms) after setting stepStartedAt before the ContextBus subscription can trigger step-complete, or add a flag to ignore bus commits for the first N milliseconds after a step becomes active."
+}
