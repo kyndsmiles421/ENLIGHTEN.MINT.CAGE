@@ -4,6 +4,16 @@ import { ArrowLeft, ChevronDown, ChevronUp, BookOpen, Sparkles, Star, Heart, Shi
 import { useNavigate } from 'react-router-dom';
 
 const FAQS = [
+  // V1.0.10 — Ritual Forge / Omni-Agent — surfaced first because it's
+  // the newest hero feature. Users will look here when they spot the
+  // wand pill.
+  { q: "What is the Wand pill in the top-right corner?", a: "The Wand opens the Ritual Forge — a Sage agent that takes a natural-language intent (e.g. 'Ground me, breathe deep, capture one insight') and compiles it into a sequence of 2–6 modules that run automatically. The Wand sits in the top sticky strip on every page so you can summon a ritual from the Hub, Forge, Tesseract, or anywhere else.", category: "ritual" },
+  { q: "What's the difference between Forge & Run and the Ritual Path inside a Realm?", a: "Same engine, two surfaces. The Wand is the global entry point — quick intent, one-tap re-run from your last 3 chains. The Realm Practices panel is the formal workshop — it knows your active realm and weaves the realm's element/biome into every step. Use the Wand for daily rhythm; use the Realm panel when you want a chain shaped by where you currently are.", category: "ritual" },
+  { q: "Why does the agent pause for a few seconds on each step?", a: "It's a deliberate Dwell Guard. When a module mounts, it commits its initial state to the ContextBus — that commit could be misread as 'step done'. So we hold the floor for at least 5 seconds before any bus-driven advance. The agent still feels live (you'll see the chip pulsing), but you actually get to inhale the step instead of flashing through it. Tap Skip in the HUD if you want to go faster.", category: "ritual" },
+  { q: "What does the green '✓ Run again' chip mean?", a: "When a chain completes, the same HUD slot transitions for ~6 seconds into a recall pill. Tap 'RUN AGAIN' to restart the chain immediately — bypassing the Sage call. After 6s it auto-dismisses, or you can hit × to clear it.", category: "ritual" },
+  { q: "What happens to visual modules when Auto-Visuals is OFF?", a: "Settings → Auto-Generate AI Images. With it off (or in Calm immersion), the runner skips visual modules — Scene Gen, Story Gen, Dream Viz, Avatar, Cosmic Portrait — and advances to the next non-visual step. You'll see a '· skipped' badge in any visible Ritual Path. Nothing surprises you with an image you didn't ask for.", category: "ritual" },
+  { q: "How is Calm Immersion different for the agent?", a: "In Calm mode the chain still runs, but the HUD chip drops to ~25% opacity (a ghost in the machine) and toast notifications are suppressed. Visual modules are also skipped. The agent stays useful without ever interrupting your focus.", category: "ritual" },
+
   { q: "How do I track my mood?", a: "Tap the Heart icon in the bottom navigation or go to Dashboard → Mood Logs. Select how you're feeling and optionally add a note. Your mood history builds a powerful self-awareness map over time.", category: "basics" },
   { q: "What is the Quick Reset?", a: "Quick Reset is a personalized 5-minute wellness flow. Choose from 33+ emotions, and the app creates a custom reset combining a solfeggio frequency, breathing/meditation tool, nourishing recipe, and sacred mantra.", category: "basics" },
   { q: "How does the Star Chart work?", a: "The 3D Star Chart shows constellations from 20 world cultures. Drag to rotate, pinch/scroll to zoom, and tap any constellation for its sacred mythology. Select a culture from 'World Skies' to see that civilization's sky stories.", category: "features" },
@@ -32,6 +42,7 @@ const TUTORIALS = [
 
 const CATEGORIES = [
   { id: 'all', label: 'All' },
+  { id: 'ritual', label: 'Ritual Forge' },
   { id: 'basics', label: 'Basics' },
   { id: 'features', label: 'Features' },
   { id: 'wisdom', label: 'Wisdom' },

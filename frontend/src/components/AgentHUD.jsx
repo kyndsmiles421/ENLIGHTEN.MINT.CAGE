@@ -1,24 +1,144 @@
 /**
- * AgentHUD.jsx — V1.0.9 Global Ritual Progress Chip
+ * AgentHUD.jsx — V1.0.9 Global Ritual Progress Chip · V1.0.10 Recall sub-state
  *
  * Lives inside App.js's top sticky strip. Renders only when
- * ProcessorState has an active ritualChain. The chip shows
- *   step 2/4 · Deep Breathing  [skip] [end]
- * and lets the user advance or abort from anywhere in the app —
- * the runner itself lives in ProcessorState.
+ * ProcessorState has an active ritualChain OR when a chain has just
+ * completed (transient 6s "Run again" sub-state). The chip shows:
+ *   running:   step 2/4 · Deep Breathing  [skip] [end]
+ *   complete:  ✓ Grounding Through Breath · Run again (auto-dismisses)
+ * Single chip slot, two states — Flatland-safe ribbon between two
+ * surfaces from one event chain.
  *
- * Flatland: inline-flex pill, no portals, no fixed positioning,
- * no z-index trap. Calm immersion → 0.25 opacity (becomes a
- * "ghost in the machine"). Full immersion → 1.
+ * Calm immersion → 0.25 opacity ("ghost in the machine").
+ * Full immersion → 1.
  */
-import React from 'react';
-import { Sparkles, SkipForward, X, Loader2 } from 'lucide-react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Sparkles, SkipForward, X, Loader2, RotateCcw, CheckCircle2 } from 'lucide-react';
 import { useProcessorState } from '../state/ProcessorState';
 import { useSensory } from '../context/SensoryContext';
 
+const RECALL_VISIBLE_MS = 6000;
+
 export default function AgentHUD() {
-  const { ritualChain, skipRitualStep, abortRitualChain } = useProcessorState();
+  const { ritualChain, skipRitualStep, abortRitualChain, startRitualChain } = useProcessorState();
   const { immersion } = useSensory();
+  const [recall, setRecall] = useState(null); // {chain, expiresAt}
+
+  // V1.0.10 — Listen for chain-complete events and surface a transient
+  // "Run again" affordance in the SAME chip slot. Auto-dismisses after
+  // RECALL_VISIBLE_MS so it never overstays.
+  useEffect(() => {
+    const onComplete = (e) => {
+      const chain = e.detail?.chain;
+      if (!chain || !chain.steps?.length) return;
+      setRecall({ chain, expiresAt: Date.now() + RECALL_VISIBLE_MS });
+      const t = setTimeout(() => setRecall(null), RECALL_VISIBLE_MS);
+      return () => clearTimeout(t);
+    };
+    const onStart = () => setRecall(null); // a new chain starts → clear recall
+    window.addEventListener('ritual:chain-complete', onComplete);
+    window.addEventListener('ritual:chain-start', onStart);
+    return () => {
+      window.removeEventListener('ritual:chain-complete', onComplete);
+      window.removeEventListener('ritual:chain-start', onStart);
+    };
+  }, []);
+
+  const handleRecall = useCallback(() => {
+    if (recall?.chain) {
+      startRitualChain(recall.chain);
+      setRecall(null);
+    }
+  }, [recall, startRitualChain]);
+
+  const opacity = immersion === 'calm' ? 0.25 : immersion === 'standard' ? 0.7 : 1;
+  const accent = '#A78BFA';
+  const recallAccent = '#86EFAC';
+
+  // V1.0.10 — Recall sub-state takes precedence visually for its 6s
+  // window unless the user starts a new chain.
+  if (!ritualChain && recall) {
+    return (
+      <div
+        data-testid="agent-hud"
+        data-hud-state="recall"
+        data-immersion={immersion}
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 6,
+          padding: '6px 10px',
+          borderRadius: 999,
+          background: 'linear-gradient(135deg, rgba(34,197,94,0.18), rgba(10,10,18,0.65))',
+          border: `1px solid ${recallAccent}55`,
+          color: '#F8FAFC',
+          fontSize: 10,
+          fontFamily: 'monospace',
+          letterSpacing: '0.10em',
+          opacity,
+          transition: 'opacity 0.4s ease',
+          maxWidth: 320,
+        }}
+      >
+        <CheckCircle2 size={11} style={{ color: recallAccent }} />
+        <span
+          style={{
+            color: '#F8FAFC',
+            maxWidth: 160,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+          title={recall.chain.ritual_title}
+        >
+          {recall.chain.ritual_title}
+        </span>
+        <button
+          type="button"
+          onClick={handleRecall}
+          data-testid="agent-hud-recall"
+          title="Run again"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 4,
+            padding: '2px 8px',
+            borderRadius: 999,
+            background: 'rgba(134,239,172,0.18)',
+            border: '1px solid rgba(134,239,172,0.4)',
+            color: recallAccent,
+            cursor: 'pointer',
+            fontSize: 9,
+            fontFamily: 'monospace',
+            letterSpacing: '0.10em',
+          }}
+        >
+          <RotateCcw size={9} /> RUN AGAIN
+        </button>
+        <button
+          type="button"
+          onClick={() => setRecall(null)}
+          data-testid="agent-hud-recall-dismiss"
+          title="Dismiss"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 18,
+            height: 18,
+            borderRadius: 999,
+            background: 'transparent',
+            border: '1px solid rgba(255,255,255,0.12)',
+            color: 'rgba(255,255,255,0.55)',
+            cursor: 'pointer',
+            padding: 0,
+          }}
+        >
+          <X size={10} />
+        </button>
+      </div>
+    );
+  }
 
   if (!ritualChain || !ritualChain.steps?.length) return null;
 
@@ -26,12 +146,10 @@ export default function AgentHUD() {
   const step = ritualChain.steps[idx];
   const total = ritualChain.steps.length;
 
-  const opacity = immersion === 'calm' ? 0.25 : immersion === 'standard' ? 0.7 : 1;
-  const accent = '#A78BFA';
-
   return (
     <div
       data-testid="agent-hud"
+      data-hud-state="running"
       data-immersion={immersion}
       style={{
         display: 'inline-flex',

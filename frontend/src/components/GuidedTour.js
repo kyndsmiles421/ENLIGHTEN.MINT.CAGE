@@ -85,6 +85,17 @@ const TOUR_STEPS = [
     bg: 'radial-gradient(ellipse at 40% 40%, rgba(56,189,248,0.12) 0%, transparent 60%)',
   },
   {
+    // V1.0.10 — Ritual Forge / Omni-Agent tour step. Surfaces the
+    // Wand pill so new users discover it instead of bouncing past
+    // the most powerful global feature.
+    id: 'ritual_forge',
+    title: 'Ritual Forge — The Omni-Agent',
+    desc: 'Tap the wand pill in the top-right corner from any page. Type what you want — "Ground me, breathe deep, capture one insight" — and Sage compiles a 2–6 step ritual that runs automatically. A progress chip stays in the corner so you can skip or end from anywhere.',
+    icon: Sparkles, color: '#A78BFA', category: 'Spotlight',
+    bg: 'radial-gradient(ellipse at 70% 30%, rgba(167,139,250,0.16) 0%, transparent 60%)',
+    features: ['Natural-language intent', 'Background runner', 'One-tap recall', 'Calm-mode aware'],
+  },
+  {
     id: 'finish', title: 'Your Journey Begins Now',
     desc: 'The ENLIGHTEN.MINT.CAFE evolves with you. Explore at your own pace — there\'s always something new to discover.',
     icon: Sparkles, color: '#D8B4FE', category: 'Begin',

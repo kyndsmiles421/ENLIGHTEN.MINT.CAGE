@@ -127,6 +127,11 @@ export default function LanguageBar() {
   const [intent, setIntent] = useState('');
   const [forging, setForging] = useState(false);
   const [forgeError, setForgeError] = useState(null);
+  // V1.0.10 — Recent ritual chains, fetched on wand-panel open. Used
+  // for one-tap re-run pills above the intent textarea so habits
+  // become rhythmic (not a fresh Sage call every time).
+  const [recentChains, setRecentChains] = useState([]);
+  const [recentLoading, setRecentLoading] = useState(false);
 
   // Hydrate the auto-follow flag + sacred mode from localStorage so
   // the choice survives reloads.
@@ -204,6 +209,50 @@ export default function LanguageBar() {
     revertAll();
     setAutoFollow(false);
   }, []);
+
+  // V1.0.10 — Fetch recent chains when the wand panel opens. Dedupe
+  // by ritual_title (most recent wins) and surface the top 3 as
+  // one-tap re-run pills.
+  const fetchRecentChains = useCallback(async () => {
+    let token = null;
+    try { token = localStorage.getItem('zen_token'); } catch { /* noop */ }
+    if (!token || token === 'guest_token') return;
+    setRecentLoading(true);
+    try {
+      const res = await axios.get(`${API}/forge/ritual-chains?limit=10`, {
+        headers: { Authorization: `Bearer ${token}` },
+        timeout: 8000,
+      });
+      const all = res.data?.chains || [];
+      const seen = new Set();
+      const unique = [];
+      for (const c of all) {
+        const key = (c.ritual_title || '').toLowerCase().trim();
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        unique.push(c);
+        if (unique.length >= 3) break;
+      }
+      setRecentChains(unique);
+    } catch { /* graceful — chip just hides */ }
+    setRecentLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (wandOpen) fetchRecentChains();
+  }, [wandOpen, fetchRecentChains]);
+
+  // V1.0.10 — One-tap re-run. Skips the LLM forge step entirely; the
+  // stored chain steps go straight to the Background Agent Runner.
+  const handleRecallChain = useCallback((chain) => {
+    if (!chain?.steps?.length) return;
+    startRitualChain(chain);
+    setWandOpen(false);
+    setIntent('');
+    toast.success(`Recalled · ${chain.ritual_title}`, {
+      description: `${chain.steps.length} steps · agent running`,
+    });
+  }, [startRitualChain]);
 
   // V1.0.9 — Forge a ritual chain from the wand panel and hand it off
   // to the Background Agent Runner. Lives here (rather than in a
@@ -633,6 +682,74 @@ export default function LanguageBar() {
               boxSizing: 'border-box',
             }}
           />
+
+          {/* V1.0.10 — Recent rituals · one-tap re-run. Renders only
+              when the user has at least one prior chain. Bypasses the
+              LLM forge step entirely — stored chain → runner. */}
+          {recentChains.length > 0 && (
+            <div data-testid="language-bar-wand-recent" style={{ marginTop: 8 }}>
+              <p
+                style={{
+                  fontSize: 8.5,
+                  letterSpacing: '0.18em',
+                  opacity: 0.5,
+                  marginBottom: 4,
+                  color: '#C4B5FD',
+                }}
+              >
+                RECENT · ONE-TAP
+              </p>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 6,
+                  overflowX: 'auto',
+                  paddingBottom: 2,
+                  scrollbarWidth: 'thin',
+                }}
+              >
+                {recentChains.map((c, i) => (
+                  <button
+                    key={c.id || i}
+                    type="button"
+                    onClick={() => handleRecallChain(c)}
+                    data-testid={`language-bar-wand-recall-${i}`}
+                    title={`${c.ritual_title} · ${c.steps?.length || 0} steps`}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      padding: '4px 10px',
+                      borderRadius: 999,
+                      background: 'rgba(167,139,250,0.10)',
+                      border: '1px solid rgba(167,139,250,0.30)',
+                      color: '#DDD6FE',
+                      fontSize: 9,
+                      letterSpacing: '0.04em',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                      maxWidth: 160,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    <RotateCcw size={9} />
+                    {c.ritual_title}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {recentLoading && recentChains.length === 0 && (
+            <p
+              data-testid="language-bar-wand-recent-loading"
+              style={{ fontSize: 9, color: 'rgba(255,255,255,0.4)', marginTop: 6 }}
+            >
+              Recalling past rituals…
+            </p>
+          )}
+
           <div
             style={{
               display: 'flex',

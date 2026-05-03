@@ -530,3 +530,54 @@ The 100% is real. Every engine reachable through `pull()` reports its lifecycle 
 - P2 Gmail "Herald" / Sheets "Scribe" via Emergent Google Auth
 - P2 3D Trophy/Relic in Tesseract for completed chains
 - P3 Muse S Biofeedback via Web Bluetooth API
+
+### V1.0.10 — Ritual Recall · Chain-Complete Sub-state · Discovery Surfaces (2026-05-03) ✅
+**Audit-first build:** before scoping, grep'd for existing `Tour|Onboard|Tutorial|Help|Codex` — found `GuidedTour.js`, `Onboarding.js`, `HelpCenter.js`, `Tutorial.js`. Refused to invent a new `<CodexOverlay>`. Reused `HelpCenter.js` for documentation and `GuidedTour.js` for discovery — kept the bundle lean.
+
+**1. Recent Rituals · One-Tap Recall** (`components/LanguageBar.jsx`)
+- On Wand panel open, fetches `GET /api/forge/ritual-chains?limit=10` and dedupes by `ritual_title.toLowerCase().trim()` — same intent yielding two slightly different titles still surfaces twice (Sage's variance is often meaningful).
+- Top 3 unique chains render as horizontal-scrolling pills above the intent textarea (`data-testid="language-bar-wand-recall-{i}"`).
+- Click pill → `startRitualChain(stored_chain)` directly. **No second LLM call.** The recall path is instantaneous because the steps are already persisted in `db.ritual_chains`.
+- Graceful: hides the entire `RECENT · ONE-TAP` section if the user has zero history; shows "Recalling past rituals…" while loading.
+
+**2. AgentHUD Chain-Complete Sub-state** (`components/AgentHUD.jsx`)
+- Same chip slot, two states. New attribute `data-hud-state="running" | "recall"`.
+- On `ritual:chain-complete`, the HUD swaps for 6s into a green recall pill: `✓ {title} [RUN AGAIN] [×]`.
+- `RUN AGAIN` calls `startRitualChain(completed_chain)` → bypasses Sage.
+- `×` dismisses early. Otherwise auto-dismisses after 6s.
+- Aborted chains (`ritual:chain-aborted`) do NOT trigger the recall chip — only natural completion.
+- Calm immersion still gates opacity (0.25). The recall chip respects the same ghost-mode contract.
+
+**3. HelpCenter "Ritual Forge" FAQ section** (`pages/HelpCenter.js`)
+- New `ritual` category added to `CATEGORIES` between `all` and `basics` — surfaces first because it's the newest hero feature.
+- Six FAQs cover: what the Wand does, Forge-vs-Realm distinction, the Dwell Guard ("Why does it pause for a few seconds?"), the green Run Again chip, Auto-Visuals OFF behaviour, Calm immersion semantics.
+- Pure data addition — no new components, no new routes, no popup. Reuses the existing FAQ accordion.
+
+**4. GuidedTour `ritual_forge` step** (`components/GuidedTour.js`)
+- New step injected before the final `finish` card (12th of 13 total).
+- Points the new user at the Wand pill: "Tap the wand pill in the top-right corner from any page…".
+- Uses the existing portal-based card walkthrough (legacy fixed-positioning component — *not* refactored; just added a TOUR_STEPS entry).
+
+**End-to-end verification:**
+- Backend: 9/9 pytest pass (`tests/test_iteration_v1_0_10_ritual_recall.py` × 3 + V1.0.9 × 6).
+- Frontend playwright run:
+  - Recent pills: `["Cosmic Vision Journey", "Grounding Insight Journey", "Journey of Grounding and Integration"]`
+  - One-tap recall → HUD `data-hud-state="running"` with step `"Deep Cosmic Breath"` (no Sage call observed)
+  - Skip-through-completion → HUD `data-hud-state="recall"` with green RUN AGAIN button
+  - Abort → no recall chip (correct semantics)
+
+**Files added/changed:**
+- `frontend/src/components/LanguageBar.jsx` — recent-chains fetch on wand-open, dedupe-by-title, recall pills, `handleRecallChain` (skips LLM)
+- `frontend/src/components/AgentHUD.jsx` — chain-complete listener, recall sub-state, RUN AGAIN button
+- `frontend/src/pages/HelpCenter.js` — 6 ritual FAQs + new `ritual` category
+- `frontend/src/components/GuidedTour.js` — `ritual_forge` step appended
+- `backend/tests/test_iteration_v1_0_10_ritual_recall.py` — 3 tests
+
+**P1/P2 Backlog (Next sprint candidates):**
+- P1 ElevenLabs Sage Companion-Verse — voice narration per ritual step (needs API key)
+- P1 "Whisper" pulses — context-aware suggestions on dwell (Phase 3 #8)
+- P2 Dynamic Dwell Scoring — `RequiredDwell = 5000 × ModuleWeight`; Scribe 0.6, Sage 1.5
+- P2 Veo/Sora video souvenirs at chain-complete (needs integration playbook)
+- P2 3D Trophy/Relic Vault in Tesseract for completed chain milestones
+- P3 Muse S Biofeedback via Web Bluetooth API
+
