@@ -11,6 +11,7 @@ import { CosmicInlineLoader, CosmicError, getCosmicErrorMessage } from '../compo
 import { commit as busCommit } from '../state/ContextBus';
 import { useProcessorState } from '../state/ProcessorState';
 import CompanionChip from '../components/CompanionChip';
+import RitualChainPanel from '../components/RitualChainPanel';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -459,6 +460,15 @@ export default function MultiverseRealms() {
                   ))}
                 </div>
               </div>
+
+              {/* V1.0.9 — Ritual Chain Forge. Intent-to-Ritual Sage
+                  agent + Background Runner. Renders inline below the
+                  practice grid so the realm offers BOTH manual
+                  practice picks and AI-orchestrated chains. */}
+              <RitualChainPanel
+                realm={activeRealm.realm}
+                accentColor={activeRealm.realm.color}
+              />
 
               {/* Stats */}
               <div className="grid grid-cols-2 gap-3 mb-6">

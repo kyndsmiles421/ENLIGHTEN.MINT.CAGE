@@ -315,9 +315,38 @@ export const MODULE_REGISTRY = {
   PRODUCTION:        React.lazy(() => import('../engines/ProductionEngine')),
 };
 
+// V1.0.9 — Modules whose output is a generated visual (image/scene).
+// The Background Agent Runner skips these auto-advancement when the
+// user has `autoVisuals` disabled (or is in 'calm' immersion). The
+// Sage chain still completes — visual steps just don't auto-pull.
+const RITUAL_VISUAL_MODULES = new Set([
+  'SCENE_GEN', 'COSMIC_PORTRAIT', 'AVATAR_GEN', 'DREAM_VIZ', 'STORY_GEN',
+]);
+
+function _readSensoryPrefs() {
+  try {
+    const raw = localStorage.getItem('cosmic_prefs');
+    if (!raw) return {};
+    return JSON.parse(raw) || {};
+  } catch { return {}; }
+}
+
 export function ProcessorStateProvider({ children }) {
   // Single source of truth for the engine's active render-mode.
   const [activeModule, setActiveModule] = useState('IDLE');
+
+  // V1.0.9 — Active Ritual Chain state. When a chain is forged in the
+  // RitualChainPanel and "Begin" is pressed, we mount the chain here;
+  // the Background Agent Runner advances through it step-by-step,
+  // pulling each step's module_id into the matrix slot. UI components
+  // (the panel, HUD ribbons) subscribe via useProcessorState() to
+  // render progress without owning the orchestration logic.
+  const [ritualChain, setRitualChain] = useState(null); // { id, ritual_title, steps:[...], stepIndex, startedAt }
+  const ritualTimerRef = React.useRef(null);
+  const ritualChainRef = React.useRef(null);
+  // Keep ref synced so window-event handlers (which close over the
+  // initial value otherwise) always see the latest chain.
+  useEffect(() => { ritualChainRef.current = ritualChain; }, [ritualChain]);
 
   // V68.82 — Time-in-Engine. We stamp when a module is pulled and POST
   // the elapsed seconds back to /api/arsenal/dwell-log on each swap or
@@ -409,9 +438,203 @@ export function ProcessorStateProvider({ children }) {
     return unsub;
   }, [activeModule]);
 
+  // V1.0.9 — Background Agent Runner.
+  //
+  // Subscribes to window events + ContextBus commits so the active
+  // ritual chain advances autonomously: when the current step's module
+  // emits a commit (or its duration timer elapses), the runner pulls
+  // the next module_id without user intervention.
+  //
+  // Calm-immersion contract: the runner *still* advances steps, but
+  // suppresses the toast/tooltip side effects so the user is never
+  // visually interrupted. Auto-Visuals contract: visual modules
+  // (scene, story, dream-viz) are skipped when autoVisualsEnabled
+  // is false — the chain leapfrogs past them to the next non-visual
+  // step instead of generating an unsolicited image.
+  const advanceRitualStep = useCallback((targetIndex) => {
+    const cur = ritualChainRef.current;
+    if (!cur) return;
+    const steps = cur.steps || [];
+    let idx = Math.max(0, targetIndex | 0);
+    const prefs = _readSensoryPrefs();
+    const immersion = prefs.immersionLevel || 'full';
+    const autoVisuals = prefs.autoVisuals !== false && immersion !== 'calm';
+
+    // Skip-forward over visual steps when auto-visuals are off.
+    while (idx < steps.length) {
+      const step = steps[idx];
+      if (RITUAL_VISUAL_MODULES.has(step.module_id) && !autoVisuals) {
+        try {
+          window.dispatchEvent(new CustomEvent('ritual:step-skipped', {
+            detail: { step, index: idx, reason: 'auto-visuals-off' },
+          }));
+        } catch { /* noop */ }
+        idx += 1;
+        continue;
+      }
+      break;
+    }
+
+    if (ritualTimerRef.current) {
+      clearTimeout(ritualTimerRef.current);
+      ritualTimerRef.current = null;
+    }
+
+    if (idx >= steps.length) {
+      // Chain complete.
+      const finished = { ...cur, stepIndex: steps.length, completedAt: Date.now() };
+      ritualChainRef.current = null;
+      setRitualChain(null);
+      try {
+        window.dispatchEvent(new CustomEvent('ritual:chain-complete', { detail: { chain: finished } }));
+      } catch { /* noop */ }
+      // Drop back to IDLE so the matrix breathes between chains.
+      flushDwell();
+      dwellStartRef.current = { moduleId: 'IDLE', startedAt: Date.now() };
+      setActiveModule('IDLE');
+      emitPulse('IDLE');
+      try { window.__sovereignActiveModule = 'IDLE'; } catch { /* noop */ }
+      publishPrimer('IDLE');
+      return;
+    }
+
+    const step = steps[idx];
+    const moduleId = step.module_id;
+    if (!Object.prototype.hasOwnProperty.call(MODULE_REGISTRY, moduleId)) {
+      // Unknown module — skip rather than dead-stop the chain.
+      ritualChainRef.current = { ...cur, stepIndex: idx + 1, stepStartedAt: Date.now() };
+      setRitualChain(ritualChainRef.current);
+      advanceRitualStep(idx + 1);
+      return;
+    }
+
+    flushDwell();
+    dwellStartRef.current = { moduleId, startedAt: Date.now() };
+    setActiveModule(moduleId);
+    emitPulse(moduleId);
+    try { window.__sovereignActiveModule = moduleId; } catch { /* noop */ }
+    publishPrimer(moduleId);
+
+    const next = { ...cur, stepIndex: idx, stepStartedAt: Date.now() };
+    ritualChainRef.current = next;
+    setRitualChain(next);
+
+    try {
+      window.dispatchEvent(new CustomEvent('ritual:step-active', {
+        detail: { step, index: idx, immersion, total: steps.length },
+      }));
+    } catch { /* noop */ }
+
+    // Auto-advance after the step's declared duration as a safety net.
+    // ContextBus commits also trigger advancement (whichever fires first).
+    const dur = Math.max(15, Math.min(Number(step.duration) || 180, 600));
+    ritualTimerRef.current = setTimeout(() => {
+      try {
+        window.dispatchEvent(new CustomEvent('ritual:step-complete', {
+          detail: { step, index: idx, source: 'timer' },
+        }));
+      } catch { /* noop */ }
+    }, dur * 1000);
+  }, [flushDwell]);
+
+  // Window-event API — the panel + any external trigger talks to the
+  // runner via window events so non-React modules can drive it too.
+  useEffect(() => {
+    const onStart = (e) => {
+      const chain = e.detail?.chain;
+      if (!chain || !Array.isArray(chain.steps) || chain.steps.length === 0) return;
+      const seeded = {
+        id: chain.id,
+        ritual_title: chain.ritual_title,
+        ritual_description: chain.ritual_description,
+        steps: chain.steps,
+        stepIndex: 0,
+        startedAt: Date.now(),
+        stepStartedAt: Date.now(),
+      };
+      ritualChainRef.current = seeded;
+      setRitualChain(seeded);
+      advanceRitualStep(0);
+    };
+    const onComplete = () => {
+      const cur = ritualChainRef.current;
+      if (!cur) return;
+      advanceRitualStep((cur.stepIndex | 0) + 1);
+    };
+    const onAbort = () => {
+      if (ritualTimerRef.current) {
+        clearTimeout(ritualTimerRef.current);
+        ritualTimerRef.current = null;
+      }
+      ritualChainRef.current = null;
+      setRitualChain(null);
+      try {
+        window.dispatchEvent(new CustomEvent('ritual:chain-aborted'));
+      } catch { /* noop */ }
+    };
+    window.addEventListener('ritual:chain-start', onStart);
+    window.addEventListener('ritual:step-complete', onComplete);
+    window.addEventListener('ritual:chain-abort', onAbort);
+    return () => {
+      window.removeEventListener('ritual:chain-start', onStart);
+      window.removeEventListener('ritual:step-complete', onComplete);
+      window.removeEventListener('ritual:chain-abort', onAbort);
+      if (ritualTimerRef.current) {
+        clearTimeout(ritualTimerRef.current);
+        ritualTimerRef.current = null;
+      }
+    };
+  }, [advanceRitualStep]);
+
+  // ContextBus subscription — when the active step's module commits
+  // its output to the bus, that's the most authoritative "step-complete"
+  // signal. We early-advance so the user isn't held hostage to the
+  // safety-net timer.
+  useEffect(() => {
+    const unsub = busSubscribe((snapshot) => {
+      const cur = ritualChainRef.current;
+      if (!cur) return;
+      const step = cur.steps?.[cur.stepIndex];
+      if (!step) return;
+      const last = (snapshot.history || [])[snapshot.history.length - 1];
+      if (!last) return;
+      // Only count commits that happened after this step became active
+      // and that originated from this step's module.
+      if (last.t < (cur.stepStartedAt || 0)) return;
+      if (last.moduleId && last.moduleId !== step.module_id) return;
+      try {
+        window.dispatchEvent(new CustomEvent('ritual:step-complete', {
+          detail: { step, index: cur.stepIndex, source: 'bus' },
+        }));
+      } catch { /* noop */ }
+    });
+    return unsub;
+  }, []);
+
+  const startRitualChain = useCallback((chain) => {
+    try {
+      window.dispatchEvent(new CustomEvent('ritual:chain-start', { detail: { chain } }));
+    } catch { /* noop */ }
+  }, []);
+  const skipRitualStep = useCallback(() => {
+    const cur = ritualChainRef.current;
+    if (!cur) return;
+    try {
+      window.dispatchEvent(new CustomEvent('ritual:step-complete', {
+        detail: { step: cur.steps?.[cur.stepIndex], index: cur.stepIndex, source: 'manual' },
+      }));
+    } catch { /* noop */ }
+  }, []);
+  const abortRitualChain = useCallback(() => {
+    try { window.dispatchEvent(new CustomEvent('ritual:chain-abort')); } catch { /* noop */ }
+  }, []);
+
   const value = useMemo(
-    () => ({ activeModule, pull, release }),
-    [activeModule, pull, release],
+    () => ({
+      activeModule, pull, release,
+      ritualChain, startRitualChain, skipRitualStep, abortRitualChain,
+    }),
+    [activeModule, pull, release, ritualChain, startRitualChain, skipRitualStep, abortRitualChain],
   );
 
   return (
@@ -425,7 +648,15 @@ export function useProcessorState() {
   const ctx = useContext(ProcessorStateContext);
   if (!ctx) {
     // Safe fallback when used outside provider (e.g., during early SSR).
-    return { activeModule: 'IDLE', pull: () => {}, release: () => {} };
+    return {
+      activeModule: 'IDLE',
+      pull: () => {},
+      release: () => {},
+      ritualChain: null,
+      startRitualChain: () => {},
+      skipRitualStep: () => {},
+      abortRitualChain: () => {},
+    };
   }
   return ctx;
 }
