@@ -1,12 +1,13 @@
 /**
- * Enlightenment Cafe Service Worker v1.2.0
+ * Enlightenment Cafe Service Worker v1.0.8
  * Smart Caching for PWA Performance
+ * - Network-First for navigation/HTML (always get latest bundle hashes)
  * - Network-First for API/Auth (always fresh data)
- * - Stale-While-Revalidate for UI assets (instant load + background update)
+ * - Stale-While-Revalidate for static assets (instant load + bg update)
  * - Background Sync for offline form submissions
  */
 
-const CACHE_NAME = 'enlightenment-v2.1.0-creator-console';
+const CACHE_NAME = 'enlightenment-v1.0.8-share-langbar';
 const OFFLINE_URL = '/offline.html';
 
 // Core assets to pre-cache for instant loading
@@ -62,9 +63,15 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // NETWORK-FIRST: API calls, Auth, dynamic data
-  // Always get fresh data, fall back to cache if offline
-  if (url.pathname.startsWith('/api') || 
+  // NETWORK-FIRST: API calls, Auth, dynamic data, AND navigation
+  // (HTML documents). Always get fresh HTML so stale bundles can't
+  // pin the user to an old build — addresses "I don't see the
+  // new feature you said you shipped" caused by SW serving the
+  // previous index.html that references previous JS hashes.
+  const isNav = event.request.mode === 'navigate' ||
+                (event.request.method === 'GET' && (event.request.headers.get('accept') || '').includes('text/html'));
+  if (isNav ||
+      url.pathname.startsWith('/api') ||
       url.pathname.startsWith('/auth') ||
       url.pathname.includes('socket') ||
       event.request.method !== 'GET') {
