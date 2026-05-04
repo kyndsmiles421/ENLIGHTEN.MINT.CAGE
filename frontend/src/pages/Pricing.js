@@ -282,4 +282,172 @@ export default function Pricing() {
                       <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{tier.name}</p>
                       <p className="text-lg font-light" style={{ color, fontFamily: 'Cormorant Garamond, serif' }}>
                         {tier.price === 0 ? 'Free' : `$${tier.price}`}
-                        {tier.price > 0 && <span className="text-[10px]" style={{ color: 'var(--text-mute
+                        {tier.price > 0 && <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>/mo</span>}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-[10px] mb-3 font-medium" style={{ color }}>
+                    {tier.credits_per_month === -1 ? 'Unlimited AI' : `${tier.credits_per_month} credits/mo`}
+                  </p>
+
+                  <div className="space-y-1.5 mb-4">
+                    {tier.perks.slice(0, id === 'free' ? 5 : 6).map((perk, i) => (
+                      <div key={i} className="flex items-start gap-1.5">
+                        <Check size={10} className="mt-0.5 flex-shrink-0" style={{ color }} />
+                        <span className="text-[9px] leading-tight" style={{ color: 'var(--text-secondary)' }}>{perk}</span>
+                      </div>
+                    ))}
+                    {tier.perks.length > (id === 'free' ? 5 : 6) && (
+                      <p className="text-[8px] pl-4" style={{ color: 'var(--text-muted)' }}>+{tier.perks.length - (id === 'free' ? 5 : 6)} more</p>
+                    )}
+                  </div>
+
+                  {isCurrent ? (
+                    <div className="w-full py-2 rounded-lg text-center text-[10px] font-medium uppercase tracking-wider"
+                      style={{ background: `${color}08`, color, border: `1px solid ${color}20` }}>
+                      Current Plan
+                    </div>
+                  ) : id === 'free' ? (
+                    <div className="w-full py-2 rounded-lg text-center text-[10px]"
+                      style={{ color: 'var(--text-muted)' }}>
+                      Default
+                    </div>
+                  ) : isUpgrade ? (
+                    <button onClick={() => handleSubscribe(id)}
+                      disabled={!!purchasing}
+                      className="w-full py-2 rounded-lg text-[10px] font-medium uppercase tracking-wider transition-all hover:scale-[1.02]"
+                      style={{ background: `${color}15`, color, border: `1px solid ${color}30` }}
+                      data-testid={`subscribe-btn-${id}`}>
+                      {purchasing === id ? <Loader2 size={12} className="animate-spin mx-auto" /> : 'Upgrade'}
+                    </button>
+                  ) : (
+                    <div className="w-full py-2 rounded-lg text-center text-[10px]"
+                      style={{ color: 'var(--text-muted)' }}>
+                      Included in your plan
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Credit Packs Section */}
+        <div className="mb-10">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-light" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
+                Credit Packs
+              </h2>
+              <p className="text-[10px]" style={{ color: 'var(--text-muted)' }}>Top up anytime, available for all tiers</p>
+            </div>
+            <button onClick={() => setShowCredits(!showCredits)}
+              className="text-[10px] px-2 py-1 rounded-lg transition-all"
+              style={{ background: 'rgba(248,250,252,0.04)', color: 'var(--text-secondary)', border: '1px solid rgba(248,250,252,0.06)' }}
+              data-testid="toggle-credit-costs-btn">
+              {showCredits ? 'Hide' : 'Show'} AI Costs
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {Object.entries(creditPacks).map(([id, pack], idx) => {
+              const colors = ['#2DD4BF', '#818CF8', '#C084FC'];
+              const color = colors[idx];
+              const bonus = idx === 0 ? '' : idx === 1 ? '10% bonus' : '25% bonus';
+              return (
+                <motion.div key={id}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + idx * 0.08 }}
+                  className="rounded-xl p-4 flex items-center justify-between"
+                  style={{ background: `${color}06`, border: `1px solid ${color}15` }}
+                  data-testid={`credit-pack-${id}`}>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-lg font-light" style={{ color, fontFamily: 'Cormorant Garamond, serif' }}>{pack.credits}</p>
+                      <span className="text-[9px]" style={{ color: 'var(--text-muted)' }}>credits</span>
+                    </div>
+                    {bonus && <span className="text-[8px] px-1.5 py-0.5 rounded-full" style={{ background: `${color}12`, color }}>{bonus}</span>}
+                  </div>
+                  <button onClick={() => handleBuyCredits(id)}
+                    disabled={!!purchasing}
+                    className="px-4 py-2 rounded-lg text-xs font-medium transition-all hover:scale-105"
+                    style={{ background: `${color}12`, color, border: `1px solid ${color}25` }}
+                    data-testid={`buy-credits-btn-${id}`}>
+                    {purchasing === id ? <Loader2 size={12} className="animate-spin" /> : `$${pack.price.toFixed(0)}`}
+                  </button>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* AI Cost Breakdown */}
+        <AnimatePresence>
+          {showCredits && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+              className="mb-10 overflow-hidden">
+              <div className="rounded-xl p-4" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}
+                data-testid="ai-cost-breakdown">
+                <p className="text-[10px] uppercase tracking-widest font-bold mb-3" style={{ color: 'var(--text-muted)' }}>Credit Usage Per AI Action</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {Object.entries(aiCosts).map(([action, cost]) => (
+                    <div key={action} className="flex items-center justify-between rounded-lg px-3 py-2"
+                      style={{ background: 'rgba(248,250,252,0.02)' }}>
+                      <span className="text-[10px] capitalize" style={{ color: 'var(--text-secondary)' }}>
+                        {action.replace(/_/g, ' ')}
+                      </span>
+                      <span className="text-xs font-medium" style={{ color: cost >= 10 ? '#C084FC' : cost >= 3 ? '#818CF8' : '#2DD4BF' }}>
+                        {cost}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Feature Comparison */}
+        <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(248,250,252,0.02)', border: '1px solid rgba(248,250,252,0.04)' }}>
+          <div className="p-4" style={{ borderBottom: '1px solid rgba(248,250,252,0.04)' }}>
+            <h2 className="text-lg font-light" style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
+              Full Perk Comparison
+            </h2>
+          </div>
+          <div className="divide-y" style={{ borderColor: 'rgba(248,250,252,0.04)' }}>
+            {tierOrder.filter(id => id !== 'free').map(id => {
+              const tier = tiers[id];
+              if (!tier) return null;
+              const color = TIER_COLORS[id];
+              const Icon = TIER_ICONS[id];
+              return (
+                <details key={id} className="group" data-testid={`tier-details-${id}`}>
+                  <summary className="px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-white/[0.02] transition-all">
+                    <div className="flex items-center gap-2">
+                      <Icon size={14} style={{ color }} />
+                      <span className="text-xs font-medium" style={{ color: 'var(--text-primary)' }}>{tier.name}</span>
+                      <span className="text-[10px]" style={{ color }}>
+                        {tier.price === 0 ? 'Free' : `$${tier.price}/mo`}
+                      </span>
+                    </div>
+                    <ChevronRight size={12} className="transition-transform group-open:rotate-90" style={{ color: 'var(--text-muted)' }} />
+                  </summary>
+                  <div className="px-4 pb-3 space-y-1.5">
+                    {tier.perks.map((perk, i) => (
+                      <div key={i} className="flex items-start gap-2">
+                        <Check size={10} className="mt-0.5 flex-shrink-0" style={{ color }} />
+                        <span className="text-[10px]" style={{ color: 'var(--text-secondary)' }}>{perk}</span>
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
