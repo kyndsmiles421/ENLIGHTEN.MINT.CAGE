@@ -2,13 +2,69 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Sparkles, Star, ChevronRight, Loader2,
-  Trophy, Zap, Gem, Crown
+  Trophy, Zap, Gem, Crown, Volume2, VolumeX, Square,
 } from 'lucide-react';
 import { useSensory } from '../../context/SensoryContext';
 import { STAT_CONFIG, ATMOSPHERE_THEMES } from './constants';
 import { StatBar } from './StatBar';
 import { XPBar } from './XPBar';
 import { SceneImage } from './SceneImage';
+import {
+  speak as sageSpeak,
+  stop as sageStop,
+  subscribe as sageSubscribe,
+} from '../../services/SageVoiceController';
+
+// V1.0.13 — Scene narration speaker. Wraps the existing SageVoice
+// service (already shipped V1.0.11/12) so the user can hear the
+// scene narrated. Inline pill — Flatland-safe. Click to play, click
+// again to stop. Reads/falls-back to the same controller state stream
+// the global HUD uses, so visual feedback stays consistent.
+function SceneNarrationSpeaker({ text, accentColor }) {
+  const [vs, setVs] = useState({ state: 'idle' });
+  useEffect(() => sageSubscribe(setVs), []);
+  const speaking = vs.state === 'speaking' || vs.state === 'loading';
+  const unavailable = vs.state === 'unavailable';
+  const onTap = () => {
+    if (speaking) { sageStop(); return; }
+    if (unavailable) return;
+    if (text) sageSpeak(text);
+  };
+  return (
+    <button
+      type="button"
+      onClick={onTap}
+      data-testid="scene-narration-speaker"
+      data-voice-state={vs.state}
+      title={
+        unavailable ? 'Sage Voice unavailable — set ELEVENLABS_API_KEY'
+        : speaking ? 'Stop narration'
+        : 'Read scene aloud'
+      }
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 5,
+        padding: '4px 10px',
+        borderRadius: 999,
+        background: speaking ? `${accentColor}28` : `${accentColor}10`,
+        border: `1px solid ${unavailable ? 'rgba(252,165,165,0.35)' : `${accentColor}55`}`,
+        color: unavailable ? '#FCA5A5' : accentColor,
+        fontSize: 9,
+        letterSpacing: '0.18em',
+        textTransform: 'uppercase',
+        cursor: unavailable ? 'not-allowed' : 'pointer',
+        marginBottom: 12,
+      }}
+    >
+      {vs.state === 'loading' ? <Loader2 size={10} className="animate-spin" />
+        : speaking ? <Square size={10} />
+        : unavailable ? <VolumeX size={10} />
+        : <Volume2 size={10} />}
+      {speaking ? 'Stop' : unavailable ? 'No Voice Key' : 'Read Aloud'}
+    </button>
+  );
+}
 
 export function GameScene({ scene, character, origin, onChoice, loading, onBack, sceneImage, imageLoading }) {
   const { reduceMotion } = useSensory();
@@ -85,7 +141,9 @@ export function GameScene({ scene, character, origin, onChoice, loading, onBack,
         </p>
       </motion.div>
 
-      {/* Narrative — always visible, no opacity tricks */}
+      {/* Narrative — always visible, no opacity tricks. V1.0.13:
+          Added inline speaker pill that calls the SageVoice service
+          (already shipped) so the player can hear the scene narrated. */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
@@ -98,6 +156,7 @@ export function GameScene({ scene, character, origin, onChoice, loading, onBack,
         <div className="absolute bottom-0 right-0 w-32 h-32 pointer-events-none"
           style={{ background: `radial-gradient(circle, ${origin.color}08, transparent)` }} />
         <div className="relative">
+          <SceneNarrationSpeaker text={scene.narrative} accentColor={theme.glow} />
           <p className="text-base md:text-lg leading-loose" style={{
             fontFamily: 'Cormorant Garamond, serif',
             color: 'var(--text-primary)',
