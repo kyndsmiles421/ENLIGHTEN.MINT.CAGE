@@ -85,15 +85,18 @@ SUBSCRIPTION_TIERS = {
     },
     "sovereign": {
         "id": "sovereign",
-        "name": "Sovereign",
-        "label": "Infrastructure Partner",
+        "name": "Sovereign Monthly",
+        "label": "The Apex",
         "price_monthly": 89.00,
+        "price_web": 89.00,
+        "price_play_store": 115.70,  # +30% Google Play platform fee
+        "term_months": 1,
         "education_level": "Professional",
         "education_desc": "CI/CD Pipelines, Infrastructure Architecture, Business Logistics",
         "monetization": "Infrastructure Partner — full dev suite and priority server resources",
         "features": [
-            "Professional-level education",
-            "30% member discount on all assets",
+            "Full Utility & Sage Voice access",
+            "30% Discount Power on all Dust upgrades",
             "Full Development Suite",
             "Priority server resources",
             "Large-scale operations (Cafe/Maintenance)",
@@ -106,8 +109,53 @@ SUBSCRIPTION_TIERS = {
         "max_commission_tier": 4,
         "can_sell": True,
         "beacon": True,
+        "is_founder": False,
         "color": "#FBBF24",
     },
+    "sovereign_founder": {
+        "id": "sovereign_founder",
+        "name": "Sovereign Founder",
+        "label": "The Apex · 2-Year Lock",
+        "price_total": 1777.00,
+        "price_web": 1777.00,
+        "price_play_store": 2310.10,  # +30% Google Play platform fee
+        "price_monthly_equivalent": 74.04,  # 1777 / 24
+        "term_months": 24,
+        "savings_pct": 60,
+        "education_level": "Professional · Total Unlock",
+        "education_desc": "Total Academy & Professional Upgrade unlock for 24 months",
+        "monetization": "Founder Lock-In — paid once, no renewal trap",
+        "features": [
+            "Total Academy & Professional Upgrade unlock (24 months)",
+            "60% Discount Power on all Dust upgrades",
+            "Full Utility & Sage Voice access",
+            "Full Development Suite",
+            "Priority server resources",
+            "Master commission (27%)",
+            "Founder badge + exclusive 432Hz Founder's Harmonic",
+            "$1,000.80 saved vs Monthly · $2,000.10 saved vs Play Store",
+        ],
+        "marketplace_discount": 60,
+        "max_project_slots": -1,
+        "fidelity": "4K/8D",
+        "forge_access": True,
+        "max_commission_tier": 4,
+        "can_sell": True,
+        "beacon": True,
+        "is_founder": True,
+        "color": "#FCD34D",
+    },
+}
+
+# ─── Sovereign Tier Order (display + comparison) ───
+SOVEREIGN_TIER_ORDER = ["discovery", "resonance", "architect", "sovereign", "sovereign_founder"]
+
+# ─── Platform Fee Constants (Transparency Graph) ───
+PLATFORM_FEES = {
+    "google_play_pct": 30,
+    "web_direct_pct": 0,
+    "label_play": "Google Play Platform Fee",
+    "label_web": "Sovereign Web Direct",
 }
 
 # ─── Track 2: Learning Packs ───
