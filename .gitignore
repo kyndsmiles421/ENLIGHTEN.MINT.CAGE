@@ -330,3 +330,12 @@ twa/*.keystore
 frontend/node_modules/.cache/default-development/69.pack
 frontend/node_modules/.cache/default-development/63.pack
 frontend/node_modules/.cache/default-development/0.pack_
+-e 
+# Environment and credential files
+.env
+.env.*
+*.env
+credentials.json
+*.pem
+*.key
+.credentials
