@@ -15,6 +15,20 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 
 ## ✅ Completed (Chronological)
 
+### V1.0.13 — Game Console Wiring + Flatland Whitelist (2026-02-04) ✅
+**Mandate:** "Look before you edit. Rewire, do not rewrite. Don't take the controller away while the game is playing."
+- **Body (Flatland Whitelist)** — `UnifiedCreatorConsole.js` line 118 flipped from blacklist→whitelist. Mixer UI now renders ONLY on cockpit + gameplay routes: `/apex-creator`, `/cosmic-mixer`, `/creator-console`, `/master-engine`, `/forge`, `/starseed-adventure`, `/starseed-realm`, `/games`. ~178px reclaimed on 190+ spiritual/Academy/Pricing routes; LanguageBar fully clickable.
+- **Brain (Global ctx Expansion)** — `ctx` now exposes ~45 closures globally so XP/sliders/generators stay wired even when UI is hidden:
+  - Setters: `setTier, setUserTierNum, setUnlocks, setPillarLevels, setMasterLevel, setModStates, setMutedModules, setExpandedPillar, setViewMode, setActivePanel, setActivePanelRaw, setIsFullscreen, setMonitorFilters, setTextOverlays, setImageOverlays, setSelectedAspectRatio, setResonance, setBankBalance`
+  - Handlers: `handleNav, handleMuteChange, handleBuy, handleBroadcast, handleSever, handlePrintModule, handlePrintLedger, togglePanel, loadStore`
+  - Audio/Visual bridge: `audioMixer, audioData, resonanceCapture, particleFieldRef`
+  - Auth/Nav: `authUser, authToken, authLogout, navigate, location, currentModule`
+  - Media/Store: `media, showStore, setShowStore, storeItems, credits, setCredits`
+- **Verification:** Smoke test confirmed `/sovereign-hub` → tool-panel=0 (hidden); `/starseed-adventure` → tool-panel=1 (visible as game HUD).
+- **Surgical:** No deletes. No rewrites. Two `search_replace` edits totaling ~50 lines.
+
+
+
 ### Earlier (pre-fork, V68.61 → V68.68)
 - Entity Graph unified (70+ herbs/plants/practices, 4 silos merged)
 - Starseed RPG narrative engine wired (replaced slot-machine)

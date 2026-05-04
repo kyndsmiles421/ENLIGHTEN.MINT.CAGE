@@ -115,7 +115,21 @@ export function MixerProvider({ children }) {
     return () => clearInterval(interval);
   }, []);
 
-  const hideMixer = ['/', '/sovereign-hub', '/landing', '/auth', '/intro'].includes(location.pathname);
+  // ═══ FLATLAND CONTROLLER WHITELIST ═══
+  // The Mixer is a HUD/Game Controller — visible only on cockpit + gameplay
+  // routes. On all other routes the UI is hidden but the Brain (ctx wires)
+  // stays alive so XP / generators / sliders still drive gamification.
+  const SHOW_MIXER_ON = [
+    '/apex-creator',
+    '/cosmic-mixer',
+    '/creator-console',
+    '/master-engine',
+    '/forge',
+    '/starseed-adventure',
+    '/starseed-realm',
+    '/games',
+  ];
+  const hideMixer = !SHOW_MIXER_ON.includes(location.pathname);
   const showMixer = !hideMixer && !isFullscreen;
 
   const togglePanel = useCallback((key) => {
@@ -275,12 +289,38 @@ export function MixerProvider({ children }) {
   const current = findModule(location.pathname);
 
   const ctx = {
-    tier, userTierNum, unlocks, pillarLevels, masterLevel, modStates, viewMode, setViewMode,
-    loadStore, handleNav, mutedModules, activePanel, setActivePanel: togglePanel,
-    isFullscreen, setIsFullscreen, monitorFilters, setMonitorFilters,
-    textOverlays, setTextOverlays, imageOverlays, setImageOverlays,
-    selectedAspectRatio, setSelectedAspectRatio, resonance, bankBalance,
-    mixerState: activePanel ? 'expanded' : 'collapsed', setMixerState: () => {},
+    // ═══ STATE (existing) ═══
+    tier, userTierNum, unlocks, pillarLevels, masterLevel, modStates, viewMode,
+    mutedModules, activePanel, isFullscreen, monitorFilters,
+    textOverlays, imageOverlays, selectedAspectRatio, resonance, bankBalance,
+    expandedPillar,
+    mixerState: activePanel ? 'expanded' : 'collapsed',
+
+    // ═══ STATE SETTERS (Brain wires — drive gamification from any route) ═══
+    setTier, setUserTierNum, setUnlocks,
+    setPillarLevels, setMasterLevel, setModStates,
+    setMutedModules, setExpandedPillar,
+    setViewMode, setActivePanel: togglePanel, setActivePanelRaw: setActivePanel,
+    setIsFullscreen, setMonitorFilters,
+    setTextOverlays, setImageOverlays, setSelectedAspectRatio,
+    setResonance, setBankBalance,
+    setMixerState: () => {},
+
+    // ═══ HANDLERS (global controller actions) ═══
+    handleNav, handleMuteChange, handleBuy,
+    handleBroadcast, handleSever,
+    handlePrintModule, handlePrintLedger,
+    togglePanel, loadStore,
+
+    // ═══ AUDIO / VISUAL BRIDGE ═══
+    audioMixer, audioData, resonanceCapture, particleFieldRef,
+
+    // ═══ AUTH / NAV / LOCATION ═══
+    authUser, authToken, authLogout,
+    navigate, location, currentModule: current,
+
+    // ═══ MEDIA / STORE ═══
+    media, showStore, setShowStore, storeItems, credits, setCredits,
   };
 
   // ═══ PANEL REGISTRY — maps tab keys to extracted components ═══
