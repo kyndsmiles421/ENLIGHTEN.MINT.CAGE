@@ -212,6 +212,146 @@ async def sage_narrate_status(user=Depends(get_current_user)):
     }
 
 
+# V1.0.13 — Budget Shield. Pulls the user-subscription endpoint from
+# ElevenLabs and surfaces the live character budget to the frontend.
+# Cached for 5 minutes to avoid hammering the upstream (their limit
+# window is per-minute; 5min cache keeps the bar fresh without being
+# abusive).
+_budget_cache = {"fetched_at": 0, "body": None}
+_BUDGET_TTL_SEC = 300
+
+
+async def _fetch_eleven_budget():
+    """Returns (ok, body_or_error_string). Uses the SDK's user
+    subscription endpoint."""
+    def _sync():
+        client = _get_eleven_client()
+        return client.user.subscription.get()
+    sub = await asyncio.wait_for(
+        asyncio.get_event_loop().run_in_executor(None, _sync),
+        timeout=10,
+    )
+    # The SDK returns a pydantic-ish object; convert to plain dict.
+    if hasattr(sub, "dict"):
+        return sub.dict()
+    if hasattr(sub, "model_dump"):
+        return sub.model_dump()
+    return dict(sub)
+
+
+@router.get("/budget")
+async def sage_voice_budget(user=Depends(get_current_user)):
+    """V1.0.13 — Real-time ElevenLabs character budget for the UI meter.
+
+    Returns:
+      {
+        configured: bool,
+        character_count: int,    # used this period
+        character_limit: int,    # total allowed this period
+        remaining: int,
+        percent_used: float,
+        tier: str,               # ElevenLabs tier label (e.g. "starter")
+        next_reset_unix: int,
+        cached: bool,
+      }
+
+    When the key is absent → 200 with {configured: false}. Frontend
+    renders a "No voice key" empty state instead of flashing an error.
+    When ElevenLabs 401s (abuse-detection) → same shape with
+    configured: true, but -1 for counters and `note` explaining why.
+    """
+    has_key = bool(os.environ.get("ELEVENLABS_API_KEY", "").strip())
+    if not has_key:
+        return {"configured": False}
+
+    now = time.time()
+    if _budget_cache["body"] and (now - _budget_cache["fetched_at"]) < _BUDGET_TTL_SEC:
+        body = dict(_budget_cache["body"])
+        body["cached"] = True
+        return body
+
+    try:
+        sub = await _fetch_eleven_budget()
+    except Exception as e:
+        msg = str(e)
+        logger.warning(f"Voice budget fetch failed: {msg[:160]}")
+        # Surface a predictable shape so the UI meter renders 'unknown'
+        # rather than a hard error bar.
+        return {
+            "configured": True,
+            "character_count": -1,
+            "character_limit": -1,
+            "remaining": -1,
+            "percent_used": -1,
+            "tier": "unknown",
+            "next_reset_unix": 0,
+            "cached": False,
+            "note": (
+                "ElevenLabs blocked the request (likely free-tier cloud-IP "
+                "check). Upgrade at https://elevenlabs.io/app/subscription."
+                if "detected_unusual_activity" in msg or "Free Tier usage disabled" in msg
+                else "Upstream call failed — will retry automatically."
+            ),
+        }
+
+    used = int(sub.get("character_count") or 0)
+    limit = int(sub.get("character_limit") or 0)
+    remaining = max(0, limit - used)
+    pct = (used / limit * 100.0) if limit > 0 else 0.0
+    tier = str(sub.get("tier") or "free")
+    reset_unix = int(sub.get("next_character_count_reset_unix") or 0)
+
+    body = {
+        "configured": True,
+        "character_count": used,
+        "character_limit": limit,
+        "remaining": remaining,
+        "percent_used": round(pct, 2),
+        "tier": tier,
+        "next_reset_unix": reset_unix,
+        "cached": False,
+    }
+    _budget_cache["body"] = body
+    _budget_cache["fetched_at"] = now
+    return body
+
+
+# V1.0.13 — Safety margin: refuse to start synthesis when the chars
+# needed would push usage above BUDGET_CEILING_PCT of the limit.
+# Keeps a reserve for "critical" narrations (a user mid-ritual never
+# hears silence unexpectedly).
+BUDGET_CEILING_PCT = 0.90
+
+
+async def _has_budget_for(chars: int) -> tuple[bool, int]:
+    """Returns (ok, remaining). Uses the cached body if warm, else
+    refreshes. Falls back to optimistic (ok=True) when the budget
+    probe itself errors — we'd rather try narration and hit the real
+    upstream cap than hard-block based on stale cache."""
+    now = time.time()
+    body = _budget_cache["body"]
+    if not body or (now - _budget_cache["fetched_at"]) > _BUDGET_TTL_SEC:
+        try:
+            sub = await _fetch_eleven_budget()
+            used = int(sub.get("character_count") or 0)
+            limit = int(sub.get("character_limit") or 0)
+            body = {
+                "character_count": used,
+                "character_limit": limit,
+                "remaining": max(0, limit - used),
+            }
+            _budget_cache["body"] = body
+            _budget_cache["fetched_at"] = now
+        except Exception:
+            return True, -1  # optimistic fallback
+    limit = int(body.get("character_limit") or 0)
+    used = int(body.get("character_count") or 0)
+    if limit <= 0:
+        return True, -1
+    ceiling = int(limit * BUDGET_CEILING_PCT)
+    return (used + chars) <= ceiling, max(0, limit - used)
+
+
 @router.get("/sample")
 async def sage_voice_sample(
     voice_id: Optional[str] = None,
