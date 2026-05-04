@@ -312,14 +312,6 @@ export default function Pricing() {
           </div>
         </div>
 
-        {/* Platform indicator */}
-        <div className="mb-4 flex items-center gap-2 flex-wrap text-[10px]">
-          <span className="px-2 py-1 rounded-full" style={{ background: platform === 'web' ? 'rgba(134,239,172,0.10)' : 'rgba(251,146,60,0.10)', color: platform === 'web' ? '#86EFAC' : '#FB923C', border: `1px solid ${platform === 'web' ? 'rgba(134,239,172,0.20)' : 'rgba(251,146,60,0.20)'}` }}
-            data-testid="platform-indicator">
-            {platform === 'web' ? '✓ Web Direct — no platform fee' : '⚠ Play Store — +30% platform fee applies'}
-          </span>
-        </div>
-
         {/* Current plan badge */}
         {myPlan && (
           <div className="mb-6 flex items-center gap-3 flex-wrap" data-testid="current-plan-badge">
@@ -393,8 +385,7 @@ export default function Pricing() {
           </motion.div>
         )}
 
-        {/* Transparency Graph for featured tier */}
-        {featuredTier && platformFees && <TransparencyGraph tier={featuredTier} platformFees={platformFees} />}
+        {/* Transparency Graph moved to checkout flow only — not persistent on /pricing */}
 
         {/* Tier grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-10">
