@@ -62,7 +62,7 @@ SUBSCRIPTION_TIERS = {
     "architect": {
         "id": "architect",
         "name": "Architect",
-        "label": "Alchemist",
+        "label": "The Builder",
         "price_monthly": 49.00,
         "education_level": "Specialist",
         "education_desc": "Solfeggio Frequencies, AI Sanctuary Management, Sacred Geometry",
@@ -263,7 +263,19 @@ POLYMATH_PASS = {
 
 @router.get("/tiers")
 async def get_subscription_tiers(request: Request):
-    """Get all subscription tiers and user's current tier."""
+    """Get all subscription tiers, credit packs, AI costs, and tier order.
+    
+    Single canonical source for Pricing.js. Includes Sovereign Founder ($1,777/24mo)
+    and Sovereign Monthly ($89/mo) plus Web/Play Store transparency pricing.
+    """
+    # Pull credit packs + AI costs from subscriptions module (single source of truth)
+    try:
+        from routes.subscriptions import CREDIT_PACKS, AI_COSTS
+        credit_packs = {k: {**v, "id": k} for k, v in CREDIT_PACKS.items()}
+        ai_costs = AI_COSTS
+    except Exception:
+        credit_packs, ai_costs = {}, {}
+
     current_tier = "discovery"
     try:
         from deps import get_current_user
@@ -272,11 +284,50 @@ async def get_subscription_tiers(request: Request):
         current_tier = profile.get("tier", "discovery") if profile else "discovery"
     except Exception:
         pass
+
+    # Return as dict (id -> tier) so Pricing.js can index by tierOrder
+    tiers_dict = {tid: tdata for tid, tdata in SUBSCRIPTION_TIERS.items()}
+
     return {
-        "tiers": list(SUBSCRIPTION_TIERS.values()),
+        "tiers": tiers_dict,
+        "tier_order": SOVEREIGN_TIER_ORDER,
+        "credit_packs": credit_packs,
+        "ai_costs": ai_costs,
+        "platform_fees": PLATFORM_FEES,
         "current_tier": current_tier,
         "current_tier_data": SUBSCRIPTION_TIERS.get(current_tier, SUBSCRIPTION_TIERS["discovery"]),
     }
+
+
+@router.get("/my-plan")
+async def get_my_plan(user=Depends(get_current_user)):
+    """Return the current user's active subscription state for Pricing.js."""
+    sub = await db.subscriptions.find_one({"user_id": user["id"]}, {"_id": 0})
+    tier_id = (sub or {}).get("tier", "discovery")
+    tier = SUBSCRIPTION_TIERS.get(tier_id, SUBSCRIPTION_TIERS["discovery"])
+    is_admin = user.get("role") in ("admin", "creator", "council")
+
+    # Bring credit balance via existing AI credits collection (best-effort)
+    try:
+        bal_doc = await db.user_credits.find_one({"user_id": user["id"]}, {"_id": 0})
+        balance = (bal_doc or {}).get("balance", 0)
+    except Exception:
+        balance = 0
+
+    return {
+        "tier": tier_id,
+        "tier_name": tier.get("name", "Discovery"),
+        "tier_data": tier,
+        "is_admin": is_admin,
+        "subscription_active": tier_id != "discovery",
+        "balance": balance,
+        "credits_per_month": -1 if tier.get("is_founder") else 0,  # founders = full unlock
+        "is_founder": bool(tier.get("is_founder")),
+        "term_months": tier.get("term_months", 1),
+        "started_at": (sub or {}).get("started_at"),
+        "trial": (sub or {}).get("trial"),
+    }
+
 
 
 @router.get("/packs")
@@ -370,15 +421,32 @@ async def get_economy_profile(user=Depends(get_current_user)):
 
 @router.post("/subscribe")
 async def create_subscription_checkout(body: dict, user=Depends(get_current_user), request: Request = None):
-    """Create Stripe checkout for subscription upgrade."""
+    """Create Stripe checkout for subscription upgrade.
+    
+    Supports:
+      - Sovereign Monthly ($89/mo, recurring intent)
+      - Sovereign Founder ($1,777 / 24-month one-time lock-in)
+      - Discovery (free auto-activation)
+    Body: { tier_id, origin_url, platform? ('web'|'play_store') }
+    """
     from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
 
     tier_id = body.get("tier_id", "")
     origin_url = body.get("origin_url", "")
+    platform = body.get("platform", "web")  # 'web' or 'play_store'
+
     if tier_id not in SUBSCRIPTION_TIERS:
         raise HTTPException(400, "Invalid tier")
     tier = SUBSCRIPTION_TIERS[tier_id]
-    if tier["price_monthly"] <= 0:
+
+    # Resolve amount: founder uses price_total, monthly uses price_monthly,
+    # platform=play_store applies +30% gross-up if price_play_store is defined.
+    if tier.get("is_founder"):
+        amount = tier.get("price_play_store", tier["price_total"]) if platform == "play_store" else tier["price_total"]
+    else:
+        amount = tier.get("price_play_store", tier.get("price_monthly", 0)) if platform == "play_store" else tier.get("price_monthly", 0)
+
+    if amount <= 0:
         # Free tier — just set it
         await db.subscriptions.update_one(
             {"user_id": user["id"]},
@@ -395,11 +463,11 @@ async def create_subscription_checkout(body: dict, user=Depends(get_current_user
     api_key = os.environ.get("STRIPE_API_KEY", "")
     stripe_checkout = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
 
-    success_url = f"{origin_url}/economy?session_id={{CHECKOUT_SESSION_ID}}&type=subscription"
-    cancel_url = f"{origin_url}/economy"
+    success_url = f"{origin_url}/pricing?session_id={{CHECKOUT_SESSION_ID}}&type=subscription"
+    cancel_url = f"{origin_url}/pricing"
 
     checkout_req = CheckoutSessionRequest(
-        amount=tier["price_monthly"],
+        amount=amount,
         currency="usd",
         success_url=success_url,
         cancel_url=cancel_url,
@@ -408,6 +476,9 @@ async def create_subscription_checkout(body: dict, user=Depends(get_current_user
             "type": "subscription",
             "tier_id": tier_id,
             "tier_name": tier["name"],
+            "platform": platform,
+            "term_months": str(tier.get("term_months", 1)),
+            "is_founder": "true" if tier.get("is_founder") else "false",
         },
     )
     session = await stripe_checkout.create_checkout_session(checkout_req)
@@ -420,13 +491,16 @@ async def create_subscription_checkout(body: dict, user=Depends(get_current_user
         "user_id": user["id"],
         "type": "subscription",
         "tier_id": tier_id,
-        "amount": tier["price_monthly"],
+        "platform": platform,
+        "amount": amount,
         "currency": "usd",
+        "term_months": tier.get("term_months", 1),
+        "is_founder": tier.get("is_founder", False),
         "payment_status": "pending",
         "created_at": datetime.now(timezone.utc).isoformat(),
     })
 
-    return {"url": session.url, "session_id": session.session_id}
+    return {"url": session.url, "session_id": session.session_id, "amount": amount, "platform": platform}
 
 
 @router.post("/purchase-pack")
