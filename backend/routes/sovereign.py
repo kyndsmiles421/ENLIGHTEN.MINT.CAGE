@@ -395,19 +395,30 @@ async def get_stop_status():
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 #  RECIPROCITY GATE — Volunteer-to-Access Bridge
+#  ⚠ DEACTIVATED 2026-02-04 per Sovereign Master Blueprint:
+#  "VOLUNTEER MODE: DEACTIVATED. All labor-for-credit structures
+#   are removed to protect platform solvency."
+#  Endpoints return 410 Gone. Code preserved for future re-enable.
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+VOLUNTEER_MODE_ACTIVE = False
+VOLUNTEER_DEACTIVATED_MESSAGE = (
+    "Volunteer Mode is permanently deactivated. All labor-for-credit "
+    "structures have been removed to protect platform solvency. "
+    "Use Dust (hard currency) for upgrades or trade Sparks (XP) in the Trade Circle."
+)
 
 @router.post("/economy/volunteer/check")
 async def check_volunteer_access(data: dict = Body(...)):
     """
-    Check if user has enough volunteer credits to bypass payment.
+    [DEACTIVATED] Volunteer access bypass.
     
-    This is THE BYPASS — the platform can't charge them if they've done the work.
-    
-    Body:
-        user_id: User's unique identifier
-        required_credits: Dollar amount required for access
+    Returns 410 Gone. The volunteer-to-credit pipeline is permanently disabled
+    per Sovereign Master Blueprint (2026-02-04).
     """
+    if not VOLUNTEER_MODE_ACTIVE:
+        raise HTTPException(status_code=410, detail=VOLUNTEER_DEACTIVATED_MESSAGE)
+
     from engines.reciprocity_gate import check_access_credits
     
     user_id = data.get("user_id")
@@ -436,15 +447,13 @@ async def check_volunteer_access(data: dict = Body(...)):
 @router.post("/economy/volunteer/record")
 async def record_volunteer_activity(data: dict = Body(...)):
     """
-    Record volunteer hours for a user.
-    GATE: Volunteer credits only unlock after initial $5 credit purchase.
-    RATE: 10 Credits/hr + 10 Fans/hr. φ-escrow (1.618%) applied silently.
+    [DEACTIVATED] Record volunteer hours.
     
-    Body:
-        user_id: User's unique identifier
-        hours: Number of volunteer hours
-        activity: Description of volunteer activity
+    Returns 410 Gone. No new volunteer ledger entries can be created.
     """
+    if not VOLUNTEER_MODE_ACTIVE:
+        raise HTTPException(status_code=410, detail=VOLUNTEER_DEACTIVATED_MESSAGE)
+
     PHI = 1.618033988749895
     CREDIT_RATE = 10  # 10 Credits/hr — in-app value, not USD
     FAN_RATE = 10     # 10 Fans/hr
@@ -524,8 +533,17 @@ async def record_volunteer_activity(data: dict = Body(...)):
 @router.get("/economy/volunteer/balance")
 async def get_volunteer_balance(user_id: str = None, authorization: str = Header(None)):
     """
-    Get volunteer balance for a user.
+    [DEACTIVATED] Get volunteer balance.
+    
+    Historic balances remain queryable as read-only (audit trail),
+    but no new balance can be accrued since VOLUNTEER_MODE_ACTIVE=False.
     """
+    if not VOLUNTEER_MODE_ACTIVE:
+        # Read-only historical view — does not raise 410 so users can see legacy totals,
+        # but earning is closed.
+        # If you want to completely seal, uncomment the next line:
+        # raise HTTPException(status_code=410, detail=VOLUNTEER_DEACTIVATED_MESSAGE)
+        pass
     # Try to get user_id from auth token if not provided
     if not user_id and authorization:
         try:

@@ -11,7 +11,12 @@ export function CosmicCanvas({ originColor, atmosphere, active }) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+    const resize = () => {
+      // Flatland: size to parent container, not viewport
+      const parent = canvas.parentElement;
+      canvas.width = parent ? parent.clientWidth : window.innerWidth;
+      canvas.height = parent ? parent.clientHeight : window.innerHeight;
+    };
     resize();
     window.addEventListener('resize', resize);
 
@@ -98,5 +103,6 @@ export function CosmicCanvas({ originColor, atmosphere, active }) {
   }, [originColor, atmosphere, active, reduceParticles]);
 
   if (reduceParticles || !active) return null;
-  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0" style={{ opacity: 0.7 }} />;
+  // Flatland: absolute (contained to parent), not fixed (viewport overlay).
+  return <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-0" style={{ opacity: 0.7 }} />;
 }

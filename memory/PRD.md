@@ -15,7 +15,28 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 
 ## ✅ Completed (Chronological)
 
-### V1.0.13 — Game Console Wiring + Flatland Whitelist (2026-02-04) ✅
+### V1.0.14 — Play Store Gold Master Compliance (2026-02-04) ✅
+**Mandate:** "The UI is clean—no constant toolbar. No refunds, No volunteer mode, Transparency Graph only at checkout."
+- **Sovereign Founder $1,777 / 24mo / 60% off** — added to `backend/routes/economy.py::SUBSCRIPTION_TIERS` with `is_founder=true`, `price_play_store=$2,310.10` (30% gross-up), `price_monthly_equivalent=$74.04`.
+- **Sovereign Monthly $89/mo / 30% off** — renamed from legacy "Sovereign" to "Sovereign Monthly", added `price_web=$89` / `price_play_store=$115.70`.
+- **Architect → "The Builder"** (15% off) · **Resonance → "Artisan"** (5% off) · **Discovery → "Seeker"** (0%).
+- **Backend endpoints:**
+  - `GET /api/economy/tiers` — canonical single source, returns `tier_order`, `credit_packs`, `ai_costs`, `platform_fees` (google_play_pct=30).
+  - `GET /api/economy/my-plan` — NEW, returns user's active tier + is_founder + term_months.
+  - `POST /api/economy/subscribe` — accepts `platform: 'web'|'play_store'`, applies +30% gross-up on Play Store, records term_months + is_founder in transaction.
+- **`Pricing.js` rewired** end-to-end to `/api/economy/*` (away from legacy `/api/subscriptions/tiers`). Founder hero, 4-tier grid, policy block. `subscriptions.py` UNTOUCHED.
+- **Clean Sanctuary:** persistent platform-indicator banner REMOVED. TransparencyGraph component preserved but dormant — ready to drop into checkout flow only. No persistent upgrade toolbar.
+- **Policy block:** "No Refunds · Dust = Hard Currency · Sparks = XP (not currency)" inline on `/pricing`.
+- **VOLUNTEER MODE DEACTIVATED:**
+  - `POST /api/sovereign/economy/volunteer/check` → **HTTP 410 Gone**
+  - `POST /api/sovereign/economy/volunteer/record` → **HTTP 410 Gone**
+  - `GET /api/sovereign/economy/volunteer/balance` → read-only (legacy audit trail preserved, no new accrual).
+  - `VOLUNTEER_MODE_ACTIVE = False` feature flag. Code preserved for future re-enable.
+- **Flatland fix — CosmicCanvas:** `position: fixed inset-0` → `position: absolute inset-0` in `components/starseed/CosmicCanvas.js`. Canvas now contained to parent, not viewport. Resize handler switched to `parent.clientWidth/Height`.
+- **Verified live:** curl returns 410 for volunteer endpoints; `/api/economy/tiers` returns all 5 tiers with correct prices; `/pricing` clean (no overlays); `/starseed-adventure` canvas `computed.position === 'absolute'`; mixer whitelist holds (/pricing=hidden, /starseed-adventure=HUD visible).
+- **Testing agent:** 16/16 backend tests pass, 100% frontend pass on Pricing + Flatland compliance routes.
+
+
 **Mandate:** "Look before you edit. Rewire, do not rewrite. Don't take the controller away while the game is playing."
 - **Body (Flatland Whitelist)** — `UnifiedCreatorConsole.js` line 118 flipped from blacklist→whitelist. Mixer UI now renders ONLY on cockpit + gameplay routes: `/apex-creator`, `/cosmic-mixer`, `/creator-console`, `/master-engine`, `/forge`, `/starseed-adventure`, `/starseed-realm`, `/games`. ~178px reclaimed on 190+ spiritual/Academy/Pricing routes; LanguageBar fully clickable.
 - **Brain (Global ctx Expansion)** — `ctx` now exposes ~45 closures globally so XP/sliders/generators stay wired even when UI is hidden:
@@ -30,6 +51,13 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 
 
 ### Earlier (pre-fork, V68.61 → V68.68)
+### V1.0.13 — Game Console Wiring + Flatland Whitelist (2026-02-04) ✅
+**Mandate:** "Look before you edit. Rewire, do not rewrite. Don't take the controller away while the game is playing."
+- **Body (Flatland Whitelist)** — `UnifiedCreatorConsole.js` line 118 flipped blacklist→whitelist. Mixer UI renders ONLY on cockpit + gameplay routes: `/apex-creator`, `/cosmic-mixer`, `/creator-console`, `/master-engine`, `/forge`, `/starseed-adventure`, `/starseed-realm`, `/games`. ~178px reclaimed on 190+ routes.
+- **Brain (Global ctx Expansion)** — `ctx` exposes ~45 closures globally (setters, handlers, audio/visual bridge, auth/nav/media) so XP/sliders/generators stay wired even when UI is hidden.
+- **Surgical:** 2 `search_replace` edits, no files deleted, no rewrites.
+
+
 - Entity Graph unified (70+ herbs/plants/practices, 4 silos merged)
 - Starseed RPG narrative engine wired (replaced slot-machine)
 - Chamber mini-games herbal gestures + ContextBus injection
