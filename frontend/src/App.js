@@ -438,14 +438,18 @@ function AnimatedRoutes() {
         plane as everything else, no fixed overlay. */}
     <div
       style={{
+        // V1.0.13 — Flatland: strip flows in document order. No negative
+        // marginTop, no z-index escalation. Sits above the page content
+        // in normal flow; when the LanguageBar dropdown opens it pushes
+        // siblings DOWN instead of riding over them.
         position: 'sticky',
         top: 12,
-        zIndex: 99999,
+        zIndex: 40,
         display: 'flex',
         justifyContent: 'flex-end',
         gap: 6,
         padding: '0 12px',
-        marginTop: showBackBtn ? -36 : 8,
+        marginTop: 8,
         marginBottom: 4,
         pointerEvents: 'none',
       }}

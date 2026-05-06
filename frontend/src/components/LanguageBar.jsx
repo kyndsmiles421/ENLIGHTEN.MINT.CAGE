@@ -28,11 +28,13 @@
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import axios from 'axios';
-import { Languages, Loader2, X, BookOpen, RotateCcw, Wand2, Sparkles } from 'lucide-react';
+import { Languages, Loader2, X, BookOpen, RotateCcw, Wand2, Sparkles, Mic, Volume2, MicOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLocation } from 'react-router-dom';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 import { useProcessorState } from '../state/ProcessorState';
+import { useVoiceCommand } from '../context/VoiceCommandContext';
+import * as SageVoice from '../services/SageVoiceController';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const STORAGE_KEY = 'sovereign_language_bar_v1';
@@ -118,6 +120,19 @@ export default function LanguageBar() {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  // V1.0.13 — Voice Translator. Reuses existing infrastructure:
+  //   • useVoiceCommand() → mic capture + Whisper STT (returns transcript)
+  //   • /api/translator/translate → text translation
+  //   • SageVoiceController.speak() → ElevenLabs TTS in target language
+  const [voiceBusy, setVoiceBusy] = useState(false);
+  const [voiceTranscript, setVoiceTranscript] = useState('');
+  const [voiceTranslated, setVoiceTranslated] = useState('');
+  const [voiceError, setVoiceError] = useState(null);
+
+  // Hook into existing voice infrastructure (no new MediaRecorder code).
+  const voice = useVoiceCommand();
+  const lastTranscriptRef = useRef(null);
+
   // V1.0.9 — Wand / Intent mode. When the user hits the wand pill, a
   // separate intent panel opens (sibling to the translator panel).
   // POSTs the intent to /api/forge/ritual-chain and dispatches
@@ -147,6 +162,40 @@ export default function LanguageBar() {
       return !!(raw && raw.sacred);
     } catch { return false; }
   });
+
+  // V1.0.13 — Voice Translator wiring. When a new transcript arrives
+  // from the mic (via useVoiceCommand → /api/voice/command Whisper),
+  // translate it via /api/translator/translate, then speak the result
+  // via SageVoiceController (ElevenLabs). All three pieces existed
+  // before; this just wires them together.
+  useEffect(() => {
+    const transcript = voice?.lastCommand;
+    if (!transcript || transcript === lastTranscriptRef.current) return;
+    lastTranscriptRef.current = transcript;
+    setVoiceTranscript(transcript);
+
+    if (language === 'en') {
+      setVoiceTranslated(transcript);
+      SageVoice.speak(transcript).catch(() => {});
+      return;
+    }
+
+    setVoiceBusy(true);
+    setVoiceError(null);
+    axios.post(
+      `${API}/translator/translate`,
+      { text: transcript, target: language, sacred },
+      { timeout: TRANSLATE_TIMEOUT_MS },
+    ).then(({ data }) => {
+      const translated = data?.translated || data?.text || transcript;
+      setVoiceTranslated(translated);
+      SageVoice.speak(translated).catch(() => {});
+    }).catch((err) => {
+      setVoiceError(err?.response?.data?.detail || 'Translation failed');
+    }).finally(() => {
+      setVoiceBusy(false);
+    });
+  }, [voice?.lastCommand, language, sacred]);
 
   useEffect(() => {
     try {
@@ -593,6 +642,97 @@ export default function LanguageBar() {
               ? 'STOP · SHOW ORIGINAL'
               : `TRANSLATE THIS PAGE → ${cur.flag}`}
           </button>
+
+          {/* V1.0.13 — VOICE TRANSLATOR. Push-to-talk mic. Transcribes
+              via Whisper, translates to selected language, speaks via
+              ElevenLabs Sage Voice. All inline, no overlays. */}
+          <div
+            data-testid="voice-translator-block"
+            style={{
+              marginTop: 10,
+              padding: 8,
+              borderRadius: 8,
+              background: 'rgba(167,139,250,0.06)',
+              border: '1px solid rgba(167,139,250,0.20)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+              <Mic size={10} style={{ color: '#C4B5FD' }} />
+              <span style={{ fontSize: 8.5, letterSpacing: '0.20em', color: '#C4B5FD' }}>
+                VOICE TRANSLATOR
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onMouseDown={() => voice.startRecording && voice.startRecording()}
+              onMouseUp={() => voice.stopRecording && voice.stopRecording()}
+              onMouseLeave={() => voice.isRecording && voice.stopRecording && voice.stopRecording()}
+              onTouchStart={() => voice.startRecording && voice.startRecording()}
+              onTouchEnd={() => voice.stopRecording && voice.stopRecording()}
+              data-testid="voice-translator-mic"
+              disabled={voiceBusy || voice.isProcessing}
+              style={{
+                width: '100%',
+                padding: '6px 8px',
+                borderRadius: 6,
+                background: voice.isRecording ? 'rgba(239,68,68,0.20)' : 'rgba(167,139,250,0.12)',
+                border: `1px solid ${voice.isRecording ? 'rgba(239,68,68,0.6)' : 'rgba(167,139,250,0.45)'}`,
+                color: voice.isRecording ? '#FCA5A5' : '#C4B5FD',
+                fontSize: 9,
+                letterSpacing: '0.15em',
+                cursor: (voiceBusy || voice.isProcessing) ? 'wait' : 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 6,
+              }}
+            >
+              {voice.isProcessing || voiceBusy ? (
+                <><Loader2 size={11} className="animate-spin" /> WORKING…</>
+              ) : voice.isRecording ? (
+                <><MicOff size={11} /> RELEASE TO TRANSLATE</>
+              ) : (
+                <><Mic size={11} /> HOLD TO SPEAK → {cur.flag}</>
+              )}
+            </button>
+
+            {voiceTranscript && (
+              <div data-testid="voice-translator-transcript" style={{ marginTop: 6, fontSize: 9, lineHeight: 1.4, opacity: 0.85 }}>
+                <span style={{ opacity: 0.55, letterSpacing: '0.10em' }}>YOU:</span> {voiceTranscript}
+              </div>
+            )}
+            {voiceTranslated && voiceTranslated !== voiceTranscript && (
+              <div data-testid="voice-translator-translated" style={{ marginTop: 4, fontSize: 9, lineHeight: 1.4, color: '#C4B5FD' }}>
+                <span style={{ opacity: 0.65, letterSpacing: '0.10em' }}>{cur.flag}:</span> {voiceTranslated}
+                <button
+                  type="button"
+                  onClick={() => SageVoice.speak(voiceTranslated).catch(() => {})}
+                  data-testid="voice-translator-replay"
+                  style={{
+                    marginLeft: 6,
+                    padding: '1px 6px',
+                    borderRadius: 4,
+                    background: 'rgba(167,139,250,0.15)',
+                    border: '1px solid rgba(167,139,250,0.4)',
+                    color: '#C4B5FD',
+                    fontSize: 8,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 3,
+                  }}
+                >
+                  <Volume2 size={9} /> Replay
+                </button>
+              </div>
+            )}
+            {voiceError && (
+              <div data-testid="voice-translator-error" style={{ marginTop: 6, fontSize: 8.5, color: '#FCA5A5' }}>
+                {voiceError}
+              </div>
+            )}
+          </div>
 
           <p
             style={{
