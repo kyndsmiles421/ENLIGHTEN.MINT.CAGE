@@ -701,10 +701,15 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
                 context: `Material: ${selMat.origin || ''}. Teach geological/botanical/culinary context, grain/structure considerations, and why this material rewards the ${theme.verb.toLowerCase()} action.`,
               } : null);
 
-          // V1.0.14 — Geology workshop swaps to true 3D R3F chamber
-          // (rock mesh, OrbitControls, strike fractures). Other modules
-          // keep the existing 2D ChamberMiniGame for now.
-          const Use3D = moduleId === 'geology' && theme.mode === 'break';
+          // V1.0.15 — Bulk 3D conversion: ALL break/rhythm/collect modes
+          // route through the unified Chamber3DGame. The 5 modules user
+          // demanded — Carpentry, Herbology, Aromatherapy, Physics,
+          // Academy — plus geology + the rest of the science pillar all
+          // hit the same 3D engine. Generic mesh factory inside the
+          // chamber adapts the visual (rock for break, wave for rhythm,
+          // field for collect). Sage Voice → mesh pulse via window
+          // event bus. Tier fidelity reads zen_tier from localStorage.
+          const Use3D = ['break', 'rhythm', 'collect'].includes(theme.mode);
           const ChamberComp = Use3D ? Chamber3DGame : ChamberMiniGame;
 
           return (

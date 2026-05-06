@@ -51,6 +51,26 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Flatland:** No `position:fixed`, no floating X close. Inline document flow with sequential "FOLD UP" pill at the bottom. Inline header (title + sparks + verb counter) flows above canvas, completion banner unfolds below.
 - **Verified live:** `<canvas>` mounted with `[data-testid="chamber-3d-canvas-geology_break"]`. Faceted 3D rock crystal renders correctly on `/workshop/geology` after tool selection.
 
+### V1.0.15 — Sovereign Engine Wiring (math → mesh) (2026-05-06) ✅
+**Mandate:** "Wire the logic to the light. The math you've spent 63 days protecting must move the mesh."
+- **Bulk 3D conversion:** Flipped UniversalWorkshop gate from `geology+break` to all `['break','rhythm','collect']` modes. Verified 5/5 modules render R3F: Geology, Electrical, Herbalism, Carpentry, Bible.
+- **3 mesh types in `Chamber3DGame.js`** (one file, mode-driven mesh factory):
+  - `break` → fracturing IcosahedronGeometry (rock/wood/dough/stone)
+  - `rhythm` → pulsing TorusKnotGeometry (current/heartbeat/wind/flow)
+  - `collect` → 3x3 OctahedronGeometry field positioned via `toroidalDisplacement` (helix sub-grid for verses/herbs/seedlings/fossils)
+- **Wired existing math (no new files):**
+  - `lib/SacredGeometry.goldenSpiralPoints` → shard ejection vectors (math-driven, not random)
+  - `lib/SacredGeometry.toroidalDisplacement` → 3x3 collect-grid positioning (helix sub-region)
+  - `lib/SacredGeometry.GRID_SIZE/TOTAL_NODES` → 9x9 / 81-node constants imported
+  - `utils/SovereignMath.PHI` → wave breath frequency
+  - `utils/SovereignMath.PHI_SQ` (≈2.618) → squared XP multiplier on Sovereign/Founder completions
+  - `engines/LoxIgnitionPulse.getLoxIgnitionPulse()` → shard count modulation per LOX intensity
+- **Sage Voice → Mesh reaction (`useSageReaction` hook):** Listens to existing window event bus (`sage:narrate`, `SOVEREIGN_XR_START`, `resonance-change`) — no new Provider added. When fired, all 3 mesh types receive a 700ms emissive pulse spike. Hooks into project's existing `window.dispatchEvent` pattern (already used in 8+ utility files).
+- **Tier-gated fidelity (`useTierFidelity` hook):** Reads `zen_tier`/`zen_user_tier` localStorage. Founder/Sovereign/Architect → polyDetail=3, dpr=2, night HDRI Environment, 10-14 shards/strike. Discovery/Seeker → polyDetail=2, dpr=1.25, no HDRI, 6-10 shards.
+- **Hollow Earth shell:** `<sphereGeometry args={[14,32,32]}/>` with `THREE.BackSide` + emissive color background. User is INSIDE the chamber, not outside. Opacity tier-gated (4% Discovery, 10% Sovereign).
+- **Flatland:** All meshes inline. No `position:fixed`. Sequential FOLD UP pill at bottom.
+- **Lint clean. Verified live across 5 routes.**
+
 
 **Mandate:** "Look before you edit. Rewire, do not rewrite. Don't take the controller away while the game is playing."
 - **Body (Flatland Whitelist)** — `UnifiedCreatorConsole.js` line 118 flipped from blacklist→whitelist. Mixer UI now renders ONLY on cockpit + gameplay routes: `/apex-creator`, `/cosmic-mixer`, `/creator-console`, `/master-engine`, `/forge`, `/starseed-adventure`, `/starseed-realm`, `/games`. ~178px reclaimed on 190+ spiritual/Academy/Pricing routes; LanguageBar fully clickable.
