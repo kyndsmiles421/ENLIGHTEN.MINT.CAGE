@@ -531,8 +531,17 @@ export default function Chamber3DGame({
         </div>
       </div>
 
+      {/* Inline hint — Flatland clean (above canvas, sequential) */}
+      <div style={{
+        padding: '4px 16px 6px',
+        textAlign: 'center', fontFamily: 'monospace',
+        fontSize: 9, letterSpacing: 2, color: `${color}aa`,
+      }}>
+        DRAG TO ORBIT · TAP CRYSTAL TO {verb}
+      </div>
+
       {/* The actual 3D canvas */}
-      <div style={{ width: '100%', height: 360, position: 'relative' }}>
+      <div style={{ width: '100%', height: 360 }}>
         <Canvas
           camera={{ position: [0, 0, 4], fov: 45 }}
           shadows
@@ -600,16 +609,6 @@ export default function Chamber3DGame({
             dampingFactor={0.08}
           />
         </Canvas>
-
-        {/* Inline strike hint (NOT an overlay — sits inside canvas frame) */}
-        <div style={{
-          position: 'absolute', bottom: 10, left: 0, right: 0,
-          textAlign: 'center', fontFamily: 'monospace',
-          fontSize: 9, letterSpacing: 2, color: `${color}aa`,
-          pointerEvents: 'none',
-        }}>
-          DRAG TO ORBIT · TAP CRYSTAL TO {verb}
-        </div>
       </div>
 
       {/* Teach panel — sequential, inline */}

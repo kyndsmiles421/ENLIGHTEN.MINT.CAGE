@@ -229,6 +229,8 @@ const MusicTheory = lazy(() => import('./pages/MusicTheory'));
 const Workshop = lazy(() => import('./pages/Workshop'));
 const HelixNavPage = lazy(() => import('./pages/HelixNavPage'));
 const Forge3D = lazy(() => import('./components/Forge3D'));
+const BlackHillsBathymetry = lazy(() => import('./components/BlackHillsBathymetry'));
+const TesseractVault = lazy(() => import('./components/TesseractVault'));
 const OrbitalHub = lazy(() => import('./pages/OrbitalHub'));
 const EnlightenMintHub = lazy(() => import('./pages/EnlightenMintHub'));
 const QuantumLoom = lazy(() => import('./pages/QuantumLoom'));
@@ -615,6 +617,10 @@ function AnimatedRoutes() {
         <Route path="/helix-nav" element={<HelixNavPage />} />
         <Route path="/helix" element={<HelixNavPage />} />
         <Route path="/forge" element={<div style={{padding:'20px 16px', maxWidth:980, margin:'0 auto'}}><h1 style={{fontFamily:'Cormorant Garamond, serif', fontWeight:300, fontSize:'1.75rem'}}>The Forge · Live Gear Train</h1><p style={{fontSize:11, letterSpacing:1.5, color:'var(--text-muted)', marginBottom:20}}>ω₂ = ω₁ · (N₁/N₂) · MATH → MESH</p><Forge3D /></div>} />
+        <Route path="/pactola" element={<div style={{padding:'20px 16px', maxWidth:980, margin:'0 auto'}}><h1 style={{fontFamily:'Cormorant Garamond, serif', fontWeight:300, fontSize:'1.75rem'}}>Pactola Reservoir · Black Hills Bathymetry</h1><p style={{fontSize:11, letterSpacing:1.5, color:'var(--text-muted)', marginBottom:20}}>USGS-INFORMED PROCEDURAL TOPOGRAPHY · MAN-MADE 1956</p><BlackHillsBathymetry /></div>} />
+        <Route path="/black-hills" element={<div style={{padding:'20px 16px', maxWidth:980, margin:'0 auto'}}><h1 style={{fontFamily:'Cormorant Garamond, serif', fontWeight:300, fontSize:'1.75rem'}}>Pactola Reservoir · Black Hills Bathymetry</h1><p style={{fontSize:11, letterSpacing:1.5, color:'var(--text-muted)', marginBottom:20}}>USGS-INFORMED PROCEDURAL TOPOGRAPHY · MAN-MADE 1956</p><BlackHillsBathymetry /></div>} />
+        <Route path="/vault" element={<div style={{padding:'20px 16px', maxWidth:980, margin:'0 auto'}}><h1 style={{fontFamily:'Cormorant Garamond, serif', fontWeight:300, fontSize:'1.75rem'}}>Tesseract Relic Vault</h1><p style={{fontSize:11, letterSpacing:1.5, color:'var(--text-muted)', marginBottom:20}}>4D HYPERCUBE · HAWAIIAN IMPORTS · GOLDEN-SPIRAL DISTRIBUTION</p><TesseractVault /></div>} />
+        <Route path="/tesseract" element={<div style={{padding:'20px 16px', maxWidth:980, margin:'0 auto'}}><h1 style={{fontFamily:'Cormorant Garamond, serif', fontWeight:300, fontSize:'1.75rem'}}>Tesseract Relic Vault</h1><p style={{fontSize:11, letterSpacing:1.5, color:'var(--text-muted)', marginBottom:20}}>4D HYPERCUBE · HAWAIIAN IMPORTS · GOLDEN-SPIRAL DISTRIBUTION</p><TesseractVault /></div>} />
         <Route path="/hub" element={<OrbitalHub />} />
         <Route path="/orbital-hub" element={<OrbitalHub />} />
         <Route path="/sovereign-hub" element={<SovereignHub />} />

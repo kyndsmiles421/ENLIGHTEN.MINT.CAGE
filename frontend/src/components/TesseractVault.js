@@ -1,0 +1,293 @@
+/**
+ * TesseractVault.js — V1.0.19 4D Hypercube Relic Vault
+ *
+ * 3D gallery for "Hawaiian Imports" (or any user-imported relics).
+ * Renders a tesseract (4D hypercube projected to 3D) with relics
+ * floating in/around the inner cube. Each relic is a clickable
+ * mesh with metadata (lilikoi fudge, lychee, koa wood, etc.).
+ *
+ * Tesseract math: outer cube + inner cube + 8 connecting struts.
+ * The inner cube rotates on its own axis (4D rotation projection)
+ * to give the impossible-geometry feel.
+ *
+ * Flatland: NO position:fixed, NO floating UI. Inline document flow.
+ * Relic detail panel unfolds BELOW the canvas (sequential).
+ */
+import React, { Suspense, useMemo, useRef, useState } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Float, Html, Environment } from '@react-three/drei';
+import * as THREE from 'three';
+import { ChevronUp, Gem, Package, Info } from 'lucide-react';
+import { PHI } from '../utils/SovereignMath';
+
+// Default relic catalogue — Hawaiian imports from user's actual business
+const DEFAULT_RELICS = [
+  { id: 'lilikoi-fudge', label: 'Lilikoi Fudge', origin: 'Maui · Family Recipe', color: '#FBBF24', tier: 'sovereign' },
+  { id: 'lychee', label: 'Lychee', origin: 'Big Island Orchards', color: '#F472B6', tier: 'all' },
+  { id: 'macadamia', label: 'Macadamia Nuts', origin: 'Kona Roastery', color: '#A78BFA', tier: 'all' },
+  { id: 'koa-wood', label: 'Koa Wood Carving', origin: 'Hawaii Heritage', color: '#92400E', tier: 'architect' },
+  { id: 'kona-coffee', label: 'Kona Coffee', origin: 'South Kona Slopes', color: '#7C2D12', tier: 'all' },
+  { id: 'sea-salt', label: 'Black Hawaiian Salt', origin: 'Molokai Salt Pans', color: '#1F2937', tier: 'all' },
+  { id: 'taro', label: 'Taro Chips', origin: 'Kauai Fields', color: '#7C3AED', tier: 'all' },
+  { id: 'spam-musubi', label: 'Spam Musubi Kit', origin: 'Honolulu Diner', color: '#EF4444', tier: 'all' },
+];
+
+// Tesseract structure — outer cube vertices + inner cube vertices + struts
+function TesseractWireframe({ size = 1.4, innerScale = 0.55, color = '#FCD34D' }) {
+  const innerRef = useRef();
+  const outerRef = useRef();
+
+  // Outer cube edge geometry
+  const outerEdges = useMemo(() => {
+    const geo = new THREE.BoxGeometry(size, size, size);
+    return new THREE.EdgesGeometry(geo);
+  }, [size]);
+
+  // Inner cube edge geometry
+  const innerEdges = useMemo(() => {
+    const geo = new THREE.BoxGeometry(size * innerScale, size * innerScale, size * innerScale);
+    return new THREE.EdgesGeometry(geo);
+  }, [size, innerScale]);
+
+  // 8 connecting struts (corner-to-corner outer→inner)
+  const strutLines = useMemo(() => {
+    const half = size / 2;
+    const innerHalf = (size * innerScale) / 2;
+    const corners = [
+      [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+      [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1],
+    ];
+    const points = [];
+    corners.forEach((c) => {
+      points.push(new THREE.Vector3(c[0] * half, c[1] * half, c[2] * half));
+      points.push(new THREE.Vector3(c[0] * innerHalf, c[1] * innerHalf, c[2] * innerHalf));
+    });
+    const geo = new THREE.BufferGeometry().setFromPoints(points);
+    return geo;
+  }, [size, innerScale]);
+
+  // The 4D-projection illusion: rotate inner cube on different axes than outer
+  useFrame((state) => {
+    const t = state.clock.elapsedTime;
+    if (outerRef.current) {
+      outerRef.current.rotation.x = Math.sin(t * 0.3) * 0.2;
+      outerRef.current.rotation.y = t * 0.15;
+    }
+    if (innerRef.current) {
+      innerRef.current.rotation.x = -Math.cos(t * 0.5) * 0.3;
+      innerRef.current.rotation.y = -t * 0.4 * PHI;
+      innerRef.current.rotation.z = Math.sin(t * 0.25) * 0.2;
+    }
+  });
+
+  return (
+    <group>
+      <lineSegments ref={outerRef} geometry={outerEdges}>
+        <lineBasicMaterial color={color} transparent opacity={0.6} />
+      </lineSegments>
+      <lineSegments ref={innerRef} geometry={innerEdges}>
+        <lineBasicMaterial color={color} transparent opacity={0.85} />
+      </lineSegments>
+      <lineSegments geometry={strutLines}>
+        <lineBasicMaterial color={color} transparent opacity={0.25} />
+      </lineSegments>
+    </group>
+  );
+}
+
+// A single relic — floating mesh inside the tesseract
+function Relic({ relic, position, isSelected, onSelect }) {
+  const ref = useRef();
+  useFrame((state) => {
+    if (!ref.current) return;
+    const t = state.clock.elapsedTime;
+    // Gentle bob using PHI-derived frequency
+    ref.current.position.y = position[1] + Math.sin(t * PHI + position[0]) * 0.04;
+    ref.current.rotation.y = t * 0.2 + position[0];
+    // Selected = pulse
+    const target = isSelected ? 1.5 : 1;
+    ref.current.scale.lerp(new THREE.Vector3(target, target, target), 0.15);
+  });
+  return (
+    <group ref={ref} position={position}>
+      <mesh
+        onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+        onPointerOut={() => { document.body.style.cursor = 'default'; }}
+        onClick={(e) => { e.stopPropagation(); onSelect(relic); }}
+      >
+        <icosahedronGeometry args={[0.10, 0]} />
+        <meshStandardMaterial
+          color={relic.color}
+          emissive={relic.color}
+          emissiveIntensity={isSelected ? 1.4 : 0.7}
+          metalness={0.7}
+          roughness={0.25}
+        />
+      </mesh>
+      {isSelected && (
+        <Html center distanceFactor={6} style={{ pointerEvents: 'none' }}>
+          <div style={{
+            padding: '4px 8px',
+            fontSize: 10,
+            fontFamily: 'monospace',
+            color: relic.color,
+            background: 'rgba(2,6,18,0.85)',
+            border: `1px solid ${relic.color}55`,
+            borderRadius: 4,
+            letterSpacing: 1,
+            whiteSpace: 'nowrap',
+            transform: 'translate3d(0,-26px,0)',
+          }}>
+            {relic.label}
+          </div>
+        </Html>
+      )}
+    </group>
+  );
+}
+
+export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
+  const [selected, setSelected] = useState(null);
+
+  // Position relics around the inner cube — golden-spiral on a sphere
+  const relicPositions = useMemo(() => {
+    const n = relics.length;
+    const positions = [];
+    const phi = Math.PI * (3 - Math.sqrt(5));  // golden angle
+    for (let i = 0; i < n; i++) {
+      const y = 1 - (i / (n - 1)) * 2;  // -1..1
+      const radius = Math.sqrt(1 - y * y);
+      const theta = phi * i;
+      const x = Math.cos(theta) * radius;
+      const z = Math.sin(theta) * radius;
+      positions.push([x * 1.0, y * 0.55, z * 1.0]);
+    }
+    return positions;
+  }, [relics]);
+
+  return (
+    <div
+      data-testid="tesseract-vault"
+      style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: 520,
+        borderRadius: 16,
+        overflow: 'hidden',
+        background: 'radial-gradient(circle at 50% 30%, rgba(252,211,77,0.10) 0%, rgba(2,6,18,0.98) 70%)',
+        border: '1px solid rgba(252,211,77,0.22)',
+        marginBottom: 16,
+      }}
+    >
+      <div style={{
+        padding: '14px 16px 10px',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end',
+        borderBottom: '1px solid rgba(252,211,77,0.15)', gap: 8, flexWrap: 'wrap',
+      }}>
+        <div style={{ fontFamily: 'monospace', color: '#FCD34D' }}>
+          <div style={{ fontSize: 11, letterSpacing: 2 }}>TESSERACT RELIC VAULT</div>
+          <div style={{ fontSize: 9, letterSpacing: 1.5, opacity: 0.65, marginTop: 2 }}>
+            <Gem size={9} style={{ verticalAlign: 'middle' }} /> 4D HYPERCUBE · {relics.length} RELICS
+          </div>
+        </div>
+        <div style={{ display: 'inline-flex', gap: 6, fontFamily: 'monospace', fontSize: 9, color: '#FCD34Dcc' }}>
+          <Package size={10} /> HAWAIIAN IMPORTS
+        </div>
+      </div>
+
+      <div style={{
+        padding: '4px 16px 6px',
+        textAlign: 'center', fontFamily: 'monospace',
+        fontSize: 9, letterSpacing: 2, color: 'rgba(252,211,77,0.7)',
+      }}>
+        DRAG TO ORBIT · TAP RELIC TO INSPECT
+      </div>
+
+      <div style={{ width: '100%', height: 380 }}>
+        <Canvas camera={{ position: [0, 0.4, 2.6], fov: 50 }} dpr={[1, 1.75]} data-testid="tesseract-canvas">
+          <ambientLight intensity={0.45} />
+          <pointLight position={[2, 2, 2]} intensity={0.9} color="#FCD34D" />
+          <pointLight position={[-2, -1, 2]} intensity={0.5} color="#FB923C" />
+          <Suspense fallback={null}>
+            <Environment preset="night" />
+          </Suspense>
+          <Float speed={0.4} rotationIntensity={0.15} floatIntensity={0.2}>
+            <TesseractWireframe size={1.6} innerScale={0.55} color="#FCD34D" />
+            {relics.map((r, i) => (
+              <Relic
+                key={r.id}
+                relic={r}
+                position={relicPositions[i]}
+                isSelected={selected && selected.id === r.id}
+                onSelect={(rel) => setSelected(selected && selected.id === rel.id ? null : rel)}
+              />
+            ))}
+          </Float>
+          <OrbitControls
+            enablePan={false}
+            minDistance={1.8}
+            maxDistance={5}
+            enableDamping
+            dampingFactor={0.08}
+            autoRotate={!selected}
+            autoRotateSpeed={0.4}
+          />
+        </Canvas>
+      </div>
+
+      {/* Selected relic detail panel — INLINE, pushes content down (Flatland clean) */}
+      {selected && (
+        <div data-testid="relic-detail-panel" style={{
+          padding: '12px 16px',
+          borderTop: '1px solid rgba(252,211,77,0.18)',
+          background: `${selected.color}08`,
+          fontFamily: 'monospace',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
+            <div>
+              <div style={{ fontSize: 12, color: selected.color, letterSpacing: 1.5 }}>{selected.label.toUpperCase()}</div>
+              <div style={{ fontSize: 10, color: 'rgba(248,250,252,0.65)', marginTop: 3 }}>
+                <Info size={9} style={{ verticalAlign: 'middle' }} /> {selected.origin}
+              </div>
+            </div>
+            <span style={{
+              padding: '3px 8px',
+              borderRadius: 999,
+              fontSize: 8.5,
+              letterSpacing: 1.5,
+              border: `1px solid ${selected.color}55`,
+              background: `${selected.color}15`,
+              color: selected.color,
+            }}>
+              {selected.tier === 'all' ? 'ALL TIERS' : `${selected.tier.toUpperCase()}+ ONLY`}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {onClose && (
+        <div style={{ padding: '8px 16px 12px', textAlign: 'center', borderTop: '1px solid rgba(252,211,77,0.10)' }}>
+          <button
+            type="button"
+            onClick={onClose}
+            data-testid="tesseract-vault-fold"
+            style={{
+              background: 'transparent',
+              border: '1px solid rgba(252,211,77,0.3)',
+              color: 'rgba(252,211,77,0.85)',
+              padding: '5px 12px',
+              borderRadius: 999,
+              fontFamily: 'monospace',
+              fontSize: 8.5,
+              letterSpacing: 2,
+              cursor: 'pointer',
+              display: 'inline-flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            <ChevronUp size={10} /> FOLD VAULT
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

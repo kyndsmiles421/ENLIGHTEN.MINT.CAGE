@@ -185,7 +185,6 @@ export default function HelixNav3D({ height = 480, autoRotate = true }) {
       style={{
         position: 'relative',
         width: '100%',
-        height,
         borderRadius: 16,
         overflow: 'hidden',
         background: 'radial-gradient(circle at 50% 50%, rgba(124,58,237,0.10) 0%, rgba(2,6,18,0.98) 70%)',
@@ -193,13 +192,23 @@ export default function HelixNav3D({ height = 480, autoRotate = true }) {
         marginBottom: 16,
       }}
     >
+      {/* Inline header — Flatland clean (no position:absolute) */}
       <div style={{
-        position: 'absolute', top: 12, left: 14, zIndex: 2,
+        padding: '10px 14px 6px',
         fontFamily: 'monospace', color: '#C4B5FD',
         fontSize: 10, letterSpacing: 2,
+        borderBottom: '1px solid rgba(124,58,237,0.10)',
       }}>
         9×9 SOVEREIGN HELIX · {TOTAL_NODES} NODES · {nodes.filter((n) => n.module).length} ACTIVE
       </div>
+      <div style={{
+        padding: '4px 14px 6px',
+        textAlign: 'center', fontFamily: 'monospace',
+        fontSize: 9, letterSpacing: 2, color: 'rgba(196,181,253,0.60)',
+      }}>
+        DRAG TO ORBIT · TAP A NODE TO VECTOR-SHIFT
+      </div>
+      <div style={{ width: '100%', height }}>
       <Canvas
         camera={{ position: [0, 0, 4.5], fov: 50 }}
         dpr={[1, 1.75]}
@@ -233,13 +242,6 @@ export default function HelixNav3D({ height = 480, autoRotate = true }) {
         />
         <FollowCamera targetNode={activeNode} />
       </Canvas>
-      <div style={{
-        position: 'absolute', bottom: 10, left: 0, right: 0,
-        textAlign: 'center', fontFamily: 'monospace',
-        fontSize: 9, letterSpacing: 2, color: '#C4B5FD99',
-        pointerEvents: 'none',
-      }}>
-        DRAG TO ORBIT · TAP A NODE TO VECTOR-SHIFT
       </div>
     </div>
   );

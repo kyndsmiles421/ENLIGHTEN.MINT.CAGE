@@ -107,6 +107,35 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Test IDs:** `helix-nav-3d`, `helix-nav-canvas`, `helix-nav-page`, `helix-link-*`, `forge-3d`, `forge-3d-canvas`, `forge-3d-rpm-hud`, `forge-3d-fold`
 - **Verified live:** both canvases render, no console errors, lint clean.
 
+### V1.0.18 — LOX Particle Solver + Pactola Bathymetry + Flatland Strict (2026-05-06) ✅
+- **Step 5 — LOX Particle Field** (`/forge`):
+  - `<LoxParticleField>` mounted in Forge3D Canvas. 240-particle `<instancedMesh>` (one draw call).
+  - Each particle has position, velocity, life, size. Spawn rate + base velocity scale with `getLoxIgnitionPulse().pressure` and `currentMode`.
+  - Mode multiplier: CRUISE=1.0, BOOST=1.6, HYPER=2.4, MAXIMUM=3.5
+  - Vapor expands as it ages, drifts upward (buoyancy), recycles via cursor pointer.
+  - Inline LOX mode pills (CRUISE/BOOST/HYPER/MAXIMUM) call `lox.currentMode = m` and recompute pressure (φ-stabilized base × mode multiplier).
+- **Step 7 — Pactola Bathymetry** (`/pactola`, `/black-hills`):
+  - `<BlackHillsBathymetry>` renders procedural 96×96 vertex heightmap modeled on Pactola's actual geometry: Rapid Creek W→E channel, squared-falloff littoral zone, deepest point near dam (150ft).
+  - Constants from public USGS / SD GFP data (lat/lon, surface acres, dam date 1956, shoreline 14mi).
+  - Water surface plane + red emissive "DEEPEST · 150ft" marker at dam end + gray concrete dam mesh.
+  - Data structure swap-ready for real USGS 3DEP DEM tiles when fetched.
+- **V1.0.18.1 — Flatland strict purge:**
+  - Stripped ALL `position:absolute` from DOM layer of all 5 R3F components (Forge3D, HelixNav3D, Chamber3DGame, BlackHillsBathymetry, TesseractVault).
+  - "DRAG TO ORBIT" hints, RPM HUD, helix header, mixer hints now all flow as **inline sequential rows** above/below the canvas.
+  - Verified: `grep "position.*absolute"` returns ZERO matches across all 5 components.
+- **Lint clean across all 5 R3F components.**
+
+### V1.0.19 — Tesseract Relic Vault (2026-05-06) ✅
+- **Step 9 — `<TesseractVault>`** (`/vault`, `/tesseract`):
+  - 4D hypercube wireframe: outer cube + inner cube (rotates on PHI-derived axis) + 8 connecting struts. Real tesseract math.
+  - 8 Hawaiian relic catalogue (Lilikoi Fudge, Lychee, Macadamia, Koa Wood, Kona Coffee, Black Hawaiian Salt, Taro, Spam Musubi)
+  - Relics distributed via golden-angle spiral on a sphere (`Math.PI * (3 - sqrt(5))`)
+  - Each relic = clickable icosahedron mesh with color, origin, tier-gating tag (sovereign/architect/all)
+  - Tap relic → unfolds inline detail panel below canvas (Flatland: sequential, NO modal overlay)
+  - Camera auto-rotates when no relic selected; stops on selection
+- **Routes:** `/vault`, `/tesseract`
+- **Verified live:** `[data-testid="tesseract-canvas"]` mounts, all 8 relics render and respond to clicks.
+
 
 **Mandate:** "Look before you edit. Rewire, do not rewrite. Don't take the controller away while the game is playing."
 - **Body (Flatland Whitelist)** — `UnifiedCreatorConsole.js` line 118 flipped from blacklist→whitelist. Mixer UI now renders ONLY on cockpit + gameplay routes: `/apex-creator`, `/cosmic-mixer`, `/creator-console`, `/master-engine`, `/forge`, `/starseed-adventure`, `/starseed-realm`, `/games`. ~178px reclaimed on 190+ spiritual/Academy/Pricing routes; LanguageBar fully clickable.

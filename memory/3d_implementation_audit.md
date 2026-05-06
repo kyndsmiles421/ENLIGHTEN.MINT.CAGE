@@ -132,3 +132,20 @@ components/StarChartAudio.js                                             227  2D
 - For any product spec dispute, this audit should be paired with: (a) the original written requirement promising "3D / VR", and (b) the chat transcripts where 3D was scoped.
 - Some experiences may use "cosmic" naming as a thematic / aesthetic choice, not a literal 3D promise.
 
+
+---
+
+## RE-AUDIT — 2026-05-06 (after V1.0.13–V1.0.19)
+
+| Metric | Initial | Current | Delta |
+|---|---|---|---|
+| Total .js/.jsx files | 719 | 725 | +6 |
+| Files rendering `<Canvas>` | 3 | 8 | +5 |
+| Files importing R3F | 5 | 10 | +5 |
+| Files importing any Three.js | 11 | 16 | +5 |
+
+**Canvas %:** 0.42% → **1.10%**
+
+### NEW R3F components added this session:
+```
+```
