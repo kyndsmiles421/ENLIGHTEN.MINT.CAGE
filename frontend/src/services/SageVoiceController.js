@@ -26,10 +26,51 @@ function _audio() {
   if (!audioEl && typeof Audio !== 'undefined') {
     audioEl = new Audio();
     audioEl.preload = 'auto';
+    audioEl.crossOrigin = 'anonymous';  // V1.0.16 — allow MediaElementSource for FFT
     audioEl.addEventListener('ended', () => _setState('idle'));
     audioEl.addEventListener('error', () => _setState('idle'));
   }
   return audioEl;
+}
+
+// V1.0.16 — Singleton AudioContext + AnalyserNode for FFT vertex
+// displacement. Wired ONCE on first speak() so we don't violate the
+// browser's "user gesture required" autoplay policy. Consumed by
+// useSageFFT() inside Chamber3DGame.
+let _audioCtx = null;
+let _analyser = null;
+let _sourceNode = null;
+const _fftBins = 64;
+
+function _ensureAnalyser() {
+  if (_analyser) return _analyser;
+  const a = _audio();
+  if (!a) return null;
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    _audioCtx = new Ctx();
+    _sourceNode = _audioCtx.createMediaElementSource(a);
+    _analyser = _audioCtx.createAnalyser();
+    _analyser.fftSize = 256;  // → 128 frequency bins
+    _analyser.smoothingTimeConstant = 0.7;
+    _sourceNode.connect(_analyser);
+    _analyser.connect(_audioCtx.destination);
+  } catch (e) {
+    // Some browsers throw if MediaElementSource was already created;
+    // safe to swallow — we just won't have FFT this session.
+    return null;
+  }
+  return _analyser;
+}
+
+export function getSageAnalyser() {
+  return _ensureAnalyser();
+}
+
+export function getSageAudioContext() {
+  _ensureAnalyser();
+  return _audioCtx;
 }
 
 // V1.0.12 — Calm-immersion contract: when user is in calm mode the
@@ -123,11 +164,13 @@ export async function speak(text, opts = {}) {
     if (!a) { _setState('idle'); return; }
     a.src = data.audio_url;
     a.volume = calm ? 0.4 : 1.0;
+    // V1.0.16 — wire analyser graph just-in-time (after first user gesture)
+    _ensureAnalyser();
+    if (_audioCtx && _audioCtx.state === 'suspended') { try { await _audioCtx.resume(); } catch {} }
     _setState('speaking');
     try {
-      // Browsers may require user-gesture-bound playback. The wand /
-      // HUD speaker click both happen inside a user click, so this is
-      // safe in practice. If autoplay is blocked, we drop to idle.
+      // Notify any FFT consumers (Chamber3DGame meshes) that Sage is speaking
+      try { window.dispatchEvent(new CustomEvent('sage:narrate', { detail: { url: data.audio_url } })); } catch {}
       await a.play();
     } catch {
       _setState('idle');

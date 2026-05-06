@@ -27,6 +27,7 @@ import { Hammer, Sparkles, ChevronUp } from 'lucide-react';
 import { goldenSpiralPoints, GRID_SIZE, toroidalDisplacement } from '../../lib/SacredGeometry';
 import { PHI, PHI_SQ } from '../../utils/SovereignMath';
 import { getLoxIgnitionPulse } from '../../engines/LoxIgnitionPulse';
+import { getSageAnalyser } from '../../services/SageVoiceController';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -79,7 +80,45 @@ function useSageReaction() {
   return pulse;
 }
 
-// ── V1.0.15 Tier-gated render fidelity ──────────────────────────
+// ── V1.0.16 Sage FFT — read live frequency data from SageVoiceController ──
+// Returns a stable ref whose .current array is updated in-place each
+// frame. Consumers (RockMesh useFrame) read from it without triggering
+// re-renders. Falls back to silence if no analyser available.
+function useSageFFT() {
+  const dataRef = useRef(new Uint8Array(128));
+  const sumRef = useRef({ low: 0, mid: 0, high: 0, total: 0 });
+  useFrame(() => {
+    const an = getSageAnalyser();
+    if (!an) return;
+    if (dataRef.current.length !== an.frequencyBinCount) {
+      dataRef.current = new Uint8Array(an.frequencyBinCount);
+    }
+    an.getByteFrequencyData(dataRef.current);
+    // Aggregate into low/mid/high bands
+    const n = dataRef.current.length;
+    const third = Math.floor(n / 3);
+    let lo = 0, mi = 0, hi = 0;
+    for (let i = 0; i < third; i++) lo += dataRef.current[i];
+    for (let i = third; i < third * 2; i++) mi += dataRef.current[i];
+    for (let i = third * 2; i < n; i++) hi += dataRef.current[i];
+    sumRef.current.low = lo / (third * 255);
+    sumRef.current.mid = mi / (third * 255);
+    sumRef.current.high = hi / (third * 255);
+    sumRef.current.total = (lo + mi + hi) / (n * 255);
+  });
+  return sumRef;
+}
+
+// ── V1.0.16 Centrifugal hollow-earth gravity for shards ──
+// Replaces falling-down gravity. Shards are pushed OUTWARD radially
+// from origin, accelerating toward the BackSide shell at radius=14.
+function applyCentrifugal(position, dt, shellR = 14) {
+  const r = Math.sqrt(position.x ** 2 + position.y ** 2 + position.z ** 2) || 0.001;
+  const radialAccel = 2.5 * (1 + r / shellR);  // accelerates as it nears shell
+  position.x += (position.x / r) * radialAccel * dt;
+  position.y += (position.y / r) * radialAccel * dt;
+  position.z += (position.z / r) * radialAccel * dt;
+}
 // Reads the user's tier from localStorage (set by economy/my-plan).
 // Founder/Sovereign get high-poly + night HDRI + dpr 2.
 // Seeker/Discovery get low-poly + matte + dpr 1.
@@ -112,6 +151,7 @@ function RockMesh({ hits, hitsPerTarget, color, onStrike, broken, sagePulse = 0,
   const [glow, setGlow] = useState(0);
   const [shake, setShake] = useState(0);
   const damage = Math.min(hits / hitsPerTarget, 1);
+  const fft = useSageFFT();   // V1.0.16 — live FFT frequency bands
 
   // Build a distorted icosahedron once (poly detail driven by tier)
   const geometry = useMemo(() => {
@@ -163,6 +203,39 @@ function RockMesh({ hits, hitsPerTarget, color, onStrike, broken, sagePulse = 0,
       meshRef.current.position.y *= 0.85;
     }
     if (glow > 0) setGlow(Math.max(0, glow - dt * 1.8));
+
+    // V1.0.16 — FFT vertex displacement. Sage's voice frequency bands
+    // re-displace the rock vertices in real-time. Low band → x-axis
+    // breath, mid → y-axis pulse, high → z-axis crackle. When Sage is
+    // silent, fft.total ≈ 0 and there's no effect.
+    const bands = fft.current;
+    if (bands.total > 0.02 && geomRef.current) {
+      const pos = geomRef.current.attributes.position;
+      const original = geometry.userData.original;
+      if (original) {
+        const lo = bands.low * 0.18;
+        const mi = bands.mid * 0.16;
+        const hi = bands.high * 0.14;
+        for (let i = 0; i < pos.count; i++) {
+          const ox = original[i * 3], oy = original[i * 3 + 1], oz = original[i * 3 + 2];
+          const baseNoise = 0.18 * (Math.sin(ox * 4.1) + Math.cos(oy * 3.7) + Math.sin(oz * 5.2));
+          const crackNoise = damage * 0.35 * (Math.sin(ox * 11 + hits) + Math.cos(oy * 13 + hits));
+          // Voice-driven oscillation per-axis
+          const t = state.clock.elapsedTime;
+          const voiceX = lo * Math.sin(t * 6 + ox * 2);
+          const voiceY = mi * Math.cos(t * 9 + oy * 2);
+          const voiceZ = hi * Math.sin(t * 14 + oz * 2);
+          pos.setXYZ(
+            i,
+            ox + baseNoise * ox + crackNoise * ox + voiceX * ox,
+            oy + baseNoise * oy + crackNoise * oy + voiceY * oy,
+            oz + baseNoise * oz + crackNoise * oz + voiceZ * oz,
+          );
+        }
+        pos.needsUpdate = true;
+        geomRef.current.computeVertexNormals();
+      }
+    }
   });
 
   if (broken) return null;
@@ -189,17 +262,24 @@ function RockMesh({ hits, hitsPerTarget, color, onStrike, broken, sagePulse = 0,
   );
 }
 
-// ── Fragment Shards (post-strike particles) ─────────────────────
+// ── Fragment Shards (post-strike particles, V1.0.16 centrifugal) ─
 function Shard({ origin, direction, color, life }) {
   const ref = useRef();
   const startTime = useRef(performance.now());
-  useFrame(() => {
+  const pos = useRef({ x: origin[0], y: origin[1], z: origin[2] });
+  const vel = useRef({ x: direction[0] * 2, y: direction[1] * 2, z: direction[2] * 2 });
+  useFrame((_, dt) => {
     if (!ref.current) return;
     const t = (performance.now() - startTime.current) / 1000;
     const decay = Math.max(0, 1 - t / life);
-    ref.current.position.x = origin[0] + direction[0] * t * 2;
-    ref.current.position.y = origin[1] + direction[1] * t * 2 - 0.5 * 9.8 * t * t * 0.2;
-    ref.current.position.z = origin[2] + direction[2] * t * 2;
+    // V1.0.16 — Hollow-Earth centrifugal gravity: shards accelerate
+    // OUTWARD radially toward the BackSide shell at radius 14, instead
+    // of falling toward an imaginary floor.
+    pos.current.x += vel.current.x * dt;
+    pos.current.y += vel.current.y * dt;
+    pos.current.z += vel.current.z * dt;
+    applyCentrifugal(pos.current, dt, 14);
+    ref.current.position.set(pos.current.x, pos.current.y, pos.current.z);
     ref.current.rotation.x += 0.1;
     ref.current.rotation.y += 0.07;
     ref.current.material.opacity = decay;
@@ -405,15 +485,18 @@ export default function Chamber3DGame({
   }, [done, broken, zone, hitsPerTarget, spawnShards]);
 
   // Completion — V1.0.15 squared XP multiplier for Sovereign tiers
+  const [awardedXP, setAwardedXP] = useState(0);
+  const isSovereignTier = ['sovereign_founder', 'sovereign'].some((k) => fidelity.tier.includes(k));
   useEffect(() => {
     if (cleared >= targetCount && !done) {
       setDone(true);
-      const mult = ['sovereign_founder', 'sovereign'].includes(fidelity.tier) ? PHI_SQ : 1;
+      const mult = isSovereignTier ? PHI_SQ : 1;
       const xpAward = Math.round(completionXP * mult);
+      setAwardedXP(xpAward);
       creditSparks(zone, xpAward);
       onComplete && onComplete(xpAward);
     }
-  }, [cleared, targetCount, done, zone, completionXP, onComplete, fidelity.tier]);
+  }, [cleared, targetCount, done, zone, completionXP, onComplete, isSovereignTier]);
 
   if (!open) return null;
 
@@ -561,7 +644,20 @@ export default function Chamber3DGame({
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color, fontFamily: 'monospace' }}>
               <Sparkles size={14} />
               <span style={{ fontSize: 11, letterSpacing: 2 }}>{completionMsg}</span>
-              <span style={{ fontSize: 9, opacity: 0.7 }}>+{completionXP} XP</span>
+              <span style={{ fontSize: 9, opacity: 0.7 }}>+{awardedXP || completionXP} XP</span>
+              {isSovereignTier && (
+                <span data-testid="phi-squared-badge" style={{
+                  fontSize: 8.5,
+                  letterSpacing: 1.5,
+                  padding: '2px 6px',
+                  borderRadius: 4,
+                  background: `${color}25`,
+                  border: `1px solid ${color}55`,
+                  color,
+                }}>
+                  φ² · 2.618×
+                </span>
+              )}
             </div>
             <button
               type="button"

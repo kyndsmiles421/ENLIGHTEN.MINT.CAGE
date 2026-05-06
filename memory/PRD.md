@@ -71,6 +71,20 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Flatland:** All meshes inline. No `position:fixed`. Sequential FOLD UP pill at bottom.
 - **Lint clean. Verified live across 5 routes.**
 
+### V1.0.16 — FFT + Centrifugal + φ² Badge (2026-05-06) ✅
+**Mandate (4 of 10-step protocol):** "FFT Voice-Vertex link, Centrifugal Hollow-Earth gravity, Squared Multiplier Verification, Translator Flatland sync."
+- **Step 1 — Real FFT vertex displacement (not emissive flash):**
+  - `SageVoiceController.js` exposes `getSageAnalyser()` + `getSageAudioContext()`. Audio element gets `crossOrigin='anonymous'` + a `MediaElementSource → AnalyserNode (fftSize=256)` chain wired just-in-time inside the user-gesture-bound `speak()` call (avoids autoplay policy errors).
+  - `useSageFFT()` hook in `Chamber3DGame.js` reads `getByteFrequencyData()` per frame and aggregates into low/mid/high bands.
+  - Inside `RockMesh.useFrame`, when total band energy > 0.02, vertices are re-displaced per-axis: low→x oscillation, mid→y, high→z. Real audio-driven deformation. Stops when Sage is silent.
+- **Step 3 — Centrifugal Hollow-Earth gravity:**
+  - `applyCentrifugal(position, dt, shellR=14)` accelerates particles OUTWARD radially toward the inverted BackSide shell, not down toward a floor.
+  - `Shard` particle now uses position+velocity Euler integration plus centrifugal acceleration. Replaces previous `0.5 * 9.8 * t²` floor-gravity model.
+- **Step 6 — Visible φ² · 2.618× badge:**
+  - Sovereign/Founder completion banner shows inline `data-testid="phi-squared-badge"` chip displaying `φ² · 2.618×`. Reflects the actual `PHI_SQ` multiplier already applied to spark accrual.
+- **Step 8 — Translator Flatland sync:** confirmed already live since V1.0.13 (LanguageBar dropdown is inline, no `position:absolute` overlay).
+- **Lint clean. Zero console errors on live preview.**
+
 
 **Mandate:** "Look before you edit. Rewire, do not rewrite. Don't take the controller away while the game is playing."
 - **Body (Flatland Whitelist)** — `UnifiedCreatorConsole.js` line 118 flipped from blacklist→whitelist. Mixer UI now renders ONLY on cockpit + gameplay routes: `/apex-creator`, `/cosmic-mixer`, `/creator-console`, `/master-engine`, `/forge`, `/starseed-adventure`, `/starseed-realm`, `/games`. ~178px reclaimed on 190+ spiritual/Academy/Pricing routes; LanguageBar fully clickable.
