@@ -227,6 +227,8 @@ const CosmicMap = lazy(() => import('./pages/CosmicMap'));
 const PowerSpotAdmin = lazy(() => import('./pages/PowerSpotAdmin'));
 const MusicTheory = lazy(() => import('./pages/MusicTheory'));
 const Workshop = lazy(() => import('./pages/Workshop'));
+const HelixNavPage = lazy(() => import('./pages/HelixNavPage'));
+const Forge3D = lazy(() => import('./components/Forge3D'));
 const OrbitalHub = lazy(() => import('./pages/OrbitalHub'));
 const EnlightenMintHub = lazy(() => import('./pages/EnlightenMintHub'));
 const QuantumLoom = lazy(() => import('./pages/QuantumLoom'));
@@ -610,6 +612,9 @@ function AnimatedRoutes() {
         <Route path="/admin/power-spot" element={<PowerSpotAdmin />} />
         <Route path="/theory" element={<MusicTheory />} />
         <Route path="/workshop" element={<Workshop />} />
+        <Route path="/helix-nav" element={<HelixNavPage />} />
+        <Route path="/helix" element={<HelixNavPage />} />
+        <Route path="/forge" element={<div style={{padding:'20px 16px', maxWidth:980, margin:'0 auto'}}><h1 style={{fontFamily:'Cormorant Garamond, serif', fontWeight:300, fontSize:'1.75rem'}}>The Forge · Live Gear Train</h1><p style={{fontSize:11, letterSpacing:1.5, color:'var(--text-muted)', marginBottom:20}}>ω₂ = ω₁ · (N₁/N₂) · MATH → MESH</p><Forge3D /></div>} />
         <Route path="/hub" element={<OrbitalHub />} />
         <Route path="/orbital-hub" element={<OrbitalHub />} />
         <Route path="/sovereign-hub" element={<SovereignHub />} />

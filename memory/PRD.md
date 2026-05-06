@@ -85,6 +85,28 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Step 8 — Translator Flatland sync:** confirmed already live since V1.0.13 (LanguageBar dropdown is inline, no `position:absolute` overlay).
 - **Lint clean. Zero console errors on live preview.**
 
+### V1.0.17 — HelixNav3D + Forge3D Gear Train (2026-05-06) ✅
+**Mandate:** "Step 2 + Step 4. Now."
+- **Step 2 — `<HelixNav3D>` 9×9 spatial nav** (`/helix-nav`, `/helix`):
+  - 81 octahedron nodes positioned via `lib/SacredGeometry.goldenSpiralPoints(81)`
+  - 20 modules currently mapped (Geology/Carpentry/Masonry/Culinary/Electrical/Plumbing/Herbology/Aromatherapy/Bible/Academy/Meteorology/Ecology/Paleontology/Nursing/Eldercare/Childcare/Forge/Pricing/Sovereign Hub/Starseed); 61 reserved slots for future expansion
+  - `<HelixCurve>` Catmull-Rom curve threaded through all 81 nodes (spline visualization)
+  - `<FollowCamera>` lerps to active node on tap (vector-shift feel) before `navigate()` fires (600ms delay)
+  - Hover → `<Html>` label tooltip; active route auto-highlights via `useLocation`
+  - Accessible 2D fallback list rendered below the canvas (SEO + non-WebGL users)
+  - `<Float>` + `Environment preset="night"` + dual point lights (purple + gold)
+  - Routes: `/helix-nav` and `/helix`
+- **Step 4 — `<Forge3D>` live gear-ratio mesh** (`/forge`):
+  - 3 extruded gear meshes: 18T → 12T → 36T
+  - Driver ω₁ = 1.5 rad/s constant
+  - ω₂ and ω₃ computed via `calculateMechanicalAdvantage('wheel_axle', {wheel_radius, axle_radius})` from `engines/MechanicalSovereignty.js` — math output literally drives mesh rotation in `useFrame`
+  - Direction alternates per gear (meshing physics)
+  - Live RPM HUD: ω₁/ω₂/ω₃ converted via `60/(2π)·|ω|` displayed as overlay
+  - MA + resonance status (PHI_OPTIMAL/SQRT2_EFFICIENT/STANDARD) shown below canvas
+  - Routes: `/forge`
+- **Test IDs:** `helix-nav-3d`, `helix-nav-canvas`, `helix-nav-page`, `helix-link-*`, `forge-3d`, `forge-3d-canvas`, `forge-3d-rpm-hud`, `forge-3d-fold`
+- **Verified live:** both canvases render, no console errors, lint clean.
+
 
 **Mandate:** "Look before you edit. Rewire, do not rewrite. Don't take the controller away while the game is playing."
 - **Body (Flatland Whitelist)** — `UnifiedCreatorConsole.js` line 118 flipped from blacklist→whitelist. Mixer UI now renders ONLY on cockpit + gameplay routes: `/apex-creator`, `/cosmic-mixer`, `/creator-console`, `/master-engine`, `/forge`, `/starseed-adventure`, `/starseed-realm`, `/games`. ~178px reclaimed on 190+ spiritual/Academy/Pricing routes; LanguageBar fully clickable.
