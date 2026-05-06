@@ -15,7 +15,7 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 
 ## ✅ Completed (Chronological)
 
-### V1.0.14 — Play Store Gold Master Compliance (2026-02-04) ✅
+### V1.0.14 — Play Store Gold Master Compliance + True 3D Geology (2026-02-04 → 2026-05-06) ✅
 **Mandate:** "The UI is clean—no constant toolbar. No refunds, No volunteer mode, Transparency Graph only at checkout."
 - **Sovereign Founder $1,777 / 24mo / 60% off** — added to `backend/routes/economy.py::SUBSCRIPTION_TIERS` with `is_founder=true`, `price_play_store=$2,310.10` (30% gross-up), `price_monthly_equivalent=$74.04`.
 - **Sovereign Monthly $89/mo / 30% off** — renamed from legacy "Sovereign" to "Sovereign Monthly", added `price_web=$89` / `price_play_store=$115.70`.
@@ -35,6 +35,21 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Flatland fix — CosmicCanvas:** `position: fixed inset-0` → `position: absolute inset-0` in `components/starseed/CosmicCanvas.js`. Canvas now contained to parent, not viewport. Resize handler switched to `parent.clientWidth/Height`.
 - **Verified live:** curl returns 410 for volunteer endpoints; `/api/economy/tiers` returns all 5 tiers with correct prices; `/pricing` clean (no overlays); `/starseed-adventure` canvas `computed.position === 'absolute'`; mixer whitelist holds (/pricing=hidden, /starseed-adventure=HUD visible).
 - **Testing agent:** 16/16 backend tests pass, 100% frontend pass on Pricing + Flatland compliance routes.
+
+### V1.0.14a — True 3D Geology Workshop (2026-05-06) ✅
+**Mandate:** "I'm not waiting another month for a 3D rebuild. Show me a `<Canvas>` and a 3D rock mesh, not 2D bubbles."
+- **NEW:** `frontend/src/components/games/Chamber3DGame.js` (~340 lines) — real R3F implementation:
+  - `<Canvas>` root with `dpr=[1,2]`, `camera fov=45`, soft shadows
+  - Procedurally distorted `IcosahedronGeometry` rock mesh (24 vertices, vertex-displacement noise)
+  - Each strike re-displaces vertices → visible cracking/fracturing as damage accumulates
+  - `<PresentationControls>` + `<OrbitControls>` for true spatial interaction (drag to orbit, pinch/wheel to zoom, polar/azimuth limits)
+  - Shard particle system: 6-10 `<tetrahedronGeometry>` fragments per strike with gravity-decayed trajectories + opacity fade
+  - `<Float>` + ambient + directional + colored point light + drei `<Environment preset="night">`
+  - Mesh shake on strike, emissive glow flash, haptic vibration via `navigator.vibrate(15)`
+  - Same `/api/sparks/immersion` XP backend as 2D version → no economy regression
+- **Wiring:** `UniversalWorkshop.js` swaps `ChamberMiniGame` → `Chamber3DGame` only when `moduleId === 'geology' && theme.mode === 'break'`. Other 6 modules (Culinary/Carpentry/Herbology/Academy/Aromatherapy/Physics) untouched.
+- **Flatland:** No `position:fixed`, no floating X close. Inline document flow with sequential "FOLD UP" pill at the bottom. Inline header (title + sparks + verb counter) flows above canvas, completion banner unfolds below.
+- **Verified live:** `<canvas>` mounted with `[data-testid="chamber-3d-canvas-geology_break"]`. Faceted 3D rock crystal renders correctly on `/workshop/geology` after tool selection.
 
 
 **Mandate:** "Look before you edit. Rewire, do not rewrite. Don't take the controller away while the game is playing."

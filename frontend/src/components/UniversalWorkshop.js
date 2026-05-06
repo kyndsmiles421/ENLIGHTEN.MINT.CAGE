@@ -31,6 +31,7 @@ import axios from 'axios';
 import HolographicChamber from './HolographicChamber';
 import ChamberProp from './ChamberProp';
 import ChamberMiniGame from './games/ChamberMiniGame';
+import Chamber3DGame from './games/Chamber3DGame';
 import { phiStaggerDelay, PHI_EASE_BEZIER } from '../utils/SovereignMath';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -700,8 +701,14 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
                 context: `Material: ${selMat.origin || ''}. Teach geological/botanical/culinary context, grain/structure considerations, and why this material rewards the ${theme.verb.toLowerCase()} action.`,
               } : null);
 
+          // V1.0.14 — Geology workshop swaps to true 3D R3F chamber
+          // (rock mesh, OrbitControls, strike fractures). Other modules
+          // keep the existing 2D ChamberMiniGame for now.
+          const Use3D = moduleId === 'geology' && theme.mode === 'break';
+          const ChamberComp = Use3D ? Chamber3DGame : ChamberMiniGame;
+
           return (
-            <ChamberMiniGame
+            <ChamberComp
               open={!!gameKey}
               onClose={() => setGameKey(null)}
               mode={theme.mode}
