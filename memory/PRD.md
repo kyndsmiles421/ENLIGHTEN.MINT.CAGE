@@ -136,6 +136,26 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Routes:** `/vault`, `/tesseract`
 - **Verified live:** `[data-testid="tesseract-canvas"]` mounts, all 8 relics render and respond to clicks.
 
+### V1.1.2 — Voice Translator Hotfix (2026-05-06) ✅
+**Mandate:** "Voice translator does not work on production. Stuck at WORKING…."
+
+**Root causes (3 compounding bugs):**
+1. **Backend Whisper signature wrong** (`/api/voice/command`) — was calling `stt.transcribe(tmp_path)` (positional string) but `emergentintegrations` rejects with `Expected entry at 'file' to be bytes, an io.IOBase instance, PathLike or a tuple but received <class 'str'>`. Every voice command returned HTTP 500. Fix: open file as binary and pass via `file=` kwarg with `model="whisper-1", response_format="json", language="en"` (matches the working pattern already used in `coach.py`).
+2. **Frontend translator payload key wrong** (`LanguageBar.jsx` voice path) — sent `{target}` but backend expects `{target_lang}`. Returned HTTP 400 on every non-English voice translate. Fix: rename to `target_lang`.
+3. **Frontend stuck-at-WORKING…** — `axios.post('/voice/command')` had no timeout AND mobile touch race could leave `pendingStop` lost AND error from VoiceCommandContext was never surfaced to LanguageBar UI. Fix:
+   - Added `timeout: 25000ms` to the Whisper axios call (`VoiceCommandContext.js`).
+   - Mobile touch race: new `pendingStopRef` flag — if user releases hold-to-talk before `getUserMedia` resolves, the recorder stops the moment it's actually ready (eliminates the "I tapped but nothing happened, then it started recording after I let go" path).
+   - Skip Whisper round-trip on captures <2KB (touch-race noise).
+   - LanguageBar `useEffect` watches `voice.lastResponse.error` and surfaces the error inline as `voiceError` (with friendly DISMISS button) instead of leaving the user staring at a stale "WORKING…" pill.
+   - `e.preventDefault()` on touch handlers + clear `voiceError` on press so retries don't show stale errors.
+   - Friendlier error copy: `Microphone permission denied`, `Voice timed out — please try again`, `Sign in to use voice translator`.
+
+**Verified end-to-end via curl:**
+- `POST /api/voice/command` (auth + 1s WAV) → 200 with `{transcript:'you', intent:'sage_query', response_text, response_audio:base64}`
+- `POST /api/translator/translate` `{target_lang:'zh', sacred:true}` → 200 with sacred-mode Chinese translation
+- `POST /api/translator/translate` `{target_lang:'yue'}` → 200 Cantonese translation
+- Backend logs clean (no more `litellm.APIConnectionError`).
+
 ### V1.1.1 — Pillar Wiring + Hawaiian Imports Storage Rights (2026-05-06) ✅
 **Mandate:** "Wire the 73 pillars using existing logic. Finish the Vault. NO new chips, NO rewrites, NO ghost-hunting."
 

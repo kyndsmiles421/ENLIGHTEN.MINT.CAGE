@@ -168,6 +168,14 @@ export default function LanguageBar() {
   // translate it via /api/translator/translate, then speak the result
   // via SageVoiceController (ElevenLabs). All three pieces existed
   // before; this just wires them together.
+  // V1.1.2 — Surface backend / mic errors instead of leaving the
+  // user staring at a stuck "WORKING…" pill.
+  useEffect(() => {
+    const resp = voice?.lastResponse;
+    if (resp?.error && resp?.response_text) {
+      setVoiceError(resp.response_text);
+    }
+  }, [voice?.lastResponse]);
   useEffect(() => {
     const transcript = voice?.lastCommand;
     if (!transcript || transcript === lastTranscriptRef.current) return;
@@ -184,7 +192,9 @@ export default function LanguageBar() {
     setVoiceError(null);
     axios.post(
       `${API}/translator/translate`,
-      { text: transcript, target: language, sacred },
+      // V1.1.2 — Backend expects `target_lang`, not `target`. Previous
+      // payload silently rejected with HTTP 422 on any non-English.
+      { text: transcript, target_lang: language, sacred },
       { timeout: TRANSLATE_TIMEOUT_MS },
     ).then(({ data }) => {
       const translated = data?.translated || data?.text || transcript;
@@ -665,11 +675,11 @@ export default function LanguageBar() {
 
             <button
               type="button"
-              onMouseDown={() => voice.startRecording && voice.startRecording()}
+              onMouseDown={() => { setVoiceError(null); voice.startRecording && voice.startRecording(); }}
               onMouseUp={() => voice.stopRecording && voice.stopRecording()}
               onMouseLeave={() => voice.isRecording && voice.stopRecording && voice.stopRecording()}
-              onTouchStart={() => voice.startRecording && voice.startRecording()}
-              onTouchEnd={() => voice.stopRecording && voice.stopRecording()}
+              onTouchStart={(e) => { e.preventDefault(); setVoiceError(null); voice.startRecording && voice.startRecording(); }}
+              onTouchEnd={(e) => { e.preventDefault(); voice.stopRecording && voice.stopRecording(); }}
               data-testid="voice-translator-mic"
               disabled={voiceBusy || voice.isProcessing}
               style={{
@@ -728,8 +738,25 @@ export default function LanguageBar() {
               </div>
             )}
             {voiceError && (
-              <div data-testid="voice-translator-error" style={{ marginTop: 6, fontSize: 8.5, color: '#FCA5A5' }}>
-                {voiceError}
+              <div data-testid="voice-translator-error" style={{ marginTop: 6, fontSize: 8.5, color: '#FCA5A5', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ flex: 1 }}>{voiceError}</span>
+                <button
+                  type="button"
+                  onClick={() => { setVoiceError(null); setVoiceTranscript(''); setVoiceTranslated(''); }}
+                  data-testid="voice-translator-clear-error"
+                  style={{
+                    padding: '2px 8px',
+                    borderRadius: 999,
+                    background: 'rgba(252,165,165,0.1)',
+                    border: '1px solid rgba(252,165,165,0.4)',
+                    color: '#FCA5A5',
+                    fontSize: 8,
+                    letterSpacing: '0.10em',
+                    cursor: 'pointer',
+                  }}
+                >
+                  DISMISS
+                </button>
               </div>
             )}
           </div>

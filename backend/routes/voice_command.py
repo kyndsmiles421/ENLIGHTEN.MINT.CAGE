@@ -57,16 +57,29 @@ async def process_voice_command(req: VoiceCommandRequest, user=Depends(get_curre
     try:
         # Decode audio
         audio_bytes = base64.b64decode(req.audio_base64)
-        
+
         # Save to temp file for Whisper
         with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as tmp:
             tmp.write(audio_bytes)
             tmp_path = tmp.name
 
         # Transcribe with Whisper
+        # V1.1.2 — Fixed signature. Previous call passed the path string
+        # positionally, which the litellm/OpenAI SDK rejects with
+        # "Expected entry at `file` to be bytes, an io.IOBase instance,
+        # PathLike or a tuple but received <class 'str'> instead". The
+        # working pattern (see coach.py) opens the file as binary and
+        # passes the file object via the `file=` kwarg.
         stt = OpenAISpeechToText(api_key=EMERGENT_LLM_KEY)
-        transcript = await stt.transcribe(tmp_path)
-        
+        with open(tmp_path, "rb") as audio_file:
+            stt_response = await stt.transcribe(
+                file=audio_file,
+                model="whisper-1",
+                response_format="json",
+                language="en",
+            )
+        transcript = (getattr(stt_response, "text", "") or "").strip()
+
         # Clean up temp file
         try:
             os.unlink(tmp_path)

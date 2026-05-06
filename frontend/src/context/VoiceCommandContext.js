@@ -19,6 +19,13 @@ export function VoiceCommandProvider({ children }) {
   const audioChunksRef = useRef([]);
   const streamRef = useRef(null);
   const recognitionRef = useRef(null);
+  // V1.1.2 — Mobile touch-race fix. If the user releases the
+  // hold-to-talk button BEFORE getUserMedia resolves (common on
+  // first tap when Chrome shows the mic permission prompt), we
+  // queue a "stop ASAP" flag so the recorder stops the moment it
+  // actually starts. Prevents the "stuck at WORKING…" symptom that
+  // happens when the recorder never sees a stop call.
+  const pendingStopRef = useRef(false);
   const authHeaders = user ? { Authorization: `Bearer ${localStorage.getItem('zen_token')}` } : {};
 
   // Wake word detection using Web Speech API
@@ -90,6 +97,7 @@ export function VoiceCommandProvider({ children }) {
   // Hold-to-talk recording
   const startRecording = useCallback(async () => {
     if (isRecording || isProcessing) return;
+    pendingStopRef.current = false;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
@@ -104,22 +112,50 @@ export function VoiceCommandProvider({ children }) {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         stream.getTracks().forEach(t => t.stop());
         streamRef.current = null;
+        // Skip Whisper round-trip on too-short captures (touch race
+        // tap-and-release usually yields <2KB of webm — pure overhead).
+        if (audioBlob.size < 2000) {
+          setIsRecording(false);
+          return;
+        }
         await processVoiceCommand(audioBlob);
       };
 
       mediaRecorderRef.current = mediaRecorder;
       mediaRecorder.start();
       setIsRecording(true);
+      // V1.1.2 — If a touchend / mouseup arrived during the
+      // getUserMedia await, honour it now instead of stranding the
+      // user mid-record.
+      if (pendingStopRef.current) {
+        pendingStopRef.current = false;
+        try { mediaRecorder.stop(); } catch {}
+        setIsRecording(false);
+      }
     } catch (err) {
       console.error('Mic access denied:', err);
+      // Surface failure to consumers (LanguageBar reads lastResponse).
+      setLastResponse({
+        error: true,
+        response_text: err?.name === 'NotAllowedError'
+          ? 'Microphone permission denied'
+          : 'Microphone unavailable',
+      });
+      setIsRecording(false);
+      pendingStopRef.current = false;
     }
   }, [isRecording, isProcessing]);
 
   const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop();
+    const rec = mediaRecorderRef.current;
+    if (rec && rec.state === 'recording') {
+      try { rec.stop(); } catch {}
       setIsRecording(false);
+      return;
     }
+    // V1.1.2 — Recorder isn't ready yet (getUserMedia still pending).
+    // Queue the stop so startRecording will honour it on resolve.
+    pendingStopRef.current = true;
   }, []);
 
   // Process voice command
@@ -137,7 +173,13 @@ export function VoiceCommandProvider({ children }) {
       const res = await axios.post(`${API}/voice/command`, {
         audio_base64: base64,
         context: 'full_app',
-      }, { headers: authHeaders });
+      }, {
+        headers: authHeaders,
+        // V1.1.2 — Hard 25s ceiling. Whisper rarely takes >5s; anything
+        // beyond that is a hung connection. Without this, the UI was
+        // stranded at "WORKING…" indefinitely.
+        timeout: 25000,
+      });
 
       const result = res.data;
       setLastCommand(result.transcript);
@@ -159,7 +201,16 @@ export function VoiceCommandProvider({ children }) {
       return result;
     } catch (err) {
       console.error('Voice command error:', err);
-      setLastResponse({ error: true, response_text: 'Could not process voice command' });
+      const isTimeout = err?.code === 'ECONNABORTED' || /timeout/i.test(err?.message || '');
+      const isAuth = err?.response?.status === 401 || err?.response?.status === 403;
+      setLastResponse({
+        error: true,
+        response_text: isTimeout
+          ? 'Voice timed out — please try again'
+          : isAuth
+          ? 'Sign in to use voice translator'
+          : (err?.response?.data?.detail || 'Could not process voice command'),
+      });
       return null;
     } finally {
       setIsProcessing(false);
