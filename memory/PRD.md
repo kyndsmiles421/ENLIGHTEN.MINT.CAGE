@@ -136,6 +136,18 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Routes:** `/vault`, `/tesseract`
 - **Verified live:** `[data-testid="tesseract-canvas"]` mounts, all 8 relics render and respond to clicks.
 
+### V1.0.20 — Demo Reel Auto-Walk (2026-05-06) ✅
+- **`<DemoReel>` page** (`/demo-reel`, `/demo`):
+  - 5-scene auto-walk totaling 60 seconds: Helix (10s) → Geology Chamber (12s) → Forge LOX (15s) → Tesseract Vault (12s) → Pactola Bathymetry (11s)
+  - Each scene transitions via `setTimeout` with framer-motion fade-in/out
+  - Inline scene chips show position in walk-through
+  - Overall progress bar with active-scene gradient
+  - PAUSE / SKIP / RESTART pills (inline, no overlays)
+  - "DEMO REEL COMPLETE · 60s" banner at end with REPLAY action
+  - Flatland clean: 100% inline document flow
+- **Test IDs:** `demo-reel-page`, `demo-chip-{id}`, `demo-reel-pause`, `demo-reel-skip`, `demo-reel-restart`, `demo-reel-done`, `demo-reel-replay`
+- **Lint clean. Verified live.**
+
 
 **Mandate:** "Look before you edit. Rewire, do not rewrite. Don't take the controller away while the game is playing."
 - **Body (Flatland Whitelist)** — `UnifiedCreatorConsole.js` line 118 flipped from blacklist→whitelist. Mixer UI now renders ONLY on cockpit + gameplay routes: `/apex-creator`, `/cosmic-mixer`, `/creator-console`, `/master-engine`, `/forge`, `/starseed-adventure`, `/starseed-realm`, `/games`. ~178px reclaimed on 190+ spiritual/Academy/Pricing routes; LanguageBar fully clickable.
