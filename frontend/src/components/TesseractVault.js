@@ -13,13 +13,16 @@
  * Flatland: NO position:fixed, NO floating UI. Inline document flow.
  * Relic detail panel unfolds BELOW the canvas (sequential).
  */
-import React, { Suspense, useMemo, useRef, useState } from 'react';
+import React, { Suspense, useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Float, Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
-import { ChevronUp, Gem, Package, Info } from 'lucide-react';
+import { ChevronUp, Gem, Package, Info, Lock, Plus, X as XIcon } from 'lucide-react';
+import { toast } from 'sonner';
 import { PHI } from '../utils/SovereignMath';
 import { useAITexture } from '../hooks/useAITexture';
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // Default relic catalogue — Hawaiian imports from user's actual business
 const DEFAULT_RELICS = [
@@ -153,6 +156,72 @@ function Relic({ relic, position, isSelected, onSelect }) {
 
 export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
   const [selected, setSelected] = useState(null);
+  // V1.1.1 — Hawaiian Imports storage rights (Sparks → slots).
+  // Vault state hydrates from /api/tesseract-vault/state when authed;
+  // guests still see the catalogue rendered inline (no claim affordance).
+  const [vaultState, setVaultState] = useState(null);
+  const [loadingClaim, setLoadingClaim] = useState(null);
+  const fetchVault = useCallback(async () => {
+    const token = localStorage.getItem('zen_token');
+    if (!token || token === 'guest_token') return;
+    try {
+      const r = await fetch(`${API}/tesseract-vault/state`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (r.ok) setVaultState(await r.json());
+    } catch {}
+  }, []);
+  useEffect(() => { fetchVault(); }, [fetchVault]);
+
+  const claimedIds = useMemo(() => {
+    if (!vaultState) return new Set();
+    return new Set((vaultState.claims || []).map((c) => c.relic_id));
+  }, [vaultState]);
+
+  const claimRelic = useCallback(async (relicId) => {
+    const token = localStorage.getItem('zen_token');
+    if (!token || token === 'guest_token') {
+      toast('Sign in to claim relics into your vault');
+      return;
+    }
+    setLoadingClaim(relicId);
+    try {
+      const r = await fetch(`${API}/tesseract-vault/claim/${relicId}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (r.ok) {
+        const j = await r.json();
+        toast.success(`✦ ${relicId.replace(/-/g, ' ')} claimed · ${j.slots_used}/${j.slots_total} slots`);
+        await fetchVault();
+      } else {
+        const j = await r.json().catch(() => ({}));
+        const detail = typeof j.detail === 'object' ? j.detail.message : (j.detail || 'Claim failed');
+        toast.error(detail);
+      }
+    } catch (e) {
+      toast.error('Network error');
+    } finally {
+      setLoadingClaim(null);
+    }
+  }, [fetchVault]);
+
+  const releaseRelic = useCallback(async (relicId) => {
+    const token = localStorage.getItem('zen_token');
+    if (!token || token === 'guest_token') return;
+    setLoadingClaim(relicId);
+    try {
+      const r = await fetch(`${API}/tesseract-vault/release/${relicId}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (r.ok) {
+        toast(`Released · ${relicId.replace(/-/g, ' ')}`);
+        await fetchVault();
+      }
+    } catch {}
+    finally { setLoadingClaim(null); }
+  }, [fetchVault]);
 
   // Position relics around the inner cube — golden-spiral on a sphere
   const relicPositions = useMemo(() => {
@@ -195,8 +264,24 @@ export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
             <Gem size={9} style={{ verticalAlign: 'middle' }} /> 4D HYPERCUBE · {relics.length} RELICS
           </div>
         </div>
-        <div style={{ display: 'inline-flex', gap: 6, fontFamily: 'monospace', fontSize: 9, color: '#FCD34Dcc' }}>
+        <div style={{ display: 'inline-flex', gap: 8, fontFamily: 'monospace', fontSize: 9, color: '#FCD34Dcc', alignItems: 'center', flexWrap: 'wrap' }}>
           <Package size={10} /> HAWAIIAN IMPORTS
+          {vaultState?.quota && (
+            <span data-testid="vault-slot-quota" style={{
+              padding: '3px 8px',
+              borderRadius: 999,
+              fontSize: 9,
+              background: 'rgba(252,211,77,0.10)',
+              border: '1px solid rgba(252,211,77,0.25)',
+              color: '#FCD34D',
+              letterSpacing: 1.2,
+            }}>
+              {vaultState.slots_used}/{vaultState.quota.total_slots} SLOTS
+              {vaultState.quota.bonus_slots > 0 && (
+                <span style={{ marginLeft: 4, opacity: 0.7 }}>(+{vaultState.quota.bonus_slots} ✦)</span>
+              )}
+            </span>
+          )}
         </div>
       </div>
 
@@ -267,6 +352,68 @@ export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
               {selected.tier === 'all' ? 'ALL TIERS' : `${selected.tier.toUpperCase()}+ ONLY`}
             </span>
           </div>
+          {/* V1.1.1 — Claim / Release. Only when authed (vaultState exists). */}
+          {vaultState && (() => {
+            const isClaimed = claimedIds.has(selected.id);
+            const cataItem = (vaultState.catalogue || []).find((c) => c.id === selected.id);
+            const eligible = cataItem ? cataItem.tier_eligible : true;
+            const lockReason = cataItem?.lock_reason;
+            const slotsFull = !isClaimed && vaultState.slots_available <= 0;
+            const isLoading = loadingClaim === selected.id;
+            return (
+              <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                {isClaimed ? (
+                  <button
+                    type="button"
+                    onClick={() => releaseRelic(selected.id)}
+                    disabled={isLoading}
+                    data-testid={`vault-release-${selected.id}`}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: 999,
+                      background: 'rgba(248,250,252,0.04)',
+                      border: '1px solid rgba(248,250,252,0.20)',
+                      color: 'rgba(248,250,252,0.85)',
+                      fontFamily: 'monospace',
+                      fontSize: 9,
+                      letterSpacing: 1.5,
+                      cursor: isLoading ? 'wait' : 'pointer',
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                    }}
+                  >
+                    <XIcon size={10} /> RELEASE
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => eligible && !slotsFull && claimRelic(selected.id)}
+                    disabled={!eligible || slotsFull || isLoading}
+                    data-testid={`vault-claim-${selected.id}`}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: 999,
+                      background: !eligible || slotsFull
+                        ? 'rgba(248,250,252,0.03)'
+                        : `${selected.color}25`,
+                      border: `1px solid ${!eligible || slotsFull ? 'rgba(248,250,252,0.10)' : selected.color + '55'}`,
+                      color: !eligible || slotsFull ? 'rgba(248,250,252,0.40)' : selected.color,
+                      fontFamily: 'monospace',
+                      fontSize: 9,
+                      letterSpacing: 1.5,
+                      cursor: !eligible || slotsFull || isLoading ? 'not-allowed' : 'pointer',
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                    }}
+                  >
+                    {!eligible ? <Lock size={10} /> : <Plus size={10} />}
+                    {!eligible ? lockReason || 'TIER LOCKED' : slotsFull ? 'VAULT FULL' : 'CLAIM TO VAULT'}
+                  </button>
+                )}
+                <span style={{ fontSize: 9, color: 'rgba(248,250,252,0.5)', letterSpacing: 1 }}>
+                  {isClaimed ? '✦ in your vault' : `${vaultState.slots_available || 0} slots free · earn sparks for more`}
+                </span>
+              </div>
+            );
+          })()}
         </div>
       )}
 
