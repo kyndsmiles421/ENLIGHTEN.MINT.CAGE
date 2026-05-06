@@ -136,6 +136,37 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Routes:** `/vault`, `/tesseract`
 - **Verified live:** `[data-testid="tesseract-canvas"]` mounts, all 8 relics render and respond to clicks.
 
+### V1.1.1 — Pillar Wiring + Hawaiian Imports Storage Rights (2026-05-06) ✅
+**Mandate:** "Wire the 73 pillars using existing logic. Finish the Vault. NO new chips, NO rewrites, NO ghost-hunting."
+
+**🏛 98 Pillar Routes Wired (in-place pull, zero new adapter files)**
+- Used V68.97 direct-page-lazy-import pattern (no ceremonial 7-line adapter files):
+  ```
+  ACADEMY: React.lazy(() => import('../pages/AcademyPage')),
+  ```
+- 98 entries added to `MODULE_REGISTRY` (`state/ProcessorState.js`) and 98 entries to `ROUTE_TO_MODULE` (`pages/SovereignHub.js`).
+- **Total wired pillar routes: 155 / 178** (the remaining 23 are workshop sub-routes already sharing `WORKSHOP` engine, plus `/evolution-lab` and `/vr/celestial-dome` which have no Routes in App.js).
+- Testing agent caught + fixed two import typos in my bulk write: `SovereignConsole` → `SovereignDashboard`, `CrystallineEngine` → `FractalEngine` (orphan modules).
+- **Verification:** SovereignHub pillar clicks for `/light-therapy`, `/forgotten-languages`, `/rock-hounding`, `/reiki`, `/hooponopono`, `/tantra`, `/dream-realms`, `/nexus`, `/rpg`, `/codex`, `/fractal-engine`, `/observatory`, `/community` all pull in-place via the matrix render slot — URL stays at `/sovereign-hub`. Verified by testing agent.
+
+**📦 Tesseract Vault Hawaiian Imports — Storage Rights (Sparks → Slots)**
+- **Backend** (NEW `routes/tesseract_vault.py`, ~200 lines, MongoDB collection `tesseract_vault_claims`):
+  - `GET /api/tesseract-vault/catalogue` — public, returns 8 Hawaiian relics
+  - `GET /api/tesseract-vault/state` — auth, returns `{quota, catalogue, claims, slots_used, slots_available}`
+  - `POST /api/tesseract-vault/claim/{relic_id}` — claim (tier check, slot check, idempotent re-claim returns `already_claimed`)
+  - `POST /api/tesseract-vault/release/{relic_id}` — release (frees slot)
+- **Slot economics (compliant — Sparks merit currency, NOT volunteer endpoints):**
+  - Discovery: 2 base · Resonance: 4 · Architect: 6 · Sovereign: 10 · Founder: 12
+  - Bonus: `+1 slot per 1000 sparks earned` (capped at +8)
+- **Tier gating:** lilikoi-fudge (Sovereign+), koa-wood (Architect+), rest open to all tiers.
+- **Frontend** (`components/TesseractVault.js`):
+  - Slot quota pill (`data-testid="vault-slot-quota"`) e.g. `0/2 SLOTS (+0 ✦)`
+  - Per-relic CLAIM TO VAULT / RELEASE buttons in inline detail panel (Flatland-clean)
+  - Tier-locked relics show `Tier sovereign+ only` with Lock icon
+  - Vault-full state shows `VAULT FULL` disabled button
+  - Guest fallback: catalogue still renders in 3D, claim button shows toast "Sign in to claim"
+- **Backend test suite** (`tests/test_iteration_v1_1_1_tesseract_vault.py`): **12/12 PASS** — covers catalogue, state, claim (free-tier, tier-lock 403, idempotency, vault-full 402), release (200 + 404), volunteer-410 regression, mesh-texture cache regression.
+
 ### V1.1.0 — Generative AI Mesh Textures + Ghost Button Fix (2026-05-06) ✅
 **Mandate:** "Wire the texture pipeline. Bulletproof with Gemini fallback. And — ghost button steals + dead-end locked tiles. Fix it."
 
