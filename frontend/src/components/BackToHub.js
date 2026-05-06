@@ -419,8 +419,13 @@ export default function BackToHub() {
     <>
       {/* Back + Related — z-[100000] so 3D pages (Tesseract, Fractal, Lab)
           that push UI to z:9999/10001 cannot occlude the Hub exit. The
-          Never-Trapped guarantee depends on this stacking-context win. */}
-      <div className="sticky top-0 left-0 right-0 flex items-center gap-1.5 px-3 pt-3 pb-2" style={{ zIndex: 100000, background: 'linear-gradient(to bottom, rgba(10,10,18,0.95), rgba(10,10,18,0.8), transparent)' }} data-testid="nav-controls">
+          Never-Trapped guarantee depends on this stacking-context win.
+          V1.1.1 — Wrapper is pointer-events:none so the empty space on
+          the right side of the strip does NOT steal taps from the
+          Share/EN/wand pills (z:40) underneath. Inner buttons restore
+          pointer-events:auto so they remain clickable. Same pattern as
+          App.js LanguageBar strip. Fixes "ghost button steals" report. */}
+      <div className="sticky top-0 left-0 right-0 flex items-center gap-1.5 px-3 pt-3 pb-2" style={{ zIndex: 100000, pointerEvents: 'none', background: 'linear-gradient(to bottom, rgba(10,10,18,0.95), rgba(10,10,18,0.8), transparent)' }} data-testid="nav-controls">
         <button
           onClick={() => navigate('/sovereign-hub')}
           className="flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all active:scale-95"
@@ -429,6 +434,7 @@ export default function BackToHub() {
             border: '1px solid rgba(255,255,255,0.08)',
             color: 'rgba(255,255,255,0.85)',
             backdropFilter: 'none',
+            pointerEvents: 'auto',
           }}
           data-testid="back-to-hub"
         >
@@ -445,6 +451,7 @@ export default function BackToHub() {
               border: `1px solid ${showRelated ? 'rgba(139,92,246,0.25)' : 'rgba(255,255,255,0.08)'}`,
               color: showRelated ? '#C4B5FD' : 'rgba(255,255,255,0.75)',
               backdropFilter: 'none',
+              pointerEvents: 'auto',
             }}
             data-testid="related-toggle"
           >

@@ -28,6 +28,7 @@ import { goldenSpiralPoints, GRID_SIZE, toroidalDisplacement } from '../../lib/S
 import { PHI, PHI_SQ } from '../../utils/SovereignMath';
 import { getLoxIgnitionPulse } from '../../engines/LoxIgnitionPulse';
 import { getSageAnalyser } from '../../services/SageVoiceController';
+import { useAITexture } from '../../hooks/useAITexture';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -145,13 +146,16 @@ function useTierFidelity() {
 // ── 3D Rock Mesh ────────────────────────────────────────────────
 // Procedurally distorted icosahedron. Each strike adds noise to the
 // vertex displacement scale so the rock visibly cracks.
-function RockMesh({ hits, hitsPerTarget, color, onStrike, broken, sagePulse = 0, polyDetail = 2 }) {
+function RockMesh({ hits, hitsPerTarget, color, onStrike, broken, sagePulse = 0, polyDetail = 2, textureRefId = 'geology' }) {
   const meshRef = useRef();
   const geomRef = useRef();
   const [glow, setGlow] = useState(0);
   const [shake, setShake] = useState(0);
   const damage = Math.min(hits / hitsPerTarget, 1);
   const fft = useSageFFT();   // V1.0.16 — live FFT frequency bands
+  // V1.1.0 — Generative AI texture (cached). Falls back to procedural
+  // material color if the hook returns null.
+  const { texture: aiTex } = useAITexture({ category: 'rock', refId: textureRefId });
 
   // Build a distorted icosahedron once (poly detail driven by tier)
   const geometry = useMemo(() => {
@@ -251,12 +255,13 @@ function RockMesh({ hits, hitsPerTarget, color, onStrike, broken, sagePulse = 0,
     >
       <bufferGeometry ref={geomRef} {...geometry} />
       <meshStandardMaterial
-        color={color}
+        color={aiTex ? '#ffffff' : color}
+        map={aiTex || null}
         roughness={0.55 + damage * 0.3}
         metalness={0.35}
         emissive={color}
         emissiveIntensity={0.1 + glow * 0.6 + sagePulse * 0.8}
-        flatShading
+        flatShading={!aiTex}
       />
     </mesh>
   );
@@ -595,6 +600,7 @@ export default function Chamber3DGame({
                   broken={broken}
                   sagePulse={sagePulse}
                   polyDetail={fidelity.polyDetail}
+                  textureRefId={(zone || 'geology').split('_')[0]}
                 />
               )}
             </PresentationControls>

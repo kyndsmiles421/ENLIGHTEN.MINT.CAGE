@@ -19,6 +19,7 @@ import { OrbitControls, Float, Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import { ChevronUp, Gem, Package, Info } from 'lucide-react';
 import { PHI } from '../utils/SovereignMath';
+import { useAITexture } from '../hooks/useAITexture';
 
 // Default relic catalogue — Hawaiian imports from user's actual business
 const DEFAULT_RELICS = [
@@ -98,6 +99,9 @@ function TesseractWireframe({ size = 1.4, innerScale = 0.55, color = '#FCD34D' }
 // A single relic — floating mesh inside the tesseract
 function Relic({ relic, position, isSelected, onSelect }) {
   const ref = useRef();
+  // V1.1.0 — Each relic gets a bespoke AI-generated texture (Hawaiian Imports).
+  // Cached on backend so subsequent visitors see it instantly.
+  const { texture: aiTex } = useAITexture({ category: 'relic', refId: relic.id });
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
@@ -117,11 +121,12 @@ function Relic({ relic, position, isSelected, onSelect }) {
       >
         <icosahedronGeometry args={[0.10, 0]} />
         <meshStandardMaterial
-          color={relic.color}
+          color={aiTex ? '#ffffff' : relic.color}
+          map={aiTex || null}
           emissive={relic.color}
           emissiveIntensity={isSelected ? 1.4 : 0.7}
-          metalness={0.7}
-          roughness={0.25}
+          metalness={aiTex ? 0.45 : 0.7}
+          roughness={aiTex ? 0.4 : 0.25}
         />
       </mesh>
       {isSelected && (

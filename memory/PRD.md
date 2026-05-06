@@ -136,6 +136,37 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Routes:** `/vault`, `/tesseract`
 - **Verified live:** `[data-testid="tesseract-canvas"]` mounts, all 8 relics render and respond to clicks.
 
+### V1.1.0 — Generative AI Mesh Textures + Ghost Button Fix (2026-05-06) ✅
+**Mandate:** "Wire the texture pipeline. Bulletproof with Gemini fallback. And — ghost button steals + dead-end locked tiles. Fix it."
+
+**🎨 Generative AI Texture Pipeline (Sovereign V1.1.0 Gold Master):**
+- **Backend** (`/api/ai-visuals/mesh-texture`, `routes/ai_visuals.py`): public endpoint accepts `{category, ref_id, prompt?}`, returns `{image_b64, data_url}`. Three-layer pipeline:
+  1. MongoDB cache hit (instant) — keyed by `secure_hash_short("mesh-tex:{category}:{ref_id}")`
+  2. **PRIMARY**: OpenAI `gpt-image-1` (90s timeout)
+  3. **FALLBACK**: Gemini `gemini-3.1-flash-image-preview` (Nano Banana, 60s timeout) — kicks in if OpenAI fails. `source` field in cache records which generator produced it.
+- **Prompt strategy** (Hybrid per user choice):
+  - `RELIC_PROMPTS` — bespoke per-Hawaiian-import (Lilikoi Fudge, Lychee, Macadamia, Koa Wood, Kona Coffee, Black Hawaiian Salt, Taro, Spam Musubi). Each gets a unique, food-photographic, square-format prompt.
+  - `ROCK_PROMPT_PRESETS` — generic per-mesh-type (geology=Black Hills granite, amethyst, quartz, obsidian, carpentry=walnut, culinary=sourdough, herbology=lavender, bible=parchment, default=crystalline).
+- **Frontend hook** (`/frontend/src/hooks/useAITexture.js`): three-tier cache (in-memory `THREE.Texture` Map → localStorage data-URL → network). De-dupes in-flight requests. Returns `{texture, loading, error}`. Failure mode = null (consumer falls back to procedural color). Sets `THREE.SRGBColorSpace`, `RepeatWrapping`, `anisotropy=4`.
+- **Wire-up:**
+  - `Chamber3DGame.js::RockMesh` — accepts `textureRefId` prop, passes via `useAITexture({category:'rock'})`, applies as `material.map`. Switches to white base color when texture loads (no double-tinting). Texture refId derived from `zone.split('_')[0]` (geology, carpentry, culinary, herbology, bible, default).
+  - `TesseractVault.js::Relic` — each of the 8 Hawaiian Imports calls `useAITexture({category:'relic', refId:relic.id})`. Bespoke texture per relic.
+- **Verified:**
+  - First-gen `geology` rock: 11s. Cache hit thereafter: ~1s (transfer time only).
+  - 7 relics generated in parallel: 42s total. Pre-cached for all visitors.
+  - Live curl: `POST /api/ai-visuals/mesh-texture {category:rock, ref_id:geology}` → 200, 3.1MB PNG. Second call: instant cache hit.
+  - Screenshot: Geology workshop shows cream/granite-toned faceted icosahedron (was uniform amber before). Tesseract Vault shows 8 muted/realistic-toned relics (was saturated procedural colors before).
+
+**🛡 Ghost Button Steal — Fixed (`components/BackToHub.js`):**
+- **Root cause:** sticky strip at `zIndex: 100000` spanned full viewport width with default `pointer-events: auto`. Empty area (between Hub button on left and SharePill/LanguageBar on right) sat ABOVE the share strip (z:40) and silently captured all taps. Users tapping Share/EN/wand pills got nothing.
+- **Fix:** wrapper now has `pointerEvents: 'none'`; Hub button + Related toggle inner buttons restore `pointerEvents: 'auto'`. Same proven pattern as App.js LanguageBar strip (V1.0.8).
+- **Verified live:** `document.elementFromPoint(1735, 95)` (Share btn center) now returns the Share span (was returning page-enter div). `(200, 30)` empty area passes through to `page-enter` parent (not BackToHub).
+
+**🚪 Dead-End Locked Tiles — Fixed (`pages/RPGPage.js::RegionTile`):**
+- Locked region tiles (Cosmic Realm world map: "??? · Locked Lv 5", "Sunken Temple · Locked Lv 6", etc.) used `disabled={!accessible}` which silently swallowed taps with no feedback.
+- Replaced with friendly `sonner` toast: `🔒 {region.name} · Reach Lv {N} to enter` (or `🔒 Hidden region · Reach Lv {N} to discover` for undiscovered). `aria-disabled` preserved for a11y. `cursor: 'help'` instead of `not-allowed`. Touch-action: `manipulation` for snappy mobile taps.
+- Flatland-clean: sonner toast is portal-based but already in use by 200+ call sites across the app and well within ground rules (auto-dismiss, no z-index war).
+
 ### V1.0.20 — Demo Reel Auto-Walk (2026-05-06) ✅
 - **`<DemoReel>` page** (`/demo-reel`, `/demo`):
   - 5-scene auto-walk totaling 60 seconds: Helix (10s) → Geology Chamber (12s) → Forge LOX (15s) → Tesseract Vault (12s) → Pactola Bathymetry (11s)

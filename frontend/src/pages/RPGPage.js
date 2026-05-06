@@ -149,18 +149,33 @@ function RegionNode({ region, onExplore }) {
 function RegionTile({ region, onExplore }) {
   const accessible = !!region.accessible;
   const discovered = !!region.discovered;
+  const handleTap = () => {
+    if (accessible) {
+      onExplore(region.id);
+      return;
+    }
+    // V1.1.1 — No more dead-end taps. Locked tiles emit friendly
+    // inline feedback (sonner toast — Flatland-safe, no modal/overlay)
+    // so the user always knows WHY a tile didn't open.
+    const msg = discovered
+      ? `🔒 ${region.name} · Reach Lv ${region.level_req} to enter`
+      : `🔒 Hidden region · Reach Lv ${region.level_req} to discover`;
+    try { toast(msg, { duration: 2200 }); } catch {}
+  };
   return (
     <button
       type="button"
-      onClick={() => accessible && onExplore(region.id)}
-      disabled={!accessible}
+      onClick={handleTap}
+      aria-disabled={!accessible}
       data-testid={`region-tile-${region.id}`}
+      data-locked={!accessible}
       className="w-full rounded-xl p-3 text-left transition-all active:scale-[0.98]"
       style={{
         background: discovered ? `${region.color}0E` : 'rgba(10,10,18,0.5)',
         border: `1px solid ${discovered ? `${region.color}33` : 'rgba(255,255,255,0.08)'}`,
-        cursor: accessible ? 'pointer' : 'not-allowed',
-        opacity: accessible ? 1 : 0.75,
+        cursor: accessible ? 'pointer' : 'help',
+        opacity: accessible ? 1 : 0.78,
+        touchAction: 'manipulation',
       }}
     >
       <div className="flex items-center gap-2 mb-1.5">

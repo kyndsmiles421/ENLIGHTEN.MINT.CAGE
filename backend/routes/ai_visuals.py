@@ -969,3 +969,166 @@ async def set_active_avatar(body: dict = Body(...), user=Depends(get_current_use
         )
 
     return {"status": "success"}
+
+
+
+# ════════════════════════════════════════════
+# V1.1.0 — MESH TEXTURE PIPELINE (3D Sovereign Engine)
+# ════════════════════════════════════════════
+# Generates photoreal seamless textures applied to R3F mesh maps:
+#   • RockMesh (Chamber3DGame) — generic crystalline / mineral surfaces
+#   • RelicMesh (TesseractVault) — bespoke Hawaiian Imports
+#
+# Strategy:
+#   1. Hit MongoDB cache by (category, ref_id) → instant hit if seen before.
+#   2. PRIMARY: OpenAI gpt-image-1 (square, photoreal).
+#   3. FALLBACK: Gemini 3.1 Flash Image Preview (Nano Banana) if OpenAI fails.
+#   4. Persist to ai_visuals_cache and return base64 data URL.
+# Result: zero recurring API cost; first user pays the latency, all
+# subsequent users get O(1) DB read.
+
+# Curated relic prompts (bespoke — high distinctness for vault).
+RELIC_PROMPTS = {
+    "lilikoi-fudge": "Photorealistic seamless texture of Hawaiian Lilikoi (passion fruit) fudge, golden-yellow tropical fruit swirl in dark chocolate fudge, glossy artisan candy surface, top-down macro studio shot, square format, high detail, soft natural light, no text, no watermark, food photography",
+    "lychee": "Photorealistic seamless texture of fresh Hawaiian lychee fruit, pink-red bumpy peel with one cracked open showing translucent white flesh and dark seed, dewy water droplets, top-down macro, square format, vibrant tropical, no text",
+    "macadamia": "Photorealistic seamless texture of Hawaiian Kona macadamia nuts, polished cream-colored hemispheres tightly packed, subtle grain pattern, glossy roasted finish, top-down macro studio, square format, warm amber lighting, no text",
+    "koa-wood": "Photorealistic seamless texture of polished Hawaiian Koa wood, deep curly figure, rich amber and chocolate streaks with golden chatoyance, hand-finished oil patina, top-down macro grain shot, square format, warm cinematic lighting, no text",
+    "kona-coffee": "Photorealistic seamless texture of dark-roasted whole Kona coffee beans, oily glossy surfaces, deep mahogany browns, tightly packed top-down macro, square format, dramatic warm directional light, no text",
+    "sea-salt": "Photorealistic seamless texture of black Hawaiian Molokai lava sea salt, irregular obsidian crystals with mineral facets glinting, top-down macro studio, square format, dark moody lighting, no text",
+    "taro": "Photorealistic seamless texture of Hawaiian taro chips, lavender-purple and cream concentric rings, crispy fried edges, top-down macro, square format, warm natural light, no text",
+    "spam-musubi": "Photorealistic seamless texture of Hawaiian spam musubi cross-section, glistening teriyaki-glazed pink spam over white sticky rice wrapped in dark green nori seaweed, top-down macro food shot, square format, appetizing cinematic light, no text",
+}
+
+# Generic mesh-type prompts (rock / mineral chambers — solid industrial).
+ROCK_PROMPT_PRESETS = {
+    "geology": "Photorealistic seamless texture of Black Hills granite rock surface, faceted crystalline mineral matrix, deep grays with quartz veins and pyrite flecks, raw industrial geology specimen, top-down macro studio shot, square format tileable, dramatic side lighting, no text, no watermark",
+    "amethyst": "Photorealistic seamless texture of raw amethyst crystal cluster surface, deep violet faceted quartz points with white druzy base, glossy crystalline refraction, top-down macro studio, square format, soft purple bloom lighting, no text",
+    "quartz": "Photorealistic seamless texture of clear quartz crystal cluster, transparent hexagonal points with internal rainbow refractions, top-down macro studio shot, square format, neutral white studio light, no text",
+    "obsidian": "Photorealistic seamless texture of polished volcanic obsidian, glossy jet-black natural glass with conchoidal fractures and subtle rainbow sheen, top-down macro studio, square format, hard rim light, no text",
+    "carpentry": "Photorealistic seamless texture of polished walnut hardwood grain, rich chocolate-brown wood with figure and natural growth rings, hand-finished oil patina, top-down macro, square format, warm side lighting, no text",
+    "culinary": "Photorealistic seamless texture of artisan sourdough bread crust, crackled golden-brown surface with flour dust and visible fermentation bubbles, top-down macro food shot, square format, warm bakery light, no text",
+    "herbology": "Photorealistic seamless texture of dried lavender and rosemary herbs scattered on rough linen, deep purple and sage-green sprigs, top-down macro botanical shot, square format, soft golden-hour light, no text",
+    "bible": "Photorealistic seamless texture of aged parchment manuscript surface, weathered cream-vellum fibers with subtle gold leaf edges, top-down macro, square format, warm candlelight, no text, no readable script",
+    "default": "Photorealistic seamless texture of crystalline mineral surface, faceted deep-violet and gold geode interior, glossy industrial polish, top-down macro studio, square format tileable, cinematic lighting, no text, no watermark",
+}
+
+
+async def _gemini_image_fallback(prompt: str) -> str | None:
+    """Gemini 3.1 Flash Image Preview (Nano Banana) image fallback.
+    Returns base64 PNG string or None on failure.
+    """
+    try:
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"mesh-tex-{uuid.uuid4().hex[:8]}",
+            system_message="You are a photoreal texture generator for 3D meshes. Produce clean, seamless, square textures.",
+        ).with_model("gemini", "gemini-3.1-flash-image-preview").with_params(modalities=["image", "text"])
+        msg = UserMessage(text=f"Generate this photoreal seamless texture: {prompt}")
+        _, images = await asyncio.wait_for(
+            chat.send_message_multimodal_response(msg),
+            timeout=60,
+        )
+        if images and len(images) > 0:
+            return images[0].get("data")
+    except Exception as e:
+        logger.warning(f"Gemini fallback failed: {e}")
+    return None
+
+
+async def _get_or_generate_mesh_texture(prompt: str, category: str, ref_id: str) -> str | None:
+    """Cache-first texture pipeline with OpenAI primary + Gemini fallback.
+    Returns base64 PNG (no data URL prefix), or None on total failure.
+    """
+    cache_key = secure_hash_short(f"mesh-tex:{category}:{ref_id}", 32)
+
+    cached = await db.ai_visuals_cache.find_one(
+        {"cache_key": cache_key}, {"_id": 0, "image_b64": 1}
+    )
+    if cached and cached.get("image_b64"):
+        return cached["image_b64"]
+
+    image_b64 = None
+    source = None
+
+    # PRIMARY: OpenAI gpt-image-1
+    try:
+        gen = OpenAIImageGeneration(api_key=EMERGENT_LLM_KEY)
+        images = await asyncio.wait_for(
+            gen.generate_images(prompt=prompt, model="gpt-image-1", number_of_images=1),
+            timeout=90,
+        )
+        if images and len(images) > 0:
+            image_b64 = base64.b64encode(images[0]).decode("utf-8")
+            source = "openai_gpt_image_1"
+    except Exception as e:
+        logger.warning(f"OpenAI mesh-texture primary failed [{category}/{ref_id}]: {e}")
+
+    # FALLBACK: Gemini Nano Banana
+    if not image_b64:
+        image_b64 = await _gemini_image_fallback(prompt)
+        if image_b64:
+            source = "gemini_3_1_flash_image"
+
+    if not image_b64:
+        return None
+
+    # Persist
+    try:
+        await db.ai_visuals_cache.update_one(
+            {"cache_key": cache_key},
+            {"$set": {
+                "cache_key": cache_key,
+                "category": category,
+                "ref_id": ref_id,
+                "prompt_preview": prompt[:200],
+                "image_b64": image_b64,
+                "source": source,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }},
+            upsert=True,
+        )
+    except Exception as e:
+        logger.warning(f"Mesh-texture cache persist failed [{category}/{ref_id}]: {e}")
+
+    return image_b64
+
+
+@router.post("/ai-visuals/mesh-texture")
+async def generate_mesh_texture(
+    data: dict = Body(...),
+    user=Depends(get_current_user_optional),
+):
+    """Generate (or return cached) photoreal seamless texture for a 3D mesh.
+
+    Body:
+        { "category": "relic" | "rock", "ref_id": "lilikoi-fudge" | "geology" | ..., "prompt": "(optional override)" }
+
+    Public — no auth required so the 3D scenes load for guests too. The
+    cache layer protects against runaway generation cost.
+    """
+    category = (data.get("category") or "rock").lower()
+    ref_id = (data.get("ref_id") or "default").lower()
+    custom_prompt = (data.get("prompt") or "").strip()
+
+    # Resolve prompt: explicit override > preset > default
+    if custom_prompt:
+        prompt = custom_prompt[:600]
+    elif category == "relic":
+        prompt = RELIC_PROMPTS.get(ref_id) or (
+            f"Photorealistic seamless texture of {ref_id.replace('-', ' ')}, "
+            "macro studio shot, square format, cinematic lighting, no text"
+        )
+    else:  # rock / generic
+        prompt = ROCK_PROMPT_PRESETS.get(ref_id) or ROCK_PROMPT_PRESETS["default"]
+
+    image_b64 = await _get_or_generate_mesh_texture(prompt, category, ref_id)
+    if not image_b64:
+        raise HTTPException(status_code=503, detail="All texture generators unavailable")
+
+    return {
+        "category": category,
+        "ref_id": ref_id,
+        "image_b64": image_b64,
+        "data_url": f"data:image/png;base64,{image_b64}",
+    }
