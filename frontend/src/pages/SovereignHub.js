@@ -27,6 +27,7 @@ import MiniLattice from '../components/MiniLattice';
 import SageEngineGauge from '../components/SageEngineGauge';
 import ComplianceShieldPill from '../components/ComplianceShieldPill';
 import TimeCapsuleDrawer from '../components/TimeCapsuleDrawer';
+import ClimbLadderPill from '../components/ClimbLadderPill';
 // V68.68 — Surface the orphaned worlds + hunt.
 import SeedHuntWidget from '../components/SeedHuntWidget';
 import DailyCrossTraditionPairing from '../components/DailyCrossTraditionPairing';
@@ -481,6 +482,41 @@ const ROUTE_TO_MODULE = {
   '/yantra':               'YANTRA',
 };
 
+// V1.1.6 — Sovereign Gates. High-signal pillars require a paid tier.
+// Lower tiers see the tile, but the ClimbLadderPill replaces the
+// pull() action so every gated tap becomes a one-click upgrade funnel.
+// All tier IDs match SUBSCRIPTION_TIERS in backend/routes/economy.py.
+const PILLAR_MIN_TIER = {
+  '/codex':              'architect',
+  '/master-engine':      'sovereign',
+  '/lab':                'architect',
+  '/sovereign-canvas':   'architect',
+  '/fabricator':         'sovereign',
+  '/observatory':        'architect',
+  '/refractor':          'sovereign',
+  '/console':            'architect',
+  '/creator-console':    'architect',
+  '/crystalline-engine': 'sovereign',
+  '/fractal-engine':     'sovereign',
+  '/sovereigns':         'sovereign',
+};
+
+// Tier rank for "user has access" checks. Mirrors backend
+// SOVEREIGN_TIER_ORDER (discovery → resonance → architect → sovereign → founder).
+const TIER_RANK = {
+  discovery: 0, seeker: 0, free: 0,
+  resonance: 1, artisan: 1,
+  architect: 2, builder: 2,
+  sovereign: 3, sovereign_monthly: 3,
+  sovereign_founder: 4, founder: 4,
+};
+
+function userHasTier(userTier, requiredTier) {
+  const u = TIER_RANK[(userTier || 'discovery').toLowerCase()] ?? 0;
+  const r = TIER_RANK[(requiredTier || 'discovery').toLowerCase()] ?? 0;
+  return u >= r;
+}
+
 export default function SovereignHub() {
   const navigate = useNavigate();
   const { pull } = useProcessorState();
@@ -495,11 +531,21 @@ export default function SovereignHub() {
 
   /**
    * dispatchPillar(route) — single dispatcher for every pillar item.
+   * V1.1.6 — Tier-gated routes show a toast prompting upgrade instead
+   * of pulling the engine. The ClimbLadderPill rendered inside the
+   * tile (data-locked='true') is the primary one-tap funnel; this
+   * toast is the fallback for users who tap the tile body itself.
    * Wired routes pull() the engine into the matrix slot (no URL
    * change). Unwired routes fall through to navigate(). Closes the
    * pillar drawer either way so the lattice is visible after dispatch.
    */
   const dispatchPillar = useCallback((route) => {
+    const userTier = (user?.subscription_tier || user?.tier_id || user?.gilded_tier || 'discovery');
+    const required = PILLAR_MIN_TIER[route];
+    if (required && !userHasTier(userTier, required)) {
+      toast(`🔒 ${required.toUpperCase()}+ tier required · use the Climb pill below to unlock`);
+      return;
+    }
     const moduleId = ROUTE_TO_MODULE[route];
     if (moduleId && MODULE_REGISTRY[moduleId] !== undefined) {
       setExpanded(null);
@@ -512,7 +558,7 @@ export default function SovereignHub() {
       return;
     }
     navigate(route);
-  }, [navigate, pull]);
+  }, [navigate, pull, user]);
 
   useEffect(() => {
     if (typeof window.__workAccrue === 'function') window.__workAccrue('module_interaction', 5);
@@ -818,28 +864,36 @@ export default function SovereignHub() {
                           const wired = !!ROUTE_TO_MODULE[item.route];
                           const verbCfg = PILLAR_VERB[pillar.title];
                           const wiredCaption = (verbCfg?.verb) || '✦ Pull';
+                          // V1.1.6 — Tier gate. Lower-tier user → tile renders
+                          // dimmed with an inline ClimbLadderPill funnel.
+                          const requiredTier = PILLAR_MIN_TIER[item.route];
+                          const userTier = (user?.subscription_tier || user?.tier_id || user?.gilded_tier || 'discovery');
+                          const locked = !!(requiredTier && !userHasTier(userTier, requiredTier));
                           return (
                           <motion.button
                             key={item.label}
                             initial={{ opacity: 0, y: 6 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.03 * i, duration: 0.3 }}
-                            whileHover={{ y: -2, scale: 1.02 }}
-                            whileTap={{ scale: 0.97 }}
+                            whileHover={{ y: -2, scale: locked ? 1 : 1.02 }}
+                            whileTap={{ scale: locked ? 1 : 0.97 }}
                             onClick={() => dispatchPillar(item.route)}
                             className="relative rounded-xl px-3 py-3 text-left overflow-hidden group"
                             style={{
-                              background: `linear-gradient(135deg, ${pillar.color}18 0%, rgba(10,10,18,0.5) 100%)`,
-                              border: `1px solid ${pillar.color}${wired ? '88' : '33'}`,
-                              boxShadow: wired ? `0 0 12px ${pillar.color}33, inset 0 0 8px ${pillar.color}22` : 'none',
-                              color: '#F1F5F9',
+                              background: `linear-gradient(135deg, ${pillar.color}${locked ? '0E' : '18'} 0%, rgba(10,10,18,0.5) 100%)`,
+                              border: `1px solid ${pillar.color}${locked ? '22' : (wired ? '88' : '33')}`,
+                              boxShadow: !locked && wired ? `0 0 12px ${pillar.color}33, inset 0 0 8px ${pillar.color}22` : 'none',
+                              color: locked ? 'rgba(241,245,249,0.55)' : '#F1F5F9',
+                              cursor: locked ? 'help' : 'pointer',
                             }}
                             data-testid={`nav-${item.label.toLowerCase().replace(/[\s&]/g, '-')}`}
                             data-wired={wired ? 'true' : 'false'}
+                            data-locked={locked ? 'true' : 'false'}
+                            data-required-tier={requiredTier || ''}
                           >
                             {/* Mini crystal facet */}
                             <svg className="absolute top-1 right-1 opacity-70" width="14" height="14" viewBox="0 0 16 16" aria-hidden>
-                              <polygon points="8,1 14,6 12,14 4,14 2,6" fill={pillar.color} opacity={wired ? 0.95 : 0.5} />
+                              <polygon points="8,1 14,6 12,14 4,14 2,6" fill={pillar.color} opacity={locked ? 0.25 : (wired ? 0.95 : 0.5)} />
                             </svg>
                             <span className="block text-[12px] font-semibold leading-tight">{item.label}</span>
                             <span
@@ -847,8 +901,19 @@ export default function SovereignHub() {
                               style={{ color: pillar.color }}
                               title={wired ? verbCfg?.gloss : undefined}
                             >
-                              {wired ? wiredCaption : 'Enter'}
+                              {locked ? `🔒 ${requiredTier.toUpperCase()}+` : (wired ? wiredCaption : 'Enter')}
                             </span>
+                            {locked && (
+                              <div onClick={(e) => e.stopPropagation()} style={{ marginTop: 6 }}>
+                                <ClimbLadderPill
+                                  requiredTier={requiredTier}
+                                  context={`pillar-${item.route.replace('/', '')}`}
+                                  featureLabel={item.label}
+                                  variant="compact"
+                                  showFounderJump={false}
+                                />
+                              </div>
+                            )}
                           </motion.button>
                           );
                         })}

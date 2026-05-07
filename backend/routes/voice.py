@@ -129,6 +129,30 @@ async def sage_narrate(
     model_id = (body.model_id or DEFAULT_MODEL_ID).strip() or DEFAULT_MODEL_ID
     calm = bool(body.calm)
 
+    # V1.1.6 — Cache layer. Repeat phrases (unlock acknowledgments,
+    # ritual prompts, sample previews) round-trip the cache instead
+    # of burning ElevenLabs characters. Cache key includes calm flag
+    # since voice_settings differ → different audio.
+    import hashlib
+    cache_key = hashlib.sha256(
+        f"{voice_id}|{model_id}|{int(calm)}|{text}".encode("utf-8")
+    ).hexdigest()[:32]
+    try:
+        cached = await db.sage_audio_cache.find_one(
+            {"cache_key": cache_key}, {"_id": 0, "audio_b64": 1}
+        )
+        if cached and cached.get("audio_b64"):
+            return {
+                "audio_url": f"data:audio/mpeg;base64,{cached['audio_b64']}",
+                "voice_id": voice_id,
+                "model_id": model_id,
+                "char_count": len(text),
+                "elapsed_ms": 0,
+                "cached": True,
+            }
+    except Exception:
+        pass  # cache layer is non-fatal — fall through to live synthesis
+
     started = time.time()
     try:
         audio_bytes = await asyncio.wait_for(
@@ -174,6 +198,27 @@ async def sage_narrate(
 
     audio_b64 = base64.b64encode(audio_bytes).decode("ascii")
     elapsed_ms = int((time.time() - started) * 1000)
+
+    # V1.1.6 — Persist to cache. Best-effort upsert.
+    try:
+        await db.sage_audio_cache.update_one(
+            {"cache_key": cache_key},
+            {"$set": {
+                "cache_key": cache_key,
+                "voice_id": voice_id,
+                "model_id": model_id,
+                "calm": calm,
+                "text_preview": text[:120],
+                "audio_b64": audio_b64,
+                "char_count": len(text),
+                "created_at": __import__("datetime").datetime.now(
+                    __import__("datetime").timezone.utc,
+                ).isoformat(),
+            }},
+            upsert=True,
+        )
+    except Exception:
+        pass
 
     # Lightweight logging for budget awareness — owner can inspect
     # `db.voice_narrations` to see character usage.
@@ -448,4 +493,114 @@ async def sage_voice_sample(
         "cached": False,
         "char_count": len(SAMPLE_TEXT),
         "elapsed_ms": elapsed_ms,
+    }
+
+
+
+# V1.1.6 — Sage Voice pre-warm pipeline.
+# The 8 Hawaiian relic unlock acknowledgments are short, repeated, and
+# user-facing on a payment-completion event — perfect candidates for
+# cache pre-warming. Owner runs this once after deploy; every user
+# from then on hears Sage instantly when they claim a relic.
+RELIC_UNLOCK_PHRASES = [
+    "Claimed: lilikoi fudge",
+    "Claimed: lychee",
+    "Claimed: macadamia",
+    "Claimed: koa wood",
+    "Claimed: kona coffee",
+    "Claimed: sea salt",
+    "Claimed: taro",
+    "Claimed: spam musubi",
+]
+
+
+@router.post("/sage-narrate/prewarm")
+async def prewarm_sage_phrases(
+    body: dict = Body(default={}),
+    user=Depends(get_current_user),
+):
+    """Pre-warm the Sage Voice cache with a known list of phrases.
+
+    Body:
+      { "phrases": ["..."], "voice_id": "...", "calm": false }
+
+    If `phrases` is missing or empty, defaults to RELIC_UNLOCK_PHRASES
+    (the 8 Hawaiian unlock acknowledgments).
+
+    Each phrase is synthesized once and persisted to db.sage_audio_cache.
+    Subsequent /sage-narrate calls with the same (text, voice, calm)
+    tuple return instantly with `cached: true` and zero ElevenLabs
+    character cost. Idempotent — already-cached phrases are skipped.
+
+    Returns a per-phrase status report.
+    """
+    if not os.environ.get("ELEVENLABS_API_KEY", "").strip():
+        raise HTTPException(503, "ELEVENLABS_API_KEY not configured")
+
+    phrases = body.get("phrases") or RELIC_UNLOCK_PHRASES
+    voice_id = (body.get("voice_id") or DEFAULT_VOICE_ID).strip() or DEFAULT_VOICE_ID
+    model_id = (body.get("model_id") or DEFAULT_MODEL_ID).strip() or DEFAULT_MODEL_ID
+    calm = bool(body.get("calm", False))
+
+    import hashlib
+    results = []
+    for phrase in phrases:
+        text = (phrase or "").strip()
+        if not text:
+            continue
+        cache_key = hashlib.sha256(
+            f"{voice_id}|{model_id}|{int(calm)}|{text}".encode("utf-8")
+        ).hexdigest()[:32]
+
+        # Skip if already cached
+        try:
+            existing = await db.sage_audio_cache.find_one(
+                {"cache_key": cache_key}, {"_id": 0, "audio_b64": 1}
+            )
+            if existing and existing.get("audio_b64"):
+                results.append({"phrase": text, "status": "already_cached"})
+                continue
+        except Exception:
+            pass
+
+        # Synthesize via the existing inline helper used by /sage-narrate
+        try:
+            audio_bytes = await asyncio.wait_for(
+                asyncio.get_event_loop().run_in_executor(
+                    None, _synthesize_sync, text, voice_id, model_id, calm,
+                ),
+                timeout=20,
+            )
+            audio_b64 = base64.b64encode(audio_bytes).decode("ascii")
+            await db.sage_audio_cache.update_one(
+                {"cache_key": cache_key},
+                {"$set": {
+                    "cache_key": cache_key,
+                    "voice_id": voice_id,
+                    "model_id": model_id,
+                    "calm": calm,
+                    "text_preview": text[:120],
+                    "audio_b64": audio_b64,
+                    "char_count": len(text),
+                    "created_at": __import__("datetime").datetime.now(
+                        __import__("datetime").timezone.utc,
+                    ).isoformat(),
+                    "prewarmed": True,
+                }},
+                upsert=True,
+            )
+            results.append({
+                "phrase": text,
+                "status": "warmed",
+                "char_count": len(text),
+            })
+        except Exception as e:
+            results.append({"phrase": text, "status": "failed", "error": str(e)[:200]})
+
+    return {
+        "total": len(phrases),
+        "warmed": sum(1 for r in results if r["status"] == "warmed"),
+        "already_cached": sum(1 for r in results if r["status"] == "already_cached"),
+        "failed": sum(1 for r in results if r["status"] == "failed"),
+        "results": results,
     }

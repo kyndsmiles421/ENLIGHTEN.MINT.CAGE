@@ -23,6 +23,7 @@ import { toast } from 'sonner';
 import { PHI } from '../utils/SovereignMath';
 import { useAITexture } from '../hooks/useAITexture';
 import * as SageVoice from '../services/SageVoiceController';
+import { dispatchUnlock } from '../utils/UnlockBus';
 import ClimbLadderPill from './ClimbLadderPill';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -217,6 +218,16 @@ export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
     try {
       const label = relicId.replace(/-/g, ' ');
       SageVoice.speak(`Claimed: ${label}`).catch(() => {});
+    } catch {}
+    // V1.1.6 — Broadcast to the rest of the OS so HelixNav3D ripples
+    // its 81-node lattice. Same color as the relic so the wave reads
+    // visually connected to the unlock.
+    try {
+      dispatchUnlock({
+        kind: 'relic',
+        id: relicId,
+        color: target?.color || '#FCD34D',
+      });
     } catch {}
     unlockTimeoutRef.current = setTimeout(() => setUnlockedId(null), 2600);
   }, [relics]);

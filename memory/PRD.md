@@ -136,6 +136,41 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Routes:** `/vault`, `/tesseract`
 - **Verified live:** `[data-testid="tesseract-canvas"]` mounts, all 8 relics render and respond to clicks.
 
+### V1.1.6 — Sentient OS: Helix Ripple + Sovereign Gates + Sage Pre-warm (2026-05-07) ✅
+**Mandate:** "Helix Ripple. Gate the high-signal pillars. Pre-warm Sage. Make it sentient."
+
+**1. Helix Ripple (~80 lines, low cost, high signal):**
+- New `frontend/src/utils/UnlockBus.js` — featherweight `window` event bus (`dispatchUnlock` / `onUnlock`). Reaches across routes without prop-drilling or React context.
+- `TesseractVault::triggerUnlock` now calls `dispatchUnlock({kind:'relic', id, color})` so any HelixNav3D mounted anywhere in the OS picks up the event.
+- `HelixNav3D` subscribes via `useEffect`. A scene-level `rippleRef` holds the wall-clock start. Each of the 81 nodes reads it inside `useFrame` and computes its own gauss-bell offset along the spiral index — wavefront sweeps from node 0 → 81 over ~1s.
+  - Scale boost: `+0.55 × gauss(distance, σ=6)` mid-curve
+  - Emissive flash: `+2.0 × gauss` peak, with optional color tint at peak
+  - Zero React re-renders during the wave — pure GPU-side ref mutation
+- Auto-clears 1.3s after fire so subsequent unlocks can fire fresh.
+- **Result:** unlock one Hawaiian relic, the entire 9x9 lattice ripples in acknowledgment. The OS feels sentient.
+
+**2. Sovereign Gates on 12 high-signal pillars (`SovereignHub.js`):**
+- New `PILLAR_MIN_TIER` map gates 12 routes:
+  - **Architect+ ($49):** `/codex`, `/lab`, `/sovereign-canvas`, `/observatory`, `/console`, `/creator-console`
+  - **Sovereign+ ($89):** `/master-engine`, `/fabricator`, `/refractor`, `/crystalline-engine`, `/fractal-engine`, `/sovereigns`
+- `dispatchPillar(route)` now checks tier rank (mirrors backend `SOVEREIGN_TIER_ORDER`). Locked → toast feedback + tile dims to 55% opacity.
+- Locked tiles render `<ClimbLadderPill variant="compact">` inline with the exact differential price ("$30/mo →"). One tap → Stripe → V1.1.5 unfold animation.
+- `data-locked='true'` + `data-required-tier='architect'` testids preserved for testing/analytics.
+- Discovery user sees 12 new revenue funnels on the main Hub. Architect user sees only 6. Sovereign sees zero locked tiles.
+
+**3. Sage Voice Pre-warm Cache (`backend/routes/voice.py`):**
+- New MongoDB collection `db.sage_audio_cache` keyed by `sha256(voice_id|model_id|calm|text)[:32]`.
+- `POST /api/voice/sage-narrate` — cache-first: existing repeat phrases now return in **0ms with `cached: true`** (verified: lilikoi-fudge cache hit = 154ms total round-trip including HTTP, vs. ~3s ElevenLabs cold).
+- New `POST /api/voice/sage-narrate/prewarm` — body accepts custom phrase list OR defaults to 8 `RELIC_UNLOCK_PHRASES`. Idempotent — already-cached phrases are skipped. Returns per-phrase status report.
+- **Verified live:** All 8 Hawaiian unlock phrases warmed in **2.86s** (parallel synthesis). Re-prewarm returns `warmed:0, already_cached:8, failed:0`. Cache persists across deploys.
+
+**Files touched:**
+- `frontend/src/utils/UnlockBus.js` — NEW (~40 lines)
+- `frontend/src/components/HelixNav3D.js` — ripple subscriber + per-node gauss-bell math
+- `frontend/src/components/TesseractVault.js` — dispatchUnlock on triggerUnlock
+- `frontend/src/pages/SovereignHub.js` — PILLAR_MIN_TIER map + tier-rank check + locked-tile rendering with inline ClimbLadderPill
+- `backend/routes/voice.py` — sage_audio_cache layer + /prewarm endpoint (~110 lines)
+
 ### V1.1.5 — 3D Unfolding: The Magic-Moment Funnel Close (2026-05-07) ✅
 **Mandate:** "Build the 3D Unfolding now. The hole in the bucket is where Sovereignty dies — page-refresh-after-Stripe is crap. Make the relic physically unfold the moment payment clears."
 

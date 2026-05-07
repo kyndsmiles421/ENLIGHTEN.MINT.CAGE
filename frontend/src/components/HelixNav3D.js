@@ -21,6 +21,7 @@ import { OrbitControls, Float, Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import { goldenSpiralPoints, GRID_SIZE, TOTAL_NODES, phiExtrusion } from '../lib/SacredGeometry';
 import { PHI } from '../utils/SovereignMath';
+import { onUnlock } from '../utils/UnlockBus';
 
 // 81 modules mapped to helix coordinates. The first ~20 nodes are
 // real workshops; the rest are reserved for future expansion (the
@@ -67,8 +68,9 @@ function useHelixNodes() {
   }, []);
 }
 
-function HelixNode({ node, isActive, onSelect }) {
+function HelixNode({ node, isActive, onSelect, rippleRef, rippleColor }) {
   const ref = useRef();
+  const matRef = useRef();
   const [hovered, setHovered] = useState(false);
   const hasModule = !!node.module;
   const color = hasModule ? node.module.color : '#475569';
@@ -77,10 +79,41 @@ function HelixNode({ node, isActive, onSelect }) {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
     // Active node pulses, hovered grows, idle subtle bob
-    const target = isActive ? 1.4 + Math.sin(t * 3) * 0.1
-                  : hovered ? 1.25
-                  : 1 + Math.sin(t * PHI + node.index) * 0.05;
-    ref.current.scale.lerp(new THREE.Vector3(target, target, target), 0.15);
+    let target = isActive ? 1.4 + Math.sin(t * 3) * 0.1
+                : hovered ? 1.25
+                : 1 + Math.sin(t * PHI + node.index) * 0.05;
+
+    // V1.1.6 — Helix Ripple. Wave starts at node 0 and travels along
+    // the spiral by node.index. Uses gauss bell so each node spikes
+    // briefly when the wavefront passes through it, then settles.
+    let rippleK = 0;
+    if (rippleRef && rippleRef.current) {
+      const elapsed = (performance.now() - rippleRef.current) / 1000; // 1.0s ripple
+      if (elapsed >= 1.2) {
+        // Animation finished — tag for clear at scene level (handled by parent)
+      } else {
+        // Wavefront sweeps from index 0 to TOTAL_NODES over ~1s
+        const wavefront = elapsed * TOTAL_NODES; // node-index that is currently peaking
+        const distance = Math.abs(node.index - wavefront);
+        // Gauss bell width 6 nodes → smooth ripple
+        rippleK = Math.exp(-(distance * distance) / 18);
+      }
+    }
+    target += rippleK * 0.55;
+    ref.current.scale.lerp(new THREE.Vector3(target, target, target), 0.20);
+
+    // Emissive flash on ripple
+    if (matRef.current) {
+      const baseEmit = hasModule ? (isActive ? 1.2 : hovered ? 0.8 : 0.5) : 0.15;
+      matRef.current.emissiveIntensity = baseEmit + rippleK * 2.0;
+      // Optional color tint toward ripple color at peak
+      if (rippleK > 0.4 && rippleColor) {
+        try { matRef.current.emissive.set(rippleColor); }
+        catch { /* invalid color string — keep base */ }
+      } else if (rippleK < 0.05 && matRef.current.emissive) {
+        try { matRef.current.emissive.set(color); } catch {}
+      }
+    }
   });
 
   return (
@@ -93,6 +126,7 @@ function HelixNode({ node, isActive, onSelect }) {
       >
         <octahedronGeometry args={[hasModule ? 0.13 : 0.06, 0]} />
         <meshStandardMaterial
+          ref={matRef}
           color={color}
           emissive={color}
           emissiveIntensity={hasModule ? (isActive ? 1.2 : hovered ? 0.8 : 0.5) : 0.15}
@@ -167,6 +201,23 @@ export default function HelixNav3D({ height = 480, autoRotate = true }) {
   const location = useLocation();
   const nodes = useHelixNodes();
   const [activeNode, setActiveNode] = useState(null);
+  // V1.1.6 — Helix Ripple. When an unlock event fires anywhere in
+  // the OS (relic claim, future modifier purchase), a single shared
+  // ref holds the wall-clock start of the wavefront. Every node
+  // reads it via useFrame and computes its own gauss-bell offset
+  // along the spiral index. No state thrashing, no React re-renders.
+  const rippleRef = useRef(null);
+  const [rippleColor, setRippleColor] = useState(null);
+  useEffect(() => {
+    return onUnlock((detail) => {
+      rippleRef.current = performance.now();
+      setRippleColor(detail.color || '#FCD34D');
+      // Auto-clear ref after the animation window so subsequent
+      // unlocks fire fresh (otherwise stale `performance.now()` slips
+      // past the elapsed >= 1.2s guard the first time only).
+      setTimeout(() => { rippleRef.current = null; }, 1300);
+    });
+  }, []);
 
   // Auto-detect active route → set node
   useEffect(() => {
@@ -228,6 +279,8 @@ export default function HelixNav3D({ height = 480, autoRotate = true }) {
               node={n}
               isActive={activeNode && activeNode.index === n.index}
               onSelect={onSelect}
+              rippleRef={rippleRef}
+              rippleColor={rippleColor}
             />
           ))}
         </Float>
