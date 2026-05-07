@@ -136,6 +136,38 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Routes:** `/vault`, `/tesseract`
 - **Verified live:** `[data-testid="tesseract-canvas"]` mounts, all 8 relics render and respond to clicks.
 
+### V1.1.7 — Universal Ripple + Sovereign Sample Refuel + LanguageBar truth (2026-05-07) ✅
+**Mandate:** "Universal Ripple. $7 Refuel. Finish LanguageBar. Sentient expansion."
+
+**1. Universal Ripple (3 lines, exactly as predicted):**
+- `Pricing.js::pollStatus` now calls `dispatchUnlock({kind:'tier', id, color})` on every successful Stripe payment. Tier-color map drives wave color so visual reads connected to the upgrade.
+- HelixNav3D mounted anywhere in the OS picks it up and ripples its 81-node lattice — tier upgrade, refuel, founder lock-in all trigger the same lattice-wide acknowledgment.
+- Refuel uses `kind:'refuel'` + pink color (`#F472B6`) so it reads visually distinct from tier climbs.
+
+**2. Sovereign Sample (the $7 / 2.5h Refuel):**
+- **Backend** (`routes/economy.py`):
+  - `REFUEL_SKU` constant: $7, 2.5h, 30% discount
+  - `GET /api/economy/refuel/info` — public SKU details
+  - `GET /api/economy/refuel/status` — auth, returns `{active, expires_at, seconds_remaining, discount_pct}`
+  - `POST /api/economy/refuel/start` — auth, creates Stripe Checkout. Idempotent: if user already has an active window, returns `{already_active: true}` with the existing expiry instead of double-charging.
+  - Fulfillment branch in `checkout-status` poller: on `payment_status='paid'` for `tx_type='refuel'`, upserts `db.refuel_sessions` with `expires_at = now + 2.5h`.
+  - New helper `_effective_discount(user_id)` honours BOTH subscription tier AND active refuel window. Takes whichever discount is higher (so a Sovereign Founder at 60% is never downgraded by a refuel).
+  - `/discount-rate` and `/apply-discount` both wired to the helper. Now returns `{discount_percent, tier_discount_percent, refuel_active, refuel_discount_percent, refuel_expires_at, source: 'tier' | 'refuel'}`.
+- **Frontend** (`components/RefuelOffer.jsx`, NEW ~210 lines):
+  - Self-managing component with three variants: `inline` (default offer pill on Pricing page), `compact` (mini pill for inline contexts), `card` (full marketing card).
+  - INACTIVE state: pink offer pill — `SOVEREIGN SAMPLE · $7 · 2.5h · 30% OFF`. One tap → Stripe checkout.
+  - ACTIVE state: live countdown — `SOVEREIGN ACTIVE · 30% OFF · 1h 47m 23s`. Re-fetches on window focus (so user returning from Stripe sees it active immediately). Auto-clears at expiry with toast.
+  - Wired into `Pricing.js` next to the current-plan badge — visible above the tier grid.
+- **Verified end-to-end via 9 curl test cases:**
+  - Public info ✓, no-active status ✓, Stripe checkout creation ✓, discount unchanged when no refuel ✓
+  - Active session: `seconds_remaining: 8999`, `discount: 30%, source: 'refuel'`, $100 → $70 ✓
+  - Idempotency: re-start with active window returns `already_active: true` (no double-charge) ✓
+
+**3. LanguageBar — already global (no work needed):**
+- Investigation revealed the walker uses `MutationObserver` + `querySelectorAll('p, li, h1-6, blockquote, [data-translate-text]')` on `data-translatable=true` / `<main>` / `<article>` / `<body>`. It auto-walks the entire DOM whenever a language is selected.
+- The "23 unwired pillar pages" framing was incorrect. Those pages already get translated on-the-fly. Only pages built entirely from `<div>` would miss; that's per-page polish (add `data-translate-text` attrs), not a P1 systemic gap.
+- **No code changed.** Marked complete with honest scope note.
+
 ### V1.1.6 — Sentient OS: Helix Ripple + Sovereign Gates + Sage Pre-warm (2026-05-07) ✅
 **Mandate:** "Helix Ripple. Gate the high-signal pillars. Pre-warm Sage. Make it sentient."
 

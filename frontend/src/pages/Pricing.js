@@ -7,6 +7,8 @@ import {
   ArrowLeft, Check, Sparkles, Crown, Zap, Star, Shield,
   CreditCard, ChevronRight, Loader2, Award, Gem, Lock, ArrowRight,
 } from 'lucide-react';
+import { dispatchUnlock } from '../utils/UnlockBus';
+import RefuelOffer from '../components/RefuelOffer';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -200,8 +202,34 @@ export default function Pricing() {
       const res = await axios.get(`${API}/economy/checkout-status/${sessionId}`, { headers: authHeaders });
       if (res.data.payment_status === 'paid') {
         setPolling(false);
-        toast.success(`Activated ${res.data.tier || 'subscription'}!`);
+        // V1.1.7 — Refuel returns are not subscription tier changes;
+        // surface an appropriate toast and dispatch a refuel-colored
+        // ripple instead.
+        const isRefuel = res.data.type === 'refuel';
+        if (isRefuel) {
+          toast.success('Sovereign Sample activated — 30% OFF for 2.5 hours');
+        } else {
+          toast.success(`Activated ${res.data.tier || 'subscription'}!`);
+        }
         fetchData();
+        // V1.1.7 — Universal Ripple. Every Stripe-success now fires
+        // a system-wide UnlockBus event so any HelixNav3D mounted
+        // anywhere in the OS lights up its 81-node lattice in
+        // acknowledgment. Tier color drives the wave color so the
+        // visual reads connected to the upgrade.
+        try {
+          const tierId = isRefuel ? 'refuel' : (res.data.tier || 'sovereign');
+          const TIER_COLORS = {
+            resonance: '#818CF8', architect: '#2DD4BF',
+            sovereign: '#FBBF24', sovereign_founder: '#FCD34D',
+            refuel: '#F472B6',
+          };
+          dispatchUnlock({
+            kind: isRefuel ? 'refuel' : 'tier',
+            id: tierId,
+            color: TIER_COLORS[tierId] || '#FCD34D',
+          });
+        } catch {}
         // V1.1.5 — Sovereign Bridge: if a ClimbLadderPill stashed a
         // pending unlock target before redirecting to Stripe, route
         // the user back there now so the 3D unfold animation fires
@@ -351,6 +379,9 @@ export default function Pricing() {
                 <Award size={12} /> 2-Year Founder
               </div>
             )}
+            {/* V1.1.7 — Refuel badge / offer (renders active state if window
+                is live, otherwise the inline offer pill so the user can opt in). */}
+            <RefuelOffer variant="inline" />
           </div>
         )}
 

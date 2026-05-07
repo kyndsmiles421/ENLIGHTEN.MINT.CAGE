@@ -11,6 +11,23 @@ import uuid
 
 router = APIRouter(prefix="/economy", tags=["Dual-Track Economy"])
 
+# V1.1.7 — Sovereign Sample (the "$7 Refuel"). One-time micro-purchase
+# that gives a non-subscriber a 2.5-hour window of Sovereign Monthly
+# benefits (30% discount on all Dust/Sparks utility upgrades). Designed
+# as the lowest-friction conversion tool: lets users feel the math of
+# the ladder before committing to a full subscription. After the window
+# expires, they revert to their original tier — but the 30% discount
+# during the window is real and applied via apply-discount + discount-rate.
+REFUEL_SKU = {
+    "id": "refuel",
+    "name": "Sovereign Sample",
+    "label": "2.5-Hour Refuel",
+    "price": 7.00,
+    "duration_hours": 2.5,
+    "discount_pct": 30,
+    "description": "Feel the Sovereign math: 30% off all utility upgrades for 2.5 hours.",
+}
+
 # ─── Track 1: App Subscription Tiers ───
 SUBSCRIPTION_TIERS = {
     "discovery": {
@@ -652,6 +669,27 @@ async def get_checkout_status(session_id: str, user=Depends(get_current_user), r
                 upsert=True,
             )
 
+        elif tx_type == "refuel":
+            # V1.1.7 — Sovereign Sample fulfillment. Set refuel session
+            # 2.5h from now. discount-rate / apply-discount endpoints
+            # honour the window on top of the user's subscription tier.
+            from datetime import timedelta
+            until = (datetime.now(timezone.utc) + timedelta(
+                hours=REFUEL_SKU["duration_hours"]
+            )).isoformat()
+            await db.refuel_sessions.update_one(
+                {"user_id": uid},
+                {"$set": {
+                    "user_id": uid,
+                    "session_id": session_id,
+                    "started_at": now,
+                    "expires_at": until,
+                    "discount_pct": REFUEL_SKU["discount_pct"],
+                    "duration_hours": REFUEL_SKU["duration_hours"],
+                }},
+                upsert=True,
+            )
+
         elif tx_type == "pack_purchase":
             pack_id = tx.get("pack_id")
             await db.pack_purchases.update_one(
@@ -716,15 +754,58 @@ async def downgrade_to_discovery(user=Depends(get_current_user)):
     return {"tier": "discovery", "message": "Downgraded to Discovery"}
 
 
+# V1.1.7 — Helper: returns the user's effective discount, honoring
+# both their subscription tier AND any active Refuel window. If a
+# refuel is active, takes whichever discount is HIGHER (so a Sovereign
+# Founder at 60% doesn't get downgraded to 30% during refuel).
+async def _effective_discount(user_id: str) -> dict:
+    sub = await db.subscriptions.find_one({"user_id": user_id}, {"_id": 0})
+    tier_id = sub.get("tier", "discovery") if sub else "discovery"
+    tier = SUBSCRIPTION_TIERS.get(tier_id, SUBSCRIPTION_TIERS["discovery"])
+    base_pct = tier["marketplace_discount"]
+    refuel_active = False
+    refuel_pct = 0
+    refuel_expires = None
+    sess = await db.refuel_sessions.find_one({"user_id": user_id}, {"_id": 0})
+    if sess and sess.get("expires_at"):
+        try:
+            expires = datetime.fromisoformat(sess["expires_at"])
+            if expires.tzinfo is None:
+                expires = expires.replace(tzinfo=timezone.utc)
+            if expires > datetime.now(timezone.utc):
+                refuel_active = True
+                refuel_pct = sess.get("discount_pct", REFUEL_SKU["discount_pct"])
+                refuel_expires = sess["expires_at"]
+        except Exception:
+            pass
+    final_pct = max(base_pct, refuel_pct) if refuel_active else base_pct
+    return {
+        "tier": tier_id,
+        "tier_discount_pct": base_pct,
+        "refuel_active": refuel_active,
+        "refuel_discount_pct": refuel_pct,
+        "refuel_expires_at": refuel_expires,
+        "final_discount_pct": final_pct,
+        "source": "refuel" if (refuel_active and refuel_pct > base_pct) else "tier",
+    }
+
+
 @router.get("/discount-rate")
 async def get_discount_rate(user=Depends(get_current_user)):
-    """Get user's current discount rate based on subscription tier."""
+    """Get user's current discount rate based on subscription tier
+    AND any active Refuel window (V1.1.7)."""
     sub = await db.subscriptions.find_one({"user_id": user["id"]}, {"_id": 0})
     tier_id = sub.get("tier", "discovery") if sub else "discovery"
     tier = SUBSCRIPTION_TIERS.get(tier_id, SUBSCRIPTION_TIERS["discovery"])
+    eff = await _effective_discount(user["id"])
     return {
         "tier": tier_id,
-        "discount_percent": tier["marketplace_discount"],
+        "discount_percent": eff["final_discount_pct"],
+        "tier_discount_percent": tier["marketplace_discount"],
+        "refuel_active": eff["refuel_active"],
+        "refuel_discount_percent": eff["refuel_discount_pct"],
+        "refuel_expires_at": eff["refuel_expires_at"],
+        "source": eff["source"],
         "can_sell": tier.get("can_sell", False),
         "beacon": tier.get("beacon", False),
         "education_level": tier.get("education_level", "Foundation"),
@@ -734,23 +815,23 @@ async def get_discount_rate(user=Depends(get_current_user)):
 
 @router.post("/apply-discount")
 async def apply_discount(body: dict, user=Depends(get_current_user)):
-    """Calculate discounted price for a purchase based on tier."""
+    """Calculate discounted price honoring tier + active Refuel window."""
     base_price = body.get("base_price", 0)
     if base_price <= 0:
         raise HTTPException(400, "base_price must be positive")
 
-    sub = await db.subscriptions.find_one({"user_id": user["id"]}, {"_id": 0})
-    tier_id = sub.get("tier", "discovery") if sub else "discovery"
-    tier = SUBSCRIPTION_TIERS.get(tier_id, SUBSCRIPTION_TIERS["discovery"])
-    discount = tier["marketplace_discount"] / 100.0
+    eff = await _effective_discount(user["id"])
+    discount = eff["final_discount_pct"] / 100.0
     discounted_price = round(base_price * (1 - discount), 2)
 
     return {
         "base_price": base_price,
-        "discount_percent": tier["marketplace_discount"],
+        "discount_percent": eff["final_discount_pct"],
         "discount_amount": round(base_price - discounted_price, 2),
         "final_price": discounted_price,
-        "tier": tier_id,
+        "tier": eff["tier"],
+        "refuel_active": eff["refuel_active"],
+        "source": eff["source"],
     }
 
 
@@ -827,4 +908,126 @@ async def buy_up_quote(target_tier: str, user=Depends(get_current_user)):
             f"Climb to {target['name']} for ${differential:.2f}/mo more "
             f"({target['marketplace_discount']}% discount unlocked)."
         ),
+    }
+
+
+
+# ════════════════════════════════════════════
+# V1.1.7 — SOVEREIGN SAMPLE / REFUEL endpoints
+# ════════════════════════════════════════════
+
+@router.get("/refuel/info")
+async def refuel_info():
+    """Public — Refuel SKU details for the offer pill / pricing copy."""
+    return REFUEL_SKU
+
+
+@router.get("/refuel/status")
+async def refuel_status(user=Depends(get_current_user)):
+    """Returns whether the user has an active Refuel window and how
+    much time is left. Frontend uses this to render the persistent
+    'SOVEREIGN ACTIVE · 1h 47m left' pill during the window.
+    """
+    sess = await db.refuel_sessions.find_one(
+        {"user_id": user["id"]}, {"_id": 0}
+    )
+    if not sess or not sess.get("expires_at"):
+        return {"active": False}
+    try:
+        expires = datetime.fromisoformat(sess["expires_at"])
+        if expires.tzinfo is None:
+            expires = expires.replace(tzinfo=timezone.utc)
+    except Exception:
+        return {"active": False}
+    now = datetime.now(timezone.utc)
+    if expires <= now:
+        return {
+            "active": False,
+            "expired_at": sess["expires_at"],
+            "discount_pct": sess.get("discount_pct"),
+        }
+    seconds_remaining = int((expires - now).total_seconds())
+    return {
+        "active": True,
+        "expires_at": sess["expires_at"],
+        "started_at": sess.get("started_at"),
+        "seconds_remaining": seconds_remaining,
+        "discount_pct": sess.get("discount_pct", REFUEL_SKU["discount_pct"]),
+    }
+
+
+@router.post("/refuel/start")
+async def start_refuel(body: dict, user=Depends(get_current_user), request: Request = None):
+    """Create a Stripe Checkout for the $7 Sovereign Sample Refuel.
+
+    Body: { origin_url: "https://..." }
+
+    Idempotency: if the user already has an active refuel window, we
+    return its status instead of charging them again. Frontend can
+    handle this by reading `already_active` and routing to the timer.
+    """
+    from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+
+    origin_url = (body or {}).get("origin_url", "")
+    if not origin_url:
+        raise HTTPException(400, "origin_url required")
+
+    # Idempotency check — never charge twice in the same window
+    existing = await db.refuel_sessions.find_one(
+        {"user_id": user["id"]}, {"_id": 0}
+    )
+    if existing and existing.get("expires_at"):
+        try:
+            expires = datetime.fromisoformat(existing["expires_at"])
+            if expires.tzinfo is None:
+                expires = expires.replace(tzinfo=timezone.utc)
+            if expires > datetime.now(timezone.utc):
+                return {
+                    "already_active": True,
+                    "expires_at": existing["expires_at"],
+                    "discount_pct": existing.get("discount_pct"),
+                }
+        except Exception:
+            pass
+
+    host_url = str(request.base_url).rstrip("/") if request else origin_url
+    webhook_url = f"{host_url}/api/webhook/stripe"
+    api_key = os.environ.get("STRIPE_API_KEY", "")
+    stripe_checkout = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
+
+    success_url = f"{origin_url}/pricing?session_id={{CHECKOUT_SESSION_ID}}&type=refuel"
+    cancel_url = f"{origin_url}/pricing"
+
+    checkout_req = CheckoutSessionRequest(
+        amount=REFUEL_SKU["price"],
+        currency="usd",
+        success_url=success_url,
+        cancel_url=cancel_url,
+        metadata={
+            "user_id": user["id"],
+            "type": "refuel",
+            "duration_hours": str(REFUEL_SKU["duration_hours"]),
+            "discount_pct": str(REFUEL_SKU["discount_pct"]),
+        },
+    )
+    session = await stripe_checkout.create_checkout_session(checkout_req)
+
+    tx_id = str(uuid.uuid4())
+    await db.payment_transactions.insert_one({
+        "id": tx_id,
+        "session_id": session.session_id,
+        "user_id": user["id"],
+        "type": "refuel",
+        "amount": REFUEL_SKU["price"],
+        "currency": "usd",
+        "duration_hours": REFUEL_SKU["duration_hours"],
+        "discount_pct": REFUEL_SKU["discount_pct"],
+        "payment_status": "pending",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    return {
+        "url": session.url,
+        "session_id": session.session_id,
+        "amount": REFUEL_SKU["price"],
     }
