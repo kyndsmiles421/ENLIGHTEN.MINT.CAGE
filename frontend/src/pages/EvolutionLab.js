@@ -8,6 +8,7 @@ import { useLatency } from '../hooks/useLatencyPulse';
 import useGameController from '../hooks/useGameController';
 import GameModuleWrapper from '../components/game/GameModuleWrapper';
 import { dispatchUnlock } from '../utils/UnlockBus';
+import EvolutionGemStage3D from '../components/EvolutionGemStage3D';
 import {
   ArrowLeft, Gem, Sparkles, Shield, Flame, Droplets, Mountain,
   Sprout, Star, Clock, Zap, TrendingUp, Eye, Activity,
@@ -107,7 +108,7 @@ function EvolutionBar({ vc, stage, progress }) {
   );
 }
 
-function SpecimenEvolutionCard({ item, onInteract, interacting }) {
+function SpecimenEvolutionCard({ item, onInteract, interacting, isSelected, onSelect }) {
   const rc = RARITY_COLORS[item.rarity] || '#9CA3AF';
   const sc = STAGE_COLORS[item.stage?.id] || '#9CA3AF';
   const ElIcon = EL_ICONS[item.element] || Gem;
@@ -116,10 +117,24 @@ function SpecimenEvolutionCard({ item, onInteract, interacting }) {
   const stageVisual = item.stage?.id === 'transcendental' ? 'animate-pulse' :
                        item.stage?.id === 'refined' ? '' : '';
 
+  // raw → polish, refined → refine, transcendental → awaken
+  const stageAction = item.stage?.id === 'transcendental'
+    ? { type: 'awaken', label: 'Awaken' }
+    : item.stage?.id === 'refined'
+      ? { type: 'refine', label: 'Refine' }
+      : { type: 'polish', label: 'Polish' };
+
   return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl p-3 mb-2 relative overflow-hidden"
-      style={{ background: `${rc}03`, border: `1px solid ${rc}08` }}
+    <motion.div
+      initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+      onClick={() => onSelect && onSelect(item.specimen_id)}
+      className="rounded-xl p-3 mb-2 relative overflow-hidden cursor-pointer"
+      style={{
+        background: isSelected ? `${rc}10` : `${rc}03`,
+        border: `1px solid ${isSelected ? `${rc}30` : `${rc}08`}`,
+        boxShadow: isSelected ? `0 0 0 1px ${rc}25, 0 0 22px ${rc}18` : 'none',
+        transition: 'background 200ms, border-color 200ms, box-shadow 200ms',
+      }}
       data-testid={`evo-specimen-${item.specimen_id}`}>
 
       {/* Transcendental particle aura */}
@@ -185,7 +200,7 @@ function SpecimenEvolutionCard({ item, onInteract, interacting }) {
           {/* Action buttons */}
           <div className="flex flex-col gap-1 flex-shrink-0">
             <button
-              onClick={() => onInteract(item.specimen_id, 'polish')}
+              onClick={(e) => { e.stopPropagation(); onInteract(item.specimen_id, stageAction.type); }}
               disabled={interacting}
               className="px-2 py-1 rounded-lg text-[8px] font-bold"
               style={{
@@ -194,11 +209,11 @@ function SpecimenEvolutionCard({ item, onInteract, interacting }) {
                 border: `1px solid ${sc}20`,
                 opacity: interacting ? 0.5 : 1,
               }}
-              data-testid={`polish-${item.specimen_id}`}>
-              Polish
+              data-testid={`${stageAction.type}-${item.specimen_id}`}>
+              {stageAction.label}
             </button>
             <button
-              onClick={() => setShowDetails(!showDetails)}
+              onClick={(e) => { e.stopPropagation(); setShowDetails(!showDetails); }}
               className="px-2 py-1 rounded-lg text-[8px]"
               style={{ background: 'rgba(255,255,255,0.03)', color: 'rgba(255,255,255,0.7)' }}>
               {showDetails ? 'Hide' : 'Info'}
@@ -300,6 +315,9 @@ export default function EvolutionLab() {
   const [loading, setLoading] = useState(true);
   const [interacting, setInteracting] = useState(false);
   const [filter, setFilter] = useState('all');
+  const [selectedId, setSelectedId] = useState(null);
+  const [pulseKey, setPulseKey] = useState(0);
+  const [reactionLine, setReactionLine] = useState('');
 
   const fetchData = useCallback(async () => {
     try {
@@ -315,20 +333,22 @@ export default function EvolutionLab() {
 
   const handleInteract = async (assetId, type) => {
     setInteracting(true);
+    setSelectedId(assetId);
     latency?.startPulse('evolve');
     try {
       const res = await axios.post(`${API}/evolution/interact`, { asset_id: assetId, type }, { headers });
       latency?.endPulse('evolve', true);
+      // Fire 3D pulse on the gem stage every successful interaction.
+      setPulseKey((k) => k + 1);
       if (res.data.evolved) {
-        toast.success(`${assetId} evolved to ${res.data.stage.name}!`);
+        setReactionLine(`evolved → ${res.data.stage?.name || 'next stage'}`);
       } else {
-        toast.success(`+${res.data.rewards.xp} XP · "${res.data.mantra}"`);
+        const mantra = res.data.mantra ? `"${res.data.mantra}"` : '';
+        setReactionLine(`+${res.data.rewards?.xp || 0} xp ${mantra}`.trim());
       }
       // V1.1.10 — Every successful interaction (Polish, Refine, Awaken,
       // etc.) now fires the system-wide UnlockBus event. Any HelixNav3D
       // mounted in the OS picks it up and ripples its 81-node lattice.
-      // Real 3D acknowledgment from a 2D button — same plumbing as
-      // V1.1.6 relic claims & V1.1.7 tier upgrades.
       try {
         const stageColor = res.data?.stage?.color || res.data?.color || '#2DD4BF';
         dispatchUnlock({
@@ -341,7 +361,7 @@ export default function EvolutionLab() {
       controller.refreshState();
     } catch (err) {
       latency?.endPulse('evolve', false);
-      toast.error(err.response?.data?.detail || 'Interaction failed');
+      setReactionLine(err.response?.data?.detail || 'interaction failed');
     }
     setInteracting(false);
   };
@@ -376,6 +396,10 @@ export default function EvolutionLab() {
       ? collection.filter(c => c.stage?.id === filter)
       : collection.filter(c => c.element === filter);
 
+  // Auto-select first visible specimen when filter changes / data loads.
+  const selectedAsset = filtered.find(c => c.specimen_id === selectedId) || filtered[0] || null;
+  const selectedColor = selectedAsset ? (RARITY_COLORS[selectedAsset.rarity] || '#A78BFA') : '#A78BFA';
+
   const dust = controller.coreStats?.currencies?.cosmic_dust || 0;
 
   return (
@@ -407,6 +431,31 @@ export default function EvolutionLab() {
             </span>
           </div>
         </div>
+
+        {/* Refraction Engine — procedural PHI gem viewer (one Canvas) */}
+        {selectedAsset && (
+          <div className="mx-4 mb-3" data-testid="evo-refraction-engine">
+            <EvolutionGemStage3D asset={selectedAsset} pulseKey={pulseKey} />
+            {reactionLine && (
+              <motion.div
+                key={pulseKey}
+                initial={{ opacity: 0, y: -4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-center"
+                style={{
+                  fontFamily: 'monospace',
+                  fontSize: 9,
+                  letterSpacing: '0.18em',
+                  color: selectedColor,
+                  textTransform: 'uppercase',
+                  marginTop: -4,
+                }}
+                data-testid="evo-reaction-line">
+                · {reactionLine} ·
+              </motion.div>
+            )}
+          </div>
+        )}
 
         {/* Season Banner */}
         <SeasonBanner season={data?.season} />
@@ -465,6 +514,8 @@ export default function EvolutionLab() {
                 item={item}
                 onInteract={handleInteract}
                 interacting={interacting}
+                isSelected={selectedAsset?.specimen_id === item.specimen_id}
+                onSelect={(id) => { setSelectedId(id); setReactionLine(''); }}
               />
             ))
           )}

@@ -48,90 +48,46 @@ export class CosmicErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      const errMsg = this.state.error?.message || String(this.state.error || 'Unknown error');
-      const errStack = this.state.error?.stack || '';
-      const compStack = this.state.info?.componentStack || '';
+      // Flatland-clean: no yellow buttons, no modal-card. Inline glyph
+      // line + a silent retry. Errors still log to console for debug.
       return (
-        <div className="min-h-[60vh] flex items-center justify-center px-4 py-8" data-testid="cosmic-error-boundary">
+        <div
+          className="min-h-[40vh] flex items-center justify-center px-4 py-8"
+          data-testid="cosmic-error-boundary"
+          onClick={this.handleReset}
+          style={{ cursor: 'pointer' }}
+        >
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="max-w-md text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.2 }}
+            className="text-center select-none"
           >
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              style={{ background: 'rgba(192,132,252,0.06)', border: '1px solid rgba(192,132,252,0.1)' }}>
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-                style={{ fontSize: '24px', color: '#C084FC', fontFamily: 'Cormorant Garamond, serif' }}
-              >
-                *
-              </motion.div>
+            <motion.div
+              animate={{ opacity: [0.35, 0.85, 0.35] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                fontFamily: 'monospace',
+                fontSize: 10,
+                letterSpacing: '0.32em',
+                color: 'rgba(192,132,252,0.78)',
+                textTransform: 'uppercase',
+              }}
+            >
+              · a rift in the lattice ·
+            </motion.div>
+            <div
+              style={{
+                marginTop: 14,
+                fontFamily: 'monospace',
+                fontSize: 8,
+                letterSpacing: '0.22em',
+                color: 'rgba(248,250,252,0.32)',
+                textTransform: 'uppercase',
+              }}
+            >
+              tap to refold
             </div>
-            <h2 className="text-lg font-light mb-2"
-              style={{ color: 'var(--text-primary)', fontFamily: 'Cormorant Garamond, serif' }}>
-              A dimensional rift appeared
-            </h2>
-            <p className="text-[11px] mb-5" style={{ color: 'var(--text-muted)' }}>
-              Something unexpected disrupted this part of the cosmos. Your data and progress are safe.
-            </p>
-            <div className="flex items-center justify-center gap-3 mb-4 flex-wrap">
-              <button
-                onClick={this.handleReset}
-                className="px-5 py-2 rounded-full text-[11px] font-medium transition-all hover:scale-105"
-                style={{ background: 'rgba(129,140,248,0.12)', border: '1px solid rgba(129,140,248,0.2)', color: '#818CF8' }}
-                data-testid="error-boundary-retry"
-              >
-                Try Again
-              </button>
-              <button
-                onClick={() => { window.location.href = '/sovereign-hub'; }}
-                className="px-5 py-2 rounded-full text-[11px] transition-all hover:scale-105"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', color: 'var(--text-muted)' }}
-                data-testid="error-boundary-home"
-              >
-                Return Home
-              </button>
-              <button
-                onClick={this.toggleDetails}
-                className="px-4 py-2 rounded-full text-[10px] transition-all hover:scale-105 uppercase"
-                style={{ background: 'rgba(251,191,36,0.06)', border: '1px solid rgba(251,191,36,0.18)', color: '#FBBF24', letterSpacing: '0.16em', fontFamily: 'monospace' }}
-                data-testid="error-boundary-details-toggle"
-              >
-                {this.state.showDetails ? 'Hide details' : 'Show details'}
-              </button>
-            </div>
-            {this.state.showDetails && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="rounded-lg mt-2 p-3 text-left overflow-auto"
-                style={{
-                  background: 'rgba(4,6,15,0.7)',
-                  border: '1px solid rgba(251,191,36,0.18)',
-                  fontFamily: 'monospace',
-                  fontSize: 10,
-                  color: '#FCD34D',
-                  maxHeight: 320,
-                }}
-                data-testid="error-boundary-details"
-              >
-                <p style={{ color: '#F87171', marginBottom: 8, wordBreak: 'break-word' }}>{errMsg}</p>
-                {errStack && (
-                  <pre style={{ color: 'rgba(252,211,77,0.78)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0 }}>
-                    {errStack.split('\n').slice(0, 12).join('\n')}
-                  </pre>
-                )}
-                {compStack && (
-                  <pre style={{ color: 'rgba(148,163,184,0.78)', whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginTop: 8 }}>
-                    {compStack.split('\n').slice(0, 8).join('\n')}
-                  </pre>
-                )}
-                <p style={{ color: 'rgba(148,163,184,0.55)', marginTop: 8, fontSize: 9, letterSpacing: '0.1em' }}>
-                  Copy this text when reporting the issue.
-                </p>
-              </motion.div>
-            )}
           </motion.div>
         </div>
       );
