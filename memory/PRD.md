@@ -13,6 +13,16 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Cybernetic Loop** — Generators → `ContextBus` → `ResonanceAnalyzer` → `CrystallineLattice3D` + `SageEngineGauge`
 - **Closed-loop Economy** — Credits (server-issued) → Dust/Gems/Components via AI Merchant; Stripe is the only real-money gateway
 
+### V1.1.12 — Refraction Engine Unification + Black Hills→Vault Binding (2026-02-07) ✅
+**Mandate:** "A gem polished in the Lab should arrive in the Vault as the EXACT same lattice it was forged from. Bind the Black Hills topographic floor inside the Tesseract."
+- **`/app/frontend/src/components/RefractionGem.jsx`** — NEW shared in-canvas primitive. Procedural platonic solid (icosahedron / octahedron / dodecahedron), driven by `stageId` (raw/refined/transcendental/sovereign) for emissive intensity + scale + spin rate, deformed by PHI/PHI_INV math from `SovereignMath`. `pulseKey` prop fires a 1.5s ease-out cubic bell on every Polish/Refine/Awaken AND every relic claim — one curve, one language across the OS.
+- Exports `SOLID_FOR_CRYSTAL_SYSTEM` mapping (used by Lab gems) and `solidForId()` deterministic hash (used by Vault relics that have no crystal_system). Same three platonic solids cycle through both surfaces in PHI-weighted distribution.
+- **`EvolutionGemStage3D.jsx`** rewritten as a thin Canvas wrapper around `<RefractionGem>` — no behavior change for the Lab.
+- **`TesseractVault.js`** Relic component now uses `<RefractionGem>` instead of a bespoke icosahedron + meshStandardMaterial pair. Tier maps to stage (sovereign→transcendental, architect→refined, all→raw); `claimedIds` lifts the rank one notch; `isSelected` lifts it again; `justUnlocked` bumps `pulseKey`. AI textures (`useAITexture`) still flow through via the new `map` prop. All click + hover handlers preserved.
+- **Black Hills binding** — `BasinMesh` exported as a named export from `BlackHillsBathymetry.js`. `TesseractVault.js` mounts it inside the Tesseract canvas at `position={[0,-1.05,0]} scale={[0.72,0.55,0.72]}` so the actual Pactola Reservoir bathymetry sits as the topographic floor under the 4D hypercube. The "DEEPEST · 150ft" depth marker confirms the binding is alive.
+- Frontend testing agent: 11/11 PASS (iteration_435.json) — Vault renders unified procedural gems (no 2D placeholders), Black Hills floor visible, Lab unchanged, /forgotten-languages and /pricing smoke clean.
+
+
 ### V1.1.11 — Evolution Lab Refraction Engine + Quiet Rift (2026-02-07) ✅
 **Mandate:** "Evolution Lab must render 3D, not a 2D spreadsheet. Hide the yellow Check-Engine sticker on the speedometer."
 - **EvolutionGemStage3D** wired into `/app/frontend/src/pages/EvolutionLab.js` — one R3F `<Canvas>` mounted above the season banner, fed by the currently-selected specimen. Procedural platonic solids (icosahedron / octahedron / dodecahedron) selected from `crystal_system`; PHI-weighted idle bob + spin from `SovereignMath` (`PHI`, `PHI_INV`); stage rank drives emissive intensity, scale, spin rate.
