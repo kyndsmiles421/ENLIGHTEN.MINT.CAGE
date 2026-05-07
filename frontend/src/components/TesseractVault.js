@@ -23,7 +23,7 @@ import { toast } from 'sonner';
 import { PHI } from '../utils/SovereignMath';
 import { useAITexture } from '../hooks/useAITexture';
 import * as SageVoice from '../services/SageVoiceController';
-import { dispatchUnlock } from '../utils/UnlockBus';
+import { dispatchUnlock, onUnlock } from '../utils/UnlockBus';
 import ClimbLadderPill from './ClimbLadderPill';
 import RefractionGem, { solidForId } from './RefractionGem';
 import { BasinMesh as BlackHillsBasinMesh } from './BlackHillsBathymetry';
@@ -238,6 +238,40 @@ export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
     if (unlockTimeoutRef.current) clearTimeout(unlockTimeoutRef.current);
   }, []);
 
+  // V1.1.13 — Sympathetic Pulse. When ANY other surface (Evolution
+  // Lab Polish/Refine/Awaken, modifier panel, future Sage command)
+  // fires an UnlockBus event, find the Vault relic whose color is
+  // closest to the event color and pulse it. Lab and Vault breathe
+  // as one organism. Self-fired 'relic' events are ignored to avoid
+  // double-pulses.
+  const [sympathyRelicId, setSympathyRelicId] = useState(null);
+  useEffect(() => {
+    return onUnlock((detail) => {
+      if (detail.kind === 'relic') return;
+      const evtColor = (detail.color || '').toLowerCase();
+      if (!evtColor) return;
+      // Closest-color match by squared RGB distance.
+      const hexToRgb = (hex) => {
+        const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return m ? [parseInt(m[1], 16), parseInt(m[2], 16), parseInt(m[3], 16)] : null;
+      };
+      const target = hexToRgb(evtColor);
+      if (!target) return;
+      let best = null;
+      let bestDist = Infinity;
+      for (const r of relics) {
+        const rgb = hexToRgb(r.color || '');
+        if (!rgb) continue;
+        const d = (rgb[0]-target[0])**2 + (rgb[1]-target[1])**2 + (rgb[2]-target[2])**2;
+        if (d < bestDist) { bestDist = d; best = r; }
+      }
+      if (best) {
+        setSympathyRelicId(best.id);
+        setTimeout(() => setSympathyRelicId(null), 1700);
+      }
+    });
+  }, [relics]);
+
   // V1.1.5 — Stripe success path. When the ClimbLadderPill (V1.1.4) sends
   // a user through Stripe and they return to /vault?just_claimed=lilikoi,
   // honour the unlock animation immediately. Also strip the query so a
@@ -410,7 +444,7 @@ export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
                 position={relicPositions[i]}
                 isSelected={selected && selected.id === r.id}
                 onSelect={(rel) => setSelected(selected && selected.id === rel.id ? null : rel)}
-                justUnlocked={unlockedId === r.id}
+                justUnlocked={unlockedId === r.id || sympathyRelicId === r.id}
                 isClaimed={claimedIds.has(r.id)}
               />
             ))}

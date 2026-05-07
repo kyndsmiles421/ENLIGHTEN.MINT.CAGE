@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLatency } from '../hooks/useLatencyPulse';
 import useGameController from '../hooks/useGameController';
 import GameModuleWrapper from '../components/game/GameModuleWrapper';
-import { dispatchUnlock } from '../utils/UnlockBus';
+import { dispatchUnlock, onUnlock } from '../utils/UnlockBus';
 import EvolutionGemStage3D from '../components/EvolutionGemStage3D';
 import {
   ArrowLeft, Gem, Sparkles, Shield, Flame, Droplets, Mountain,
@@ -318,6 +318,25 @@ export default function EvolutionLab() {
   const [selectedId, setSelectedId] = useState(null);
   const [pulseKey, setPulseKey] = useState(0);
   const [reactionLine, setReactionLine] = useState('');
+  // V1.1.13 — Sympathetic Pulse. The Lab's currently-selected gem
+  // breathes in colored sympathy when ANY other surface (Tesseract
+  // Vault, modifier panel, future Sage voice command) fires an
+  // UnlockBus event. The Vault and the Lab are now one organism.
+  const [sympathyTint, setSympathyTint] = useState(null);
+  useEffect(() => {
+    return onUnlock((detail) => {
+      // Ignore self-fired evolution events to avoid double-pulses.
+      if (detail.kind === 'evolution') return;
+      setPulseKey((k) => k + 1);
+      setSympathyTint(detail.color || null);
+      const label = (detail.id || '').replace(/[-_]/g, ' ');
+      const kindLabel = (detail.kind || 'pulse').toUpperCase();
+      setReactionLine(`sympathy · ${kindLabel}${label ? ` · ${label}` : ''}`);
+      // Auto-clear the tint after the pulse curve completes (~1.5s).
+      const t = setTimeout(() => setSympathyTint(null), 1700);
+      return () => clearTimeout(t);
+    });
+  }, []);
 
   const fetchData = useCallback(async () => {
     try {
@@ -398,7 +417,8 @@ export default function EvolutionLab() {
 
   // Auto-select first visible specimen when filter changes / data loads.
   const selectedAsset = filtered.find(c => c.specimen_id === selectedId) || filtered[0] || null;
-  const selectedColor = selectedAsset ? (RARITY_COLORS[selectedAsset.rarity] || '#A78BFA') : '#A78BFA';
+  const selectedColor = sympathyTint
+    || (selectedAsset ? (RARITY_COLORS[selectedAsset.rarity] || '#A78BFA') : '#A78BFA');
 
   const dust = controller.coreStats?.currencies?.cosmic_dust || 0;
 

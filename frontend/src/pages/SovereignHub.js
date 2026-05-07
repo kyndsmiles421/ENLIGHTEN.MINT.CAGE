@@ -53,6 +53,7 @@ function ArchitectBadgeMount() {
 import { Telescope, Orbit, Sparkles as SparkleIcon, Globe, Eye, Infinity as InfinityIcon, Moon, Layers, TreePine, Compass } from 'lucide-react';
 import { useProcessorState, MODULE_REGISTRY } from '../state/ProcessorState';
 import SovereignPreferences from '../kernel/SovereignPreferences';
+import { prewarmRoute } from '../utils/PrewarmRoutes';
 
 // V68.55 — R3F lattice is heavy (three.js + drei). Lazy-load so the
 // 2D-skin user never downloads it. Mounts only when crystalFidelity
@@ -878,6 +879,8 @@ export default function SovereignHub() {
                             whileHover={{ y: -2, scale: locked ? 1 : 1.02 }}
                             whileTap={{ scale: locked ? 1 : 0.97 }}
                             onClick={() => dispatchPillar(item.route)}
+                            onPointerEnter={() => prewarmRoute(item.route)}
+                            onFocus={() => prewarmRoute(item.route)}
                             className="relative rounded-xl px-3 py-3 text-left overflow-hidden group"
                             style={{
                               background: `linear-gradient(135deg, ${pillar.color}${locked ? '0E' : '18'} 0%, rgba(10,10,18,0.5) 100%)`,
