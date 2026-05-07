@@ -13,6 +13,15 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Cybernetic Loop** — Generators → `ContextBus` → `ResonanceAnalyzer` → `CrystallineLattice3D` + `SageEngineGauge`
 - **Closed-loop Economy** — Credits (server-issued) → Dust/Gems/Components via AI Merchant; Stripe is the only real-money gateway
 
+### V1.1.13 — Sympathetic Pulse + Predictive Pre-Warm (2026-02-07) ✅
+**Mandate:** "Make the system breathe as one organism. Lab and Vault must pulse in sympathy. Hub transitions must be zero-latency."
+- **Sympathetic Pulse — Lab side** (`/pages/EvolutionLab.js`): subscribed to `onUnlock` from `UnlockBus`. When ANY non-evolution event fires (relic claim, modifier upgrade, future Sage command), the Lab bumps `pulseKey` on the currently-selected gem, tints `selectedColor` with the event's color, and displays a `sympathy · KIND · id` reaction line for 1.7s.
+- **Sympathetic Pulse — Vault side** (`/components/TesseractVault.js`): subscribed to `onUnlock`. On any non-relic event, finds the relic with the closest RGB-distance match to the event color, and OR's its id into the existing `justUnlocked` prop so the unfold scale + emissive pulse fires. Same primitive (`<RefractionGem>`) + same 1.5s ease-out cubic curve as a real claim — visual sympathy reads identical to real activity.
+- **Predictive Pre-Warm** (`/utils/PrewarmRoutes.js`): NEW curated registry of 12 high-traffic routes (Evolution Lab, Vault, Tesseract, Forgotten Languages, Pricing, Observatory, Spiritual Coach, Meditation, Breathing, Herbology, Oracle) mapped to dynamic-import thunks tagged with webpackPrefetch. Idempotent via `PREWARMED` Set — hovering the same pillar 50× still only fetches once.
+- **Hub wiring** (`/pages/SovereignHub.js`): pillar buttons now have `onPointerEnter` + `onFocus` handlers that call `prewarmRoute(item.route)`. Webpack starts fetching the chunk on hover/keyboard-focus so the actual tap is zero-latency.
+- Frontend testing agent: 12/12 PASS (iteration_436.json) — synthetic UnlockBus event correctly tints Lab reaction line, hover-prewarm fetches chunks before click, idempotency holds (5 hovers = 1 fetch), all V1.1.12 features still work, no console errors.
+
+
 ### V1.1.12 — Refraction Engine Unification + Black Hills→Vault Binding (2026-02-07) ✅
 **Mandate:** "A gem polished in the Lab should arrive in the Vault as the EXACT same lattice it was forged from. Bind the Black Hills topographic floor inside the Tesseract."
 - **`/app/frontend/src/components/RefractionGem.jsx`** — NEW shared in-canvas primitive. Procedural platonic solid (icosahedron / octahedron / dodecahedron), driven by `stageId` (raw/refined/transcendental/sovereign) for emissive intensity + scale + spin rate, deformed by PHI/PHI_INV math from `SovereignMath`. `pulseKey` prop fires a 1.5s ease-out cubic bell on every Polish/Refine/Awaken AND every relic claim — one curve, one language across the OS.
