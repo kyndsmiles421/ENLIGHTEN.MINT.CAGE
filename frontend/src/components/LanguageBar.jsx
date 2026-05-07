@@ -40,10 +40,14 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const STORAGE_KEY = 'sovereign_language_bar_v1';
 
 // Tunables. Tight enough that the bar can't outrun the preview ingress.
+// V1.1.8 — bumped MAX_NODES 80 → 200 and CONCURRENCY 3 → 6. Forgotten
+// Languages and SacredTexts pages have far more than 80 paragraphs;
+// the previous cap silently dropped half the page. 6-way concurrency
+// halves the wall-clock without overwhelming the 18s per-call timeout.
 const MIN_CHARS = 18;            // skip "Hub", "X", labels, dates
-const MAX_NODES = 80;            // hard cap per page traversal
+const MAX_NODES = 200;           // hard cap per page traversal
 const TRANSLATE_TIMEOUT_MS = 18000;
-const CONCURRENCY = 3;
+const CONCURRENCY = 6;
 const NAV_DEBOUNCE_MS = 700;     // wait for the new page to render
 
 /**
@@ -190,14 +194,23 @@ export default function LanguageBar() {
 
     setVoiceBusy(true);
     setVoiceError(null);
+    // V1.1.8 — Auth header (was missing → some installs 401'd silently)
+    let voiceToken = null;
+    try { voiceToken = localStorage.getItem('zen_token'); } catch {}
+    const voiceHeaders = voiceToken && voiceToken !== 'guest_token'
+      ? { Authorization: `Bearer ${voiceToken}` }
+      : {};
     axios.post(
       `${API}/translator/translate`,
-      // V1.1.2 — Backend expects `target_lang`, not `target`. Previous
-      // payload silently rejected with HTTP 422 on any non-English.
+      // V1.1.2 — Backend expects `target_lang`, not `target`.
       { text: transcript, target_lang: language, sacred },
-      { timeout: TRANSLATE_TIMEOUT_MS },
+      { timeout: TRANSLATE_TIMEOUT_MS, headers: voiceHeaders },
     ).then(({ data }) => {
-      const translated = data?.translated || data?.text || transcript;
+      // V1.1.8 — Backend returns `{translation: ...}` not `translated`.
+      // The wrong key was making the voice button silently echo the
+      // English transcript back through Sage instead of speaking the
+      // actual translation. Symptom: "voice button doesn't do anything".
+      const translated = data?.translation || data?.translated || data?.text || transcript;
       setVoiceTranslated(translated);
       SageVoice.speak(translated).catch(() => {});
     }).catch((err) => {

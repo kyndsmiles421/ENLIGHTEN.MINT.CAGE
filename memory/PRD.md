@@ -136,6 +136,36 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Routes:** `/vault`, `/tesseract`
 - **Verified live:** `[data-testid="tesseract-canvas"]` mounts, all 8 relics render and respond to clicks.
 
+### V1.1.8 — Voice Translator Bug + Page-Walker Capacity (2026-05-07) ✅
+**Mandate:** "Voice button doesn't actually do anything. Translator slow + only does half the info."
+
+**Three concrete bugs fixed:**
+
+1. **Voice translator silently echoed English instead of speaking translation** (`LanguageBar.jsx::useEffect[voice.lastCommand]`):
+   - Backend returns `{translation: "..."}` but frontend was reading `data?.translated || data?.text` — both wrong keys → fell through to `transcript` (the English original) → Sage spoke back the English the user just said.
+   - **Symptom:** "voice button doesn't do anything" — because nothing perceptibly changed.
+   - **Fix:** read `data?.translation` first.
+
+2. **Voice translate path missing auth headers** (same useEffect):
+   - Some endpoints / installs require auth on `/translator/translate`. Voice path was sending no Authorization header at all → silent 401 → caught error → empty UI state.
+   - **Fix:** read `zen_token` from localStorage and send Bearer header (matches the page-walker's `translateOne` pattern).
+
+3. **Page-walker only did half the page** (`MAX_NODES = 80`, `CONCURRENCY = 3`):
+   - Forgotten Languages and SacredTexts pages have well over 80 paragraphs. The hard cap silently dropped the rest.
+   - **Symptom:** "only does half the information it used to do."
+   - **Fix:** `MAX_NODES = 200`, `CONCURRENCY = 6`. Halves wall-clock time without exceeding per-call 18s timeout.
+
+**Verified end-to-end via curl:**
+- `POST /translator/translate {target_lang:'zh'}` → `{translation: "欢迎来到主权样本", target_lang, sacred_mode, sacred_note, tier}` ✓
+- Confirmed `translated` and `text` keys do NOT exist in response (which is why the old code silently failed)
+- Frontend lint clean, /forgotten-languages serves HTTP 200
+
+**About the production "Dimensional Rift" / token error:**
+- The CosmicErrorBoundary already exists and **already has a "Show details" button** that surfaces the actual error message + stack + component-stack to copy-paste.
+- All `${token}` references in source were verified to be properly destructured from `useAuth()` or scoped via `localStorage.getItem('zen_token')` in callbacks. The "ReferenceError" on production must come from a code path triggered by user interaction; without prod source-maps or a stack trace from the user clicking "Show details" we can only guess at the file.
+- **Action on user:** next time the rift appears in prod, tap the yellow "Show details" pill and screenshot the technical stack. That gives us the exact file + line.
+- **No code changed for this** — already-shipped boundary handles it gracefully; reflexively patching scope-leak phantoms without evidence would just add cruft.
+
 ### V1.1.7 — Universal Ripple + Sovereign Sample Refuel + LanguageBar truth (2026-05-07) ✅
 **Mandate:** "Universal Ripple. $7 Refuel. Finish LanguageBar. Sentient expansion."
 
