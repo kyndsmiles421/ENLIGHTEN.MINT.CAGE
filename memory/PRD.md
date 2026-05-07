@@ -136,6 +136,35 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Routes:** `/vault`, `/tesseract`
 - **Verified live:** `[data-testid="tesseract-canvas"]` mounts, all 8 relics render and respond to clicks.
 
+### V1.1.3 — Sovereign Ladder: Four-Tier Buy-Up Economy (2026-05-07) ✅
+**Mandate:** "Look what's there and integrate, enhance, utilize. Four-tier ladder: Artisan $19, Architect $49, Sovereign Monthly $89, Sovereign Founder $1,777. Buy-up the ladder mechanism."
+
+**Existing infrastructure used (zero rebuilds):**
+- 5-tier `SUBSCRIPTION_TIERS` registry already in place with discount/forge/commission flags
+- Generic `/api/economy/subscribe` Stripe checkout endpoint (works for any tier_id)
+- `Pricing.js` fully data-driven from `/api/economy/tiers` (no hardcoded prices)
+- `marketplace_discount` / `apply-discount` / `discount-rate` endpoints already enforce the discount ladder
+
+**Surgical changes (3 lines + 1 endpoint):**
+1. **Resonance → Artisan rebrand at $19** (`backend/routes/economy.py`):
+   - `name: "Resonance"` → `"Artisan"` (was sub-label, now primary)
+   - `label: "Artisan"` → `"Creator · Tier 1"`
+   - `price_monthly: 27.00` → `19.00`
+   - Added `price_web: 19.00`, `price_play_store: 24.70` (+30% Google fee), `term_months: 1`
+2. **NEW `GET /api/economy/buy-up-quote?target_tier=...`** — Sovereign Ladder differential pricing:
+   - Monthly → higher monthly: differential = `target.price_monthly - current.price_monthly` with friendly message ("Climb to Architect for $30.00/mo more (15% discount unlocked)")
+   - Any monthly → Sovereign Founder: `$1,777 - min(current_monthly × 3, $75)` goodwill credit toward the lock-in (encourages climbing). Founders cannot downgrade (400).
+   - Same-tier or downgrade: 400 with "use /downgrade".
+3. **Pricing.js zero changes** — picks up new $19 from `/api/economy/tiers` automatically.
+
+**Verified end-to-end:**
+- `/api/economy/tiers` → all 5 tiers, prices ✓ (0/19/49/89/1777, discounts 0/5/15/30/60%)
+- `/api/economy/buy-up-quote?target_tier=architect` (from discovery) → `$49.00 differential, 15% unlocked`
+- `/api/economy/buy-up-quote?target_tier=sovereign_founder` → returns `founder_lock_in` kind with credit calc
+- `/api/economy/buy-up-quote?target_tier=discovery` → 400 (downgrade rejected)
+- `/api/economy/subscribe` `{tier_id:"resonance"}` → Stripe checkout for **$19.00** ✓
+- Live Pricing page screenshot: 5 tier cards render correctly. Founder card top, Discovery/Artisan/Architect/Sovereign Monthly in 4-up grid. "MOST POPULAR · 30% OFF" banner over Sovereign Monthly preserved.
+
 ### V1.1.2 — Voice Translator Hotfix (2026-05-06) ✅
 **Mandate:** "Voice translator does not work on production. Stuck at WORKING…."
 

@@ -38,15 +38,18 @@ SUBSCRIPTION_TIERS = {
     },
     "resonance": {
         "id": "resonance",
-        "name": "Resonance",
-        "label": "Artisan",
-        "price_monthly": 27.00,
+        "name": "Artisan",
+        "label": "Creator · Tier 1",
+        "price_monthly": 19.00,
+        "price_web": 19.00,
+        "price_play_store": 24.70,  # +30% Google Play platform fee
+        "term_months": 1,
         "education_level": "Creator",
         "education_desc": "UI/UX Design, Geometry of Sound, Modular Basics",
         "monetization": "Trusted Trader — P2P Beacon notifications for local bartering",
         "features": [
-            "Creator-level education",
-            "5% member discount on all purchases",
+            "Creator-level education & topic journeys",
+            "5% discount on all Dust upgrades",
             "P2P Beacon notifications",
             "Modular UI customization unlocked",
         ],
@@ -748,4 +751,80 @@ async def apply_discount(body: dict, user=Depends(get_current_user)):
         "discount_amount": round(base_price - discounted_price, 2),
         "final_price": discounted_price,
         "tier": tier_id,
+    }
+
+
+
+@router.get("/buy-up-quote")
+async def buy_up_quote(target_tier: str, user=Depends(get_current_user)):
+    """V1.1.3 — "Buy Up the Ladder" quote.
+
+    Returns the pricing differential for elevating from the user's
+    current tier to a higher target tier. Implements the Sovereign
+    Ladder logic: pay only the difference, not the full target price.
+
+    Rules:
+      • Discovery (free) → any paid tier: pay full target price.
+      • Same tier or downgrade: 400 (use /downgrade).
+      • Paid → paid (monthly): differential = target.price_monthly - current.price_monthly
+        (since the current month's payment is sunk, surcharge is the gap).
+      • Any monthly → Sovereign Founder: differential = $1,777 - (3 months × current.price_monthly)
+        (we credit the user up to a quarter of their current monthly run-rate
+        as goodwill toward the lock-in — encourages climbing).
+      • Founder → anything: 400 (founders cannot downgrade their lock).
+    """
+    if target_tier not in SUBSCRIPTION_TIERS:
+        raise HTTPException(400, f"Unknown target_tier '{target_tier}'")
+
+    sub = await db.subscriptions.find_one({"user_id": user["id"]}, {"_id": 0})
+    current_id = sub.get("tier", "discovery") if sub else "discovery"
+    current = SUBSCRIPTION_TIERS.get(current_id, SUBSCRIPTION_TIERS["discovery"])
+    target = SUBSCRIPTION_TIERS[target_tier]
+
+    cur_rank = SOVEREIGN_TIER_ORDER.index(current_id) if current_id in SOVEREIGN_TIER_ORDER else 0
+    tgt_rank = SOVEREIGN_TIER_ORDER.index(target_tier) if target_tier in SOVEREIGN_TIER_ORDER else 0
+
+    if current.get("is_founder"):
+        raise HTTPException(400, "Sovereign Founder cannot change tiers")
+    if tgt_rank <= cur_rank:
+        raise HTTPException(400, "target_tier must be higher than your current tier")
+
+    cur_monthly = float(current.get("price_monthly", 0) or 0)
+    tgt_is_founder = bool(target.get("is_founder"))
+
+    if tgt_is_founder:
+        # Founder lock-in: $1,777 less up to 3 months credit toward the seat.
+        founder_price = float(target.get("price_total", 1777.0))
+        credit = round(min(cur_monthly * 3, 75.0), 2)  # cap credit at $75
+        differential = round(founder_price - credit, 2)
+        return {
+            "current_tier": current_id,
+            "target_tier": target_tier,
+            "current_monthly": cur_monthly,
+            "target_price": founder_price,
+            "credit_applied": credit,
+            "differential": differential,
+            "savings_vs_full": credit,
+            "term_months": int(target.get("term_months", 24)),
+            "kind": "founder_lock_in",
+            "message": (
+                f"Climb to Sovereign Founder for ${differential:.2f} "
+                f"(${credit:.2f} credited from your current monthly run-rate)."
+            ),
+        }
+
+    # Monthly → higher monthly. Differential is the gap between monthlies.
+    tgt_monthly = float(target.get("price_monthly", 0) or 0)
+    differential = round(max(tgt_monthly - cur_monthly, 0), 2)
+    return {
+        "current_tier": current_id,
+        "target_tier": target_tier,
+        "current_monthly": cur_monthly,
+        "target_price": tgt_monthly,
+        "differential": differential,
+        "kind": "monthly_step_up",
+        "message": (
+            f"Climb to {target['name']} for ${differential:.2f}/mo more "
+            f"({target['marketplace_discount']}% discount unlocked)."
+        ),
     }
