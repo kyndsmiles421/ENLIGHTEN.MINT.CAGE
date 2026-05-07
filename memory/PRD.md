@@ -13,6 +13,17 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Cybernetic Loop** — Generators → `ContextBus` → `ResonanceAnalyzer` → `CrystallineLattice3D` + `SageEngineGauge`
 - **Closed-loop Economy** — Credits (server-issued) → Dust/Gems/Components via AI Merchant; Stripe is the only real-money gateway
 
+### V1.1.11 — Evolution Lab Refraction Engine + Quiet Rift (2026-02-07) ✅
+**Mandate:** "Evolution Lab must render 3D, not a 2D spreadsheet. Hide the yellow Check-Engine sticker on the speedometer."
+- **EvolutionGemStage3D** wired into `/app/frontend/src/pages/EvolutionLab.js` — one R3F `<Canvas>` mounted above the season banner, fed by the currently-selected specimen. Procedural platonic solids (icosahedron / octahedron / dodecahedron) selected from `crystal_system`; PHI-weighted idle bob + spin from `SovereignMath` (`PHI`, `PHI_INV`); stage rank drives emissive intensity, scale, spin rate.
+- **Tap-to-select** specimen cards swap the gem in the 3D stage (no overlay, inline). Active card gets a colored ring + glow.
+- **Stage-aware action button** — raw → Polish, refined → Refine, transcendental → Awaken (all three call `/api/evolution/interact` and bump a shared `pulseKey` so the gem visibly pulses scale + emissive on every interaction).
+- **Toast spam removed** for evolve interactions. Replaced by an inline `data-testid='evo-reaction-line'` text strip beneath the 3D stage (Flatland-clean).
+- **CosmicErrorBoundary** stripped of yellow chrome — no more "Show details / Try Again / Return Home" cluster. Now a single animated glyph line `· a rift in the lattice ·` + `tap to refold` hint. Errors still log to console for debug.
+- **Confirmed already-present** (not new): `BlackHillsBathymetry.js` USGS topographic component is wired in `App.js` + `DemoReel.js`; `geospatial_nexus.py` + `refraction_engine.py` exist on the backend.
+- Frontend testing agent: 10/10 PASS (canvas mount, WebGL context, auto-select, card swap, pulse-on-interact, no-toast, reaction line, no error-boundary-details-toggle, /forgotten-languages smoke).
+
+
 ## ✅ Completed (Chronological)
 
 ### V1.0.14 — Play Store Gold Master Compliance + True 3D Geology (2026-02-04 → 2026-05-06) ✅
