@@ -285,3 +285,8 @@ export default function BlackHillsBathymetry({ onClose }) {
     </div>
   );
 }
+
+// V1.1.12 — Re-export the in-canvas basin mesh so the Tesseract
+// Vault can mount the same procedural Pactola topography as a floor
+// below its 4D hypercube. One source of truth for the Black Hills.
+export { BasinMesh };
