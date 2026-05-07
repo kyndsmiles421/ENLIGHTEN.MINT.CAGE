@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLatency } from '../hooks/useLatencyPulse';
 import useGameController from '../hooks/useGameController';
 import GameModuleWrapper from '../components/game/GameModuleWrapper';
+import { dispatchUnlock } from '../utils/UnlockBus';
 import {
   ArrowLeft, Gem, Sparkles, Shield, Flame, Droplets, Mountain,
   Sprout, Star, Clock, Zap, TrendingUp, Eye, Activity,
@@ -323,6 +324,19 @@ export default function EvolutionLab() {
       } else {
         toast.success(`+${res.data.rewards.xp} XP · "${res.data.mantra}"`);
       }
+      // V1.1.10 — Every successful interaction (Polish, Refine, Awaken,
+      // etc.) now fires the system-wide UnlockBus event. Any HelixNav3D
+      // mounted in the OS picks it up and ripples its 81-node lattice.
+      // Real 3D acknowledgment from a 2D button — same plumbing as
+      // V1.1.6 relic claims & V1.1.7 tier upgrades.
+      try {
+        const stageColor = res.data?.stage?.color || res.data?.color || '#2DD4BF';
+        dispatchUnlock({
+          kind: 'evolution',
+          id: `${assetId}:${type}`,
+          color: stageColor,
+        });
+      } catch {}
       fetchData();
       controller.refreshState();
     } catch (err) {

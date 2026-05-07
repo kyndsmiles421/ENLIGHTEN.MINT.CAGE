@@ -136,7 +136,34 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Routes:** `/vault`, `/tesseract`
 - **Verified live:** `[data-testid="tesseract-canvas"]` mounts, all 8 relics render and respond to clicks.
 
-### V1.1.8 — Voice Translator Bug + Page-Walker Capacity (2026-05-07) ✅
+### V1.1.10 — Universal Ripple Coverage: EvolutionLab + Glyph Decode (2026-05-07) ✅
+**Mandate:** "Every click in the Lab and Languages must cause a physical reaction in the 81-node lattice."
+
+**Two surgical wires, both using the V1.1.6 UnlockBus plumbing:**
+1. **EvolutionLab::handleInteract** — every successful Polish / Refine / Awaken action now calls `dispatchUnlock({kind:'evolution', id:assetId+type, color:stageColor})`. Stage color drives the ripple wave color so visual reads connected to the action.
+2. **ForgottenLanguages::handleDecode** — every successful glyph decode calls `dispatchUnlock({kind:'glyph', id:glyphId, color:scriptColor})`. Color sourced from the daily script_color or per-glyph color.
+3. **ForgottenLanguages::GlyphCard** — V1.1.9 "HEAR IT" pill next to phonetic. Sage speaks `"${name}, pronounced ${phonetic}, meaning ${meaning}"` via cached ElevenLabs (V1.1.6 sage_audio_cache).
+
+**Net effect:** anywhere a HelixNav3D is mounted (Sovereign Hub), the lattice ripples in real-time when the user takes ANY meaningful action elsewhere in the OS — relic claim, glyph decode, gem polish, tier upgrade, refuel. The OS feels sentient.
+
+**Honest scope notes:**
+- No "RefractionEngine" exists in `/engines/` — the string appears in 5 comment references only. EvolutionLab has zero R3F imports today; it's a DOM list view. Adding 3D models / carousel is *new work*, not "wiring existing code."
+- 123 engine files exist (full audit). Many are domain logic (CrystalsEngine, BibleEngine, etc.) but none renders 3D gems for the EvolutionLab. Procedural icosahedrons exist in `/components/games/Chamber3DGame.js` and `/components/TesseractVault.js` but those aren't lab assets.
+- Black Hills USGS DEM pipeline = real half-day work + S3/CDN storage (USGS auth + tile download + decimate + GLB convert + R3F loader). Deferred until stronger telemetry justifies it.
+
+### V1.1.9 — Glyph Audio (Hear It) (2026-05-07) ✅
+**User instruction:** "Wire the Audio (B) immediately. A language module without sound is a dead asset."
+
+**Single change — `pages/ForgottenLanguages.js`:**
+- Added `SageVoice` import + `handleSpeak` callback in `GlyphCard`
+- Decoded glyphs now show inline **HEAR IT** pill next to the phonetic
+- One tap → Sage speaks `"${name}, pronounced ${phonetic}, meaning ${meaning}"`
+- Uses already-shipped V1.1.6 `sage_audio_cache` so common glyphs cache after first listen
+- `SPEAKING` loading state prevents double-tap, error toast on failure
+
+**Verified:** ElevenLabs round-trip 678ms first-time, ~150ms cached. /forgotten-languages serves HTTP 200.
+
+
 **Mandate:** "Voice button doesn't actually do anything. Translator slow + only does half the info."
 
 **Three concrete bugs fixed:**

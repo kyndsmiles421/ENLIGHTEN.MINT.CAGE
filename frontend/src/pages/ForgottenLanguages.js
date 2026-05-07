@@ -11,6 +11,8 @@ import {
   ArrowLeft, Lock, Unlock, BookOpen, Wind, Eye, Star,
   Sparkles, ChevronRight, Award, Zap, Volume2
 } from 'lucide-react';
+import * as SageVoice from '../services/SageVoiceController';
+import { dispatchUnlock } from '../utils/UnlockBus';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const EL_COLORS = { wood: '#22C55E', fire: '#EF4444', earth: '#F59E0B', metal: '#94A3B8', water: '#3B82F6' };
@@ -184,6 +186,23 @@ function BreathCycle({ pattern, color, active, onComplete }) {
 function GlyphCard({ glyph, scriptColor, onDecode, decoding }) {
   const [breathing, setBreathing] = useState(false);
   const [revealed, setRevealed] = useState(glyph.decoded);
+  // V1.1.9 — Speak the phonetic via Sage. Uses already-warmed
+  // ElevenLabs cache (V1.1.6 sage_audio_cache) so common phonetics
+  // arrive instantly. Shape "name (phonetic) — meaning" so the
+  // synthesis sounds like a teacher pronouncing the term.
+  const [speaking, setSpeaking] = useState(false);
+  const handleSpeak = async () => {
+    if (speaking) return;
+    setSpeaking(true);
+    try {
+      const text = `${glyph.name}, pronounced ${glyph.phonetic}, meaning ${glyph.meaning}`;
+      await SageVoice.speak(text);
+    } catch {
+      toast.error('Voice unavailable');
+    } finally {
+      setSpeaking(false);
+    }
+  };
 
   const handleStartDecode = () => {
     if (revealed) return;
@@ -245,10 +264,34 @@ function GlyphCard({ glyph, scriptColor, onDecode, decoding }) {
               </span>
             </div>
 
-            {/* Phonetic */}
-            <p className="text-[8px] font-mono mb-1" style={{ color: revealed ? scriptColor : 'var(--text-muted)' }}>
-              /{glyph.phonetic}/
-            </p>
+            {/* Phonetic — V1.1.9 click to hear Sage pronounce it */}
+            <div className="flex items-center gap-2 mb-1">
+              <p className="text-[8px] font-mono" style={{ color: revealed ? scriptColor : 'var(--text-muted)' }}>
+                /{glyph.phonetic}/
+              </p>
+              {revealed && (
+                <button
+                  type="button"
+                  onClick={handleSpeak}
+                  disabled={speaking}
+                  data-testid={`speak-glyph-${glyph.id}`}
+                  title="Hear Sage pronounce this glyph"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full transition-opacity"
+                  style={{
+                    background: `${scriptColor}10`,
+                    border: `1px solid ${scriptColor}30`,
+                    color: scriptColor,
+                    fontSize: 8,
+                    letterSpacing: '0.1em',
+                    cursor: speaking ? 'wait' : 'pointer',
+                    opacity: speaking ? 0.6 : 1,
+                  }}
+                >
+                  <Volume2 size={9} />
+                  {speaking ? 'SPEAKING' : 'HEAR IT'}
+                </button>
+              )}
+            </div>
 
             {/* Meaning (only when decoded) */}
             <AnimatePresence>
@@ -396,6 +439,14 @@ export default function ForgottenLanguages() {
       const { rewards, progress, streak } = res.data;
       const streakText = streak?.current > 0 ? ` (${streak.multiplier}x streak!)` : '';
       toast(`Decoded! +${rewards.xp} XP${rewards.bonus_xp > 0 ? ` (+${rewards.bonus_xp} bonus)` : ''}, ${rewards.modifier}${streakText}`);
+      // V1.1.10 — Decoded glyph ripples the 81-node Helix (UnlockBus).
+      // Color matches the glyph's script color from the daily payload
+      // so the wave reads visually connected to the unlock.
+      try {
+        const glyphColor = (daily?.glyphs || []).find((g) => g.id === glyphId)?.color
+          || daily?.script_color || '#FBBF24';
+        dispatchUnlock({ kind: 'glyph', id: glyphId, color: glyphColor });
+      } catch {}
       controller.refreshState();
 
       // Update local state
