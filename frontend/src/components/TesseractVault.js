@@ -21,6 +21,7 @@ import { ChevronUp, Gem, Package, Info, Lock, Plus, X as XIcon } from 'lucide-re
 import { toast } from 'sonner';
 import { PHI } from '../utils/SovereignMath';
 import { useAITexture } from '../hooks/useAITexture';
+import ClimbLadderPill from './ClimbLadderPill';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -411,6 +412,17 @@ export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
                 <span style={{ fontSize: 9, color: 'rgba(248,250,252,0.5)', letterSpacing: 1 }}>
                   {isClaimed ? '✦ in your vault' : `${vaultState.slots_available || 0} slots free · earn sparks for more`}
                 </span>
+                {/* V1.1.4 — All-Time Upsell. When the relic is tier-locked,
+                    surface the buy-up pill inline so the user has a one-tap
+                    path to unlock instead of a dead-end disabled button. */}
+                {!isClaimed && !eligible && cataItem && (
+                  <ClimbLadderPill
+                    requiredTier={cataItem.tier}
+                    context={`vault-${selected.id}`}
+                    featureLabel={selected.label}
+                    variant="compact"
+                  />
+                )}
               </div>
             );
           })()}

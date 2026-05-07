@@ -136,6 +136,37 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Routes:** `/vault`, `/tesseract`
 - **Verified live:** `[data-testid="tesseract-canvas"]` mounts, all 8 relics render and respond to clicks.
 
+### V1.1.4 — All-Time Upsell: ClimbLadderPill (2026-05-07) ✅
+**Mandate:** "Infuse the 'Climb the Ladder' Pill into every tier-gated boundary in the OS. One source of truth, context-aware, with $1,777 Founder anchor as Master Key."
+
+**Single shared component** — `frontend/src/components/ClimbLadderPill.jsx`:
+- Pulls live differential price from V1.1.3 `/api/economy/buy-up-quote` endpoint (auth required; no-ops for guests)
+- Pulls separate Founder quote in parallel (so the "Master Key" $1,777 jump is always one tap away regardless of which target tier triggered the pill)
+- Launches Stripe checkout via `/api/economy/subscribe` on click
+- **Three variants** for different surfaces:
+  - `compact` — tiny pill (`$30/mo →`) for inline contexts like locked relic detail, locked synthesis citations
+  - `inline` — standard pill with action button + Founder Master-Key fallback
+  - `card` — full footer block with personalized message + 60% discount messaging (for synthesis result panels, modifier panels)
+- **Auto-hides** when differential ≤ 0 (user already at-or-above tier) — no false upsells
+- Renders `CHECKING…` loader during fetch, gracefully no-ops on guest / network failure
+- Flatland-clean: pure inline DOM, no overlays
+
+**First wire — Tesseract Vault:**
+- Locked Hawaiian relic detail panel (when `tier_eligible=false`) now renders `<ClimbLadderPill variant="compact">` next to the existing disabled CLAIM button
+- User on Discovery clicking lilikoi-fudge (Sovereign+) sees: `🔒 SOVEREIGN+ ONLY · $89/mo →` — one tap → Stripe checkout
+- The previously dead-end disabled state is now a one-tap revenue path
+
+**What's intentionally NOT done (per honest scope):**
+- "1,7,7 Layer 2 routing" — no real infrastructure to wire it into; would be invention
+- "Founder edits GLSL shaders" — no shader editor exists; would be days of new work
+- "Citations as walkable VR sub-nodes" — high cost, low utility relative to inline citation links
+- Full 81-node SmartyMe card grid — `SovereignHub` already renders pillars as a card grid that pulls in-place; rebuilding is a rewrite, not infusion
+
+**Future infusions (one-line additions):**
+- Drop `<ClimbLadderPill requiredTier="architect" variant="card" />` into any future synthesis result panel
+- Add to locked Hub pillar tiles once `min_tier` metadata gets added to the PILLARS array
+- Add to any 3D node modifier when those tools land
+
 ### V1.1.3 — Sovereign Ladder: Four-Tier Buy-Up Economy (2026-05-07) ✅
 **Mandate:** "Look what's there and integrate, enhance, utilize. Four-tier ladder: Artisan $19, Architect $49, Sovereign Monthly $89, Sovereign Founder $1,777. Buy-up the ladder mechanism."
 
