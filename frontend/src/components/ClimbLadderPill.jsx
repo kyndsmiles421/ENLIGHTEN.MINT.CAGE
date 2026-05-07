@@ -84,6 +84,19 @@ export default function ClimbLadderPill({
     }
     setPurchasing(tierId);
     try {
+      // V1.1.5 — Stash a "pending unlock" marker so the post-Stripe
+      // /pricing success handler can route the user back to the
+      // originating surface (vault, hub, modifier panel) and trigger
+      // the 3D unfold on the just-claimed thing. Cleaner than
+      // threading a return_to URL through Stripe redirects.
+      if (context && context.startsWith('vault-')) {
+        const relicId = context.slice('vault-'.length);
+        try {
+          localStorage.setItem('sov_pending_unlock', JSON.stringify({
+            kind: 'vault', relic_id: relicId, ts: Date.now(),
+          }));
+        } catch {}
+      }
       const r = await fetch(`${API}/economy/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -108,7 +121,7 @@ export default function ClimbLadderPill({
     } finally {
       setPurchasing(null);
     }
-  }, []);
+  }, [context]);
 
   // Guest or already at-or-above tier — render nothing
   if (loading) {

@@ -136,6 +136,33 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Routes:** `/vault`, `/tesseract`
 - **Verified live:** `[data-testid="tesseract-canvas"]` mounts, all 8 relics render and respond to clicks.
 
+### V1.1.5 — 3D Unfolding: The Magic-Moment Funnel Close (2026-05-07) ✅
+**Mandate:** "Build the 3D Unfolding now. The hole in the bucket is where Sovereignty dies — page-refresh-after-Stripe is crap. Make the relic physically unfold the moment payment clears."
+
+**The funnel close:**
+- New `unlockedId` state in `TesseractVault` + `triggerUnlock(relicId)` callback.
+- New `justUnlocked` prop on the `Relic` mesh. When set, a 2.5s curve runs inside `useFrame`:
+  - **Scale**: `1 → peak 1.9 → settle to 1` (or 1.5 if also selected) via `Math.sin(K·π)` mid-curve boost
+  - **Emissive intensity**: `0.7 → peak 3.5 → settle` — the icosahedron literally lights up
+  - **Bonus spin**: `+3 full rotations` mid-curve via `K·π·6` rotation kick
+  - **Easing**: `ease-out cubic` (1−(1−t)³) so the most impact lands in the first 1s
+- Material `ref` (`matRef`) so emissive intensity drives directly on the GPU side without React re-renders.
+- `unlockTimeoutRef` cleans up after 2.6s; cleanup on unmount.
+
+**Two trigger paths, same 3D animation:**
+1. **Same-session claim** — when `claimRelic` returns 200, calls `triggerUnlock(relicId)` after `fetchVault()`. User clicks CLAIM → 200ms backend round-trip → relic explodes into life.
+2. **Stripe success cross-page** — new `sov_pending_unlock` localStorage marker:
+   - `ClimbLadderPill` (V1.1.4) stashes `{kind:'vault', relic_id, ts}` BEFORE redirecting to Stripe (only if `context` starts with `vault-`)
+   - `Pricing.js::pollStatus` reads + clears the marker on `payment_status === 'paid'`, then `navigate('/vault?just_claimed=ID', {replace:true})`
+   - `TesseractVault::useEffect[searchParams]` consumes `?just_claimed=`, calls `triggerUnlock`, strips the param so refresh doesn't re-fire
+   - 30-min staleness guard — old markers ignored
+   - User pays → returns to vault → relic auto-selects and explodes into life. Zero hunting.
+
+**Sage Voice acknowledgment:**
+- `triggerUnlock` calls `SageVoice.speak(`Claimed: ${label}`)` (best-effort, never blocks animation)
+- Wired into existing ElevenLabs `/api/voice/sage-narrate` pipeline
+- If first-time generation is slow (~3s), the 3D unfold still runs at 2.5s — voice arrives a beat after, which actually feels intentional (acknowledgment-after-unlock)
+
 ### V1.1.4 — All-Time Upsell: ClimbLadderPill (2026-05-07) ✅
 **Mandate:** "Infuse the 'Climb the Ladder' Pill into every tier-gated boundary in the OS. One source of truth, context-aware, with $1,777 Founder anchor as Master Key."
 

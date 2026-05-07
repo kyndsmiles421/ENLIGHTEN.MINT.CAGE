@@ -202,6 +202,25 @@ export default function Pricing() {
         setPolling(false);
         toast.success(`Activated ${res.data.tier || 'subscription'}!`);
         fetchData();
+        // V1.1.5 — Sovereign Bridge: if a ClimbLadderPill stashed a
+        // pending unlock target before redirecting to Stripe, route
+        // the user back there now so the 3D unfold animation fires
+        // on the originating surface (vault relic, hub pillar, etc.).
+        try {
+          const pendingRaw = localStorage.getItem('sov_pending_unlock');
+          if (pendingRaw) {
+            const pending = JSON.parse(pendingRaw);
+            localStorage.removeItem('sov_pending_unlock');
+            // Stale markers (>30 min) are ignored — likely a stranded
+            // session, do not surprise the user with a random unfold.
+            if (pending && Date.now() - (pending.ts || 0) < 30 * 60 * 1000) {
+              if (pending.kind === 'vault' && pending.relic_id) {
+                navigate(`/vault?just_claimed=${encodeURIComponent(pending.relic_id)}`, { replace: true });
+                return;
+              }
+            }
+          }
+        } catch {}
         window.history.replaceState({}, '', '/pricing');
         return;
       }
@@ -215,7 +234,7 @@ export default function Pricing() {
     } catch {
       setTimeout(() => pollStatus(sessionId, type, attempts + 1), 2500);
     }
-  }, [authHeaders, fetchData]);
+  }, [authHeaders, fetchData, navigate]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 

@@ -16,11 +16,13 @@
 import React, { Suspense, useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Float, Html, Environment } from '@react-three/drei';
+import { useSearchParams } from 'react-router-dom';
 import * as THREE from 'three';
 import { ChevronUp, Gem, Package, Info, Lock, Plus, X as XIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { PHI } from '../utils/SovereignMath';
 import { useAITexture } from '../hooks/useAITexture';
+import * as SageVoice from '../services/SageVoiceController';
 import ClimbLadderPill from './ClimbLadderPill';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -101,20 +103,55 @@ function TesseractWireframe({ size = 1.4, innerScale = 0.55, color = '#FCD34D' }
 }
 
 // A single relic — floating mesh inside the tesseract
-function Relic({ relic, position, isSelected, onSelect }) {
+function Relic({ relic, position, isSelected, onSelect, justUnlocked }) {
   const ref = useRef();
+  const matRef = useRef();
   // V1.1.0 — Each relic gets a bespoke AI-generated texture (Hawaiian Imports).
   // Cached on backend so subsequent visitors see it instantly.
   const { texture: aiTex } = useAITexture({ category: 'relic', refId: relic.id });
+  // V1.1.5 — Unfolding animation. When `justUnlocked` is set, capture the
+  // wall-clock start so we can drive a 2.5s scale + emissive + spin curve
+  // that runs independently of selection state. The "magic moment" the
+  // user sees the instant a claim succeeds (or Stripe success returns).
+  const unlockStartRef = useRef(null);
+  useEffect(() => {
+    if (justUnlocked) unlockStartRef.current = performance.now();
+  }, [justUnlocked]);
   useFrame((state) => {
     if (!ref.current) return;
     const t = state.clock.elapsedTime;
     // Gentle bob using PHI-derived frequency
     ref.current.position.y = position[1] + Math.sin(t * PHI + position[0]) * 0.04;
     ref.current.rotation.y = t * 0.2 + position[0];
-    // Selected = pulse
-    const target = isSelected ? 1.5 : 1;
-    ref.current.scale.lerp(new THREE.Vector3(target, target, target), 0.15);
+
+    // Unfolding curve: 0..1 over ~2.5s. Easing: out-cubic for scale,
+    // sin-pulse for emissive intensity, extra spin for kinetic energy.
+    let unlockK = 0;
+    if (unlockStartRef.current) {
+      const elapsed = (performance.now() - unlockStartRef.current) / 2500;
+      if (elapsed >= 1) {
+        unlockStartRef.current = null;
+      } else {
+        unlockK = 1 - Math.pow(1 - elapsed, 3); // ease-out cubic
+        // Bonus spin only during unlock — adds ~3 full rotations
+        ref.current.rotation.y += unlockK * Math.PI * 6 * 0.016;
+      }
+    }
+
+    // Scale: 1 → peak 1.9 mid-curve → settle to 1 (or 1.5 if also selected)
+    const baseTarget = isSelected ? 1.5 : 1;
+    const unlockBoost = unlockStartRef.current
+      ? Math.sin(unlockK * Math.PI) * 0.9   // peaks at 1.9 around K=0.5
+      : 0;
+    const target = baseTarget + unlockBoost;
+    ref.current.scale.lerp(new THREE.Vector3(target, target, target), 0.18);
+
+    // Emissive flash: peak 3.5 mid-curve, settles to selected/idle
+    if (matRef.current) {
+      const baseEmit = isSelected ? 1.4 : 0.7;
+      const unlockEmit = unlockStartRef.current ? Math.sin(unlockK * Math.PI) * 2.5 : 0;
+      matRef.current.emissiveIntensity = baseEmit + unlockEmit;
+    }
   });
   return (
     <group ref={ref} position={position}>
@@ -125,6 +162,7 @@ function Relic({ relic, position, isSelected, onSelect }) {
       >
         <icosahedronGeometry args={[0.10, 0]} />
         <meshStandardMaterial
+          ref={matRef}
           color={aiTex ? '#ffffff' : relic.color}
           map={aiTex || null}
           emissive={relic.color}
@@ -157,11 +195,48 @@ function Relic({ relic, position, isSelected, onSelect }) {
 
 export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
   const [selected, setSelected] = useState(null);
-  // V1.1.1 — Hawaiian Imports storage rights (Sparks → slots).
+  // V1.1.0 — Hawaiian Imports storage rights (Sparks → slots).
   // Vault state hydrates from /api/tesseract-vault/state when authed;
   // guests still see the catalogue rendered inline (no claim affordance).
   const [vaultState, setVaultState] = useState(null);
   const [loadingClaim, setLoadingClaim] = useState(null);
+  // V1.1.5 — Unfolding animation. When a claim succeeds (or Stripe
+  // success returns with ?just_claimed=...), set this to the relic id
+  // for ~2.6s. The Relic mesh consumes it via the justUnlocked prop
+  // and runs the scale + emissive + spin curve.
+  const [unlockedId, setUnlockedId] = useState(null);
+  const unlockTimeoutRef = useRef(null);
+  const triggerUnlock = useCallback((relicId) => {
+    if (!relicId) return;
+    if (unlockTimeoutRef.current) clearTimeout(unlockTimeoutRef.current);
+    setUnlockedId(relicId);
+    // Auto-select the relic so the user sees the detail panel populated
+    const target = relics.find((r) => r.id === relicId);
+    if (target) setSelected(target);
+    // Fire a quick Sage voice line (best-effort, never blocks).
+    try {
+      const label = relicId.replace(/-/g, ' ');
+      SageVoice.speak(`Claimed: ${label}`).catch(() => {});
+    } catch {}
+    unlockTimeoutRef.current = setTimeout(() => setUnlockedId(null), 2600);
+  }, [relics]);
+  useEffect(() => () => {
+    if (unlockTimeoutRef.current) clearTimeout(unlockTimeoutRef.current);
+  }, []);
+
+  // V1.1.5 — Stripe success path. When the ClimbLadderPill (V1.1.4) sends
+  // a user through Stripe and they return to /vault?just_claimed=lilikoi,
+  // honour the unlock animation immediately. Also strip the query so a
+  // page refresh doesn't loop the unfold.
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    const justClaimed = searchParams.get('just_claimed');
+    if (!justClaimed) return;
+    triggerUnlock(justClaimed);
+    const next = new URLSearchParams(searchParams);
+    next.delete('just_claimed');
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams, triggerUnlock]);
   const fetchVault = useCallback(async () => {
     const token = localStorage.getItem('zen_token');
     if (!token || token === 'guest_token') return;
@@ -195,6 +270,8 @@ export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
         const j = await r.json();
         toast.success(`✦ ${relicId.replace(/-/g, ' ')} claimed · ${j.slots_used}/${j.slots_total} slots`);
         await fetchVault();
+        // V1.1.5 — fire the 3D unfolding animation
+        triggerUnlock(relicId);
       } else {
         const j = await r.json().catch(() => ({}));
         const detail = typeof j.detail === 'object' ? j.detail.message : (j.detail || 'Claim failed');
@@ -311,6 +388,7 @@ export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
                 position={relicPositions[i]}
                 isSelected={selected && selected.id === r.id}
                 onSelect={(rel) => setSelected(selected && selected.id === rel.id ? null : rel)}
+                justUnlocked={unlockedId === r.id}
               />
             ))}
           </Float>
