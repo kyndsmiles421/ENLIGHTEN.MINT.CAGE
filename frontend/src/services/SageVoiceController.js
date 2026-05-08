@@ -142,6 +142,7 @@ export async function speak(text, opts = {}) {
         text: txt.slice(0, 800),
         voice_id: opts.voiceId,
         model_id: opts.modelId,
+        language: opts.language,  // V1.1.14 — LanguageBar → backend voice routing
         calm,
       }),
     });

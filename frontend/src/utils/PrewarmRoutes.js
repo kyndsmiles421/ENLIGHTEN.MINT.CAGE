@@ -35,6 +35,33 @@ const PREWARM_REGISTRY = {
 };
 
 const PREWARMED = new Set();
+const READY = new Set();
+const READY_LISTENERS = new Set();
+
+function notifyReady(route) {
+  READY.add(route);
+  for (const l of READY_LISTENERS) {
+    try { l(route); } catch { /* noop */ }
+  }
+}
+
+/**
+ * Subscribe to chunk-ready events. Called with the route string each
+ * time a prewarm fetch resolves. Returns a cleanup function.
+ */
+export function onPrewarmReady(handler) {
+  READY_LISTENERS.add(handler);
+  // Replay already-ready routes so late subscribers don't miss them.
+  for (const r of READY) {
+    try { handler(r); } catch { /* noop */ }
+  }
+  return () => READY_LISTENERS.delete(handler);
+}
+
+/** Synchronous check — has this route's chunk finished pre-warming? */
+export function isPrewarmed(route) {
+  return READY.has(route);
+}
 
 /**
  * Kick off the chunk import for a route. Idempotent — calling
@@ -48,15 +75,17 @@ export function prewarmRoute(route) {
   if (!thunk) return;
   PREWARMED.add(route);
   try {
-    thunk().catch(() => {
-      // If a chunk fails (lazy module deleted, network), drop the
-      // memo so a future hover can retry. No console noise — the
-      // actual click will surface a real error if the route is gone.
-      PREWARMED.delete(route);
-    });
+    thunk()
+      .then(() => notifyReady(route))
+      .catch(() => {
+        // If a chunk fails (lazy module deleted, network), drop the
+        // memo so a future hover can retry. No console noise — the
+        // actual click will surface a real error if the route is gone.
+        PREWARMED.delete(route);
+      });
   } catch {
     PREWARMED.delete(route);
   }
 }
 
-export default { prewarmRoute };
+export default { prewarmRoute, onPrewarmReady, isPrewarmed };

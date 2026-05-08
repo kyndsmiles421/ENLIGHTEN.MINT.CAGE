@@ -53,7 +53,8 @@ function ArchitectBadgeMount() {
 import { Telescope, Orbit, Sparkles as SparkleIcon, Globe, Eye, Infinity as InfinityIcon, Moon, Layers, TreePine, Compass } from 'lucide-react';
 import { useProcessorState, MODULE_REGISTRY } from '../state/ProcessorState';
 import SovereignPreferences from '../kernel/SovereignPreferences';
-import { prewarmRoute } from '../utils/PrewarmRoutes';
+import { prewarmRoute, onPrewarmReady } from '../utils/PrewarmRoutes';
+import SageVoiceCommand from '../components/SageVoiceCommand';
 
 // V68.55 — R3F lattice is heavy (three.js + drei). Lazy-load so the
 // 2D-skin user never downloads it. Mounts only when crystalFidelity
@@ -529,6 +530,21 @@ export default function SovereignHub() {
   const [lensOpen, setLensOpen] = useState(false);
   const [buyTimeOpen, setBuyTimeOpen] = useState(false);
   const [visitorOpen, setVisitorOpen] = useState(false);
+  // V1.1.14 — Architect's Confirmation. Each Hub pillar that has been
+  // hover-prewarmed (chunk fetched + parsed) gets a subtle 1px
+  // breathing ring so the user sees the OS is *anticipating* their
+  // next tap. Subscribes once, replays already-ready routes.
+  const [prewarmedRoutes, setPrewarmedRoutes] = useState(() => new Set());
+  useEffect(() => {
+    return onPrewarmReady((route) => {
+      setPrewarmedRoutes((prev) => {
+        if (prev.has(route)) return prev;
+        const next = new Set(prev);
+        next.add(route);
+        return next;
+      });
+    });
+  }, []);
 
   /**
    * dispatchPillar(route) — single dispatcher for every pillar item.
@@ -675,7 +691,12 @@ export default function SovereignHub() {
       <MatrixRenderSlot />
 
       {/* Utility Row: Sign In / Share / Sign Out */}
-      <div className="flex justify-center gap-3 px-4 pb-6">
+      <div className="flex justify-center items-center gap-3 px-4 pb-6 flex-wrap">
+        {/* V1.1.14 — Sage Voice command pill. Inline, Flatland-clean.
+            Tap → mic permission → say "open the vault" → prewarm +
+            ripple + navigate. Browsers without Web Speech API hide
+            the pill silently (Firefox, etc.). */}
+        <SageVoiceCommand size="compact" />
         {!user ? (
           <Link
             to="/auth"
@@ -893,7 +914,30 @@ export default function SovereignHub() {
                             data-wired={wired ? 'true' : 'false'}
                             data-locked={locked ? 'true' : 'false'}
                             data-required-tier={requiredTier || ''}
+                            data-prewarmed={prewarmedRoutes.has(item.route) ? 'true' : 'false'}
                           >
+                            {/* V1.1.14 — Architect's Confirmation breathing ring.
+                                Fades in once the prewarmRoute fetch resolves.
+                                1px hairline, slow opacity oscillation, color
+                                tinted by the pillar so it reads as "this seat
+                                is warmed up" without shouting. */}
+                            {!locked && wired && prewarmedRoutes.has(item.route) && (
+                              <motion.span
+                                aria-hidden
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: [0.18, 0.55, 0.18] }}
+                                transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+                                data-testid={`prewarm-ring-${item.label.toLowerCase().replace(/[\s&]/g, '-')}`}
+                                style={{
+                                  position: 'absolute',
+                                  inset: 0,
+                                  borderRadius: 12,
+                                  border: `1px solid ${pillar.color}`,
+                                  pointerEvents: 'none',
+                                  boxShadow: `0 0 6px ${pillar.color}33, inset 0 0 4px ${pillar.color}22`,
+                                }}
+                              />
+                            )}
                             {/* Mini crystal facet */}
                             <svg className="absolute top-1 right-1 opacity-70" width="14" height="14" viewBox="0 0 16 16" aria-hidden>
                               <polygon points="8,1 14,6 12,14 4,14 2,6" fill={pillar.color} opacity={locked ? 0.25 : (wired ? 0.95 : 0.5)} />

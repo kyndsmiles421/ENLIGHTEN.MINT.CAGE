@@ -51,6 +51,12 @@ class NarrateBody(BaseModel):
     voice_id: Optional[str] = None
     model_id: Optional[str] = None
     calm: Optional[bool] = False
+    # V1.1.14 — LanguageBar bridge. When the client passes a non-English
+    # language code (e.g. 'es', 'ja', 'haw'), we transparently swap the
+    # default flash-v2_5 model for `eleven_multilingual_v2` so the same
+    # voice can speak the user's chosen language. No new asset costs —
+    # just routing through the existing ElevenLabs multilingual surface.
+    language: Optional[str] = None
 
 
 # V1.0.12 — Fixed sample text for the voice-preview button. Short
@@ -127,6 +133,13 @@ async def sage_narrate(
 
     voice_id = (body.voice_id or DEFAULT_VOICE_ID).strip() or DEFAULT_VOICE_ID
     model_id = (body.model_id or DEFAULT_MODEL_ID).strip() or DEFAULT_MODEL_ID
+    # V1.1.14 — Auto-route non-English to the multilingual model. The
+    # default flash-v2_5 supports ENG natively but other languages
+    # require eleven_multilingual_v2. If the caller already specified
+    # an explicit model_id, respect it.
+    lang = (body.language or "en").strip().lower()
+    if lang and lang not in ("en", "en-us", "en-gb") and not body.model_id:
+        model_id = "eleven_multilingual_v2"
     calm = bool(body.calm)
 
     # V1.1.6 — Cache layer. Repeat phrases (unlock acknowledgments,

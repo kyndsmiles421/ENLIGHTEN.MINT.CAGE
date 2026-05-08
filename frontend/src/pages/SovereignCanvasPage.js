@@ -27,7 +27,7 @@ const SovereignCanvas = () => {
   useEffect(() => {
     document.body.style.background = "#000";
     document.body.style.overflow = "hidden";
-    document.title = "The Enlightenment Cafe | Sovereign Mode";
+    document.title = "Sovereign Mode | ENLIGHTEN.MINT.CAFE";
     
     // Purge legacy elements
     const legacy = document.querySelectorAll(

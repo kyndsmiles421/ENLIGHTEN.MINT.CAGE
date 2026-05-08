@@ -17,7 +17,11 @@
   }
 
   // 2. FORCE BRAND ALIGNMENT
-  document.title = "The Enlightenment Cafe";
+  // V1.1.14 — Sovereign Identity Stack. Title is the SEO anchor that
+  // disambiguates the OS from the beverage brand collision in Google
+  // AI Overview. DO NOT regress this string without updating the
+  // SoftwareApplication JSON-LD schema in /public/index.html.
+  document.title = "ENLIGHTEN.MINT.CAFE | Sovereign Engine V12 OS";
   
   // 3. PHYSICAL MATRIX ERASURE - CLEAN SLATE SCRIPT
   const cleanSlate = () => {
@@ -119,8 +123,8 @@ const GlobalRebrand = {
       GlobalRebrand.clearOldStyles();
     }
     
-    // Set document title
-    document.title = GlobalRebrand.appName;
+    // Set document title — V1.1.14 Sovereign Identity Stack anchor.
+    document.title = "ENLIGHTEN.MINT.CAFE | Sovereign Engine V12 OS";
     
     // Update meta theme
     const themeMeta = document.querySelector('meta[name="theme-color"]');
