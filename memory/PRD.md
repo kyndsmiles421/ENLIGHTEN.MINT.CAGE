@@ -13,6 +13,19 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Cybernetic Loop** — Generators → `ContextBus` → `ResonanceAnalyzer` → `CrystallineLattice3D` + `SageEngineGauge`
 - **Closed-loop Economy** — Credits (server-issued) → Dust/Gems/Components via AI Merchant; Stripe is the only real-money gateway
 
+### V1.1.17 — Brand Node Injection (Knowledge Graph Anchor) (2026-02-07) ✅
+**Mandate:** "Add @type: Brand to the JSON-LD so Google's Knowledge Graph treats ENLIGHTEN.MINT.CAFE as a distinct brand entity."
+- **`/public/index.html` + `/public/landing.html`**: JSON-LD `@graph` extended from 2 nodes → 3 nodes. New `@type: Brand` node:
+  - `@id`: `https://enlighten-mint-cafe.me/#brand`
+  - `name`: ENLIGHTEN.MINT.CAFE
+  - `alternateName`: ["Sovereign Engine", "Sovereign Engine V12", "EMC Sovereign OS"]
+  - `description`: explicit "distinct from any beverage, tea, or hospitality concept" disambiguation text — the disambiguation Google's AI Overview reads when crawling Knowledge Graph candidates.
+  - `founder`: linked to the Steven Michael `#architect` Person node
+  - `url` + `sameAs`: anchored to the canonical apex
+- **SoftwareApplication updated**: now references `brand: { @id: '#brand' }` so Google sees the product is owned by the brand entity (proper schema.org wiring).
+- Validated programmatically: both files parse as valid JSON, Brand node present, SoftwareApplication.brand correctly references it. Live preview at `/landing.html` confirms the 3-node graph is being served.
+
+
 ### V1.1.16 — Apex Landing Identity + SEO Anchor + Forgotten Languages Sage (2026-02-07) ✅
 **Mandate:** "Push Identity Stack to live production. Mount Sage globally. SEO anchor for crawlers."
 **Critical discovery:** the apex `enlighten-mint-cafe.me/` was serving a **static HTML landing page** (`/public/landing.html`), NOT the React build. The V1.1.14 Identity Stack lived only in `/public/index.html` (React entry) — Google was crawling the static page first and seeing the OLD title "A Sovereign Spiritual Instrument" with no JSON-LD schema.
