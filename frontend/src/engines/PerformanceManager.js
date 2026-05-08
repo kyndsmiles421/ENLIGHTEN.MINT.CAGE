@@ -107,9 +107,33 @@ const narrationSystem = {
 
     async playVoice(text, options = {}) {
         const { voice = 'nova', speed = 1.0, onStart, onEnd, onError } = options;
-        
+
         // Stop any existing playback
         this.stop();
+
+        // V1.1.22 — Mobile autoplay rescue. iOS Safari + Android Chrome
+        // require Audio.play() to be invoked WITHIN the synchronous
+        // user-gesture handler that produced the click. After the
+        // ~4s fetch to /api/tts/narrate the gesture context is gone
+        // and play() rejects with NotAllowedError. Fix: create the
+        // Audio element NOW (still inside the user gesture from the
+        // button click), call play() on a tiny silent buffer to
+        // "unlock" it, then swap the src once the fetch returns.
+        let unlockedAudio = null;
+        try {
+            unlockedAudio = new Audio();
+            unlockedAudio.preload = 'auto';
+            // 1-frame silent MP3 — enough to satisfy the gesture lock
+            // without producing audible output.
+            unlockedAudio.src = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID/////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAQAAAAAAAAAAnFD9Hgf////////////////////////////////////////////////////////////////////////////////////////////////////////8=';
+            // Best-effort unlock; ignore the result either way.
+            const unlockPromise = unlockedAudio.play();
+            if (unlockPromise && typeof unlockPromise.catch === 'function') {
+                unlockPromise.catch(() => { /* expected on some browsers */ });
+            }
+            unlockedAudio.pause();
+            unlockedAudio.currentTime = 0;
+        } catch { /* noop */ }
 
         try {
             // Attempt primary Backend API first
@@ -127,17 +151,27 @@ const narrationSystem = {
             const data = await response.json();
             if (!data.audio) throw new Error("NO_AUDIO_DATA");
 
-            // Play the backend audio
-            this._audioElement = new Audio(`data:audio/mp3;base64,${data.audio}`);
+            // V1.1.22 — Reuse the pre-unlocked Audio element. Setting
+            // .src on an already-unlocked element keeps the gesture
+            // privilege so play() succeeds on mobile.
+            this._audioElement = unlockedAudio || new Audio();
+            this._audioElement.src = `data:audio/mp3;base64,${data.audio}`;
             this._audioElement.onplay = () => onStart?.();
             this._audioElement.onended = () => onEnd?.();
             this._audioElement.onerror = () => {
                 console.warn('[NarrationSystem] Audio playback error, falling back to browser TTS');
                 this.browserFallback(text, { speed, onStart, onEnd, onError });
             };
-            
-            await this._audioElement.play();
-            
+
+            try {
+                await this._audioElement.play();
+            } catch (playErr) {
+                // Autoplay blocked even after unlock attempt — fall
+                // through to browser Web Speech API.
+                console.warn('[NarrationSystem] Mobile autoplay blocked, browser fallback', playErr?.message);
+                this.browserFallback(text, { speed, onStart, onEnd, onError });
+            }
+
         } catch (err) {
             console.warn('[NarrationSystem] Backend TTS failed, switching to Browser-Native TTS Fallback...', err.message);
             this.browserFallback(text, { speed, onStart, onEnd, onError });

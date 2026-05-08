@@ -650,9 +650,19 @@ export default function StarseedWorlds() {
     );
   }
 
+  // V1.1.22 — Redirect from useEffect, not during render. Calling
+  // navigate() during render caused mobile cold-loads to bounce
+  // back to the main menu when the auth context was mid-hydrate.
+  useEffect(() => {
+    if (!authLoading && !loading && !user) navigate('/');
+  }, [authLoading, loading, user, navigate]);
+
   if (!user) {
-    navigate('/');
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
+        <Loader2 className="animate-spin" size={24} style={{ color: '#C084FC' }} />
+      </div>
+    );
   }
 
   const ORIGIN_COLORS = {
