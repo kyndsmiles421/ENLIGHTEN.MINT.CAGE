@@ -212,15 +212,15 @@ export default function ProfilePage() {
               </div>
             )}
           </div>
-          <div className="pb-2 flex-1">
-            <div className="flex items-center justify-between">
-              <div>
+          <div className="pb-2 flex-1 min-w-0">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="min-w-0">
                 {editing ? (
                   <input value={draft.display_name || ''} onChange={(e) => update('display_name', e.target.value)}
                     className="input-glass text-2xl font-light mb-1" style={{ fontFamily: 'Cormorant Garamond, serif', padding: '4px 8px' }}
                     placeholder="Display Name" data-testid="edit-display-name" />
                 ) : (
-                  <h1 className="text-3xl md:text-4xl font-light" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-light truncate" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                     {p.display_name || p.name || user?.name}
                     {isOwnProfile && p.visibility && p.visibility !== 'public' && (
                       <span className="inline-flex items-center gap-1 ml-3 text-xs px-2 py-0.5 rounded-full align-middle"
@@ -233,7 +233,7 @@ export default function ProfilePage() {
                   </h1>
                 )}
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {isOwnProfile && (
                   <button onClick={async () => {
                     const shareData = {
