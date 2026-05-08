@@ -102,6 +102,41 @@ async function translateOne(text, target, sacred) {
   return res.data?.translation || null;
 }
 
+// V1.1.21 — Batch translator. Sends up to 60 strings in ONE request.
+// Replaces the previous 200-sequential-call page sweep that was taking
+// 30-60 seconds per page with a 5-10 second whole-page batch.
+async function translateBatch(texts, target, sacred) {
+  if (!texts || !texts.length) return [];
+  let token = null;
+  try { token = localStorage.getItem('zen_token'); } catch { /* noop */ }
+  const headers = token && token !== 'guest_token' ? { Authorization: `Bearer ${token}` } : {};
+  const out = new Array(texts.length).fill(null);
+  // Slice into 60-string chunks and run them concurrently (small fan-out
+  // since each chunk is one LLM call already).
+  const chunkSize = 60;
+  const chunks = [];
+  for (let i = 0; i < texts.length; i += chunkSize) {
+    chunks.push({ start: i, items: texts.slice(i, i + chunkSize) });
+  }
+  await Promise.all(chunks.map(async (chunk) => {
+    try {
+      const res = await axios.post(
+        `${API}/translator/batch`,
+        { texts: chunk.items, target_lang: target, sacred: !!sacred },
+        { timeout: 50000, headers },
+      );
+      const arr = res.data?.translations || [];
+      for (let j = 0; j < chunk.items.length; j += 1) {
+        out[chunk.start + j] = arr[j] || null;
+      }
+    } catch {
+      // Per-chunk failure leaves nulls; the page-translator will skip
+      // those nodes silently rather than break the whole sweep.
+    }
+  }));
+  return out;
+}
+
 async function pooledMap(items, fn, limit = CONCURRENCY) {
   const results = new Array(items.length);
   let idx = 0;
@@ -188,7 +223,7 @@ export default function LanguageBar() {
 
     if (language === 'en') {
       setVoiceTranslated(transcript);
-      SageVoice.speak(transcript).catch(() => {});
+      SageVoice.speak(transcript, { language: 'en' }).catch(() => {});
       return;
     }
 
@@ -212,7 +247,11 @@ export default function LanguageBar() {
       // actual translation. Symptom: "voice button doesn't do anything".
       const translated = data?.translation || data?.translated || data?.text || transcript;
       setVoiceTranslated(translated);
-      SageVoice.speak(translated).catch(() => {});
+      // V1.1.21 — Pass the target language so ElevenLabs auto-routes
+      // to eleven_multilingual_v2 (V1.1.14 backend bridge). Without
+      // this, Sage spoke ZH/HI/AR text using the English voice model
+      // → garbled phonetics → "voice doesn't translate".
+      SageVoice.speak(translated, { language }).catch(() => {});
     }).catch((err) => {
       setVoiceError(err?.response?.data?.detail || 'Translation failed');
     }).finally(() => {
@@ -244,10 +283,9 @@ export default function LanguageBar() {
     let swapped = 0;
     try {
       const texts = nodes.map((n) => (n.textContent || '').trim());
-      const translations = await pooledMap(
-        texts,
-        (t) => translateOne(t, language, sacred),
-      );
+      // V1.1.21 — Batch instead of pooled-singletons. Whole-page in
+      // 5-10s instead of 30-60s.
+      const translations = await translateBatch(texts, language, sacred);
       nodes.forEach((el, i) => {
         const t = translations[i];
         if (t && typeof t === 'string') {
