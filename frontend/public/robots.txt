@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /auth/
+Disallow: /admin/
+
+# V1.2.0 Sovereign Engine — sitemap anchor for crawlers.
+Sitemap: https://enlighten-mint-cafe.me/sitemap.xml

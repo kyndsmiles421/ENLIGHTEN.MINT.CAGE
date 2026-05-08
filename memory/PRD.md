@@ -13,6 +13,16 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Cybernetic Loop** — Generators → `ContextBus` → `ResonanceAnalyzer` → `CrystallineLattice3D` + `SageEngineGauge`
 - **Closed-loop Economy** — Credits (server-issued) → Dust/Gems/Components via AI Merchant; Stripe is the only real-money gateway
 
+### V1.1.16 — Apex Landing Identity + SEO Anchor + Forgotten Languages Sage (2026-02-07) ✅
+**Mandate:** "Push Identity Stack to live production. Mount Sage globally. SEO anchor for crawlers."
+**Critical discovery:** the apex `enlighten-mint-cafe.me/` was serving a **static HTML landing page** (`/public/landing.html`), NOT the React build. The V1.1.14 Identity Stack lived only in `/public/index.html` (React entry) — Google was crawling the static page first and seeing the OLD title "A Sovereign Spiritual Instrument" with no JSON-LD schema.
+- **`/public/landing.html` head rewrite**: title → "ENLIGHTEN.MINT.CAFE | Sovereign Engine V12 OS", new description + keywords + author + robots, OG + Twitter cards, full JSON-LD `@graph` with `SoftwareApplication` + `Person` schema. Now mirrors `/public/index.html` exactly. Beverage brand collision in Google AI Overview now killed at the apex once production redeploys.
+- **`/public/sitemap.xml` (NEW)**: 10 canonical routes (apex, sovereign-hub, vault, evolution-lab, tesseract, pactola, forgotten-languages, observatory, pricing, terms) with appropriate priorities + change frequencies. Crawl signal for Google.
+- **`/public/robots.txt` (NEW)**: Allow all, disallow API/auth/admin, sitemap reference. Standard SEO scaffolding that was missing.
+- **`/forgotten-languages` Sage Mount**: SageVoiceCommand pill mounted in the page header next to the Nexus link. The Architect can speak from inside any glyph study session — closes the multilingual loop (voice in any language → Sage acknowledges in matching phonetic profile via the LanguageBar bridge from V1.1.14).
+- Smoke verified live on preview: landing.html serves new title + schema + person, sitemap + robots both 200, all 4 surfaces (Hub, Vault, Lab, Forgotten Languages) carry the Sage pill.
+
+
 ### V1.1.15 — Global Sage Mount (OS-Wide Command Surface) (2026-02-07) ✅
 **Mandate:** "Mount the Sage Voice pill in the persistent corner chrome for Vault and Evolution Lab. The OS must always be listening, no matter what 3D module the Architect is in."
 - **Vault chrome** (`/app/frontend/src/App.js` `/vault` + `/tesseract` route wrappers): the inline header was a single `<h1>` + `<p>` block. Restructured into a flex row with the heading on the left and `<SageVoiceCommand size="compact" />` on the right (lazy-loaded + Suspense-wrapped). Pill stays in document flow — Flatland-clean, no overlay.

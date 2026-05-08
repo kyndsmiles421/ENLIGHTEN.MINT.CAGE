@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import * as SageVoice from '../services/SageVoiceController';
 import { dispatchUnlock } from '../utils/UnlockBus';
+import SageVoiceCommand from '../components/SageVoiceCommand';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const EL_COLORS = { wood: '#22C55E', fire: '#EF4444', earth: '#F59E0B', metal: '#94A3B8', water: '#3B82F6' };
@@ -510,6 +511,9 @@ export default function ForgottenLanguages() {
           <button onClick={() => navigate('/nexus')} className="text-[8px] px-2 py-1 rounded-lg"
             style={{ background: `${scriptColor}06`, color: scriptColor, border: `1px solid ${scriptColor}10` }}
             data-testid="fl-nexus-link">Nexus</button>
+          {/* V1.1.15 — Global Sage Mount. Voice nav in the persistent
+              chrome of every 3D module. Speak a glyph or a route. */}
+          <SageVoiceCommand size="compact" />
         </div>
 
         {/* Tabs */}
