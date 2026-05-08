@@ -13,6 +13,15 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Cybernetic Loop** — Generators → `ContextBus` → `ResonanceAnalyzer` → `CrystallineLattice3D` + `SageEngineGauge`
 - **Closed-loop Economy** — Credits (server-issued) → Dust/Gems/Components via AI Merchant; Stripe is the only real-money gateway
 
+### V1.1.19 — Brand Identity Single Source of Truth (Drift Killer) (2026-02-07) ✅
+**Mandate:** "One source of truth for HTML head + JSON endpoint. Future renames must propagate in one edit."
+- **`/app/shared/brand_identity.json`** (NEW) — canonical brand graph + version + updated date. The ONLY file you edit going forward when renaming, adding alternateNames, or bumping the version.
+- **`/app/backend/routes/brand_identity.py`** (REFACTORED) — reads `/app/shared/brand_identity.json` at request time. No hard-coded schema. `_meta` now includes `source_of_truth: "/app/shared/brand_identity.json"` so agents can introspect where the canonical declaration lives. Version bumped to 1.1.19, live verified via curl on preview.
+- **`/app/scripts/sync_brand_identity.py`** (NEW) — propagates the source JSON into `<!-- BRAND_IDENTITY:START -->` / `<!-- BRAND_IDENTITY:END -->` sentinel-wrapped blocks in `index.html` + `landing.html`. Supports `--check` (CI exit 1 on drift), `--install` (one-time wrap of existing JSON-LD with sentinels). Already run with `--install`; both HTML files now carry sentinel-managed canonical blocks.
+- Drift validation: `python3 /app/scripts/sync_brand_identity.py --check` returns clean. Both HTML files independently parsed: 3-node graph, brand link from SoftwareApplication validates.
+- **Workflow going forward**: edit `/app/shared/brand_identity.json` → run sync script → both HTML files + JSON endpoint all updated. No more hand-editing 3 places.
+
+
 ### V1.1.18 — Sovereign Brand Birth Certificate Endpoint (2026-02-07) ✅
 **Mandate:** "Make the Sovereign Engine agent-native — Play Store reviewers and AI crawlers fetch a canonical brand declaration in one round-trip without scraping HTML."
 - **`/app/backend/routes/brand_identity.py`** (NEW): `GET /api/.well-known/brand-identity.json` returns the same 3-node `@graph` (SoftwareApplication + Brand + Person) embedded in `index.html` and `landing.html`. Public, no auth, `Cache-Control: public, max-age=3600`, `Access-Control-Allow-Origin: *`.

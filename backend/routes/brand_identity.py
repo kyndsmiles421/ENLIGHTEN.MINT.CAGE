@@ -1,109 +1,68 @@
 """
-brand_identity.py — V1.1.18 Sovereign Brand Birth Certificate
+brand_identity.py — V1.1.19 Sovereign Brand Birth Certificate
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Canonical, machine-readable Brand Identity surface for the Sovereign
-Engine. Mirrors the JSON-LD `@graph` embedded in /public/index.html
-and /public/landing.html so any AI agent, Play Store reviewer, or
-schema validator can fetch the brand declaration in one round-trip
-without scraping HTML.
+Canonical, machine-readable Brand Identity surface. Reads from the
+Single Source of Truth at /app/shared/brand_identity.json so the HTML
+head schema, this endpoint, and the sync script can never drift.
 
 Path: GET /api/.well-known/brand-identity.json
 
-Why a route? Because the static file at /.well-known/* would require
-custom server config (the React build serves /static/ but not /.well-known/
-out of the box). Routing it through FastAPI guarantees it's always live,
-versioned with the rest of the OS, and CORS-clean.
-
-Public — no auth, no rate limit beyond global. Cache 1 hour.
+To change the brand identity:
+  1. Edit /app/shared/brand_identity.json
+  2. Run /app/scripts/sync_brand_identity.py to propagate to the HTML
+     files (index.html, landing.html). This endpoint picks up the
+     change automatically on next request — no rebuild needed.
 """
+import json
+from pathlib import Path
+
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
 router = APIRouter()
 
-# Schema mirrors /public/index.html and /public/landing.html JSON-LD.
-# When you change the brand identity in those files, mirror the change
-# here. This is the *one* place agents will go to read the canonical
-# identity, so drift between this and the head schema = brand confusion.
-BRAND_IDENTITY_GRAPH = {
-    "@context": "https://schema.org",
-    "@graph": [
-        {
-            "@type": "SoftwareApplication",
-            "@id": "https://enlighten-mint-cafe.me/#software",
-            "name": "ENLIGHTEN.MINT.CAFE",
-            "alternateName": "Sovereign Engine V12",
-            "operatingSystem": "3D Geospatial / Web-Based OS",
-            "applicationCategory": "WellnessOperatingSystem",
-            "description": (
-                "A high-fidelity 3D Operating System and Sovereign Engine "
-                "powered by the 9×9 Helix, Tesseract Vault, and USGS "
-                "geospatial rendering architecture."
-            ),
-            "author": {"@id": "https://enlighten-mint-cafe.me/#architect"},
-            "brand":  {"@id": "https://enlighten-mint-cafe.me/#brand"},
-            "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "USD",
+# Single Source of Truth lives at /app/shared/brand_identity.json.
+# Resolve the path relative to this file so it works in any deploy
+# environment (preview, prod, container).
+_BRAND_FILE = Path(__file__).resolve().parents[2] / "shared" / "brand_identity.json"
+
+
+def _load_brand_graph() -> dict:
+    """Read the canonical brand graph from the shared JSON. Falls
+    through to a minimal stub if the file is missing so the endpoint
+    never 500s — but in normal operation the file is always present."""
+    try:
+        with _BRAND_FILE.open("r", encoding="utf-8") as fh:
+            data = json.load(fh)
+        graph = data.get("graph", {})
+        # Embed metadata so agents can detect changes without diffing
+        # the full graph. Mirrors the version + updated fields in the
+        # source JSON.
+        return {
+            **graph,
+            "_meta": {
+                "version": data.get("version", "unknown"),
+                "schema_origin": "https://enlighten-mint-cafe.me/",
+                "agent_readable": True,
+                "updated": data.get("updated", "unknown"),
+                "source_of_truth": "/app/shared/brand_identity.json",
             },
-        },
-        {
-            "@type": "Brand",
-            "@id": "https://enlighten-mint-cafe.me/#brand",
-            "name": "ENLIGHTEN.MINT.CAFE",
-            "alternateName": [
-                "Sovereign Engine",
-                "Sovereign Engine V12",
-                "EMC Sovereign OS",
-            ],
-            "url": "https://enlighten-mint-cafe.me",
-            "description": (
-                "ENLIGHTEN.MINT.CAFE is a Sovereign 3D Wellness Operating "
-                "System brand — distinct from any beverage, tea, or "
-                "hospitality concept of the same wording. The brand "
-                "identity is anchored in the 9×9 Helix architecture, "
-                "Tesseract Vault, and Refraction Engine authored by "
-                "Steven Michael."
-            ),
-            "founder": {"@id": "https://enlighten-mint-cafe.me/#architect"},
-            "sameAs": ["https://enlighten-mint-cafe.me"],
-        },
-        {
-            "@type": "Person",
-            "@id": "https://enlighten-mint-cafe.me/#architect",
-            "name": "Steven Michael",
-            "jobTitle": "Lead Architect & Founder",
-            "description": (
-                "Founder and Architect of the Sovereign Engine and the "
-                "9×9 Helix V12 Operating System."
-            ),
-            "knowsAbout": [
-                "3D Operating Systems",
-                "Sovereign Engines",
-                "Geospatial Computing",
-                "Digital Architecture",
-                "Crystalline Logic",
-            ],
-            "url": "https://enlighten-mint-cafe.me",
-        },
-    ],
-    # Versioning surface — agents that cache the identity can re-fetch
-    # only when this changes instead of polling for diffs.
-    "_meta": {
-        "version": "1.1.18",
-        "schema_origin": "https://enlighten-mint-cafe.me/",
-        "agent_readable": True,
-        "updated": "2026-02-07",
-    },
-}
+        }
+    except Exception:
+        # Never block the endpoint on a missing/corrupt file. Return
+        # the minimal stub so crawlers still get a valid response.
+        return {
+            "@context": "https://schema.org",
+            "@graph": [],
+            "_meta": {"version": "unknown", "agent_readable": True},
+        }
 
 
 @router.get("/.well-known/brand-identity.json")
 async def brand_identity():
     """Canonical machine-readable brand identity. Public, cacheable."""
     return JSONResponse(
-        content=BRAND_IDENTITY_GRAPH,
+        content=_load_brand_graph(),
         headers={
             "Cache-Control": "public, max-age=3600",
             "Access-Control-Allow-Origin": "*",
