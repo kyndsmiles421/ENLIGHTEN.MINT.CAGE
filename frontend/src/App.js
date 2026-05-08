@@ -10,6 +10,10 @@ import { ProcessorStateProvider } from './state/ProcessorState';
 // V58.0: Engine init deferred to requestIdleCallback (already in lines below)
 // Only import the immediate-need engines synchronously
 import { purgeNoise } from './engines/NukeTheChaos';
+// V1.1.22 — global silent-rejection guard for mobile autoplay-blocked
+// audio.play() calls. Single import, single mount, covers every site.
+import { installAudioAutoplayShield } from './utils/AudioAutoplayShield';
+installAudioAutoplayShield();
 import { applySovereignReality } from './engines/SovereignCore';
 import { lockObsidianReality, SovereignEngine, SovereignState } from './engines/UnifiedAppCore';
 import './styles/UniverseMaterials.css';

@@ -106,7 +106,7 @@ export function CosmicNarrator({ text, constellationName, color, authHeaders, to
 
   const play = async () => {
     if (state === 'paused' && audioRef.current) {
-      audioRef.current.play();
+      audioRef.current.play().catch(() => { setState('idle'); ambient.stop(); });
       ambient.start();
       setState('playing');
       return;
@@ -131,7 +131,7 @@ export function CosmicNarrator({ text, constellationName, color, authHeaders, to
 
       audio.onended = () => { setState('idle'); setProgress(0); ambient.stop(); };
       audio.ontimeupdate = () => { if (audio.duration) setProgress(audio.currentTime / audio.duration); };
-      audio.play();
+      audio.play().catch(() => { setState('idle'); ambient.stop(); });
       ambient.start();
       setState('playing');
       if (token) {
