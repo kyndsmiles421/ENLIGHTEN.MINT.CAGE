@@ -13,6 +13,14 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Cybernetic Loop** — Generators → `ContextBus` → `ResonanceAnalyzer` → `CrystallineLattice3D` + `SageEngineGauge`
 - **Closed-loop Economy** — Credits (server-issued) → Dust/Gems/Components via AI Merchant; Stripe is the only real-money gateway
 
+### V1.1.18 — Sovereign Brand Birth Certificate Endpoint (2026-02-07) ✅
+**Mandate:** "Make the Sovereign Engine agent-native — Play Store reviewers and AI crawlers fetch a canonical brand declaration in one round-trip without scraping HTML."
+- **`/app/backend/routes/brand_identity.py`** (NEW): `GET /api/.well-known/brand-identity.json` returns the same 3-node `@graph` (SoftwareApplication + Brand + Person) embedded in `index.html` and `landing.html`. Public, no auth, `Cache-Control: public, max-age=3600`, `Access-Control-Allow-Origin: *`.
+- `_meta` block adds `version`, `schema_origin`, `agent_readable: true`, `updated` so caching agents can detect changes without diffing the full graph.
+- **Live verified on preview**: `curl /api/.well-known/brand-identity.json` returns `types: [SoftwareApplication, Brand, Person]`, `version: 1.1.18`, brand link from SoftwareApplication is correct.
+- This closes the SEO loop: HTML head schema for first-crawl Google indexing + machine-readable JSON endpoint for AI agents that prefer structured fetches over HTML parsing.
+
+
 ### V1.1.17 — Brand Node Injection (Knowledge Graph Anchor) (2026-02-07) ✅
 **Mandate:** "Add @type: Brand to the JSON-LD so Google's Knowledge Graph treats ENLIGHTEN.MINT.CAFE as a distinct brand entity."
 - **`/public/index.html` + `/public/landing.html`**: JSON-LD `@graph` extended from 2 nodes → 3 nodes. New `@type: Brand` node:
