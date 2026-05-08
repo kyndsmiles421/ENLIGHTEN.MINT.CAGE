@@ -30,7 +30,7 @@ export default function Starseed() {
     setInitialLoading(true);
     setFetchError(null);
     axios.get(`${API}/starseed/origins`)
-      .then(r => setOrigins(r.data))
+      .then(r => setOrigins(r.data.origins || r.data || []))
       .catch(err => {
         const cosmic = getCosmicErrorMessage(err);
         setFetchError(cosmic);
