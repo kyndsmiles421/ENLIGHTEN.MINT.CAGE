@@ -13,6 +13,14 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Cybernetic Loop** — Generators → `ContextBus` → `ResonanceAnalyzer` → `CrystallineLattice3D` + `SageEngineGauge`
 - **Closed-loop Economy** — Credits (server-issued) → Dust/Gems/Components via AI Merchant; Stripe is the only real-money gateway
 
+### V1.1.15 — Global Sage Mount (OS-Wide Command Surface) (2026-02-07) ✅
+**Mandate:** "Mount the Sage Voice pill in the persistent corner chrome for Vault and Evolution Lab. The OS must always be listening, no matter what 3D module the Architect is in."
+- **Vault chrome** (`/app/frontend/src/App.js` `/vault` + `/tesseract` route wrappers): the inline header was a single `<h1>` + `<p>` block. Restructured into a flex row with the heading on the left and `<SageVoiceCommand size="compact" />` on the right (lazy-loaded + Suspense-wrapped). Pill stays in document flow — Flatland-clean, no overlay.
+- **Lab chrome** (`/app/frontend/src/pages/EvolutionLab.js`): existing top-bar (back button + "Evolution Lab" title + VC badge) extended with the Sage pill alongside the VC badge. Same `size="compact"`, same toggle wiring.
+- Sage pill is now a true **OS-wide command surface** — speak from inside the Pactola basin or mid-Polish on a gem, without scrolling back to the Hub. Same intent matcher, same prewarm + dispatchUnlock + multilingual `speak()` flow.
+- Smoke screenshot verified: 1 pill mounted on `/vault` (top-right of "Tesseract Relic Vault" header), 1 pill mounted on `/evolution-lab` (next to the VC badge).
+
+
 ### V1.1.14 — Sovereign Identity Stack + Sage Voice + Breathing Ring + Multilingual Bridge (2026-02-07) ✅
 **Mandate:** "Drop the Identity Stack to kill the beverage brand collision. Wire the breathing ring. Wire Sage Voice through the existing LanguageBar — no new R&D, just bolt the imported parts together."
 - **Sovereign Identity Stack** (`/public/index.html`): JSON-LD `@graph` with `SoftwareApplication` (alternateName "Sovereign Engine V12", category "WellnessOperatingSystem") + `Person` (Steven Michael, Lead Architect & Founder, knowsAbout: 3D Operating Systems, Sovereign Engines, Geospatial Computing, Crystalline Logic). Updated `<title>`, og:url, og:title, og:description, twitter:*, canonical link, robots, author, keywords. Anchors Google AI Overview to the OS, not the beverage.

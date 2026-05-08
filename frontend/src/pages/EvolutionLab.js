@@ -9,6 +9,7 @@ import useGameController from '../hooks/useGameController';
 import GameModuleWrapper from '../components/game/GameModuleWrapper';
 import { dispatchUnlock, onUnlock } from '../utils/UnlockBus';
 import EvolutionGemStage3D from '../components/EvolutionGemStage3D';
+import SageVoiceCommand from '../components/SageVoiceCommand';
 import {
   ArrowLeft, Gem, Sparkles, Shield, Flame, Droplets, Mountain,
   Sprout, Star, Clock, Zap, TrendingUp, Eye, Activity,
@@ -444,11 +445,17 @@ export default function EvolutionLab() {
             <ArrowLeft size={16} color="#F8FAFC" />
           </button>
           <h1 className="text-base font-bold" style={{ color: '#F8FAFC' }}>Evolution Lab</h1>
-          <div className="flex items-center gap-1.5">
-            <Activity size={10} color="#FCD34D" />
-            <span className="text-[10px] font-bold" style={{ color: '#FCD34D' }}>
-              {data?.total_vc || 0} VC
-            </span>
+          <div className="flex items-center gap-2">
+            {/* V1.1.15 — Global Sage Mount. Voice nav lives in the
+                persistent chrome of every 3D module so the Architect
+                can navigate without scrolling back to the Hub. */}
+            <SageVoiceCommand size="compact" />
+            <div className="flex items-center gap-1.5">
+              <Activity size={10} color="#FCD34D" />
+              <span className="text-[10px] font-bold" style={{ color: '#FCD34D' }}>
+                {data?.total_vc || 0} VC
+              </span>
+            </div>
           </div>
         </div>
 
