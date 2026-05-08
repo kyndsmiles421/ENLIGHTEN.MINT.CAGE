@@ -34,11 +34,20 @@ async def knowledge_deep_dive(req: KnowledgeRequest, user=Depends(get_current_us
     # Track what the user has already seen for this topic
     seen_count = await db.knowledge_views.count_documents({"user_id": uid, "topic": req.topic})
 
-    # If user hasn't seen it and we have a cache, serve it
-    if seen_count == 0 and not fresh:
-        cached = await db.knowledge_cache.find_one(
-            {"topic": req.topic, "category": req.category}, {"_id": 0}
-        )
+    # V1.1.20 — Perspective-keyed cache. Each topic has 8 rotating
+    # perspectives (see list below). Cache by (topic, category,
+    # perspective_idx) so a returning user gets the SAME Visit #2 /
+    # Visit #3 content instantly instead of waiting 45-52s for a new
+    # gpt-5.2 generation every single time. White Peony was timing
+    # out on mobile because each "Explore deeper" tap regenerated.
+    perspective_idx = seen_count % 8
+    cache_key = {
+        "topic": req.topic,
+        "category": req.category,
+        "perspective_idx": perspective_idx,
+    }
+    if not fresh:
+        cached = await db.knowledge_cache.find_one(cache_key, {"_id": 0})
         if cached:
             await db.knowledge_views.insert_one({
                 "user_id": uid, "topic": req.topic, "category": req.category,
@@ -96,8 +105,14 @@ async def knowledge_deep_dive(req: KnowledgeRequest, user=Depends(get_current_us
         timeout_s = 22
         attempts = 1
     else:
-        model_provider, model_name = "openai", "gpt-5.2"
-        timeout_s = 45
+        # V1.1.20 — Switched from gpt-5.2 to gpt-4o for the deep-dive
+        # path. White Peony was hitting 52s on gpt-5.2 which causes
+        # mobile-network timeouts. gpt-4o returns comparable depth in
+        # 12-25s and the result is now permanently cached per
+        # perspective so the wait happens at most ONCE per (topic,
+        # perspective) across all users.
+        model_provider, model_name = "openai", "gpt-4o"
+        timeout_s = 38
         attempts = 2
 
     for attempt in range(attempts):
@@ -114,6 +129,7 @@ async def knowledge_deep_dive(req: KnowledgeRequest, user=Depends(get_current_us
             result = {
                 "topic": req.topic,
                 "category": req.category,
+                "perspective_idx": perspective_idx,
                 "content": response,
                 "generated_at": datetime.now(timezone.utc).isoformat(),
                 "perspective": perspective,
@@ -126,9 +142,17 @@ async def knowledge_deep_dive(req: KnowledgeRequest, user=Depends(get_current_us
                 "timestamp": datetime.now(timezone.utc).isoformat(),
             })
 
-            # Cache for first-time viewers
-            if seen_count == 0:
-                await db.knowledge_cache.insert_one({**result})
+            # V1.1.20 — Cache by (topic, category, perspective_idx).
+            # upsert so a regen ('fresh') replaces the prior entry
+            # for the same perspective.
+            try:
+                await db.knowledge_cache.update_one(
+                    cache_key,
+                    {"$set": {**result}},
+                    upsert=True,
+                )
+            except Exception as cache_err:
+                logger.warning(f"knowledge_cache upsert failed: {cache_err}")
 
             return result
 
