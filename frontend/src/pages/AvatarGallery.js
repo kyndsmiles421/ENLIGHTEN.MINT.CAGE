@@ -464,6 +464,11 @@ export default function AvatarGallery() {
     }
   }, [authHeaders, loadGallery]);
 
+  // V1.1.23 — Hook placed BEFORE early returns to satisfy Rules of Hooks.
+  useEffect(() => {
+    if (!authLoading && !user) navigate('/');
+  }, [authLoading, user, navigate]);
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
@@ -471,11 +476,6 @@ export default function AvatarGallery() {
       </div>
     );
   }
-
-  // V1.1.22 — Redirect from useEffect, not render.
-  useEffect(() => {
-    if (!user) navigate('/');
-  }, [user, navigate]);
 
   if (!user) {
     return (

@@ -192,6 +192,14 @@ export default function CosmicLedger() {
     load();
   }, [authHeaders]);
 
+  // V1.1.23 — Redirect from useEffect. MUST be before any early
+  // return to satisfy Rules of Hooks. Rendering FAIL_RIFT was caused
+  // by V1.1.22 placing this hook after an `if (loading) return …`
+  // branch which made the hook count change between renders.
+  useEffect(() => {
+    if (!authLoading && !loading && !user) navigate('/');
+  }, [authLoading, loading, user, navigate]);
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
@@ -199,11 +207,6 @@ export default function CosmicLedger() {
       </div>
     );
   }
-
-  // V1.1.22 — Redirect from useEffect, not render.
-  useEffect(() => {
-    if (!user) navigate('/');
-  }, [user, navigate]);
 
   if (!user) {
     return (

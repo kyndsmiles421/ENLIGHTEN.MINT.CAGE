@@ -70,7 +70,10 @@ function TonePlayer({ frequency, playing }) {
 
 function AvatarDisplay({ style, size = 80, name = '?', avatarB64 = null }) {
   const avatarStyle = AVATAR_STYLES.find(a => a.id === style) || AVATAR_STYLES[0];
-  if (avatarB64) {
+  // V1.1.23 — Only render <img> when we have actual data. Empty
+  // string/null avatarB64 was rendering <img src=""> which Chrome
+  // logs as "empty string passed to src" + re-downloads the page.
+  if (avatarB64 && typeof avatarB64 === 'string' && avatarB64.length > 16) {
     const src = avatarB64.startsWith('data:') ? avatarB64 : `data:image/png;base64,${avatarB64}`;
     return (
       <div className="rounded-full overflow-hidden"
@@ -182,7 +185,11 @@ export default function ProfilePage() {
 
       {/* Cover Photo */}
       <div className="relative h-56 md:h-72 overflow-hidden">
-        <img src={p.cover_image || covers[0]?.url} alt="Cover" className="w-full h-full object-cover" style={{ filter: 'brightness(0.7)' }} />
+        {(p.cover_image || covers[0]?.url) ? (
+          <img src={p.cover_image || covers[0]?.url} alt="Cover" className="w-full h-full object-cover" style={{ filter: 'brightness(0.7)' }} />
+        ) : (
+          <div className="w-full h-full" style={{ background: 'linear-gradient(135deg, #1f1147, #4a1d83)' }} />
+        )}
         <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, transparent 40%, var(--bg-default) 100%)` }} />
         {editing && (
           <button

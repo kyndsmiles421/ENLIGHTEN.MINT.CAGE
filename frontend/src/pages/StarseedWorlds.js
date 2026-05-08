@@ -642,6 +642,13 @@ export default function StarseedWorlds() {
     }
   }, [activeOrigin, authHeaders]);
 
+  // V1.1.23 — Hook placed BEFORE early returns to satisfy Rules of
+  // Hooks. V1.1.22 had this after `if (loading) return …` which made
+  // the hook count change between renders → FAIL_RIFT.
+  useEffect(() => {
+    if (!authLoading && !loading && !user) navigate('/');
+  }, [authLoading, loading, user, navigate]);
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
@@ -649,13 +656,6 @@ export default function StarseedWorlds() {
       </div>
     );
   }
-
-  // V1.1.22 — Redirect from useEffect, not during render. Calling
-  // navigate() during render caused mobile cold-loads to bounce
-  // back to the main menu when the auth context was mid-hydrate.
-  useEffect(() => {
-    if (!authLoading && !loading && !user) navigate('/');
-  }, [authLoading, loading, user, navigate]);
 
   if (!user) {
     return (

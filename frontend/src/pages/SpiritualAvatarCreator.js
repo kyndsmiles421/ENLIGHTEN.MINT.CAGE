@@ -128,6 +128,11 @@ export default function SpiritualAvatarCreator() {
 
   const resetSelections = () => { setSelections({}); setGeneratedAvatar(null); setCustomNotes(''); setCurrentStep(0); };
 
+  // V1.1.23 — Hook placed BEFORE early returns to satisfy Rules of Hooks.
+  useEffect(() => {
+    if (!authLoading && !loading && !user) navigate('/');
+  }, [authLoading, loading, user, navigate]);
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
@@ -135,11 +140,6 @@ export default function SpiritualAvatarCreator() {
       </div>
     );
   }
-
-  // V1.1.22 — Redirect from useEffect, not render.
-  useEffect(() => {
-    if (!user) navigate('/');
-  }, [user, navigate]);
 
   if (!user) {
     return (
