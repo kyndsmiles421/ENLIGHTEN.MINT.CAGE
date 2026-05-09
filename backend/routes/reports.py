@@ -423,7 +423,7 @@ async def get_deep_dive(user=Depends(get_current_user)):
         predictions = (
             f"Peak Performance: Your {best_day}s show highest emotional resonance — "
             f"schedule important reflections then.\n"
-            f"Sound Healing: Your most effective soundscape combinations align with "
+            f"Sound Resonance: Your most effective soundscape combinations align with "
             f"{'water-based' if synergy else 'ambient'} frequencies.\n"
             f"Growth Path: Increase journal consistency to unlock deeper self-awareness patterns."
         )

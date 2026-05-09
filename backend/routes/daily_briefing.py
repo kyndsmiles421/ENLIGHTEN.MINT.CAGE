@@ -88,7 +88,7 @@ async def get_daily_briefing(user=Depends(get_current_user)):
     if element == "Fire":
         practices = [
             {"name": "Sun Salutation Flow", "type": "yoga", "link": "/exercises", "duration": "15 min"},
-            {"name": "Cinnamon Aromatherapy", "type": "aromatherapy", "link": "/aromatherapy", "duration": "5 min"},
+            {"name": "Cinnamon Aromatic Resonance", "type": "aromatherapy", "link": "/aromatherapy", "duration": "5 min"},
             {"name": "Solar Plexus Reiki", "type": "reiki", "link": "/reiki", "duration": "10 min"},
         ]
     elif element == "Water":

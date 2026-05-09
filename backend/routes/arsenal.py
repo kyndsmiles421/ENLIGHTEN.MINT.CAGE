@@ -119,7 +119,7 @@ ACTIVE_ENGINES = [
     {"id": "CRYSTALS",         "name": "Crystals",              "layer": "frontend", "kind": "render-adapter"},
     # V68.81 — Entertainment/Education pillar batch (+15)
     {"id": "ACUPRESSURE",      "name": "Acupressure",           "layer": "frontend", "kind": "render-adapter"},
-    {"id": "AROMATHERAPY",     "name": "Aromatherapy",          "layer": "frontend", "kind": "render-adapter"},
+    {"id": "AROMATHERAPY",     "name": "Aromatic Resonance",          "layer": "frontend", "kind": "render-adapter"},
     {"id": "REFLEXOLOGY",      "name": "Reflexology",           "layer": "frontend", "kind": "render-adapter"},
     {"id": "BIBLE",            "name": "Bible",                 "layer": "frontend", "kind": "render-adapter"},
     {"id": "BLESSINGS",        "name": "Blessings",             "layer": "frontend", "kind": "render-adapter"},

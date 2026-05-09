@@ -83,6 +83,23 @@ fi
 echo ""
 echo "═══════════════════════════════════════════════════════════"
 if [ $FAIL -eq 0 ]; then
+  echo "✅ STATIC CHECKS PASSED — running runtime API serialization tests…"
+  echo ""
+  if command -v pytest >/dev/null 2>&1; then
+    if [ -f backend/tests/test_compliance_serialization.py ]; then
+      cd backend
+      REACT_APP_BACKEND_URL="${REACT_APP_BACKEND_URL:-http://localhost:8001}" \
+        pytest tests/test_compliance_serialization.py -q 2>&1 | tail -8
+      RT=${PIPESTATUS[0]}
+      cd ..
+      if [ "$RT" -ne 0 ]; then
+        echo ""
+        echo "❌ FAIL — runtime API tests detected forbidden labels or undefined fields."
+        exit 1
+      fi
+    fi
+  fi
+  echo ""
   echo "✅ ALL CHECKS PASSED — compliance & hygiene clean."
   exit 0
 else

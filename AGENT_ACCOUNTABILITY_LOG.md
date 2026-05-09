@@ -4,6 +4,31 @@
 
 ---
 
+## 2026-02-09 V1.2.4 ZERO-WASTE COMPLETION — Boundary Translation Layer + Integration Tests
+
+### MISS #19 — Backend label leaks in 5 more route files
+- **Files:** `routes/discover.py`, `routes/recommendations.py`, `routes/dynamic.py`, `routes/daily_briefing.py`, `routes/learning.py`, `routes/reports.py`, `routes/arsenal.py`
+- **Bug:** Each route defined its own `ALL_FEATURES` / `TOOL_CATALOG` / module list with names like "Aromatherapy", "Light Therapy", "Sound Healing" hardcoded. None of them passed through a translator, so frontend cards on `/discover`, `/recommendations`, `/learn`, etc. all leaked medical terms.
+- **Fix:**
+  1. Created `/app/backend/utils/compliance_labels.py` — single source of truth for `display_domain()`, `display_text()`, `display_module_name()`, `safe_module()`.
+  2. Scrubbed inline strings in `discover.py`, `recommendations.py`, `dynamic.py`, `daily_briefing.py`, `arsenal.py`, `learning.py` (sound healing → sound resonance, chromotherapy → chromatic resonance, light therapy → light resonance, aromatherapy → aromatic resonance, sound healing science article rewritten).
+  3. `discover.py` now wraps suggestions and recommended in `safe_module()` so future additions get scrubbed automatically.
+- **Status:** FIXED — all 9 integration tests passing.
+
+### NEW TOOL — `/app/backend/tests/test_compliance_serialization.py`
+- 9 tests covering 5 public API endpoints + 4 module tool endpoints
+- Asserts FORBIDDEN_TERMS (`Healing Arts`, `Light Therapy`, `Aromatherapy`, etc.) NEVER appear in any string field of any response
+- Asserts every workshop tool has populated `technique` + `description` (never "undefined")
+- Wired into `/app/scripts/compliance_guard.sh` so it runs after static grep checks
+
+### Voice key — CONFIRMED OPERATIONAL
+- `/api/voice/sage-narrate/status` → `{"configured":true,"default_voice_id":"SAz9YHcvj6GT2YYXdXww","default_model_id":"eleven_flash_v2_5"}`
+- `/api/voice/budget` → `{"configured":true,"character_count":141,"character_limit":40000,"remaining":39859}`
+- ElevenLabs API key is live, budget healthy, ~99.65% remaining for the period.
+- Frontend sticky-flag bug fixed in V1.2.0; UI label "Voice Resting" replaces "NO VOICE KEY".
+
+---
+
 ## 2026-02-09 V1.2.3 SURGICAL ROOT-CAUSE PASS — "Undefined" + Domain Label
 
 ### MISS #17 — Workshop tools rendered "undefined" for any tool with only a `desc` field

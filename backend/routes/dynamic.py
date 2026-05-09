@@ -71,7 +71,7 @@ ALL_FEATURES = [
     {"page": "/cardology", "name": "Cardology", "category": "Divination", "color": "#818CF8"},
     {"page": "/dreams", "name": "Dream Journal", "category": "Divination", "color": "#818CF8"},
     {"page": "/nourishment", "name": "Nourishment", "category": "Nourish", "color": "#22C55E"},
-    {"page": "/aromatherapy", "name": "Aromatherapy", "category": "Nourish", "color": "#86EFAC"},
+    {"page": "/aromatherapy", "name": "Aromatic Resonance", "category": "Nourish", "color": "#86EFAC"},
     {"page": "/herbology", "name": "Herbology", "category": "Nourish", "color": "#22C55E"},
     {"page": "/reiki", "name": "Reiki & Aura", "category": "Nourish", "color": "#E879F9"},
     {"page": "/creation-stories", "name": "Creation Stories", "category": "Explore", "color": "#FB923C"},

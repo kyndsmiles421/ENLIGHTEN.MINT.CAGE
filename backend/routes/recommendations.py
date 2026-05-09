@@ -22,15 +22,15 @@ TOOL_CATALOG = [
     {"id": "soundscapes", "name": "Soundscapes", "path": "/soundscapes", "category": "senses", "icon": "headphones",
      "color": "#3B82F6", "desc": "Immerse in layered ambient soundscapes for focus or relaxation."},
     {"id": "frequencies", "name": "Frequencies", "path": "/frequencies", "category": "senses", "icon": "radio",
-     "color": "#8B5CF6", "desc": "Explore healing solfeggio and binaural frequencies."},
+     "color": "#8B5CF6", "desc": "Explore resonant solfeggio and binaural frequencies."},
     {"id": "zen-garden", "name": "Zen Garden", "path": "/zen-garden", "category": "decompression", "icon": "sprout",
      "color": "#22C55E", "desc": "Nurture plants, draw in sand, or release lanterns."},
-    {"id": "light-therapy", "name": "Light Therapy", "path": "/light-therapy", "category": "senses", "icon": "lightbulb",
-     "color": "#A855F7", "desc": "Heal with chromotherapy colors aligned to your chakras."},
+    {"id": "light-therapy", "name": "Light Resonance", "path": "/light-therapy", "category": "senses", "icon": "lightbulb",
+     "color": "#A855F7", "desc": "Attune with chromatic resonance colors aligned to your chakras."},
     {"id": "mudras", "name": "Mudras", "path": "/mudras", "category": "body", "icon": "hand",
      "color": "#FDA4AF", "desc": "Practice sacred hand gestures for energy flow."},
     {"id": "mantras", "name": "Mantras", "path": "/mantras", "category": "spirit", "icon": "music",
-     "color": "#FB923C", "desc": "Chant sacred mantras for deep vibrational healing."},
+     "color": "#FB923C", "desc": "Chant sacred mantras for deep vibrational resonance."},
     {"id": "hooponopono", "name": "Ho'oponopono", "path": "/hooponopono", "category": "spirit", "icon": "heart-handshake",
      "color": "#E879F9", "desc": "Practice the Hawaiian art of forgiveness and reconciliation."},
     {"id": "exercises", "name": "Exercises", "path": "/exercises", "category": "body", "icon": "zap",
@@ -56,7 +56,7 @@ MOOD_TOOL_MAP = {
     "neutral": ["mood", "breathing", "soundscapes", "journey"],
 }
 
-# Map moods to specific healing frequencies
+# Map moods to specific resonant frequencies
 MOOD_FREQUENCY_MAP = {
     "stressed": {"hz": 396, "label": "396 Hz — Liberation from Stress"},
     "anxious": {"hz": 417, "label": "417 Hz — Dissolving Anxiety"},

@@ -3,7 +3,34 @@ Append-only running log of work shipped. Most recent first.
 
 ---
 
-## 2026-02-09 — V1.2.3: "Undefined" Generative Bug + Domain Label Scrub
+## 2026-02-09 — V1.2.4 ZERO-WASTE COMPLETION
+
+### 🔴 P0 — Boundary Translation Layer (`utils/compliance_labels.py`)
+Created `/app/backend/utils/compliance_labels.py` as the single source of truth for translating canonical-keys → user-visible labels. Functions: `display_domain()`, `display_text()`, `display_module_name()`, `safe_module()`. Now imported by every route that emits user-facing content.
+
+### 🔴 P0 — 7 more backend routes scrubbed
+Inline strings scrubbed in `discover.py`, `recommendations.py`, `dynamic.py`, `daily_briefing.py`, `arsenal.py`, `learning.py`, `reports.py`. The "Sound Healing" science article became "Sound Resonance"; the "Chromotherapy: Healing with Color" became "Chromatic Resonance: Working with Color". `discover.py` now wraps suggestion lists in `safe_module()` so future feature additions get scrubbed automatically.
+
+### 🟢 P0 — Integration test suite shipped
+`/app/backend/tests/test_compliance_serialization.py` — 9 tests:
+  - 5 verify FORBIDDEN_TERMS never leak from public endpoints (`/workshop/registry`, `/workshop/search`, `/workshop/{geology,nutrition,permaculture}/tools`)
+  - 4 verify every workshop tool has populated `technique` + `description` (never "undefined")
+
+### 🟢 P0 — CI guard upgraded
+`/app/scripts/compliance_guard.sh` now runs the integration tests AFTER static grep checks. One command end-to-end.
+
+### Voice — confirmed live
+`/api/voice/sage-narrate/status` → `configured:true`. `/api/voice/budget` → 39,859 chars remaining (99.65% headroom). ElevenLabs operational. UI "Voice Resting" string ships in the build (V1.2.0 fix).
+
+### 📸 Verification
+- CI guard end-to-end: ✅ ALL CHECKS PASSED
+- 9/9 integration tests passing
+- Backend lints clean
+- Voice budget verified live via direct curl
+
+---
+
+## 2026-02-09 — V1.2.3 SURGICAL ROOT-CAUSE PASS
 
 ### 🔴 P0 — `tool.technique` / `tool.description` rendered as "undefined"
 - **Root cause:** Geology workshop (Brunton Compass, Seismograph, GPS Station, etc.) authored tools with only a `desc` field. Backend `tool-action` endpoint hard-required `tool['technique']` and frontend `UniversalWorkshop.js` read `tool.technique` and `tool.description` directly. Both blew up with "undefined" for any tool missing those fields.
