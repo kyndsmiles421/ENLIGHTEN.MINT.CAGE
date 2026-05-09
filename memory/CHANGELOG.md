@@ -3,6 +3,33 @@ Append-only running log of work shipped. Most recent first.
 
 ---
 
+## 2026-02-09 — V1.2.3: "Undefined" Generative Bug + Domain Label Scrub
+
+### 🔴 P0 — `tool.technique` / `tool.description` rendered as "undefined"
+- **Root cause:** Geology workshop (Brunton Compass, Seismograph, GPS Station, etc.) authored tools with only a `desc` field. Backend `tool-action` endpoint hard-required `tool['technique']` and frontend `UniversalWorkshop.js` read `tool.technique` and `tool.description` directly. Both blew up with "undefined" for any tool missing those fields.
+- **Fix (defense in depth):**
+  - `backend/routes/workshop_v60.py` `/workshop/{id}/tools`: backfills `technique` and `description` from `desc` on every tool before serializing.
+  - `backend/routes/workshop_v60.py` `/workshop/{id}/tool-action`: defensively resolves `technique` and `description` with `.get(...) or .get('desc') or fallback` chain.
+  - `components/UniversalWorkshop.js` setTutorial: reads `tool.technique || tool.desc || tool.description || ''` so even un-patched tools render gracefully.
+- **Verification (live curl):** `curl /api/workshop/geology/tools` → Brunton Compass, Seismograph, GPS Station all return populated `technique` and `description` strings. No more "undefined".
+
+### 🔴 P0 — "HEALING ARTS" still rendering on Domain Mastery + workshop subtitles
+- **Root cause:** `Healing Arts` is a canonical RPG-domain key in `rpg.py` (referenced by 5+ quest hybrid-title requirements, the SKILL_DOMAINS registry, and database mastery rows). Renaming the key would break quest unlock conditions and historical user data. The previous CI guard scrubbed JSX strings but missed backend-emitted labels.
+- **Fix (translate at the boundary, not at the source):**
+  - `backend/routes/rpg.py` `/rpg/passport`: now emits `"domain": "Resonant Arts"` (display) + `"domain_key": "Healing Arts"` (canonical). Quest matching still uses the canonical key.
+  - `backend/routes/workshop_v60.py`: added `_display_domain()` and `_display_text()` helpers; `/workshop/registry` and `/workshop/search` now scrub "Healing Arts → Resonant Arts" + "Healing Arts Cell → Resonant Arts Cell" + "Healing Pillar → Resonance Pillar" at serialization.
+  - `pages/TradePassport.js` + `pages/EconomyPage.js`: added `labelFor()` defensive maps as belt-and-suspenders so old cached responses also get scrubbed client-side.
+- **Verification (live curl):**
+  - `/api/rpg/passport` → `domain: "Resonant Arts"` (was "Healing Arts")
+  - `/api/workshop/registry` → all 6 wellness workshops now show `domain: "Resonant Arts"` + subtitles say "Resonant Arts Cell" instead of "Healing Arts Cell"
+
+### 📸 Verification
+- CI guard: ✅ ALL CHECKS PASSED.
+- Lints clean (5 files: TradePassport, UniversalWorkshop, EconomyPage, workshop_v60.py, rpg.py).
+- Backend curl confirms display labels translated; canonical keys preserved for quest logic.
+
+---
+
 ## 2026-02-09 — V1.2.2 GLOBAL INTEGRITY OVERHAUL
 
 ### 🔴 P0 — Double-Click State Conflict (Global)

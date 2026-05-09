@@ -9,6 +9,35 @@ from routes.workshop import MASONRY_STONES, MASONRY_TOOLS, CARPENTRY_WOODS, CARP
 router = APIRouter()
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# V1.2.3 — Compliance Display Helpers
+# Keep canonical domain keys in DB/code (no migration), translate to
+# Play-Store-safe labels at the API serialization boundary.
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+_DOMAIN_DISPLAY = {
+    "Healing Arts": "Resonant Arts",
+}
+_TEXT_REPLACEMENTS = [
+    ("Healing Arts Cell", "Resonant Arts Cell"),
+    ("Healing Pillar", "Resonance Pillar"),
+    ("Healing Arts", "Resonant Arts"),
+    ("heal the land", "regenerate the land"),
+]
+
+def _display_domain(d: str) -> str:
+    """Return the user-facing display label for a canonical domain key."""
+    return _DOMAIN_DISPLAY.get(d, d)
+
+def _display_text(s: str) -> str:
+    """Apply user-facing text replacements without changing canonical keys."""
+    if not s:
+        return s
+    out = s
+    for old, new in _TEXT_REPLACEMENTS:
+        out = out.replace(old, new)
+    return out
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # ELECTRICAL WORKSHOP
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -721,11 +750,24 @@ async def get_module_materials(module_id: str):
 
 @router.get("/workshop/{module_id}/tools")
 async def get_module_tools(module_id: str):
-    """Universal tools endpoint for all V60.0 modules."""
+    """Universal tools endpoint for all V60.0 modules.
+    
+    V1.2.3 — Backfills missing 'technique' and 'description' fields with the
+    tool's existing 'desc' (or a sensible default) so the frontend never
+    renders 'undefined' when a tool was authored with shorter metadata.
+    """
     module = MODULES.get(module_id)
     if not module:
         return {"error": f"Module '{module_id}' not found"}
-    return {"tools": module["tools"]}
+    safe_tools = []
+    for t in module["tools"]:
+        st = dict(t)
+        # Frontend reads tool.technique and tool.description; some legacy
+        # tools (Brunton Compass, Seismograph, …) only carry 'desc'.
+        st.setdefault("technique", st.get("desc") or st.get("description") or f"Apply {st.get('action_verb', 'use')} with intention.")
+        st.setdefault("description", st.get("desc") or st.get("technique") or "")
+        safe_tools.append(st)
+    return {"tools": safe_tools}
 
 
 @router.post("/workshop/{module_id}/tool-action")
@@ -743,16 +785,24 @@ async def module_tool_action(module_id: str, data: dict = Body(...)):
     if not tool or not mat:
         return {"error": "Invalid tool or material"}
 
+    # V1.2.3 — Defensive lookups so authoring shortcuts (desc-only tools)
+    # never produce 'undefined' in the rendered tutorial.
+    technique = tool.get("technique") or tool.get("desc") or tool.get("description") or f"Apply {tool.get('action_verb', 'use')} with intention."
+    description = tool.get("description") or tool.get("desc") or technique
+
     return {
         "action": f"{tool['action_verb']} {mat['name']}",
         "tool": tool["name"],
+        "tool_technique": technique,
+        "tool_description": description,
         "material": mat["name"],
+        "material_origin": mat.get("origin", ""),
         "xp_awarded": tool["xp_per_action"],
         "skill": module["skill"],
         "tutorial_context": (
             f"The user selected the {tool['name']} tool on {mat['name']}. "
-            f"Technique: {tool['technique']} "
-            f"Context: {mat['origin']}. "
+            f"Technique: {technique} "
+            f"Context: {mat.get('origin', '')}. "
             f"Generate a practical tutorial step for using the {tool['name']} with {mat['name']}. "
             f"Include safety notes and a professional tip."
         ),
@@ -2631,7 +2681,7 @@ async def search_workshops(q: str = ""):
             results.append({
                 "id": mod_id,
                 "title": meta["title"],
-                "domain": meta["domain"],
+                "domain": _display_domain(meta["domain"]),
                 "icon": meta["icon"],
                 "accentColor": meta["accentColor"],
                 "route": f"/workshop/{mod_id}",
@@ -2652,12 +2702,12 @@ async def get_workshop_registry():
         registry.append({
             "id": mod_id,
             "title": meta["title"],
-            "subtitle": meta["subtitle"],
+            "subtitle": _display_text(meta["subtitle"]),
             "icon": meta["icon"],
             "accentColor": meta["accentColor"],
             "skillKey": meta["skillKey"],
             "matLabel": meta["matLabel"],
-            "domain": meta["domain"],
+            "domain": _display_domain(meta["domain"]),
             "materialCount": len(module["materials"]) if module else 0,
             "toolCount": len(module["tools"]) if module else 0,
             "route": f"/workshop/{mod_id}",

@@ -428,11 +428,11 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
           const tut = await axios.post(`${API}/knowledge/deep-dive`, { topic: `${tool.name} on ${selMat.name}`, category: moduleId, context: ctx }, { headers: authHeaders, timeout: 90000 });
           setTutorial(tut.data?.content || 'Tutorial complete.');
           try { await axios.post(`${API}/rpg/character/gain-xp`, { amount: 12, source: `${moduleId}_${tool.id}` }, { headers: authHeaders }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
-        } catch { setTutorial(`${tool.name} Technique:\n\n${tool.technique}\n\n${matLabel}: ${selMat.name}\n${selMat.origin || ''}\n\n${tool.description}`); }
+        } catch { setTutorial(`${tool.name} Technique:\n\n${tool.technique || tool.desc || tool.description || ''}\n\n${matLabel}: ${selMat.name}\n${selMat.origin || ''}\n\n${tool.description || tool.desc || ''}`); }
       } else {
-        setTutorial(`${tool.name} Technique:\n\n${tool.technique}\n\n${matLabel}: ${selMat.name}\n${selMat.origin || ''}\n\n${tool.description}`);
+        setTutorial(`${tool.name} Technique:\n\n${tool.technique || tool.desc || tool.description || ''}\n\n${matLabel}: ${selMat.name}\n${selMat.origin || ''}\n\n${tool.description || tool.desc || ''}`);
       }
-    } catch { setTutorial(`${tool.name}: ${tool.description}\n\n${tool.technique}`); }
+    } catch { setTutorial(`${tool.name}: ${tool.description || tool.desc || ''}\n\n${tool.technique || tool.desc || ''}`); }
     finally { setTutLoading(false); }
   }, [selMat, authHeaders, isFullAuth, moduleId, skillKey, matLabel]);
 

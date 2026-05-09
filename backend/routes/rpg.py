@@ -265,6 +265,9 @@ async def get_trade_passport(user=Depends(get_current_user)):
         source_xp[doc["_id"]] = doc["total_xp"]
 
     # Build domain mastery
+    # V1.2.3 — emit display-safe domain labels at API boundary while
+    # keeping the canonical key intact for quest requirements / DB lookups.
+    _DOMAIN_DISPLAY = {"Healing Arts": "Resonant Arts"}
     domains = []
     domain_action_totals = {}
     for domain_name, domain_def in SKILL_DOMAINS.items():
@@ -273,7 +276,8 @@ async def get_trade_passport(user=Depends(get_current_user)):
         rank_info = _rank_for_actions(actions)
         domain_action_totals[domain_name] = actions
         domains.append({
-            "domain": domain_name,
+            "domain": _DOMAIN_DISPLAY.get(domain_name, domain_name),
+            "domain_key": domain_name,
             "color": domain_def["color"],
             "actions": actions,
             "xp": xp,

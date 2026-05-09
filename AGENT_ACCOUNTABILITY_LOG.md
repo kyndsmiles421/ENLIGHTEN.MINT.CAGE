@@ -4,6 +4,22 @@
 
 ---
 
+## 2026-02-09 V1.2.3 SURGICAL ROOT-CAUSE PASS — "Undefined" + Domain Label
+
+### MISS #17 — Workshop tools rendered "undefined" for any tool with only a `desc` field
+- **Files:** `routes/workshop_v60.py` (`/tools`, `/tool-action`), `components/UniversalWorkshop.js` (line 431-435).
+- **Bug:** Geology tools (Brunton Compass, Seismograph, GPS Station, Drilling Rig, Pressure Test Kit, etc.) and many other late-added tools only carry `desc`. Backend hard-accessed `tool['technique']` (would KeyError) and frontend hard-read `tool.technique` and `tool.description` (rendered literal "undefined" in template strings).
+- **Fix (defense in depth):** backend backfills `technique`/`description` from `desc` on every serialization; frontend reads `tool.technique || tool.desc || tool.description || ''`. Live curl verified.
+- **Status:** FIXED.
+
+### MISS #18 — "Healing Arts" rendered on Domain Mastery / Workshop subtitles
+- **Files:** `routes/rpg.py` `/passport`, `routes/workshop_v60.py` `/search` + `/registry` + 7 module-meta entries.
+- **Bug:** `Healing Arts` is a canonical RPG-domain key (referenced by quest hybrid-title requirements + SKILL_DOMAINS + DB mastery rows). Previous CI guard caught JSX strings only — missed BACKEND-EMITTED domain labels and workshop subtitles.
+- **Fix (translate at API boundary):** added `_display_domain()` + `_display_text()` helpers to `workshop_v60.py`; added `_DOMAIN_DISPLAY` map to `rpg.py`. Display labels = "Resonant Arts" / "Resonant Arts Cell" / "Resonance Pillar"; canonical key = "Healing Arts" preserved so quest unlock logic still works. Frontend `TradePassport` + `EconomyPage` got the same `labelFor()` defensive map as belt-and-suspenders.
+- **Status:** FIXED + verified via live curl on both endpoints.
+
+---
+
 ## 2026-02-09 V1.2.2 GLOBAL INTEGRITY OVERHAUL — Systemic Fix Pass
 
 ### MISS #14 — Double-Click State Conflict (4 nav components)

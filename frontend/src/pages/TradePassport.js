@@ -20,6 +20,14 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 // SKILL LATTICE WEB — SVG radar chart of domain mastery
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+// V1.2.3 Compliance Display Map — render Play-Store-safe labels while
+// preserving the canonical domain keys ("Healing Arts") that the entire
+// RPG ledger / quest requirements / skill mastery DB rows depend on.
+const DOMAIN_DISPLAY_LABELS = {
+  'Healing Arts': 'Resonant Arts',
+};
+const labelFor = (d) => DOMAIN_DISPLAY_LABELS[d] || d;
+
 function SkillLatticeWeb({ domains }) {
   if (!domains || domains.length === 0) return null;
 
@@ -94,7 +102,7 @@ function SkillLatticeWeb({ domains }) {
                 textAnchor="middle"
                 dominantBaseline="middle"
               >
-                {d.domain.split(' ')[0]}
+                {labelFor(d.domain).split(' ')[0]}
               </text>
             </g>
           );
@@ -112,6 +120,7 @@ function SkillLatticeWeb({ domains }) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 function DomainRow({ domain }) {
+  const displayName = labelFor(domain.domain);
   return (
     <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl transition-all"
       style={{ background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.04)' }}
@@ -120,7 +129,7 @@ function DomainRow({ domain }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
           <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: domain.color }}>
-            {domain.domain}
+            {displayName}
           </span>
           <span className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.5)' }}>
             {domain.rank}

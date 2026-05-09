@@ -14,6 +14,15 @@ const TIER_ICONS = { discovery: Eye, resonance: Zap, sovereign: Crown, architect
 const DOMAIN_ICONS = { culinary: Coffee, engineering: Code, horticulture: Leaf, business: Briefcase };
 const CAT_ICONS = { mini: Package, mastery: BookOpen, business: Briefcase };
 
+// V1.2.3 — Compliance Display Map: keep canonical domain key for API/DB
+// contracts but render Play-Store-safe labels in user-facing UI.
+const DOMAIN_DISPLAY_LABELS = {
+  'Healing Arts': 'Resonant Arts',
+  'healing arts': 'Resonant Arts',
+  'healing_arts': 'Resonant Arts',
+};
+const labelFor = (d) => DOMAIN_DISPLAY_LABELS[d] || d;
+
 /* ── Subscription Tier Card ── */
 function TierCard({ tier, isCurrent, onSelect, loading }) {
   const Icon = TIER_ICONS[tier.id] || Star;
@@ -606,7 +615,7 @@ export default function EconomyPage() {
                         background: 'rgba(255,255,255,0.015)', border: '1px solid rgba(255,255,255,0.03)',
                       }} data-testid={`domain-${domain}`}>
                         <DIcon size={12} style={{ color: tierData.color }} />
-                        <span className="text-[10px] font-medium capitalize flex-1" style={{ color: '#F8FAFC' }}>{domain}</span>
+                        <span className="text-[10px] font-medium capitalize flex-1" style={{ color: '#F8FAFC' }}>{labelFor(domain)}</span>
                         <span className="text-[9px] font-semibold" style={{ color: tierData.color }}>
                           Level {level} — {tierData.name}
                         </span>
