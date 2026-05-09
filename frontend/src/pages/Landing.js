@@ -574,10 +574,10 @@ function QuickResetModal({ open, onClose }) {
   };
 
   const playFrequency = useCallback(async (hz) => {
-    const freq = MIXER_FREQUENCIES.find(f => f.hz === hz) || { hz, label: `${hz} Hz`, desc: 'Healing Frequency', color: '#8B5CF6' };
+    const freq = MIXER_FREQUENCIES.find(f => f.hz === hz) || { hz, label: `${hz} Hz`, desc: 'Resonant Frequency', color: '#8B5CF6' };
     await toggleFreq(freq);
     setFreqPlaying(prev => !prev);
-    toast(activeFreqs.has(hz) ? `Stopped ${hz} Hz` : `Playing ${hz} Hz`, { description: freq.desc || 'Healing frequency activated' });
+    toast(activeFreqs.has(hz) ? `Stopped ${hz} Hz` : `Playing ${hz} Hz`, { description: freq.desc || 'Resonant frequency activated' });
   }, [toggleFreq, activeFreqs]);
 
   const playMantra = useCallback(async (mantraText) => {
@@ -1076,7 +1076,7 @@ export default function Landing() {
                   High-Frequency Wellness, Delivered to You
                 </h2>
                 <p className="text-sm max-w-2xl mx-auto leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  The Enlightenment Cafe is a mobile wellness experience that brings healing frequencies, guided meditations, and ancient wisdom directly to you — wherever you are, whenever you need it.
+                  The Enlightenment Cafe is a mobile wellness experience that brings resonant frequencies, guided meditations, and ancient wisdom directly to you — wherever you are, whenever you need it.
                 </p>
               </motion.div>
 

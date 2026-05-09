@@ -61,7 +61,7 @@ class QuantumStockOracle {
             { ticker: 'VITAL-BIO', name: 'Vitality Biosciences', integrityScore: 0.85, phiMatch: 85, sector: 'VITALITY_BIO', price: 43.20 },
             { ticker: 'ABUND-INF', name: 'Abundance Infrastructure', integrityScore: 0.78, phiMatch: 78, sector: 'ABUNDANCE_INFRASTRUCTURE', price: 261.80 },
             { ticker: 'MESH-NET', name: 'Neural Mesh Networks', integrityScore: 0.88, phiMatch: 88, sector: 'TECH_SOVEREIGNTY', price: 100.00 },
-            { ticker: 'HEAL-PHI', name: 'Healing Frequency Corp', integrityScore: 0.72, phiMatch: 72, sector: 'VITALITY_BIO', price: 61.80 },
+            { ticker: 'HEAL-PHI', name: 'Resonant Frequency Corp', integrityScore: 0.72, phiMatch: 72, sector: 'VITALITY_BIO', price: 61.80 },
             { ticker: 'GOLD-RES', name: 'Golden Resonance ETF', integrityScore: 0.95, phiMatch: 95, sector: 'ABUNDANCE_INFRASTRUCTURE', price: 1618.00 },
             { ticker: 'LAZY-BOX', name: 'Legacy Systems Inc', integrityScore: 0.31, phiMatch: 31, sector: 'LEGACY', price: 12.00 }, // Below threshold
             { ticker: 'STATIC-CO', name: 'Static Holdings', integrityScore: 0.45, phiMatch: 45, sector: 'LEGACY', price: 8.50 }, // Below threshold

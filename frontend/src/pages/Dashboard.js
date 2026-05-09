@@ -203,9 +203,9 @@ export default function Dashboard() {
   const isLight = prefs.theme === 'light';
 
   const playFrequency = useCallback(async (hz) => {
-    const freq = MIXER_FREQUENCIES.find(f => f.hz === hz) || { hz, label: `${hz} Hz`, desc: 'Healing Frequency', color: '#8B5CF6' };
+    const freq = MIXER_FREQUENCIES.find(f => f.hz === hz) || { hz, label: `${hz} Hz`, desc: 'Resonant Frequency', color: '#8B5CF6' };
     await toggleFreq(freq);
-    toast(`Playing ${hz} Hz`, { description: freq.desc || 'Healing frequency activated' });
+    toast(`Playing ${hz} Hz`, { description: freq.desc || 'Resonant frequency activated' });
   }, [toggleFreq]);
 
   const [stats, setStats] = useState(null);

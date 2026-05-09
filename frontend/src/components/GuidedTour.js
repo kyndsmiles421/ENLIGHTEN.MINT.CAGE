@@ -41,7 +41,7 @@ const TOUR_STEPS = [
   },
   {
     id: 'sanctuary', title: 'Sanctuary — Rest & Restore',
-    desc: 'Soundscapes, healing frequencies, music lounge, Zen garden, journal, and the Cosmic Mixer for layered experiences.',
+    desc: 'Soundscapes, resonant frequencies, music lounge, Zen garden, journal, and the Cosmic Mixer for layered experiences.',
     icon: Leaf, color: '#86EFAC', category: 'Pillar 4', path: '/soundscapes',
     bg: 'radial-gradient(ellipse at 40% 60%, rgba(134,239,172,0.12) 0%, transparent 60%)',
     features: ['Soundscapes', 'Music Lounge', 'Frequencies', 'Cosmic Mixer'],
@@ -74,7 +74,7 @@ const TOUR_STEPS = [
   },
   {
     id: 'mixer', title: 'Cosmic Mixer — Layer Your Experience',
-    desc: 'Combine healing frequencies, ambient sounds, sacred mantras, color light therapy, and vibration — all at once.',
+    desc: 'Combine resonant frequencies, ambient sounds, sacred mantras, color light therapy, and vibration — all at once.',
     icon: Waves, color: '#A855F7', category: 'Spotlight',
     bg: 'radial-gradient(ellipse at 60% 50%, rgba(168,85,247,0.14) 0%, transparent 60%)',
   },

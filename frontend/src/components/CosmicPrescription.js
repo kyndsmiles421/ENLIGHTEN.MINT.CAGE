@@ -53,9 +53,9 @@ export default function CosmicPrescription({ authHeaders }) {
 
   const playFrequency = async () => {
     const hz = rx.recommended_frequency;
-    const freq = MIXER_FREQUENCIES.find(f => f.hz === hz) || { hz, label: `${hz} Hz`, desc: 'Healing Frequency', color: '#8B5CF6' };
+    const freq = MIXER_FREQUENCIES.find(f => f.hz === hz) || { hz, label: `${hz} Hz`, desc: 'Resonant Frequency', color: '#8B5CF6' };
     await toggleFreq(freq);
-    toast(`Playing ${hz} Hz`, { description: freq.desc || 'Healing frequency activated' });
+    toast(`Playing ${hz} Hz`, { description: freq.desc || 'Resonant frequency activated' });
   };
 
   return (

@@ -15,7 +15,7 @@ const THEMES = [
   { name: 'Self Love', value: 'self love and acceptance' },
   { name: 'Courage', value: 'courage and strength' },
   { name: 'Gratitude', value: 'gratitude and appreciation' },
-  { name: 'Healing', value: 'healing and restoration' },
+  { name: 'Resonance', value: 'resonance and restoration' },
   { name: 'Consciousness', value: 'expanded consciousness and enlightenment' },
   { name: 'Energy', value: 'vital energy and life force' },
 ];

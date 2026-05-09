@@ -22,7 +22,7 @@ const ICON_MAP = {
 // Domain visual identity — each domain has a color and a symbol
 const DOMAIN_COLORS = {
   'Trade & Craft': '#F59E0B',
-  'Healing Arts': '#EF4444',
+  'Resonant Arts': '#EF4444',
   'Sacred Knowledge': '#A78BFA',
   'Science & Physics': '#3B82F6',
   'Mind & Spirit': '#2DD4BF',
@@ -31,7 +31,7 @@ const DOMAIN_COLORS = {
 
 const DOMAIN_ORDER = [
   'Trade & Craft',
-  'Healing Arts',
+  'Resonant Arts',
   'Sacred Knowledge',
   'Science & Physics',
   'Mind & Spirit',
@@ -277,7 +277,7 @@ export default function OracleSearch({ onActiveDomains }) {
               No cells resonate with "{query}"
             </p>
             <p className="text-[9px] mt-1" style={{ color: 'rgba(255,255,255,0.15)' }}>
-              Try: foundation, pressure, safety, healing, fire
+              Try: foundation, pressure, safety, resonance, fire
             </p>
           </motion.div>
         )}

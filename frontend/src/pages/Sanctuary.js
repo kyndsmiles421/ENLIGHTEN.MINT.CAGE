@@ -23,7 +23,7 @@ const DEED_TYPES = [
   { id: 'creation', label: 'Creative Contribution', karma: 15, description: 'Art, music, writing, code' },
   { id: 'teaching', label: 'Knowledge Sharing', karma: 20, description: 'Teaching or mentoring' },
   { id: 'environmental', label: 'Environmental Care', karma: 12, description: 'Sustainability actions' },
-  { id: 'healing', label: 'Healing Work', karma: 25, description: 'Physical, emotional, spiritual healing' },
+  { id: 'healing', label: 'Resonance Work', karma: 25, description: 'Physical, emotional, spiritual resonance' },
   { id: 'restoration', label: 'Restoration', karma: 30, description: 'Repairing or renewing something' },
 ];
 

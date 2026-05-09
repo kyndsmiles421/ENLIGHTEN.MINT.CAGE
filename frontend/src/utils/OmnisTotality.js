@@ -84,7 +84,7 @@ const QUEST_POOLS = {
   ],
   WELLNESS: [
     { id: 'bio-osmosis', name: 'Master Bio-Digital Osmosis', tier: 0, xp: 100 },
-    { id: 'resonance-healing', name: '144Hz Resonance Healing Practice', tier: 0, xp: 150 },
+    { id: 'resonance-healing', name: '144Hz Resonance Practice', tier: 0, xp: 150 },
     { id: 'cellular-harmonics', name: 'Achieve Cellular Harmonics', tier: 1, xp: 200 },
     { id: 'consciousness-expand', name: 'Expand Consciousness Boundaries', tier: 1, xp: 250 },
     { id: 'phygital-ground', name: 'Complete Phygital Grounding at Black Hills', tier: 2, xp: 300 },

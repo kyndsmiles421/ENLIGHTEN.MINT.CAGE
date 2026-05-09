@@ -212,7 +212,7 @@ export default function Create() {
                   </p>
                   <textarea
                     value={aiIntention} onChange={e => setAiIntention(e.target.value)}
-                    placeholder={`What's your intention? e.g. "Finding inner peace during a difficult transition" or "Building confidence for a new career" or "Healing from grief and loss"`}
+                    placeholder={`What's your intention? e.g. "Finding inner peace during a difficult transition" or "Building confidence for a new career" or "Moving through grief and loss"`}
                     rows={4}
                     className="w-full bg-transparent rounded-lg p-4 text-sm outline-none resize-none mb-4"
                     style={{ border: `1px solid ${typeConfig.color}20`, color: 'var(--text-secondary)' }}

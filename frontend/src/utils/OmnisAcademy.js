@@ -143,7 +143,7 @@ const DEPARTMENTS = {
     color: '#22C55E',
     courses: [
       'Bio-Digital Osmosis',
-      '144Hz Resonance Healing',
+      '144Hz Resonance Practice',
       'Cellular Harmonics',
       'Consciousness Expansion',
       'Phygital Grounding',

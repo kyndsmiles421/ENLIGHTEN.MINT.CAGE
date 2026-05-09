@@ -18,7 +18,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const CATEGORIES = [
   { id: 'all', label: 'All', icon: ArrowRightLeft, color: '#C084FC' },
   { id: 'readings', label: 'Readings', icon: null, color: '#C084FC' },
-  { id: 'healing', label: 'Healing', icon: null, color: '#FDA4AF' },
+  { id: 'healing', label: 'Resonance', icon: null, color: '#FDA4AF' },
   { id: 'guidance', label: 'Guidance', icon: null, color: '#2DD4BF' },
   { id: 'meditation', label: 'Meditation', icon: null, color: '#818CF8' },
   { id: 'crafted', label: 'Crafted', icon: null, color: '#FCD34D' },

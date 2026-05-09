@@ -11,7 +11,7 @@ export const LIGHT_MODES = [
   // Discovery
   { id: 'sunrise', label: 'Sunrise Glow', colors: ['#FCD34D', '#FB923C', '#EF4444'], speed: 4000, tier: 'discovery' },
   { id: 'calm-blue', label: 'Calm Blue', colors: ['#1E3A5F', '#3B82F6', '#06B6D4'], speed: 5000, tier: 'discovery' },
-  { id: 'healing-green', label: 'Healing Green', colors: ['#064E3B', '#22C55E', '#2DD4BF'], speed: 4500, tier: 'discovery' },
+  { id: 'healing-green', label: 'Verdant Resonance', colors: ['#064E3B', '#22C55E', '#2DD4BF'], speed: 4500, tier: 'discovery' },
   // Player
   { id: 'aurora', label: 'Aurora', colors: ['#22C55E', '#2DD4BF', '#3B82F6', '#8B5CF6'], speed: 3000, tier: 'player' },
   { id: 'violet-flame', label: 'Violet Flame', colors: ['#4C1D95', '#8B5CF6', '#C084FC', '#E879F9'], speed: 3500, tier: 'player' },

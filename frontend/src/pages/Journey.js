@@ -196,7 +196,7 @@ const STAGES = [
         tryLabel: 'Explore the Mantra Library',
       },
       {
-        id: 's2-hooponopono', title: 'Healing Through Forgiveness',
+        id: 's2-hooponopono', title: 'Forgiveness Resonance',
         desc: "Learn Ho'oponopono — the Hawaiian practice of reconciliation and love.",
         visual: 'forgiveness',
         narration: "Ho'oponopono is a profound Hawaiian practice of forgiveness and reconciliation. It uses four simple yet powerful phrases: I'm sorry. Please forgive me. Thank you. I love you. These phrases are directed inward — toward yourself, toward a memory, toward a situation, or toward another person held in your awareness. The practice teaches that everything in your experience is your responsibility. Not as blame, but as empowerment. If it exists in your consciousness, you have the power to heal it. Through these four phrases, you cleanse, forgive, and restore harmony.",
@@ -231,7 +231,7 @@ const STAGES = [
       },
       {
         id: 's3-frequencies', title: 'Solfeggio & Sacred Frequencies',
-        desc: 'Discover the healing frequencies that resonate with your body and soul.',
+        desc: 'Discover the resonant frequencies that resonate with your body and soul.',
         visual: 'frequencies',
         narration: 'In the 11th century, a Benedictine monk named Guido d Arezzo developed the Solfeggio scale — a set of sacred frequencies used in Gregorian chants. These frequencies were believed to impart spiritual blessings. The most famous is 528 Hertz, known as the Love Frequency or the Miracle Tone. Research suggests it may repair DNA and reduce stress at a cellular level. 396 Hertz liberates guilt and fear. 639 Hertz harmonizes relationships. 741 Hertz awakens intuition. 852 Hertz returns to spiritual order. Each frequency is a key that unlocks a different aspect of healing.',
         content: [
@@ -240,7 +240,7 @@ const STAGES = [
           { type: 'tip', value: 'Use headphones for binaural beats — the effect requires different frequencies in each ear. Start with 10 minutes and gradually increase.' },
         ],
         tryLink: '/frequencies',
-        tryLabel: 'Experience Healing Frequencies',
+        tryLabel: 'Experience Resonant Frequencies',
       },
       {
         id: 's3-light', title: 'Chromotherapy & Light Healing',

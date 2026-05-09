@@ -15,7 +15,7 @@ export default function SovereignChoicePanel() {
 
   const FREQ = [
     { id: 'silence', label: 'Silence',  hint: 'No tone — pure Sovereign quiet', color: '#94a3b8' },
-    { id: '432hz',   label: '432 Hz',   hint: 'Healing · natural tuning',       color: '#38BDF8' },
+    { id: '432hz',   label: '432 Hz',   hint: 'Resonance · natural tuning',       color: '#38BDF8' },
     { id: '528hz',   label: '528 Hz',   hint: 'Transformation · Love',          color: '#22C55E' },
   ];
   const SKIN = [

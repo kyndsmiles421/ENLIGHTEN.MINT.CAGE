@@ -6,7 +6,7 @@ import {
 
 export const ALL_SATELLITES = [
   { id: 'mood', label: 'Mood Engine', icon: Heart, path: '/mood', color: '#EC4899', desc: 'Track your emotional frequencies' },
-  { id: 'mixer', label: 'Soundscape', icon: Music, path: '/cosmic-mixer', color: '#A78BFA', desc: 'Synthesize healing frequencies' },
+  { id: 'mixer', label: 'Soundscape', icon: Music, path: '/cosmic-mixer', color: '#A78BFA', desc: 'Synthesize resonant frequencies' },
   { id: 'map', label: 'Cosmic Map', icon: Map, path: '/cosmic-map', color: '#22C55E', desc: 'Explore the resonance grid' },
   { id: 'breathing', label: 'Breathwork', icon: Wind, path: '/breathing', color: '#60A5FA', desc: 'Guided breathing patterns' },
   { id: 'meditation', label: 'Meditation', icon: Sun, path: '/meditation', color: '#FBBF24', desc: 'Deep stillness practices' },

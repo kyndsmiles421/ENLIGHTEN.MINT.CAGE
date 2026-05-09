@@ -73,7 +73,7 @@ export const ISLAND_CONFIG = [
     color: '#818CF8',        // Indigo
     emissive: '#6366f1',
     symbol: 'wave',
-    description: 'Sound Healing',
+    description: 'Sound Resonance',
     position: 3,             // Lower Left
   },
   {

@@ -22,7 +22,7 @@ const LIGHT_MODES = [
   { id: 'sunrise', label: 'Sunrise Glow', colors: ['#FCD34D', '#FB923C', '#EF4444'], speed: 4000 },
   { id: 'aurora', label: 'Aurora', colors: ['#22C55E', '#2DD4BF', '#3B82F6', '#8B5CF6'], speed: 3000 },
   { id: 'calm-blue', label: 'Calm Blue', colors: ['#1E3A5F', '#3B82F6', '#06B6D4'], speed: 5000 },
-  { id: 'healing-green', label: 'Healing Green', colors: ['#064E3B', '#22C55E', '#2DD4BF'], speed: 4500 },
+  { id: 'healing-green', label: 'Verdant Resonance', colors: ['#064E3B', '#22C55E', '#2DD4BF'], speed: 4500 },
   { id: 'violet-flame', label: 'Violet Flame', colors: ['#4C1D95', '#8B5CF6', '#C084FC', '#E879F9'], speed: 3500 },
   { id: 'golden', label: 'Golden Light', colors: ['#78350F', '#F59E0B', '#FCD34D'], speed: 5000 },
 ];
@@ -830,7 +830,7 @@ export default function CosmicMixerPage() {
           <AccordionSection title={t("mixer.aiblend", "AI Frequency Blend")} icon={Wand2} color="#C084FC" open={openSections.aiblend} onToggle={() => toggleSection('aiblend')} badge={aiBlend ? (aiBlend.type === 'ai_enhanced' ? 'AI' : 'Auto') : null}>
             <div className="space-y-3">
               <p className="text-[10px] leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                Analyzes your mood journal patterns and creates a personalized healing frequency blend just for you.
+                Analyzes your mood journal patterns and creates a personalized resonant frequency blend just for you.
               </p>
               <button
                 onClick={handleAiBlend}

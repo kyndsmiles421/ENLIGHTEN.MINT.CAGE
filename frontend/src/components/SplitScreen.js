@@ -59,14 +59,14 @@ export const COSMIC_PAIRS = [
   {
     id: 'bowl-frequencies',
     name: 'Harmonic Resonance',
-    description: 'Singing bowls layered with healing frequencies',
+    description: 'Singing bowls layered with resonant frequencies',
     pages: ['/dance-music', '/frequencies'],
     colors: ['#7C3AED', '#FB923C'],
     icon: 'waves',
   },
   {
     id: 'flute-healing',
-    name: 'Forest Healing',
+    name: 'Forest Resonance',
     description: 'Cedar flute with green heart chakra light',
     pages: ['/dance-music', '/light-therapy'],
     colors: ['#059669', '#22C55E'],

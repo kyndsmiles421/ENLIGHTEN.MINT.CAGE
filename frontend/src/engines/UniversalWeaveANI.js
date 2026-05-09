@@ -54,7 +54,7 @@ const SYNERGY_MATRIX = {
     "health_spiritual": {
         name: "Holistic_Healing_Matrix",
         constant: 1.618,
-        description: "Physical and spiritual healing amplify each other"
+        description: "Physical and spiritual resonance amplify each other"
     },
     // Linguistic + Community = Universal Bridge
     "linguistic_community": {

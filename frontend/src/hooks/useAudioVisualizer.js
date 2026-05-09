@@ -27,7 +27,7 @@ const PHI = 1.618033988749895;
 // Solfeggio frequency → hue mapping
 const FREQ_HUE_MAP = [
   { hz: 174, hue: 30,  label: 'Foundation' },
-  { hz: 285, hue: 35,  label: 'Healing' },
+  { hz: 285, hue: 35,  label: 'Resonance' },
   { hz: 396, hue: 0,   label: 'Liberation' },
   { hz: 417, hue: 25,  label: 'Change' },
   { hz: 432, hue: 150, label: 'Harmony' },

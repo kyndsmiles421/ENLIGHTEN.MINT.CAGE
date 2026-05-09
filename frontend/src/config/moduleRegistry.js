@@ -153,7 +153,7 @@ export function getSynthesisName(modA, modB) {
   const primary = shared[0] || 'cosmic';
   const SYNTHESIS_NAMES = {
     'audio+spiritual': 'Sacred Resonance',
-    'audio+healing': 'Healing Frequency',
+    'audio+healing': 'Resonant Frequency',
     'audio+nature': 'Nature Harmony',
     'audio+cosmic': 'Celestial Chord',
     'audio+creative': 'Creative Pulse',

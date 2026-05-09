@@ -610,7 +610,7 @@ export default function SovereignHub() {
   // Map backend domain names to pillar titles for glow bridging
   const DOMAIN_TO_PILLAR = {
     'Trade & Craft': 'Sovereign Council',
-    'Healing Arts': 'Nourish & Heal',
+    'Resonant Arts': 'Nourish & Realign',
     'Sacred Knowledge': 'Knowledge',
     'Science & Physics': 'Cosmos & Physics',
     'Mind & Spirit': 'Practice',

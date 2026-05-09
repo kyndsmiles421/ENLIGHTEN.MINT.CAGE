@@ -169,7 +169,7 @@ async function deployToCore(matrix) {
         "CrystallineEngine",
         "SovereignConsole", 
         "RefractorDemo",
-        "HealingProtocolDisplay"
+        "ResonanceProtocolDisplay"
     ];
     
     // 2. Creator Council Approval

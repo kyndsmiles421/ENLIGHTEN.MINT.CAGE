@@ -614,7 +614,7 @@ const BUILD_FOCUSES = [
   { id: 'stress', label: 'Stress Relief', icon: Waves, color: '#3B82F6' },
   { id: 'sleep', label: 'Deep Sleep', icon: Moon, color: '#6366F1' },
   { id: 'focus', label: 'Mental Clarity', icon: Brain, color: '#2DD4BF' },
-  { id: 'healing', label: 'Healing', icon: Heart, color: '#FDA4AF' },
+  { id: 'healing', label: 'Resonance', icon: Heart, color: '#FDA4AF' },
   { id: 'gratitude', label: 'Gratitude', icon: Sun, color: '#FCD34D' },
   { id: 'confidence', label: 'Confidence', icon: Flame, color: '#FB923C' },
   { id: 'letting-go', label: 'Letting Go', icon: Wind, color: '#C084FC' },

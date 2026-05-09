@@ -82,7 +82,7 @@ const SECTIONS = [
       { icon: Sprout, label: 'Zen Garden', path: '/zen-garden', desc: '5 tabs: Plant Garden (grow sacred plants auto-watered by your practice), Koi Pond, Sand Drawing, Lantern Release, and Rain Scene.' },
       { icon: Droplets, label: 'Aromatherapy', path: '/aromatherapy', desc: 'Essential oil guide with blending recipes, diffuser suggestions, and mood-based recommendations.' },
       { icon: Leaf, label: 'Herbology', path: '/herbology', desc: 'Medicinal herb encyclopedia with preparations, dosages, and traditional uses.' },
-      { icon: Flame, label: 'Elixirs', path: '/elixirs', desc: 'Healing tonic recipes — teas, tinctures, and moon water preparations.' },
+      { icon: Flame, label: 'Elixirs', path: '/elixirs', desc: 'Resonant tonic recipes — teas, tinctures, and moon water preparations.' },
       { icon: Leaf, label: 'Animal Totems', path: '/animal-totems', desc: 'Discover your spirit animal guides and their symbolic meanings.' },
     ],
   },
