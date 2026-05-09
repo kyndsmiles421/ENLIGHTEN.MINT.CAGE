@@ -21,6 +21,7 @@ const subscribers = new Set();
 let audioEl = null;
 let currentRequestId = 0;
 let unavailableNoticed = false;
+let _gestureUnlocked = false;
 
 function _audio() {
   if (!audioEl && typeof Audio !== 'undefined') {
@@ -31,6 +32,33 @@ function _audio() {
     audioEl.addEventListener('error', () => _setState('idle'));
   }
   return audioEl;
+}
+
+/**
+ * V1.1.25 — Mobile autoplay unlock. Call this synchronously inside a
+ * user-gesture handler (e.g. button onClick) BEFORE any async work.
+ * Plays a 1-frame silent buffer to "unlock" the cached audio element
+ * for subsequent fetched narration. Without this, iOS Safari and
+ * Android Chrome reject Audio.play() with NotAllowedError after any
+ * `await fetch(...)` has elapsed — which is why "HEAR IT" buttons
+ * appeared dead on mobile.
+ *
+ * Idempotent — safe to call on every gesture.
+ */
+export function unlockAudio() {
+  if (_gestureUnlocked) return;
+  const a = _audio();
+  if (!a) return;
+  try {
+    a.muted = true;
+    a.src = 'data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQwAAAAAAAAAAAAAAAAAAAAAAASW5mbwAAAA8AAAACAAACcQCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgID/////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAQAAAAAAAAAAnFD9Hgf////////////////////////////////////////////////////////////////////////////////////////////////////////8=';
+    const p = a.play();
+    if (p && typeof p.catch === 'function') p.catch(() => { /* ok */ });
+    setTimeout(() => {
+      try { a.pause(); a.currentTime = 0; a.muted = false; } catch { /* noop */ }
+    }, 50);
+    _gestureUnlocked = true;
+  } catch { /* noop */ }
 }
 
 // V1.0.16 — Singleton AudioContext + AnalyserNode for FFT vertex

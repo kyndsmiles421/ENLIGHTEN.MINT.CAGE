@@ -6,7 +6,14 @@ export default function ShareButton() {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
-    const url = window.location.origin;
+    // V1.1.25 — Share an explicit, guest-safe landing URL instead of
+    // window.location.origin. The apex root redirects through RootGate
+    // which can race on slow mobile connections and land the recipient
+    // on a 404 catch-all. /landing.html is the static marketing page
+    // that works for both authed AND guest recipients with zero JS
+    // routing — guaranteed to render for whoever opens the share.
+    const origin = window.location.origin || 'https://enlighten-mint-cafe.me';
+    const url = `${origin}/landing.html`;
     const shareData = {
       title: 'The ENLIGHTEN.MINT.CAFE',
       text: 'Your sanctuary for breathwork, meditation, and spiritual growth. Join The ENLIGHTEN.MINT.CAFE.',

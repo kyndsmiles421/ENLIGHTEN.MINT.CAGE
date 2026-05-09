@@ -622,10 +622,13 @@ export default function SovereignHub() {
   }, []);
 
   const handleBroadcast = async () => {
+    // V1.1.25 — Share /landing.html (static, guest-safe) instead of
+    // window.location.origin so the recipient never hits a 404.
+    const origin = window.location.origin || 'https://enlighten-mint-cafe.me';
     const shareData = {
       title: 'ENLIGHTEN.MINT.CAFE',
       text: 'Sovereign Spiritual Instrument — breathwork, divination, alchemy, and more.',
-      url: window.location.origin,
+      url: `${origin}/landing.html`,
     };
     try {
       if (navigator.share) {

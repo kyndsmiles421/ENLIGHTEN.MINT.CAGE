@@ -50,10 +50,46 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     try:
         payload = jwt.decode(credentials.credentials, JWT_SECRET, algorithms=[JWT_ALGORITHM])
         user_id = payload["sub"]
-        # Fetch role from DB for permission checks
-        user_doc = await db.users.find_one({"id": user_id}, {"_id": 0, "role": 1})
-        role = (user_doc or {}).get("role", "user")
-        return {"id": user_id, "name": payload["name"], "role": role}
+        # V1.1.25 — Pull every tier-relevant field once so every
+        # downstream route sees the SAME tier picture, and admin/owner/
+        # creator accounts get a synthetic top-tier injection so they
+        # never hit a single tier-gate anywhere in the OS. This is the
+        # system-wide "creator mode" the architect requested — one
+        # patch at the auth choke point instead of touching 28 routes.
+        user_doc = await db.users.find_one(
+            {"id": user_id},
+            {
+                "_id": 0,
+                "role": 1, "is_admin": 1, "is_owner": 1,
+                "tier": 1, "subscription_tier": 1, "tier_id": 1, "gilded_tier": 1,
+                "email": 1,
+            },
+        ) or {}
+        role = (user_doc.get("role") or "user").lower()
+        raw_tier = (user_doc.get("tier") or "").lower()
+        is_owner = bool(user_doc.get("is_owner") or user_doc.get("is_admin"))
+        is_creator_role = role in ("admin", "owner", "creator", "architect")
+        is_creator_tier = raw_tier in ("creator", "admin", "owner", "architect_admin")
+        is_creator = is_owner or is_creator_role or is_creator_tier
+        # Gilded tier resolution: real value, OR sovereign_founder for owners.
+        gilded = user_doc.get("gilded_tier") or user_doc.get("subscription_tier") or user_doc.get("tier_id")
+        if is_creator:
+            gilded = "sovereign_founder"
+            sub_tier = "sovereign"
+        else:
+            gilded = gilded or "discovery"
+            sub_tier = user_doc.get("subscription_tier") or gilded
+        return {
+            "id": user_id,
+            "name": payload["name"],
+            "role": role,
+            "tier": raw_tier or ("creator" if is_creator else "discovery"),
+            "subscription_tier": sub_tier,
+            "tier_id": user_doc.get("tier_id") or sub_tier,
+            "gilded_tier": gilded,
+            "is_admin": is_creator,
+            "is_owner": is_creator,
+        }
     except jwt.ExpiredSignatureError:
         from fastapi import HTTPException
         raise HTTPException(status_code=401, detail="Token expired")

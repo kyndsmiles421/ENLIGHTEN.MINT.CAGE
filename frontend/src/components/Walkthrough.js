@@ -131,8 +131,14 @@ export default function Walkthrough({ onComplete }) {
           className="fixed inset-0 z-[100] flex items-center justify-center"
           data-testid="walkthrough-overlay"
         >
-          {/* Backdrop */}
-          <div className="absolute inset-0" style={{ background: 'rgba(3,3,8,0.85)', backdropFilter: 'none'}} />
+          {/* V1.1.25 — Backdrop dismisses on tap. Reduced opacity from
+              0.85 → 0.72 so the content card has visible contrast. */}
+          <div
+            className="absolute inset-0"
+            style={{ background: 'rgba(2,3,8,0.72)', backdropFilter: 'blur(8px)', cursor: 'pointer' }}
+            onClick={skip}
+            data-testid="walkthrough-backdrop"
+          />
 
           {/* Content card */}
           <motion.div
@@ -143,18 +149,22 @@ export default function Walkthrough({ onComplete }) {
             transition={{ duration: 0.3 }}
             className="relative z-10 max-w-lg w-full mx-6"
           >
-            <div className="rounded-2xl p-8 md:p-10" style={{ background: 'rgba(12,12,20,0.95)', border: `1px solid ${current.color}15`, boxShadow: `0 0 80px ${current.color}08` }}>
+            <div className="rounded-2xl p-8 md:p-10" style={{
+              background: 'linear-gradient(180deg, rgba(28,24,52,0.97) 0%, rgba(18,16,38,0.97) 100%)',
+              border: `1px solid ${current.color}55`,
+              boxShadow: `0 24px 70px rgba(0,0,0,0.6), 0 0 60px ${current.color}25`,
+            }}>
               {/* Skip button */}
-              <button onClick={skip} className="absolute top-4 right-4 p-1.5 rounded-lg transition-all"
-                style={{ color: 'var(--text-muted)' }}
+              <button onClick={skip} className="absolute top-4 right-4 p-1.5 rounded-lg transition-all hover:bg-white/10"
+                style={{ color: '#E2E8F0' }}
                 data-testid="walkthrough-skip">
                 <X size={16} />
               </button>
 
               {/* Icon */}
               <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6"
-                style={{ background: `${current.color}12`, border: `1px solid ${current.color}20` }}>
-                <Icon size={24} style={{ color: current.color, filter: `drop-shadow(0 0 8px ${current.color}40)` }} />
+                style={{ background: `${current.color}22`, border: `1px solid ${current.color}55` }}>
+                <Icon size={24} style={{ color: current.color, filter: `drop-shadow(0 0 8px ${current.color}80)` }} />
               </div>
 
               {/* Step indicator */}
@@ -163,12 +173,12 @@ export default function Walkthrough({ onComplete }) {
               </p>
 
               {/* Title */}
-              <h2 className="text-xl md:text-2xl font-light mb-3" style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-primary)' }}>
+              <h2 className="text-xl md:text-2xl font-light mb-3" style={{ fontFamily: 'Cormorant Garamond, serif', color: '#F8FAFC' }}>
                 {current.title}
               </h2>
 
               {/* Description */}
-              <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm leading-relaxed mb-4" style={{ color: '#CBD5E1' }}>
                 {current.description}
               </p>
 
