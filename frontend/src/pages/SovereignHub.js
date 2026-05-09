@@ -505,12 +505,19 @@ const PILLAR_MIN_TIER = {
 
 // Tier rank for "user has access" checks. Mirrors backend
 // SOVEREIGN_TIER_ORDER (discovery → resonance → architect → sovereign → founder).
+// V1.1.24 — Added 'creator' and 'admin' tiers as Infinity rank so the
+// app owner / admin account always sees every pillar unlocked. Without
+// this, kyndsmiles@gmail.com (tier=creator, role=admin) was showing
+// locks on Observatory ($49/mo) + Fractal Engine ($89/mo) even though
+// the backend had already authorized full access.
 const TIER_RANK = {
   discovery: 0, seeker: 0, free: 0,
   resonance: 1, artisan: 1,
   architect: 2, builder: 2,
   sovereign: 3, sovereign_monthly: 3,
   sovereign_founder: 4, founder: 4,
+  // App owner / staff — always above every gate.
+  creator: 99, admin: 99, architect_admin: 99, owner: 99,
 };
 
 function userHasTier(userTier, requiredTier) {
@@ -557,9 +564,24 @@ export default function SovereignHub() {
    * pillar drawer either way so the lattice is visible after dispatch.
    */
   const dispatchPillar = useCallback((route) => {
-    const userTier = (user?.subscription_tier || user?.tier_id || user?.gilded_tier || 'discovery');
+    // V1.1.24 — Read user.tier (set by /api/auth/me) AND user.role +
+    // is_admin so app owner / admin / creator accounts are never
+    // gated on their own app. Previously only checked
+    // subscription_tier / tier_id / gilded_tier which left the
+    // creator account resolving to 'discovery' on first render →
+    // every pillar tap fired the tier-gate toast → user thought
+    // "first tap glitched, second tap works".
+    const userTier = (
+      user?.tier ||
+      user?.subscription_tier ||
+      user?.tier_id ||
+      user?.gilded_tier ||
+      'discovery'
+    );
+    const isOwnerOrAdmin = !!(user?.is_admin || user?.is_owner ||
+      ['admin', 'owner', 'creator'].includes((user?.role || '').toLowerCase()));
     const required = PILLAR_MIN_TIER[route];
-    if (required && !userHasTier(userTier, required)) {
+    if (!isOwnerOrAdmin && required && !userHasTier(userTier, required)) {
       toast(`🔒 ${required.toUpperCase()}+ tier required · use the Climb pill below to unlock`);
       return;
     }
@@ -889,8 +911,19 @@ export default function SovereignHub() {
                           // V1.1.6 — Tier gate. Lower-tier user → tile renders
                           // dimmed with an inline ClimbLadderPill funnel.
                           const requiredTier = PILLAR_MIN_TIER[item.route];
-                          const userTier = (user?.subscription_tier || user?.tier_id || user?.gilded_tier || 'discovery');
-                          const locked = !!(requiredTier && !userHasTier(userTier, requiredTier));
+                          // V1.1.24 — Same tier-resolution logic as
+                          // dispatchPillar so the LOCK ICON in the UI
+                          // matches what a tap would actually do.
+                          const userTier = (
+                            user?.tier ||
+                            user?.subscription_tier ||
+                            user?.tier_id ||
+                            user?.gilded_tier ||
+                            'discovery'
+                          );
+                          const isOwnerOrAdmin = !!(user?.is_admin || user?.is_owner ||
+                            ['admin', 'owner', 'creator'].includes((user?.role || '').toLowerCase()));
+                          const locked = !isOwnerOrAdmin && !!(requiredTier && !userHasTier(userTier, requiredTier));
                           return (
                           <motion.button
                             key={item.label}

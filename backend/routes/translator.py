@@ -113,12 +113,19 @@ TIER_FEATURE_MATRIX = {
 
 async def _resolve_tier(user: dict) -> str:
     """Look up the user's gilded_tier, falling back to discovery for
-    unknown values so we never deny free users their basic features."""
+    unknown values so we never deny free users their basic features.
+    V1.1.24 — Owner / admin / creator accounts always resolve to
+    sovereign so the app owner is never tier-gated on their own app."""
     doc = await db.users.find_one(
         {"id": user["id"]},
-        {"_id": 0, "gilded_tier": 1, "is_owner": 1},
+        {"_id": 0, "gilded_tier": 1, "is_owner": 1, "is_admin": 1, "role": 1, "tier": 1},
     ) or {}
-    if doc.get("is_owner"):
+    if (
+        doc.get("is_owner")
+        or doc.get("is_admin")
+        or (doc.get("role") or "").lower() in ("admin", "owner", "creator")
+        or (doc.get("tier") or "").lower() in ("creator", "admin", "owner")
+    ):
         return "sovereign"
     tier = doc.get("gilded_tier", "discovery")
     return tier if tier in TIER_FEATURE_MATRIX else "discovery"

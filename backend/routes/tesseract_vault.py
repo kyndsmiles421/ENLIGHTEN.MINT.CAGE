@@ -61,7 +61,18 @@ _TIER_RANK = {
 
 
 def _user_tier_id(user: dict) -> str:
-    """Resolve the user's tier id from common shapes."""
+    """Resolve the user's tier id from common shapes.
+    V1.1.24 — Owner / admin / creator accounts always resolve to the
+    top sovereign tier so the app owner is never tier-gated."""
+    role = (user.get("role") or "").lower()
+    raw_tier = (user.get("tier") or "").lower()
+    if (
+        user.get("is_owner") is True
+        or user.get("is_admin") is True
+        or role in ("admin", "owner", "creator")
+        or raw_tier in ("creator", "admin", "owner")
+    ):
+        return "sovereign"
     return (
         (user.get("subscription_tier") or
          user.get("tier_id") or
