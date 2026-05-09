@@ -41,7 +41,7 @@ const SPLIT_PAGES = {
   '/dance-music': { label: 'Dance & Music', color: '#F59E0B' },
   '/media-library': { label: 'Media Library', color: '#C084FC' },
   '/my-creations': { label: 'My Creations', color: '#C084FC' },
-  '/light-therapy': { label: 'Light Therapy', color: '#A855F7' },
+  '/light-therapy': { label: 'Light Resonance', color: '#A855F7' },
   '/cosmic-mixer': { label: 'Cosmic Mixer', color: '#EC4899' },
   '/videos': { label: 'Videos', color: '#F97316' },
 };

@@ -76,7 +76,7 @@ const L4 = [
   { id: 'vr.starseed-arcturian', domain: 'starseed',    requires: ['starseed_active'],    unlocks: ['arcturian_realm'],   sparks: 12, purpose: 'Enter the Arcturian VR realm — sacred geometry sanctum.' },
   { id: 'vr.starseed-sirian',    domain: 'starseed',    requires: ['starseed_active'],    unlocks: ['sirian_realm'],      sparks: 12, purpose: 'Enter the Sirian VR realm — akashic library.' },
   { id: 'vr.starseed-orion',     domain: 'starseed',    requires: ['starseed_active'],    unlocks: ['orion_realm'],       sparks: 12, purpose: 'Enter the Orion VR realm — shadow alchemy.' },
-  { id: 'vr.starseed-pleiadian', domain: 'starseed',    requires: ['starseed_active'],    unlocks: ['pleiadian_realm'],   sparks: 12, purpose: 'Enter the Pleiadian VR realm — healing choir.' },
+  { id: 'vr.starseed-pleiadian', domain: 'starseed',    requires: ['starseed_active'],    unlocks: ['pleiadian_realm'],   sparks: 12, purpose: 'Enter the Pleiadian VR realm — resonant choir.' },
   { id: 'vr.starseed-venusian',  domain: 'starseed',    requires: ['starseed_active'],    unlocks: ['venusian_realm'],    sparks: 12, purpose: 'Enter the Venusian VR realm — divine beauty.' },
 ].map(t => ({ ...t, layer: 4, blade: 'entertainment', scaffold: true, material: 'gold' }));
 

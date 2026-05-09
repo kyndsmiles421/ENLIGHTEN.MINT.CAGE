@@ -40,7 +40,7 @@ const SACRED_CONSTANTS = {
   SCHUMANN: 7.83,           // Earth's heartbeat
   SOLFEGGIO: {
     UT: 174,                // Foundation & Pain Relief
-    RE: 285,                // Tissue Healing & Safety
+    RE: 285,                // Tissue Resonance & Safety
     MI: 396,                // Liberation from Fear
     FA: 417,                // Undoing & Change
     SOL: 432,               // Universal Harmony
@@ -306,7 +306,7 @@ const GAMING_INTERFACES = {
     xp_multiplier: 1.2,
   },
   Frequency_Alchemy: {
-    description: 'Mix Solfeggio frequencies for healing blends',
+    description: 'Mix Solfeggio frequencies for resonant blends',
     mechanics: ['slider_tune', 'harmonic_layer', 'preset_blend'],
     xp_multiplier: 1.4,
   },

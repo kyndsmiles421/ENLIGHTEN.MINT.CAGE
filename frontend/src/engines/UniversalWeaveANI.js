@@ -78,7 +78,7 @@ const SYNERGY_MATRIX = {
     "health_science": {
         name: "Biomedical_Synthesis",
         constant: 1.35,
-        description: "Ancient healing verified and enhanced by modern science"
+        description: "Ancient resonant traditions enriched and contextualized by modern science"
     }
 };
 

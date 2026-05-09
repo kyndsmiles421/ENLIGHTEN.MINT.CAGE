@@ -37,7 +37,7 @@ function SceneNarrationSpeaker({ text, accentColor }) {
       data-testid="scene-narration-speaker"
       data-voice-state={vs.state}
       title={
-        unavailable ? 'Sage Voice unavailable — set ELEVENLABS_API_KEY'
+        unavailable ? 'Sage Voice resting — tap again in a moment'
         : speaking ? 'Stop narration'
         : 'Read scene aloud'
       }
@@ -61,7 +61,7 @@ function SceneNarrationSpeaker({ text, accentColor }) {
         : speaking ? <Square size={10} />
         : unavailable ? <VolumeX size={10} />
         : <Volume2 size={10} />}
-      {speaking ? 'Stop' : unavailable ? 'No Voice Key' : 'Read Aloud'}
+      {speaking ? 'Stop' : unavailable ? 'Voice Resting' : 'Read Aloud'}
     </button>
   );
 }

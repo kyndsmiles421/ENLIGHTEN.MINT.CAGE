@@ -154,7 +154,7 @@ const RELATED = {
     { label: 'Meal Planning', route: '/meal-planning' },
   ],
   '/herbology': [
-    { label: 'Aromatherapy', route: '/aromatherapy' },
+    { label: 'Aromatic Resonance', route: '/aromatherapy' },
     { label: 'Elixirs', route: '/elixirs' },
     { label: 'Nourishment', route: '/nourishment' },
   ],

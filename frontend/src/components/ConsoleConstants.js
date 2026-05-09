@@ -22,7 +22,7 @@ export const PILLARS = [
   { key: 'practice', title: 'PRA', full: 'Practice', color: '#D8B4FE', modules: [
     { id: 'breathwork', label: 'Breath', route: '/breathing' }, { id: 'meditation', label: 'Medit', route: '/meditation' },
     { id: 'yoga', label: 'Yoga', route: '/yoga' }, { id: 'mudras', label: 'Mudra', route: '/mudras' },
-    { id: 'mantras', label: 'Mantra', route: '/mantras' }, { id: 'light', label: 'Light', route: '/light-therapy' },
+    { id: 'mantras', label: 'Mantra', route: '/mantras' }, { id: 'light', label: 'Light Resonance', route: '/light-therapy' },
     { id: 'affirm', label: 'Affirm', route: '/affirmations' }, { id: 'ritual', label: 'Ritual', route: '/daily-ritual' },
     { id: 'mood', label: 'Mood', route: '/mood' },
   ]},
@@ -36,7 +36,7 @@ export const PILLARS = [
   { key: 'sanctuary', title: 'SAN', full: 'Sanctuary', color: '#2DD4BF', modules: [
     { id: 'journal', label: 'Journ', route: '/journal' }, { id: 'sanctuary', label: 'Sancty', route: '/sanctuary' },
     { id: 'herbs', label: 'Herbs', route: '/herbology' }, { id: 'crystals', label: 'Crystl', route: '/crystals' },
-    { id: 'aroma', label: 'Aroma', route: '/aromatherapy' }, { id: 'elixirs', label: 'Elixir', route: '/elixirs' },
+  { id: 'aroma', label: 'Aromatic', route: '/aromatherapy' }, { id: 'elixirs', label: 'Elixir', route: '/elixirs' },
     { id: 'zen', label: 'Zen', route: '/zen-garden' }, { id: 'sounds', label: 'Sound', route: '/soundscapes' },
     { id: 'nourish', label: 'Noursh', route: '/nourishment' },
   ]},

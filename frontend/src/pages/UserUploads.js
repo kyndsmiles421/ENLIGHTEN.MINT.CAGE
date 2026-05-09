@@ -168,7 +168,7 @@ export default function UserUploads() {
             Media Library
           </h1>
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            Upload personal meditations, mantras, and healing sounds
+            Upload personal meditations, mantras, and resonant sounds
           </p>
         </div>
 

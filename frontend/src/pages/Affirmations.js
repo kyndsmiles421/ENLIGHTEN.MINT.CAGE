@@ -236,7 +236,7 @@ function BuildYourOwn() {
               <textarea
                 value={goal}
                 onChange={e => setGoal(e.target.value)}
-                placeholder="I want to feel more confident at work... / I'm healing from heartbreak and need self-love... / I want to attract abundance into my life..."
+                placeholder="I want to feel more confident at work... / I'm releasing heartbreak and inviting self-love... / I want to attract abundance into my life..."
                 className="input-glass w-full h-28 resize-none text-sm leading-relaxed"
                 data-testid="build-affirmation-goal"
               />

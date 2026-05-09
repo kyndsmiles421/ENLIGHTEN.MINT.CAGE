@@ -100,14 +100,14 @@ const MODULE_SCENES = {
 // Cross-module connections — "The Sage Recommends"
 const CROSS_LINKS = {
   crystals: [
-    { text: 'Amethyst pairs with lavender oil for deep relaxation', path: '/aromatherapy', module: 'Aromatherapy' },
+    { text: 'Amethyst pairs with lavender oil for deep relaxation', path: '/aromatherapy', module: 'Aromatic Resonance' },
     { text: 'Clear Quartz amplifies meditation intention', path: '/meditation', module: 'Meditation' },
     { text: 'Rose Quartz enhances heart chakra yoga flows', path: '/yoga', module: 'Yoga' },
   ],
   herbology: [
     { text: 'Chamomile tea synergizes with breathing exercises', path: '/breathing', module: 'Breathwork' },
     { text: 'Ashwagandha supports the Warrior yoga sequence', path: '/yoga', module: 'Yoga' },
-    { text: 'Combine herbs with crystal grids for amplified healing', path: '/crystals', module: 'Crystals' },
+    { text: 'Combine herbs with crystal grids for amplified resonance', path: '/crystals', module: 'Crystals' },
   ],
   aromatherapy: [
     { text: 'Frankincense deepens oracle readings', path: '/oracle', module: 'Oracle' },
@@ -122,7 +122,7 @@ const CROSS_LINKS = {
   mudras: [
     { text: 'Gyan Mudra deepens pranayama breathing', path: '/breathing', module: 'Breathwork' },
     { text: 'Combine mudras with mantra chanting', path: '/mantras', module: 'Mantras' },
-    { text: 'Prithvi Mudra grounds crystal energy healing', path: '/crystals', module: 'Crystals' },
+    { text: 'Prithvi Mudra grounds crystal energy resonance', path: '/crystals', module: 'Crystals' },
   ],
   nourishment: [
     { text: 'Turmeric activates with the Fire element yoga flows', path: '/yoga', module: 'Yoga' },
@@ -132,7 +132,7 @@ const CROSS_LINKS = {
   reiki: {
     0: { text: 'Reiki Hand positions enhance acupressure work', path: '/acupressure', module: 'Acupressure' },
     1: { text: 'Crystal grids amplify Reiki energy channels', path: '/crystals', module: 'Crystals' },
-    2: { text: 'Combine Reiki with guided meditation for deep healing', path: '/meditation', module: 'Meditation' },
+    2: { text: 'Combine Reiki with guided meditation for deep alignment', path: '/meditation', module: 'Meditation' },
   },
   acupressure: [
     { text: 'Meridian points align with yoga asanas', path: '/yoga', module: 'Yoga' },
@@ -556,7 +556,7 @@ function KnowledgeChallenge({ items, discoveredSet, color, category, onComplete 
       const allElements = [...new Set(items.map(i => i.element).filter(Boolean))];
       wrongAnswers = allElements.filter(e => e !== answer).sort(() => Math.random() - 0.5).slice(0, 3);
     } else {
-      const prop = target.properties?.[0] || target.systems?.[0] || 'healing';
+      const prop = target.properties?.[0] || target.systems?.[0] || 'resonance';
       q = `"${target.name}" is known for which property?`;
       answer = prop;
       const allProps = [...new Set(items.flatMap(i => i.properties || i.systems || []))];

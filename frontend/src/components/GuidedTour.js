@@ -27,7 +27,7 @@ const TOUR_STEPS = [
   },
   {
     id: 'practice', title: 'Practice — Sacred Techniques',
-    desc: 'Explore breathing, meditation, yoga, mudras, mantras, affirmations, and ancient healing practices.',
+    desc: 'Explore breathing, meditation, yoga, mudras, mantras, affirmations, and ancient resonance practices.',
     icon: Flame, color: '#2DD4BF', category: 'Pillar 2', path: '/breathing',
     bg: 'radial-gradient(ellipse at 70% 30%, rgba(45,212,191,0.12) 0%, transparent 60%)',
     features: ['Breathing', 'Meditation', 'Yoga', 'Mantras', 'Mudras'],
@@ -48,10 +48,10 @@ const TOUR_STEPS = [
   },
   {
     id: 'nourish', title: 'Nourish — Mind, Body & Spirit',
-    desc: 'Herbology, aromatherapy, sacred nourishment, and Reiki healing — feed your body as intentionally as your soul.',
+    desc: 'Herbology, aromatic resonance, sacred nourishment, and Reiki alignment — feed your body as intentionally as your soul.',
     icon: Heart, color: '#FDA4AF', category: 'Pillar 5', path: '/nourishment',
     bg: 'radial-gradient(ellipse at 60% 40%, rgba(253,164,175,0.12) 0%, transparent 60%)',
-    features: ['Herbology', 'Aromatherapy', 'Nourishment', 'Reiki'],
+    features: ['Herbology', 'Aromatic Resonance', 'Nourishment', 'Reiki'],
   },
   {
     id: 'explore', title: 'Explore — Infinite Discovery',
@@ -74,7 +74,7 @@ const TOUR_STEPS = [
   },
   {
     id: 'mixer', title: 'Cosmic Mixer — Layer Your Experience',
-    desc: 'Combine resonant frequencies, ambient sounds, sacred mantras, color light therapy, and vibration — all at once.',
+    desc: 'Combine resonant frequencies, ambient sounds, sacred mantras, color light resonance, and vibration — all at once.',
     icon: Waves, color: '#A855F7', category: 'Spotlight',
     bg: 'radial-gradient(ellipse at 60% 50%, rgba(168,85,247,0.14) 0%, transparent 60%)',
   },

@@ -332,7 +332,7 @@ export default function Sanctuary() {
           <div className="sanctuary-card">
             <h3 className="card-title">SEAL A DEED</h3>
             <p className="card-body" style={{ marginBottom: 20 }}>
-              Record your acts of service, creation, or healing to accumulate Karma.
+              Record your acts of service, creation, or resonance to accumulate Karma.
             </p>
             
             <form className="deed-form" onSubmit={handleSubmitDeed}>

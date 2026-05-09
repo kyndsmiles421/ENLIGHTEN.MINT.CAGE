@@ -47,10 +47,10 @@ const COLORS = [
     frequency: '510 THz', wavelength: '580 nm',
   },
   {
-    id: 'green', name: 'Green — Healing', hex: '#22C55E', glow: 'rgba(34,197,94,0.4)',
+    id: 'green', name: 'Green — Resonance', hex: '#22C55E', glow: 'rgba(34,197,94,0.4)',
     icon: Heart, chakra: 'Heart Chakra (Anahata)', hz: 341,
-    benefits: ['Promotes deep healing', 'Balances the nervous system', 'Soothes and calms the heart', 'Harmonizes body and mind'],
-    description: 'Green light is the color of nature and the heart chakra. It brings balance to all systems, encourages healing, soothes inflammation, and opens the heart to compassion.',
+    benefits: ['Promotes deep alignment', 'Balances the nervous system', 'Soothes and calms the heart', 'Harmonizes body and mind'],
+    description: 'Green light is the color of nature and the heart chakra. It brings balance to all systems, encourages alignment, soothes tension, and opens the heart to compassion.',
     frequency: '550 THz', wavelength: '540 nm',
   },
   {
@@ -640,7 +640,7 @@ export default function LightTherapy() {
             fontFamily: 'Cormorant Garamond, serif',
             color: selected.length ? `${blended}DD` : 'rgba(248,250,252,0.85)',
           }}>
-            {selected.length > 1 && resonanceName ? resonanceName : selected.length === 1 ? primary.name : 'Light Therapy'}
+            {selected.length > 1 && resonanceName ? resonanceName : selected.length === 1 ? primary.name : 'Light Resonance'}
           </h1>
           {selected.length > 0 ? (
             <p className="text-[10px] mb-4" style={{ color: `${accent}88` }}>

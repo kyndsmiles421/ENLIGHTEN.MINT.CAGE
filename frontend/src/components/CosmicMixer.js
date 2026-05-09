@@ -18,7 +18,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 /* ─── Layer Definitions ─── */
 const FREQUENCIES = [
   { hz: 174, label: '174 Hz', desc: 'Foundation & Pain Relief', color: '#78716C' },
-  { hz: 285, label: '285 Hz', desc: 'Tissue Healing & Safety', color: '#92400E' },
+  { hz: 285, label: '285 Hz', desc: 'Tissue Resonance & Safety', color: '#92400E' },
   { hz: 396, label: '396 Hz', desc: 'Liberation from Fear', color: '#EF4444' },
   { hz: 417, label: '417 Hz', desc: 'Undoing & Change', color: '#FB923C' },
   { hz: 432, label: '432 Hz', desc: 'Universal Harmony', color: '#10B981' },
@@ -1581,7 +1581,7 @@ function ChipButton({ active, color, onClick, testId, disabled, children }) {
   );
 }
 
-/* ─── Light Therapy Overlay ─── */
+/* ─── Light Resonance Overlay ─── */
 function LightOverlay({ mode }) {
   const [colorIdx, setColorIdx] = useState(0);
 

@@ -9,8 +9,10 @@
  *
  * Designed to fail gracefully:
  *   - 503 "key not configured" → flips state to 'unavailable' once,
- *     emits an event the HUD can render as a "Configure key" hint, and
- *     stays quiet for the rest of the session (no repeated 503 spam).
+ *     emits an event the HUD can render as a "Configure key" hint, but
+ *     auto-clears after 90s and on tab refocus so a single transient
+ *     ElevenLabs 503 (free-tier IP block, brief network blip) does NOT
+ *     poison the UI for the rest of the session.
  *   - Any other error → state returns to 'idle', user is never blocked.
  *
  * Auth: reads zen_token from localStorage. Skips entirely for guests.
@@ -22,6 +24,31 @@ let audioEl = null;
 let currentRequestId = 0;
 let unavailableNoticed = false;
 let _gestureUnlocked = false;
+
+// V1.2.0 — Auto-clear sticky 'unavailable' so a single transient 503
+// from ElevenLabs (free-tier cloud-IP block, brief network blip) does
+// not silence Sage Voice for the rest of the session. Re-probe on
+// next user gesture / next narrate call after this window elapses.
+const UNAVAILABLE_RESET_MS = 90 * 1000;
+let _unavailableSetAt = 0;
+
+function _maybeResetUnavailable() {
+  if (!unavailableNoticed) return;
+  if (Date.now() - _unavailableSetAt > UNAVAILABLE_RESET_MS) {
+    unavailableNoticed = false;
+    _setState('idle');
+  }
+}
+
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      // Tab refocused — give the user another shot at voice.
+      unavailableNoticed = false;
+      if (STATE.state === 'unavailable') _setState('idle');
+    }
+  });
+}
 
 function _audio() {
   if (!audioEl && typeof Audio !== 'undefined') {
@@ -145,6 +172,7 @@ export function stop() {
 export async function speak(text, opts = {}) {
   const txt = (text || '').trim();
   if (!txt) return;
+  _maybeResetUnavailable();
   if (unavailableNoticed) return;   // be quiet after a 503 'no key' result
 
   let token = null;
@@ -178,6 +206,7 @@ export async function speak(text, opts = {}) {
 
     if (res.status === 503) {
       unavailableNoticed = true;
+      _unavailableSetAt = Date.now();
       _setState('unavailable', 'no-key');
       return;
     }
@@ -215,6 +244,7 @@ export async function speak(text, opts = {}) {
 // HUD speaker icon mirrors the "speaking" state during preview —
 // keeping visual feedback consistent across the system.
 export async function previewSample(opts = {}) {
+  _maybeResetUnavailable();
   if (unavailableNoticed) return;
   let token = null;
   try { token = localStorage.getItem('zen_token'); } catch { /* noop */ }
@@ -234,6 +264,7 @@ export async function previewSample(opts = {}) {
     if (reqId !== currentRequestId) return;
     if (res.status === 503) {
       unavailableNoticed = true;
+      _unavailableSetAt = Date.now();
       _setState('unavailable', 'no-key');
       return;
     }

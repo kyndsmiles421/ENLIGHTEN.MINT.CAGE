@@ -733,7 +733,7 @@ export default function SuanpanMixer() {
                       { key: 'deep_sleep', label: 'Deep Sleep', description: 'Delta & theta waves' },
                       { key: 'focus', label: 'Laser Focus', description: 'Alpha-beta entrainment' },
                       { key: 'energy', label: 'Energy Surge', description: 'High-frequency activation' },
-                      { key: 'healing', label: 'Sacred Healing', description: 'Solfeggio cascade' },
+                      { key: 'healing', label: 'Sacred Resonance', description: 'Solfeggio cascade' },
                       { key: 'meditation', label: 'Deep Meditation', description: 'Theta-alpha bridge' },
                       { key: 'grounding', label: 'Earth Grounding', description: 'Sub-bass resonance' },
                     ]).map(g => {

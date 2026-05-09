@@ -53,7 +53,7 @@ export default function Aromatherapy() {
     <HolographicChamber
       chamberId="aromatherapy"
       title="The Essence Atelier"
-      subtitle="Sacred Aromatherapy Sanctum"
+      subtitle="Sacred Aromatic Resonance Sanctum"
     >
       <ChamberProp
         x={22} y={58} size={78}
@@ -100,7 +100,7 @@ export default function Aromatherapy() {
       />
 
       <InteractiveModule
-        title="Sacred Aromatherapy"
+        title="Sacred Aromatic Resonance"
         subtitle="Essential Oil Wisdom"
         icon={Droplets}
         color={ACCENT}

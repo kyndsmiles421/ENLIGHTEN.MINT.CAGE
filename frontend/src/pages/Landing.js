@@ -869,7 +869,7 @@ function Footer() {
               <div className="space-y-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
                 <p><strong style={{ color: 'var(--text-primary)' }}>For Information &amp; Entertainment Purposes Only.</strong> The Enlightenment Cafe provides tools for personal wellness, stress relief, relaxation, and reflective practice. These tools are not medical devices and are not intended to diagnose, treat, cure, or prevent any disease or medical condition.</p>
                 <p><strong style={{ color: 'var(--text-primary)' }}>Not a Substitute for Professional Care.</strong> If you are experiencing a mental health crisis, severe anxiety, depression, or any medical condition, please seek professional help immediately. Our tools complement — but never replace — professional medical or psychological care.</p>
-                <p><strong style={{ color: 'var(--text-primary)' }}>Frequency & Light Therapy:</strong> Some users may be sensitive to certain frequencies or light patterns. If you experience discomfort, dizziness, or any adverse effects, discontinue use immediately. Those with photosensitive epilepsy should consult a healthcare provider before using light therapy features.</p>
+                <p><strong style={{ color: 'var(--text-primary)' }}>Frequency & Light Resonance:</strong> Some users may be sensitive to certain frequencies or light patterns. If you experience discomfort, dizziness, or any adverse effects, discontinue use immediately. Those with photosensitive epilepsy should consult a healthcare provider before using light resonance features.</p>
                 <p><strong style={{ color: 'var(--text-primary)' }}>Nourishment Information:</strong> Recipe and nutritional information is provided for educational purposes. Individual dietary needs vary. Consult a healthcare provider or registered dietitian for personalized nutrition advice, especially if you have food allergies or medical conditions.</p>
                 <p><strong style={{ color: 'var(--text-primary)' }}>The Engineer's Promise:</strong> Every tool on this platform is designed with care, precision, and genuine intention to help. We built this because we believe in the power of these practices — and we want to share them responsibly.</p>
               </div>
@@ -1082,7 +1082,7 @@ export default function Landing() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-14">
                 {[
-                  { step: '01', title: 'Choose Your Frequency', desc: 'Select from healing soundscapes, guided meditations, breathwork, or sacred practices tailored to your current state.', color: '#D8B4FE' },
+                  { step: '01', title: 'Choose Your Frequency', desc: 'Select from resonant soundscapes, guided meditations, breathwork, or sacred practices tailored to your current state.', color: '#D8B4FE' },
                   { step: '02', title: 'Immerse & Transform', desc: 'Our 3D holographic guided experiences use AI narration, binaural frequencies, and ancient techniques to shift your energy in minutes.', color: '#2DD4BF' },
                   { step: '03', title: 'Track Your Evolution', desc: 'Daily challenges, streaks, and your personal wellness journey build momentum. Watch yourself grow with every session.', color: '#FCD34D' },
                 ].map((item, i) => (
@@ -1117,12 +1117,12 @@ export default function Landing() {
               >
                 <div className="absolute top-0 right-0 w-60 h-60 rounded-full opacity-[0.03]"
                   style={{ background: '#2DD4BF', filter: 'blur(60px)', transform: 'translate(30%, -40%)' }} />
-                <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#2DD4BF' }}>Mobile Wellness Unit</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] mb-3" style={{ color: '#2DD4BF' }}>Mobile Resonance Unit</p>
                 <h3 className="text-xl md:text-2xl font-light mb-3" style={{ fontFamily: 'Cormorant Garamond, serif' }}>
                   We Come to You
                 </h3>
                 <p className="text-sm max-w-lg mx-auto mb-6 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                  Experience The Enlightenment Cafe in person. Our mobile unit brings sound healing, frequency therapy, and guided meditation sessions directly to your location.
+                  Experience The Enlightenment Cafe in person. Our mobile unit brings sound resonance, frequency alignment, and guided meditation sessions directly to your location.
                 </p>
                 <div className="flex flex-wrap gap-3 justify-center">
                   <button onClick={() => navigate('/auth')}

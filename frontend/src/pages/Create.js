@@ -183,7 +183,7 @@ export default function Create() {
                   />
                   <input
                     value={tags} onChange={e => setTags(e.target.value)}
-                    placeholder="Tags (comma separated): peace, morning, healing"
+                    placeholder="Tags (comma separated): peace, morning, alignment"
                     className="w-full bg-transparent border-b py-3 text-xs mt-3 mb-4 outline-none"
                     style={{ borderColor: 'rgba(255,255,255,0.06)', color: 'var(--text-muted)' }}
                     data-testid="create-tags"

@@ -114,7 +114,7 @@ export const CONSTELLATION_NODES = {
     glowTriggers: ['stress_detected', 'break_needed'],
   },
   'light-therapy': { 
-    id: 'light-therapy', label: 'Light Therapy', color: '#A855F7', category: 'sanctuary',
+    id: 'light-therapy', label: 'Light Resonance', color: '#A855F7', category: 'sanctuary',
     path: '/light-therapy', connections: ['frequencies', 'mood'],
     glowTriggers: ['seasonal_adjustment', 'energy_low'],
   },

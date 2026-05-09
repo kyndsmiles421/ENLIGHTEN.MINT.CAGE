@@ -13,7 +13,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const MIXER_FREQUENCIES = [
   { hz: 174, label: '174 Hz', desc: 'Pain Reduction', color: '#EC4899' },
-  { hz: 285, label: '285 Hz', desc: 'Tissue Healing', color: '#8B5CF6' },
+  { hz: 285, label: '285 Hz', desc: 'Tissue Resonance', color: '#8B5CF6' },
   { hz: 396, label: '396 Hz', desc: 'Liberation', color: '#EF4444' },
   { hz: 417, label: '417 Hz', desc: 'Transformation', color: '#F59E0B' },
   { hz: 432, label: '432 Hz', desc: 'Universal Harmony', color: '#22C55E' },

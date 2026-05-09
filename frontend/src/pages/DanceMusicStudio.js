@@ -86,7 +86,7 @@ const DANCES = [
     id: 'powwow', name: 'Pow Wow Dance', origin: 'North America',
     tradition: 'Native American', color: '#059669',
     description: 'Sacred ceremonial gatherings honoring Native traditions through dance, song, and community. Each style—Fancy Dance, Jingle Dress, Grass Dance, Traditional—carries specific spiritual medicine and prayers. The drumbeat represents the heartbeat of Mother Earth.',
-    movements: ['Grand Entry procession', 'Traditional stomp', 'Fancy footwork', 'Jingle dress healing steps', 'Grass dance flowing movements', 'Eagle feather gestures', 'Honor beats', 'Closing circle'],
+    movements: ['Grand Entry procession', 'Traditional stomp', 'Fancy footwork', 'Jingle dress ceremonial steps', 'Grass dance flowing movements', 'Eagle feather gestures', 'Honor beats', 'Closing circle'],
     music: 'Pow wow drum, voice chanting, rattles',
     significance: 'Honoring ancestors and connecting with Mother Earth',
   },

@@ -2,7 +2,7 @@
  * HARMONIC RESONANCE SYSTEM
  * 
  * Synchronizes all nodule vibrations to Solfeggio frequencies.
- * Each frequency has unique healing/spiritual properties.
+ * Each frequency has unique resonant/spiritual properties.
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';

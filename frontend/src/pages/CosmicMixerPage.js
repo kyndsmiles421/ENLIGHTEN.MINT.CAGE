@@ -1268,7 +1268,7 @@ export default function CosmicMixerPage() {
             </div>
           </AccordionSection>
 
-          <AccordionSection title="Light Therapy" icon={Sun} color="#FCD34D" open={openSections.light} onToggle={() => toggleSection('light')} badge={activeLight ? activeLight.label : null}>
+          <AccordionSection title="Light Resonance" icon={Sun} color="#FCD34D" open={openSections.light} onToggle={() => toggleSection('light')} badge={activeLight ? activeLight.label : null}>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
               {LIGHT_MODES.map(l => (
                 <button key={l.id} onClick={() => toggleLight(l)} className="flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all hover:scale-[1.02]"

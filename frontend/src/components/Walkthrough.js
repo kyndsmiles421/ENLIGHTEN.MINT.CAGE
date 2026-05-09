@@ -69,7 +69,7 @@ const WALKTHROUGH_STEPS = [
   },
   {
     title: 'Explore Everything Else',
-    description: 'The "More" menu holds 30+ tools: Oracle readings, Sage AI coach, dream journal, yoga, mudras, mantras, sound healing, frequencies, light therapy, herbology, and much more. Explore at your own pace.',
+    description: 'The "More" menu holds 30+ tools: Oracle readings, Sage AI coach, dream journal, yoga, mudras, mantras, sound resonance, frequencies, light resonance, herbology, and much more. Explore at your own pace.',
     icon: Map,
     color: '#2DD4BF',
     position: 'center',

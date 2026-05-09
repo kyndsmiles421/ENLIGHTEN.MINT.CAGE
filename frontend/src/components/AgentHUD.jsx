@@ -224,7 +224,7 @@ export default function AgentHUD() {
         data-voice-state={voiceState.state}
         title={
           voiceState.state === 'unavailable'
-            ? 'Sage Voice unavailable — add ELEVENLABS_API_KEY'
+            ? 'Sage Voice resting — tap again in a moment'
             : voiceState.state === 'speaking'
             ? 'Tap to stop Sage'
             : `${VOICE_MODE_LABEL[sageVoiceMode] || 'Voice'} · long-press cycles mode`

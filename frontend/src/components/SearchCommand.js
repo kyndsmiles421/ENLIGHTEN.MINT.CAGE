@@ -25,14 +25,14 @@ const SEARCH_INDEX = [
   { path: '/meditation', label: 'Meditation', keywords: 'practice meditation meditate mindfulness timer', icon: Timer, category: 'Practice', color: '#D8B4FE' },
   { path: '/yoga', label: 'Yoga', keywords: 'practice yoga asana poses stretch', icon: Flame, category: 'Practice', color: '#D8B4FE' },
   { path: '/exercises', label: 'Qigong & Tai Chi', keywords: 'practice exercises qigong tai chi energy cultivation movement', icon: Zap, category: 'Practice', color: '#D8B4FE' },
-  { path: '/mudras', label: 'Mudras', keywords: 'practice mudras hand gestures healing sacred', icon: Hand, category: 'Practice', color: '#D8B4FE' },
+  { path: '/mudras', label: 'Mudras', keywords: 'practice mudras hand gestures resonance sacred alignment', icon: Hand, category: 'Practice', color: '#D8B4FE' },
   { path: '/mantras', label: 'Mantras', keywords: 'practice mantras chanting sacred sound vibration', icon: Music, category: 'Practice', color: '#D8B4FE' },
-  { path: '/light-therapy', label: 'Light Therapy', keywords: 'practice light therapy chromotherapy color healing', icon: Lightbulb, category: 'Practice', color: '#D8B4FE' },
+  { path: '/light-therapy', label: 'Light Resonance', keywords: 'practice light resonance chromatic color frequency alignment', icon: Lightbulb, category: 'Practice', color: '#D8B4FE' },
   { path: '/affirmations', label: 'Affirmations', keywords: 'practice affirmations positive mantras self love', icon: Sun, category: 'Practice', color: '#D8B4FE' },
   { path: '/rituals', label: 'Sacred Rituals', keywords: 'practice rituals sacred ceremony daily', icon: Sunrise, category: 'Practice', color: '#D8B4FE' },
   { path: '/yantra', label: 'Yantras', keywords: 'practice yantra sacred geometry diagram meditation', icon: Triangle, category: 'Practice', color: '#D8B4FE' },
   { path: '/tantra', label: 'Tantra', keywords: 'practice tantra energy consciousness expand', icon: Flame, category: 'Practice', color: '#D8B4FE' },
-  { path: '/hooponopono', label: "Ho'oponopono", keywords: 'practice hooponopono hawaiian forgiveness healing love', icon: HeartHandshake, category: 'Practice', color: '#D8B4FE' },
+  { path: '/hooponopono', label: "Ho'oponopono", keywords: 'practice hooponopono hawaiian forgiveness alignment love', icon: HeartHandshake, category: 'Practice', color: '#D8B4FE' },
 
   // Divination
   { path: '/oracle', label: 'Oracle', keywords: 'divination oracle tarot i ching astrology cards reading', icon: Sparkles, category: 'Divination', color: '#E879F9' },
@@ -48,7 +48,7 @@ const SEARCH_INDEX = [
   // Sanctuary
   { path: '/zen-garden', label: 'Zen Garden', keywords: 'sanctuary zen garden plants koi fish lanterns peaceful', icon: Sprout, category: 'Sanctuary', color: '#2DD4BF' },
   { path: '/soundscapes', label: 'Soundscapes', keywords: 'sanctuary soundscapes ambient sounds nature rain ocean', icon: Headphones, category: 'Sanctuary', color: '#2DD4BF' },
-  { path: '/frequencies', label: 'Frequencies', keywords: 'sanctuary frequencies solfeggio binaural hz healing tones', icon: Radio, category: 'Sanctuary', color: '#2DD4BF' },
+  { path: '/frequencies', label: 'Frequencies', keywords: 'sanctuary frequencies solfeggio binaural hz resonance tones', icon: Radio, category: 'Sanctuary', color: '#2DD4BF' },
   { path: '/vr', label: 'VR Sanctuary', keywords: 'sanctuary vr virtual reality immersive 3d experience', icon: Orbit, category: 'Sanctuary', color: '#2DD4BF' },
   { path: '/journal', label: 'Journal', keywords: 'sanctuary journal writing thoughts reflection diary', icon: BookOpen, category: 'Sanctuary', color: '#2DD4BF' },
   { path: '/wisdom-journal', label: 'Wisdom Log', keywords: 'sanctuary wisdom journal log insights', icon: PenTool, category: 'Sanctuary', color: '#2DD4BF' },
@@ -56,12 +56,12 @@ const SEARCH_INDEX = [
 
   // Nourish
   { path: '/nourishment', label: 'Nourishment', keywords: 'nourish nourishment food recipes golden milk energy', icon: Leaf, category: 'Nourish', color: '#22C55E' },
-  { path: '/aromatherapy', label: 'Aromatherapy', keywords: 'nourish aromatherapy essential oils scent smell', icon: Droplets, category: 'Nourish', color: '#22C55E' },
-  { path: '/herbology', label: 'Herbology', keywords: 'nourish herbology herbs plants medicine herbal', icon: Leaf, category: 'Nourish', color: '#22C55E' },
+  { path: '/aromatherapy', label: 'Aromatic Resonance', keywords: 'nourish aromatic resonance essential oils scent smell', icon: Droplets, category: 'Nourish', color: '#22C55E' },
+  { path: '/herbology', label: 'Herbology', keywords: 'nourish herbology herbs plants botanical herbal', icon: Leaf, category: 'Nourish', color: '#22C55E' },
   { path: '/elixirs', label: 'Elixirs', keywords: 'nourish elixirs drinks potions recipes', icon: Flame, category: 'Nourish', color: '#22C55E' },
   { path: '/meal-planning', label: 'Meal Planning', keywords: 'nourish meal planning food diet nutrition', icon: UtensilsCrossed, category: 'Nourish', color: '#22C55E' },
-  { path: '/acupressure', label: 'Acupressure', keywords: 'nourish acupressure pressure points healing body', icon: Target, category: 'Nourish', color: '#22C55E' },
-  { path: '/reiki', label: 'Reiki & Aura', keywords: 'nourish reiki aura energy healing chakra', icon: Eye, category: 'Nourish', color: '#22C55E' },
+  { path: '/acupressure', label: 'Acupressure', keywords: 'nourish acupressure pressure points alignment body', icon: Target, category: 'Nourish', color: '#22C55E' },
+  { path: '/reiki', label: 'Reiki & Aura', keywords: 'nourish reiki aura energy alignment chakra resonance', icon: Eye, category: 'Nourish', color: '#22C55E' },
 
   // Explore
   { path: '/creation-stories', label: 'Creation Stories', keywords: 'explore creation stories myths cultures world origins', icon: Globe, category: 'Explore', color: '#FB923C' },

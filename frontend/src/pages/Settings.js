@@ -41,7 +41,7 @@ function SageVoicePreviewButton() {
       data-voice-state={voiceState.state}
       title={
         unavailable
-          ? 'Sage Voice unavailable — add ELEVENLABS_API_KEY'
+          ? 'Sage Voice resting — tap again in a moment'
           : isPlaying ? 'Stop preview' : 'Preview Sage Voice'
       }
       style={{

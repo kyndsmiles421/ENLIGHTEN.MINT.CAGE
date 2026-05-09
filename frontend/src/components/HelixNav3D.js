@@ -34,7 +34,7 @@ const HELIX_MODULES = [
   { id: 'electrical',   label: 'Electrical',  route: '/workshop/electrical',  color: '#22D3EE' },
   { id: 'plumbing',     label: 'Plumbing',    route: '/workshop/plumbing',    color: '#60A5FA' },
   { id: 'herbology',    label: 'Herbology',   route: '/herbology',            color: '#86EFAC' },
-  { id: 'aromatherapy', label: 'Aromatherapy', route: '/aromatherapy',        color: '#F472B6' },
+  { id: 'aromatherapy', label: 'Aromatic Resonance', route: '/aromatherapy',        color: '#F472B6' },
   { id: 'bible',        label: 'Bible Study', route: '/workshop/bible',       color: '#FCD34D' },
   { id: 'academy',      label: 'Academy',     route: '/academy',              color: '#C4B5FD' },
   { id: 'meteorology',  label: 'Meteorology', route: '/workshop/meteorology', color: '#7DD3FC' },

@@ -75,7 +75,7 @@ const NAV_CATEGORIES = [
       { path: '/exercises', label: 'Qigong & Tai Chi', icon: Zap },
       { path: '/mudras', label: 'Mudras', icon: Hand },
       { path: '/mantras', label: 'Mantras', icon: Music },
-      { path: '/light-therapy', label: 'Light Therapy', icon: Lightbulb },
+      { path: '/light-therapy', label: 'Light Resonance', icon: Lightbulb },
       { path: '/affirmations', label: 'Affirmations', icon: Sun },
       { path: '/rituals', label: 'Sacred Rituals', icon: Sunrise },
       { path: '/yantra', label: 'Yantras', icon: Triangle },
@@ -118,7 +118,7 @@ const NAV_CATEGORIES = [
     id: 'nourish', label: 'Nourish', icon: Leaf, color: '#22C55E',
     items: [
       { path: '/nourishment', label: 'Nourishment', icon: Leaf },
-      { path: '/aromatherapy', label: 'Aromatherapy', icon: Droplets },
+      { path: '/aromatherapy', label: 'Aromatic Resonance', icon: Droplets },
       { path: '/herbology', label: 'Herbology', icon: Leaf },
       { path: '/elixirs', label: 'Elixirs', icon: Flame },
       { path: '/meal-planning', label: 'Meal Planning', icon: UtensilsCrossed },

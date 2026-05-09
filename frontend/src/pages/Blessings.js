@@ -13,6 +13,7 @@ const ICONS = {
   Peace: Heart, Healing: Leaf, Protection: Shield, Abundance: Sparkles,
   Strength: Flame, Love: Heart, Clarity: Eye, Joy: Sun,
   Gratitude: Gift, Rest: Moon, Courage: Zap, Forgiveness: Leaf, Custom: Brain,
+  Resonance: Leaf, Alignment: Heart,
 };
 
 export default function Blessings() {
@@ -103,7 +104,7 @@ export default function Blessings() {
             Send a Blessing
           </h1>
           <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-            Share love, healing, and light with someone in need
+            Share love, light, and resonance with someone in need
           </p>
         </div>
       </div>

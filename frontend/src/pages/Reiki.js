@@ -18,8 +18,8 @@ export default function Reiki() {
 
   return (
     <InteractiveModule
-      title="Reiki Healing"
-      subtitle="Universal Life Force"
+      title="Reiki Alignment"
+      subtitle="Universal Life Force Practice"
       icon={Hand}
       color="#F472B6"
       category="reiki"

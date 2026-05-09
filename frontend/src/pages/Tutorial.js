@@ -27,7 +27,7 @@ const SECTIONS = [
       { icon: Timer, label: 'Meditate', path: '/meditation', desc: '4 modes: Guided sessions, AI Constellation Meditations themed to your zodiac, Build Your Own with AI, and freeform Timer. Completing sessions auto-waters your Zen Garden plants.' },
       { icon: Wind, label: 'Breathwork', path: '/breathing', desc: 'Box breathing, pranayama, 4-7-8 technique, and custom patterns. Visual breath guides with haptic-style timing.' },
       { icon: Headphones, label: 'Soundscapes', path: '/soundscapes', desc: 'Ambient environments — rain, ocean, forest, temple bells, cosmic drone. Layer multiple sounds for custom mixes.' },
-      { icon: Radio, label: 'Frequencies', path: '/frequencies', desc: 'Solfeggio frequencies (396-963 Hz), binaural beats, and planetary frequencies. Each with healing descriptions.' },
+      { icon: Radio, label: 'Frequencies', path: '/frequencies', desc: 'Solfeggio frequencies (396-963 Hz), binaural beats, and planetary frequencies. Each with resonant descriptions.' },
     ],
   },
   {
@@ -57,10 +57,10 @@ const SECTIONS = [
     items: [
       { icon: Flame, label: 'Yoga', path: '/yoga', desc: 'Yoga pose library with alignment cues, benefits, and practice sequences.' },
       { icon: Zap, label: 'Exercises', path: '/exercises', desc: '6 Qigong and Tai Chi practices with step-by-step instructions and energy cultivation techniques.' },
-      { icon: Hand, label: 'Mudras', path: '/mudras', desc: '25 sacred hand gestures with images, videos, guided practice timers, and healing properties.' },
-      { icon: Target, label: 'Acupressure', path: '/acupressure', desc: 'Pressure point maps for common ailments — headaches, stress, digestion, sleep. With visual guides.' },
-      { icon: Eye, label: 'Reiki & Aura', path: '/reiki', desc: 'Energy healing positions, aura reading, and chakra balancing guides.' },
-      { icon: Lightbulb, label: 'Light Therapy', path: '/light-therapy', desc: 'Color frequency healing sessions. Each color targets different chakras and emotional states.' },
+      { icon: Hand, label: 'Mudras', path: '/mudras', desc: '25 sacred hand gestures with images, videos, guided practice timers, and resonant properties.' },
+      { icon: Target, label: 'Acupressure', path: '/acupressure', desc: 'Pressure point maps for common alignments — focus, calm, digestion, sleep. With visual guides.' },
+      { icon: Eye, label: 'Reiki & Aura', path: '/reiki', desc: 'Universal life-force positions, aura reading, and chakra balancing guides.' },
+      { icon: Lightbulb, label: 'Light Resonance', path: '/light-therapy', desc: 'Color frequency resonance sessions. Each color attunes different chakras and emotional states.' },
     ],
   },
   {
@@ -76,12 +76,12 @@ const SECTIONS = [
     ],
   },
   {
-    title: 'Nature & Healing',
+    title: 'Nature & Resonance',
     color: '#2DD4BF',
     items: [
       { icon: Sprout, label: 'Zen Garden', path: '/zen-garden', desc: '5 tabs: Plant Garden (grow sacred plants auto-watered by your practice), Koi Pond, Sand Drawing, Lantern Release, and Rain Scene.' },
-      { icon: Droplets, label: 'Aromatherapy', path: '/aromatherapy', desc: 'Essential oil guide with blending recipes, diffuser suggestions, and mood-based recommendations.' },
-      { icon: Leaf, label: 'Herbology', path: '/herbology', desc: 'Medicinal herb encyclopedia with preparations, dosages, and traditional uses.' },
+      { icon: Droplets, label: 'Aromatic Resonance', path: '/aromatherapy', desc: 'Essential oil guide with blending recipes, diffuser suggestions, and mood-based recommendations.' },
+      { icon: Leaf, label: 'Herbology', path: '/herbology', desc: 'Botanical herb encyclopedia with preparations, traditional uses, and cultural lore.' },
       { icon: Flame, label: 'Elixirs', path: '/elixirs', desc: 'Resonant tonic recipes — teas, tinctures, and moon water preparations.' },
       { icon: Leaf, label: 'Animal Totems', path: '/animal-totems', desc: 'Discover your spirit animal guides and their symbolic meanings.' },
     ],

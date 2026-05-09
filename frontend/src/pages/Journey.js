@@ -34,10 +34,10 @@ const STAGES = [
         id: 's0-welcome', title: 'Welcome to Your Journey',
         desc: 'Understand what holistic wellness means and how this path will transform your daily life.',
         visual: 'intention',
-        narration: 'Welcome to The ENLIGHTEN.MINT.CAFE. This journey will guide you through ancient and modern wellness practices — from breathwork to meditation, sound healing to sacred rituals. Each stage builds upon the last, creating a comprehensive foundation for your well-being. There is no rush. Move at your own pace. The most important thing is to show up with an open heart and a curious mind. Let us begin.',
+        narration: 'Welcome to The ENLIGHTEN.MINT.CAFE. This journey will guide you through ancient and modern wellness practices — from breathwork to meditation, sound resonance to sacred rituals. Each stage builds upon the last, creating a comprehensive foundation for your well-being. There is no rush. Move at your own pace. The most important thing is to show up with an open heart and a curious mind. Let us begin.',
         content: [
           { type: 'text', value: 'Holistic wellness is the understanding that your well-being is not just physical — it encompasses your mind, emotions, energy, and spirit. When these are in harmony, you experience vitality, clarity, and deep inner peace.' },
-          { type: 'text', value: 'In this journey, you will explore practices from traditions spanning thousands of years — yogic breathing, Buddhist meditation, Hawaiian forgiveness, sound healing, sacred geometry, and more.' },
+          { type: 'text', value: 'In this journey, you will explore practices from traditions spanning thousands of years — yogic breathing, Buddhist meditation, Hawaiian forgiveness, sound resonance, sacred geometry, and more.' },
           { type: 'tip', value: 'Set an intention now: What do you hope to gain from this journey? Write it down or hold it in your heart.' },
         ],
         tryLink: '/journal',
@@ -55,13 +55,13 @@ const STAGES = [
           { type: 'tip', value: 'Place your palms facing each other about 6 inches apart. Slowly move them closer and farther. Can you feel a subtle warmth or tingling? That is your energy field.' },
         ],
         tryLink: '/light-therapy',
-        tryLabel: 'Explore Chakra Energy with Light Therapy',
+        tryLabel: 'Explore Chakra Energy with Light Resonance',
       },
       {
         id: 's0-mindfulness', title: 'The Art of Being Present',
         desc: 'Discover mindfulness — the foundation of every practice in this journey.',
         visual: 'present',
-        narration: 'Mindfulness is simply the practice of being fully present in this moment — without judgment, without trying to change anything. It is the foundation upon which every other practice in this journey is built. When you breathe consciously, you are mindful. When you chant a mantra with full attention, you are mindful. When you listen to healing sounds with open awareness, you are mindful. Right now, take a moment. Feel your feet on the ground. Feel the air entering your nostrils. Hear the sounds around you. This is mindfulness.',
+        narration: 'Mindfulness is simply the practice of being fully present in this moment — without judgment, without trying to change anything. It is the foundation upon which every other practice in this journey is built. When you breathe consciously, you are mindful. When you chant a mantra with full attention, you are mindful. When you listen to resonant sounds with open awareness, you are mindful. Right now, take a moment. Feel your feet on the ground. Feel the air entering your nostrils. Hear the sounds around you. This is mindfulness.',
         content: [
           { type: 'text', value: 'Mindfulness is not about emptying your mind or achieving a special state. It is simply the practice of paying attention to the present moment with kindness and curiosity.' },
           { type: 'text', value: 'Research shows that regular mindfulness practice reduces stress hormones by up to 23%, increases grey matter in brain regions associated with emotional regulation, and improves immune function.' },
@@ -152,7 +152,7 @@ const STAGES = [
   {
     id: 2, title: 'Mind & Meditation', subtitle: 'Journey Inward',
     color: '#A78BFA', icon: Timer,
-    desc: 'Meditation is the art of coming home to yourself. Explore guided meditations, mantra practice, and the healing power of forgiveness.',
+    desc: 'Meditation is the art of coming home to yourself. Explore guided meditations, mantra practice, and the resonant power of forgiveness.',
     lessons: [
       {
         id: 's2-meditation-intro', title: 'What Is Meditation?',
@@ -201,9 +201,9 @@ const STAGES = [
         visual: 'forgiveness',
         narration: "Ho'oponopono is a profound Hawaiian practice of forgiveness and reconciliation. It uses four simple yet powerful phrases: I'm sorry. Please forgive me. Thank you. I love you. These phrases are directed inward — toward yourself, toward a memory, toward a situation, or toward another person held in your awareness. The practice teaches that everything in your experience is your responsibility. Not as blame, but as empowerment. If it exists in your consciousness, you have the power to heal it. Through these four phrases, you cleanse, forgive, and restore harmony.",
         content: [
-          { type: 'text', value: "Ho'oponopono (ho-oh-po-no-po-no) translates to 'to make right' or 'to correct an error.' It is an ancient Hawaiian practice modernized by Morrnah Simeona and later Dr. Ihaleakala Hew Len, who reportedly helped heal an entire ward of mentally ill patients without ever seeing them — by practicing Ho'oponopono on himself." },
+          { type: 'text', value: "Ho'oponopono (ho-oh-po-no-po-no) translates to 'to make right' or 'to correct an error.' It is an ancient Hawaiian practice modernized by Morrnah Simeona and later Dr. Ihaleakala Hew Len, who reportedly supported a ward of vulnerable people without ever seeing them — by practicing Ho'oponopono on himself." },
           { type: 'hooponopono_mini' },
-          { type: 'text', value: "The four phrases work together: 'I\\'m sorry' acknowledges the pain. 'Please forgive me' asks for release. 'Thank you' expresses gratitude for the healing. 'I love you' sends the highest frequency — unconditional love." },
+          { type: 'text', value: "The four phrases work together: 'I\\'m sorry' acknowledges the pain. 'Please forgive me' asks for release. 'Thank you' expresses gratitude for the alignment. 'I love you' sends the highest frequency — unconditional love." },
           { type: 'tip', value: "Think of someone you have a difficult relationship with. Hold them in your heart, and silently repeat: I'm sorry. Please forgive me. Thank you. I love you. Notice what shifts." },
         ],
         tryLink: '/hooponopono',
@@ -212,18 +212,18 @@ const STAGES = [
     ],
   },
   {
-    id: 3, title: 'Sound & Senses', subtitle: 'Heal Through Vibration',
+    id: 3, title: 'Sound & Senses', subtitle: 'Resonance Through Vibration',
     color: '#38BDF8', icon: Headphones,
-    desc: 'Everything in the universe vibrates. Learn to use sound, frequency, light, and affirmation as powerful tools for healing and transformation.',
+    desc: 'Everything in the universe vibrates. Learn to use sound, frequency, light, and affirmation as powerful tools for resonance and transformation.',
     lessons: [
       {
-        id: 's3-soundscapes', title: 'The Healing Power of Sound',
+        id: 's3-soundscapes', title: 'The Resonant Power of Sound',
         desc: 'Learn how ambient sounds rewire your brain for calm and focus.',
         visual: 'sound_healing',
-        narration: 'Sound has been used for healing since the beginning of human civilization. From the chanting of monks in medieval monasteries to the singing bowls of Tibet, from the didgeridoo of Aboriginal Australians to the icaros of Amazonian shamans — every culture discovered that certain sounds can heal, calm, and transform consciousness. Modern neuroscience confirms this: specific sound frequencies entrain your brain waves, shifting you from stressed beta states into calm alpha and deep theta states. You do not need to understand the science to feel the effect. Simply listen, and let the sounds carry you.',
+        narration: 'Sound has been used for resonant practice since the beginning of human civilization. From the chanting of monks in medieval monasteries to the singing bowls of Tibet, from the didgeridoo of Aboriginal Australians to the icaros of Amazonian shamans — every culture discovered that certain sounds can soothe, calm, and transform consciousness. Modern neuroscience confirms this: specific sound frequencies entrain your brain waves, shifting you from stressed beta states into calm alpha and deep theta states. You do not need to understand the science to feel the effect. Simply listen, and let the sounds carry you.',
         content: [
           { type: 'text', value: 'Neuroacoustic research shows that nature sounds (rain, ocean, birdsong) reduce cortisol levels and lower sympathetic nervous system activation. The brain interprets these sounds as "safe environment" signals, allowing deep relaxation.' },
-          { type: 'text', value: 'Sound therapy is now used in hospitals worldwide: singing bowls for pain management, binaural beats for anxiety, nature sounds for improved sleep, and music therapy for cognitive recovery.' },
+          { type: 'text', value: 'Sound resonance is now used in studios and retreats worldwide: singing bowls for relaxation, binaural beats for focus, nature sounds for improved sleep, and music as a contemplative companion.' },
           { type: 'tip', value: 'Try mixing Rain and Singing Bowls at low volume while you work or study. Notice how your focus and mood shift over 30 minutes.' },
         ],
         tryLink: '/soundscapes',
@@ -233,9 +233,9 @@ const STAGES = [
         id: 's3-frequencies', title: 'Solfeggio & Sacred Frequencies',
         desc: 'Discover the resonant frequencies that resonate with your body and soul.',
         visual: 'frequencies',
-        narration: 'In the 11th century, a Benedictine monk named Guido d Arezzo developed the Solfeggio scale — a set of sacred frequencies used in Gregorian chants. These frequencies were believed to impart spiritual blessings. The most famous is 528 Hertz, known as the Love Frequency or the Miracle Tone. Research suggests it may repair DNA and reduce stress at a cellular level. 396 Hertz liberates guilt and fear. 639 Hertz harmonizes relationships. 741 Hertz awakens intuition. 852 Hertz returns to spiritual order. Each frequency is a key that unlocks a different aspect of healing.',
+        narration: 'In the 11th century, a Benedictine monk named Guido d Arezzo developed the Solfeggio scale — a set of sacred frequencies used in Gregorian chants. These frequencies were believed to impart spiritual blessings. The most famous is 528 Hertz, known as the Love Frequency or the Miracle Tone. Tradition holds it carries restorative resonance at a cellular level. 396 Hertz liberates guilt and fear. 639 Hertz harmonizes relationships. 741 Hertz awakens intuition. 852 Hertz returns to spiritual order. Each frequency is a key that unlocks a different aspect of resonance.',
         content: [
-          { type: 'text', value: 'The Solfeggio Frequencies: 174 Hz (pain relief), 285 Hz (tissue healing), 396 Hz (liberation from fear), 417 Hz (facilitating change), 528 Hz (DNA repair, love), 639 Hz (relationships), 741 Hz (intuition), 852 Hz (spiritual order), 963 Hz (divine connection).' },
+          { type: 'text', value: 'The Solfeggio Frequencies: 174 Hz (deep grounding), 285 Hz (tissue resonance), 396 Hz (liberation from fear), 417 Hz (facilitating change), 528 Hz (love), 639 Hz (relationships), 741 Hz (intuition), 852 Hz (spiritual order), 963 Hz (divine connection).' },
           { type: 'text', value: 'Binaural beats work by playing slightly different frequencies in each ear. Your brain creates a third "phantom" frequency equal to the difference. For example, 200 Hz in one ear and 210 Hz in the other creates a 10 Hz alpha wave — associated with calm focus.' },
           { type: 'tip', value: 'Use headphones for binaural beats — the effect requires different frequencies in each ear. Start with 10 minutes and gradually increase.' },
         ],
@@ -243,18 +243,18 @@ const STAGES = [
         tryLabel: 'Experience Resonant Frequencies',
       },
       {
-        id: 's3-light', title: 'Chromotherapy & Light Healing',
+        id: 's3-light', title: 'Chromatic Resonance & Light',
         desc: 'Learn how different colors of light affect your energy and mood.',
         visual: 'chromotherapy',
         narration: 'Color is simply light vibrating at different frequencies. Each color carries a unique energy that affects your body and mind. Red stimulates vitality and grounds you in your physical body. Orange ignites creativity and emotional flow. Yellow boosts confidence and personal power. Green heals the heart and restores balance. Blue calms the mind and aids communication. Indigo deepens intuition. Violet connects you to spiritual awareness. By intentionally bathing in these colors, you can shift your energy and support specific aspects of your well-being.',
         content: [
-          { type: 'text', value: 'Chromotherapy (color therapy) has roots in ancient Egyptian and Greek medicine. Modern research confirms that blue light reduces blood pressure, red light stimulates circulation, and green light can reduce chronic pain by up to 60%.' },
+          { type: 'text', value: 'Chromatic resonance (color attunement) has roots in ancient Egyptian and Greek cultural practice. Many practitioners observe that blue tones bring calm, red tones invite warmth, and green tones soothe the senses.' },
           { type: 'chakra_colors' },
           { type: 'text', value: 'Each of the seven chakras corresponds to a color: Root (Red), Sacral (Orange), Solar Plexus (Yellow), Heart (Green), Throat (Blue), Third Eye (Indigo), Crown (Violet).' },
-          { type: 'tip', value: 'If you feel anxious, try a blue light therapy session. If you feel lethargic, try red or orange. Let your intuition guide your color choice.' },
+          { type: 'tip', value: 'If you feel anxious, try a blue light resonance session. If you feel lethargic, try red or orange. Let your intuition guide your color choice.' },
         ],
         tryLink: '/light-therapy',
-        tryLabel: 'Start a Light Therapy Session',
+        tryLabel: 'Start a Light Resonance Session',
       },
       {
         id: 's3-affirmations', title: 'The Science of Affirmations',
@@ -278,9 +278,9 @@ const STAGES = [
     lessons: [
       {
         id: 's4-mudras', title: 'Sacred Hand Gestures',
-        desc: 'Learn how mudras direct energy flow and activate healing.',
+        desc: 'Learn how mudras direct energy flow and activate inner alignment.',
         visual: 'mudras',
-        narration: 'Mudras are sacred hand gestures that have been used for thousands of years in yoga, meditation, and healing traditions. The word mudra comes from Sanskrit, meaning seal or gesture. Each finger represents one of the five elements: thumb is fire, index is air, middle is space, ring is earth, and pinky is water. By touching specific fingers together, you create energy circuits that direct prana to different areas of your body and consciousness. Gyan Mudra — touching your index finger to your thumb — is perhaps the most well-known. It enhances wisdom, focus, and calm.',
+        narration: 'Mudras are sacred hand gestures that have been used for thousands of years in yoga, meditation, and contemplative traditions. The word mudra comes from Sanskrit, meaning seal or gesture. Each finger represents one of the five elements: thumb is fire, index is air, middle is space, ring is earth, and pinky is water. By touching specific fingers together, you create energy circuits that direct prana to different areas of your body and consciousness. Gyan Mudra — touching your index finger to your thumb — is perhaps the most well-known. It enhances wisdom, focus, and calm.',
         content: [
           { type: 'text', value: 'There are over 100 known mudras, each with specific therapeutic effects. The five fingers correspond to five elements: Thumb (Fire/Agni), Index (Air/Vayu), Middle (Space/Akasha), Ring (Earth/Prithvi), Pinky (Water/Jala).' },
           { type: 'text', value: 'Research at the National Institute of Mental Health and Neurosciences found that specific mudras can alter brain wave patterns, with Gyan Mudra increasing alpha waves (associated with relaxation and creativity).' },
@@ -319,9 +319,9 @@ const STAGES = [
         id: 's4-personal', title: 'Creating Your Personal Practice',
         desc: 'Combine everything you have learned into a practice uniquely yours.',
         visual: 'personal_practice',
-        narration: 'Congratulations. You have traveled through the foundations of holistic wellness — from breathwork to meditation, from sound healing to sacred practices. Now it is time to create a practice that is uniquely yours. There is no single right way. Your practice should reflect your goals, your lifestyle, and what resonates most deeply with you. Perhaps your morning begins with 5 minutes of breathing, followed by a short meditation and 3 affirmations. Perhaps your evening includes a soundscape bath and journaling. The beauty is that you now have the tools. Trust your intuition. Your inner wisdom knows exactly what you need.',
+        narration: 'Congratulations. You have traveled through the foundations of holistic wellness — from breathwork to meditation, from sound resonance to sacred practices. Now it is time to create a practice that is uniquely yours. There is no single right way. Your practice should reflect your goals, your lifestyle, and what resonates most deeply with you. Perhaps your morning begins with 5 minutes of breathing, followed by a short meditation and 3 affirmations. Perhaps your evening includes a soundscape bath and journaling. The beauty is that you now have the tools. Trust your intuition. Your inner wisdom knows exactly what you need.',
         content: [
-          { type: 'text', value: 'You have now learned: conscious breathing, meditation, mantra practice, forgiveness, sound healing, frequency therapy, light therapy, affirmations, mudras, sacred geometry, and oracle guidance. These are powerful tools for lifelong well-being.' },
+          { type: 'text', value: 'You have now learned: conscious breathing, meditation, mantra practice, forgiveness, sound resonance, frequency alignment, light resonance, affirmations, mudras, sacred geometry, and oracle guidance. These are powerful tools for lifelong well-being.' },
           { type: 'text', value: 'Remember: The app has "Build Your Own" features in Breathing, Affirmations, Soundscapes, Mantras, and Meditations. Use these to create practices tailored exactly to your needs.' },
           { type: 'tip', value: 'Write down your ideal daily practice. Keep it to 15-20 minutes to start. As the Buddha said: "A jug fills drop by drop." Consistency is everything.' },
         ],
@@ -584,7 +584,7 @@ function MiniHooponopono() {
           </motion.p>
         </AnimatePresence>
       )}
-      {cycles >= 3 && !running && <p className="text-sm" style={{ color: '#FDA4AF' }}>Healing in progress. Thank you.</p>}
+      {cycles >= 3 && !running && <p className="text-sm" style={{ color: '#FDA4AF' }}>Resonance flowing. Thank you.</p>}
     </div>
   );
 }
@@ -619,7 +619,7 @@ function ChakraVisual() {
 }
 
 function RoutineBuilder() {
-  const practices = ['5 min Breathing', '10 min Meditation', 'Mantra (27 reps)', '3 Affirmations', 'Journaling', 'Soundscape Bath', 'Light Therapy', 'Gratitude Practice'];
+  const practices = ['5 min Breathing', '10 min Meditation', 'Mantra (27 reps)', '3 Affirmations', 'Journaling', 'Soundscape Bath', 'Light Resonance', 'Gratitude Practice'];
   const [selected, setSelected] = useState([]);
   return (
     <div className="p-6 rounded-2xl" style={{ background: 'rgba(192,132,252,0.04)', border: '1px solid rgba(192,132,252,0.1)' }}>

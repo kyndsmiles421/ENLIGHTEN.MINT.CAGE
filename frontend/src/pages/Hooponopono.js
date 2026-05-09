@@ -8,15 +8,15 @@ import NarrationPlayer from '../components/NarrationPlayer';
 const PHRASES = [
   { text: "I'm sorry", color: '#3B82F6', description: 'Acknowledge responsibility and the pain that exists' },
   { text: 'Please forgive me', color: '#D8B4FE', description: 'Ask for forgiveness from yourself and the divine' },
-  { text: 'Thank you', color: '#22C55E', description: 'Express gratitude for the healing and the lesson' },
+  { text: 'Thank you', color: '#22C55E', description: 'Express gratitude for the alignment and the lesson' },
   { text: 'I love you', color: '#FDA4AF', description: 'Send unconditional love to dissolve all barriers' },
 ];
 
 const TARGETS = [
-  { id: 'self', label: 'Myself', icon: User, desc: 'Heal your relationship with yourself', color: '#D8B4FE' },
-  { id: 'person', label: 'A Specific Person', icon: Heart, desc: 'Heal a relationship or conflict', color: '#FDA4AF' },
+  { id: 'self', label: 'Myself', icon: User, desc: 'Restore your relationship with yourself', color: '#D8B4FE' },
+  { id: 'person', label: 'A Specific Person', icon: Heart, desc: 'Restore a relationship or release conflict', color: '#FDA4AF' },
   { id: 'situation', label: 'A Situation', icon: Sparkles, desc: 'Release attachment to outcomes', color: '#FCD34D' },
-  { id: 'world', label: 'The World', icon: Globe, desc: 'Send healing to all beings', color: '#2DD4BF' },
+  { id: 'world', label: 'The World', icon: Globe, desc: 'Send light to all beings', color: '#2DD4BF' },
 ];
 
 const DURATIONS = [
@@ -105,7 +105,7 @@ function HooponoponoSession({ target, targetName, duration, onEnd }) {
   const secs = (totalSeconds - elapsed) % 60;
   const targetConfig = TARGETS.find(t => t.id === target);
 
-  const narrationText = `Ho'oponopono practice for ${targetConfig?.label || 'healing'}. ${targetName ? `Holding ${targetName} in your heart. ` : ''}I'm sorry. Please forgive me. Thank you. I love you. Continue repeating these four sacred phrases. Let them flow like a gentle river through your consciousness.`;
+  const narrationText = `Ho'oponopono practice for ${targetConfig?.label || 'alignment'}. ${targetName ? `Holding ${targetName} in your heart. ` : ''}I'm sorry. Please forgive me. Thank you. I love you. Continue repeating these four sacred phrases. Let them flow like a gentle river through your consciousness.`;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -228,7 +228,7 @@ export default function Hooponopono() {
             The Art of Forgiveness
           </h1>
           <p className="text-base mb-12" style={{ color: 'var(--text-secondary)' }}>
-            An ancient Hawaiian practice of reconciliation and self-healing through four sacred phrases.
+            An ancient Hawaiian practice of reconciliation and self-alignment through four sacred phrases.
           </p>
         </motion.div>
 
@@ -262,7 +262,7 @@ export default function Hooponopono() {
                   Ho'oponopono (ho-oh-po-no-po-no) is an ancient Hawaiian practice of reconciliation and forgiveness. The word translates to "to make right" or "to correct."
                 </p>
                 <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-secondary)' }}>
-                  The modern practice, popularized by Dr. Ihaleakala Hew Len, uses four simple phrases as a mantra to clear subconscious memories and programs that create suffering. By taking 100% responsibility for everything in your experience, you open the door to profound healing.
+                  The modern practice, popularized by Dr. Ihaleakala Hew Len, uses four simple phrases as a mantra to clear subconscious memories and programs that create suffering. By taking 100% responsibility for everything in your experience, you open the door to profound inner alignment.
                 </p>
               </div>
               <div>
@@ -273,7 +273,7 @@ export default function Hooponopono() {
                     'Repeat the four phrases silently or aloud in a cycle',
                     'Feel each phrase genuinely — not just as words, but as energy',
                     'Allow whatever arises — tears, memories, peace — to simply be',
-                    'Trust the process. Healing happens beneath conscious awareness',
+                    'Trust the process. Alignment unfolds beneath conscious awareness',
                   ].map((step, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold mt-0.5"
