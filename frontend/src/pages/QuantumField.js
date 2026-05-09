@@ -273,22 +273,25 @@ export default function QuantumField() {
   const [geoError, setGeoError] = useState(null);
 
   // Get GPS position
-  useEffect(() => {
+  const requestGeo = useCallback(() => {
     if (!navigator.geolocation) {
       setGeoError('Geolocation not supported');
-      // Fallback to default coords for demo
+      // Fallback to default coords for demo (Black Hills)
       setUserPos({ lat: 44.0805, lng: -103.2310 });
       return;
     }
+    setGeoError(null);
     navigator.geolocation.getCurrentPosition(
-      pos => setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      pos => { setGeoError(null); setUserPos({ lat: pos.coords.latitude, lng: pos.coords.longitude }); },
       () => {
         setGeoError('Location access denied');
         setUserPos({ lat: 44.0805, lng: -103.2310 });
       },
-      { enableHighAccuracy: true }
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
     );
   }, []);
+
+  useEffect(() => { requestGeo(); }, [requestGeo]);
 
   const fetchData = useCallback(async () => {
     if (!userPos) return;
@@ -351,11 +354,27 @@ export default function QuantumField() {
       </motion.div>
 
       {/* GPS Status */}
-      <div className="flex items-center gap-2 justify-center">
+      <div className="flex items-center gap-2 justify-center flex-wrap">
         <Compass size={10} style={{ color: geoError ? '#EF4444' : '#2DD4BF' }} />
         <span className="text-[8px]" style={{ color: geoError ? '#EF4444' : 'var(--text-muted)' }}>
-          {geoError ? `${geoError} (using demo coords)` : `${userPos?.lat.toFixed(4)}, ${userPos?.lng.toFixed(4)}`}
+          {geoError ? `${geoError} (demo coords: Black Hills 44.08, -103.23)` : `${userPos?.lat.toFixed(4)}, ${userPos?.lng.toFixed(4)}`}
         </span>
+        {geoError && (
+          <button
+            type="button"
+            onClick={requestGeo}
+            data-testid="quantum-retry-geo"
+            className="text-[8px] px-2 py-0.5 rounded-full"
+            style={{
+              background: 'rgba(45,212,191,0.10)',
+              color: '#2DD4BF',
+              border: '1px solid rgba(45,212,191,0.25)',
+              cursor: 'pointer',
+            }}
+          >
+            Enable Location
+          </button>
+        )}
       </div>
 
       {/* Superposition counter */}

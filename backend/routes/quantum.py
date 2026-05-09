@@ -86,7 +86,12 @@ def _haversine(lat1, lon1, lat2, lon2):
 
 
 def _generate_shadow_sprites(uid, lat, lng, count=3):
-    """Generate shadow sprites in superposition near GPS coordinates."""
+    """Generate shadow sprites in superposition near GPS coordinates.
+    
+    V1.2.1 — The first sprite is always placed within the observe_radius_m
+    (≤30m), guaranteeing every user has at least one collapsible shadow.
+    Subsequent sprites scatter up to 500m away for hunt mechanics.
+    """
     now = datetime.now(timezone.utc)
     window = now.strftime("%Y-%m-%d-%H")
     sprites = []
@@ -107,9 +112,15 @@ def _generate_shadow_sprites(uid, lat, lng, count=3):
         matching = [s for s in SHADOW_TYPES if s["rarity"] == chosen_rarity]
         shadow = rng.choice(matching) if matching else SHADOW_TYPES[0]
 
-        # Place sprite within 500m of user
-        offset_lat = rng.uniform(-0.004, 0.004)
-        offset_lng = rng.uniform(-0.004, 0.004)
+        # First sprite: guaranteed within 30m so the mechanic always works.
+        # Subsequent sprites: scattered up to 500m for hunt gameplay.
+        if i == 0:
+            # ~0.00018 deg ≈ 20m at equator — keeps it < 30m on every latitude
+            offset_lat = rng.uniform(-0.00018, 0.00018)
+            offset_lng = rng.uniform(-0.00018, 0.00018)
+        else:
+            offset_lat = rng.uniform(-0.004, 0.004)
+            offset_lng = rng.uniform(-0.004, 0.004)
         s_lat = lat + offset_lat
         s_lng = lng + offset_lng
         dist = _haversine(lat, lng, s_lat, s_lng)

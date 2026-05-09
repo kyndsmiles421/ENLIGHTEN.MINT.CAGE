@@ -3,6 +3,28 @@ Append-only running log of work shipped. Most recent first.
 
 ---
 
+## 2026-02-09 — V1.2.1 EMERGENCY: Council Deadlock + Quantum Field Restoration
+
+### 🔴 P0 — Council "Begin Session" silent failure
+- **Root cause:** `SovereignAdvisors.handleConfirmPurchase` and `handleSelect` wrapped fetch in `try { } catch {}` with empty catch blocks. ANY hiccup silently swallowed. Button appeared "dead" after click.
+- **Backend confirmed working:** Direct curl `POST /api/sovereigns/purchase-session` returns 200 + dust deducted + session_id. Bug was 100% frontend silent-catch.
+- **Fix:** Added `sonner` toasts on both success/failure paths, validate IDs before POST, surface HTTP status + detail messages, expose network errors. No more dead button — every click now produces audible feedback.
+
+### 🔴 P0 — Quantum Field 100% non-functional with demo coords
+- **Root cause:** All 3 sprites generated at random ±440m offsets. Observe radius = 50m. So 99% of users (especially those who denied geo and got demo coords) had ZERO observable sprites. Mechanic was unreachable.
+- **Fix:** Backend `_generate_shadow_sprites` now places sprite #1 within ±20m guaranteed (always observable). Sprites #2-3 keep 500m hunt-radius for advanced gameplay.
+- **Verification:** Live curl: sprite at 11.6m, observe collapse returns `{success:true, rewards:{dust:11,xp:20}}`.
+
+### 🟡 P1 — Quantum Field geolocation recovery
+- **Root cause:** First-time location-deny had no recovery — user saw "Location access denied" forever.
+- **Fix:** Added `data-testid="quantum-retry-geo"` "Enable Location" button next to the GPS status pill (only visible when geoError is set). Wrapped geo logic in re-callable `requestGeo`. Added 8s timeout + 60s maxAge cache.
+
+### 📸 Verification
+- Live screenshot https://zero-scale-physics.preview.emergentagent.com/quantum-field — confirmed: "Enable Location" retry button + Black Hills demo coords + "Wave function collapsed — integrated" badge on first sprite + "Too far" badges on distant sprites + Collapsed Shadows total: 1.
+- Lints pass clean (frontend ESLint + Python ruff).
+
+---
+
 ## 2026-02-09 — V1.2.0 EMERGENCY: Compliance Scrub + Voice Key Restore
 
 ### 🔴 P0 — System-Wide Compliance Terminology Scrub

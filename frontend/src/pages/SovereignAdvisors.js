@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 import {
   Building2, Music, Coins, Truck, Scale, ArrowLeft, Send, Loader2, Trash2,
   Lock, Sparkles, ChevronRight, ArrowRight, Globe, Compass, Brain, Code,
@@ -371,9 +372,17 @@ export default function SovereignAdvisors() {
     setLoadingHistory(true);
     try {
       const res = await fetch(`${API}/api/sovereigns/history/${member.id}`, { headers: authHeaders });
-      const data = await res.json();
-      setMessages(data.messages || []);
-    } catch { setMessages([]); }
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data.messages || []);
+      } else {
+        setMessages([]);
+        toast.error(`Could not load history (HTTP ${res.status})`);
+      }
+    } catch (e) {
+      setMessages([]);
+      toast.error(`Network error loading history`);
+    }
     setLoadingHistory(false);
   };
 
@@ -386,29 +395,51 @@ export default function SovereignAdvisors() {
     setPurchasing(true);
     try {
       if (purchaseModal.type === 'session') {
+        const memberId = purchaseModal.item.member?.id;
+        if (!memberId) {
+          toast.error('Council member ID missing — refresh and retry');
+          setPurchasing(false);
+          return;
+        }
         const res = await fetch(`${API}/api/sovereigns/purchase-session`, {
           method: 'POST',
           headers: { ...authHeaders, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sovereign_id: purchaseModal.item.member.id }),
+          body: JSON.stringify({ sovereign_id: memberId }),
         });
+        const data = await res.json().catch(() => ({}));
         if (res.ok) {
+          toast.success(`Session opened — ${data.dust_spent || ''} Dust spent`);
           setPurchaseModal(null);
           await fetchCouncil();
           const m = purchaseModal.item.member;
           handleSelect({ ...m, has_session: true });
+        } else {
+          toast.error(data.detail || `Purchase failed (HTTP ${res.status})`);
         }
       } else {
+        const utilId = purchaseModal.item?.id;
+        if (!utilId) {
+          toast.error('Utility ID missing — refresh and retry');
+          setPurchasing(false);
+          return;
+        }
         const res = await fetch(`${API}/api/sovereigns/purchase-utility`, {
           method: 'POST',
           headers: { ...authHeaders, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ utility_id: purchaseModal.item.id }),
+          body: JSON.stringify({ utility_id: utilId }),
         });
+        const data = await res.json().catch(() => ({}));
         if (res.ok) {
+          toast.success(`Utility unlocked — lifetime license active`);
           setPurchaseModal(null);
           await fetchCouncil();
+        } else {
+          toast.error(data.detail || `Purchase failed (HTTP ${res.status})`);
         }
       }
-    } catch {}
+    } catch (e) {
+      toast.error(`Network error — ${e?.message || 'connection lost'}`);
+    }
     setPurchasing(false);
   };
 
