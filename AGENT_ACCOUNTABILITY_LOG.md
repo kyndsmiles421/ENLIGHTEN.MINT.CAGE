@@ -4,7 +4,22 @@
 
 ---
 
-## 2026-02-09 V1.2.4 ZERO-WASTE COMPLETION — Boundary Translation Layer + Integration Tests
+## 2026-02-09 V1.2.5 VOICE RECOVERY — Tap-to-Retry UX
+
+### MISS #20 — "Voice Resting" pill was structurally un-tappable
+- **Files:** `services/SageVoiceController.js`, `components/starseed/GameScene.js`, `components/AgentHUD.jsx`, `pages/Settings.js`.
+- **Bug:** When `voiceState.state === 'unavailable'` (post any 503), every voice pill in the app early-returned on tap (`if (unavailable) return;`). Combined with a 90s auto-reset window, a user who hit a single transient ElevenLabs 503 mid-scene was stranded staring at "Voice Resting" / "NO KEY" with no recovery path until the timer fired or they refocused the tab. The user's "Voice Resting in middle of Celestial Ballet" screenshot was the symptom.
+- **Backend status:** confirmed via direct curl in this session — `/api/voice/sage-narrate` returns HTTP 200 with 16KB base64 audio in 0.8s. Voice infra is fully operational on preview. Production may have a missing ELEVENLABS_API_KEY env var (Emergent deploys are separate environments).
+- **Fix:**
+  1. Added exported `retry()` function to `SageVoiceController` that force-clears `unavailableNoticed` and the timestamp, then transitions state back to `idle`.
+  2. Reduced auto-reset window from 90s → 25s.
+  3. All three voice pills (GameScene, AgentHUD, Settings) now call `sageRetry()` on tap when state is `unavailable` instead of no-op'ing.
+  4. Replaced all "NO KEY" / "Voice Resting" disabled UI labels with active "Tap to Retry" / "RETRY" labels with `cursor: pointer` so the recovery affordance is visible.
+- **Status:** FIXED on preview. Production needs redeploy + verification of `ELEVENLABS_API_KEY` env var presence.
+
+---
+
+## 2026-02-09 V1.2.4 ZERO-WASTE COMPLETION
 
 ### MISS #19 — Backend label leaks in 5 more route files
 - **Files:** `routes/discover.py`, `routes/recommendations.py`, `routes/dynamic.py`, `routes/daily_briefing.py`, `routes/learning.py`, `routes/reports.py`, `routes/arsenal.py`

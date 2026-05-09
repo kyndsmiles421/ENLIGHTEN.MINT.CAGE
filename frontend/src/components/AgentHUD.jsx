@@ -16,7 +16,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Sparkles, SkipForward, X, Loader2, RotateCcw, CheckCircle2, Volume2, VolumeX, Volume } from 'lucide-react';
 import { useProcessorState } from '../state/ProcessorState';
 import { useSensory } from '../context/SensoryContext';
-import { speak as sageSpeak, stop as sageStop, subscribe as sageSubscribe } from '../services/SageVoiceController';
+import { speak as sageSpeak, stop as sageStop, subscribe as sageSubscribe, retry as sageRetry } from '../services/SageVoiceController';
 
 const RECALL_VISIBLE_MS = 6000;
 
@@ -49,6 +49,8 @@ export default function AgentHUD() {
       sageStop();
       return;
     }
+    // V1.2.5 — User tap on a 'resting' pill = retry signal.
+    if (voiceState.state === 'unavailable') sageRetry();
     sageSpeak(text);
   }, [ritualChain, voiceState.state]);
 
@@ -224,7 +226,7 @@ export default function AgentHUD() {
         data-voice-state={voiceState.state}
         title={
           voiceState.state === 'unavailable'
-            ? 'Sage Voice resting — tap again in a moment'
+            ? 'Sage Voice resting — tap to retry'
             : voiceState.state === 'speaking'
             ? 'Tap to stop Sage'
             : `${VOICE_MODE_LABEL[sageVoiceMode] || 'Voice'} · long-press cycles mode`

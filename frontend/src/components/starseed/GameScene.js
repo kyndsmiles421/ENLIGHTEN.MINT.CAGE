@@ -13,6 +13,7 @@ import {
   speak as sageSpeak,
   stop as sageStop,
   subscribe as sageSubscribe,
+  retry as sageRetry,
 } from '../../services/SageVoiceController';
 
 // V1.0.13 — Scene narration speaker. Wraps the existing SageVoice
@@ -27,7 +28,10 @@ function SceneNarrationSpeaker({ text, accentColor }) {
   const unavailable = vs.state === 'unavailable';
   const onTap = () => {
     if (speaking) { sageStop(); return; }
-    if (unavailable) return;
+    // V1.2.5 — A user tap is itself a re-probe signal. If the controller
+    // is in 'unavailable' (e.g., post-503 sticky), clear the flag and
+    // retry rather than no-op'ing the tap.
+    if (unavailable) { sageRetry(); }
     if (text) sageSpeak(text);
   };
   return (
@@ -37,7 +41,7 @@ function SceneNarrationSpeaker({ text, accentColor }) {
       data-testid="scene-narration-speaker"
       data-voice-state={vs.state}
       title={
-        unavailable ? 'Sage Voice resting — tap again in a moment'
+        unavailable ? 'Sage Voice resting — tap to retry'
         : speaking ? 'Stop narration'
         : 'Read scene aloud'
       }
@@ -53,7 +57,7 @@ function SceneNarrationSpeaker({ text, accentColor }) {
         fontSize: 9,
         letterSpacing: '0.18em',
         textTransform: 'uppercase',
-        cursor: unavailable ? 'not-allowed' : 'pointer',
+        cursor: 'pointer',
         marginBottom: 12,
       }}
     >
@@ -61,7 +65,7 @@ function SceneNarrationSpeaker({ text, accentColor }) {
         : speaking ? <Square size={10} />
         : unavailable ? <VolumeX size={10} />
         : <Volume2 size={10} />}
-      {speaking ? 'Stop' : unavailable ? 'Voice Resting' : 'Read Aloud'}
+      {speaking ? 'Stop' : unavailable ? 'Tap to Retry' : 'Read Aloud'}
     </button>
   );
 }

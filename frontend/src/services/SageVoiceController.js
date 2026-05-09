@@ -25,11 +25,13 @@ let currentRequestId = 0;
 let unavailableNoticed = false;
 let _gestureUnlocked = false;
 
-// V1.2.0 — Auto-clear sticky 'unavailable' so a single transient 503
-// from ElevenLabs (free-tier cloud-IP block, brief network blip) does
-// not silence Sage Voice for the rest of the session. Re-probe on
-// next user gesture / next narrate call after this window elapses.
-const UNAVAILABLE_RESET_MS = 90 * 1000;
+// V1.2.5 — Auto-clear sticky 'unavailable' so a single transient 503
+// from ElevenLabs (free-tier cloud-IP block, brief network blip, rate
+// limiter) does not silence Sage Voice for the rest of the session.
+// Reduced from 90s → 25s based on user reports of being stuck on
+// "Voice Resting" mid-scene with no recovery path. Also cleared on
+// any explicit `speak()` call (the user retry) below.
+const UNAVAILABLE_RESET_MS = 25 * 1000;
 let _unavailableSetAt = 0;
 
 function _maybeResetUnavailable() {
@@ -38,6 +40,15 @@ function _maybeResetUnavailable() {
     unavailableNoticed = false;
     _setState('idle');
   }
+}
+
+/** Force-clear the unavailable flag — used when the user explicitly
+ *  taps the narration pill. A user tap is itself a re-probe signal:
+ *  if they're tapping, they want voice and we should try again. */
+export function retry() {
+  unavailableNoticed = false;
+  _unavailableSetAt = 0;
+  if (STATE.state === 'unavailable') _setState('idle');
 }
 
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
@@ -299,5 +310,5 @@ export async function checkAvailability() {
 }
 
 if (typeof window !== 'undefined') {
-  window.SageVoice = { speak, previewSample, stop, getState, subscribe, checkAvailability };
+  window.SageVoice = { speak, previewSample, stop, getState, subscribe, checkAvailability, retry };
 }

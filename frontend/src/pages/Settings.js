@@ -15,6 +15,7 @@ import {
   previewSample as sagePreview,
   stop as sageStop,
   subscribe as sageSubscribe,
+  retry as sageRetry,
 } from '../services/SageVoiceController';
 import axios from 'axios';
 
@@ -41,7 +42,7 @@ function SageVoicePreviewButton() {
       data-voice-state={voiceState.state}
       title={
         unavailable
-          ? 'Sage Voice resting — tap again in a moment'
+          ? 'Sage Voice resting — tap to retry'
           : isPlaying ? 'Stop preview' : 'Preview Sage Voice'
       }
       style={{
@@ -63,7 +64,7 @@ function SageVoicePreviewButton() {
         fontSize: 9,
         fontFamily: 'monospace',
         letterSpacing: '0.10em',
-        cursor: unavailable ? 'not-allowed' : 'pointer',
+        cursor: 'pointer',
       }}
     >
       {voiceState.state === 'loading'
@@ -71,7 +72,7 @@ function SageVoicePreviewButton() {
         : isPlaying
         ? <Square size={9} />
         : <Play size={9} />}
-      {isPlaying ? 'STOP' : unavailable ? 'NO KEY' : 'PREVIEW'}
+      {isPlaying ? 'STOP' : unavailable ? 'RETRY' : 'PREVIEW'}
     </button>
   );
 }
