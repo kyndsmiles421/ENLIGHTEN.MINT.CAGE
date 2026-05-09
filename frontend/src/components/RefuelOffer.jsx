@@ -53,7 +53,7 @@ export default function RefuelOffer({ variant = 'inline', compact = false }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (r.ok) setStatus(await r.json());
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
 
   useEffect(() => { fetchStatus(); }, [fetchStatus]);

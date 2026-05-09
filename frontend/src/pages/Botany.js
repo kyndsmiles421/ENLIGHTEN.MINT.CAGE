@@ -489,7 +489,7 @@ export default function Botany() {
     try {
       const cached = localStorage.getItem('cosmic_balance_score');
       if (cached) setBalanceScore(JSON.parse(cached));
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     // Then refresh from backend
     axios.get(`${API}/mastery/balance-score`, { headers: authHeaders })
       .then(r => {

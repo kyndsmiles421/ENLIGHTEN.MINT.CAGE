@@ -37,7 +37,7 @@ let state = (() => {
   try {
     const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
     if (raw) return { ...initial(), ...JSON.parse(raw) };
-  } catch { /* noop */ }
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   return initial();
 })();
 
@@ -48,7 +48,7 @@ function persist() {
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }
-  } catch { /* noop */ }
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 function clamp01(n) { return Math.max(0, Math.min(1, n)); }
@@ -79,7 +79,7 @@ export function commit(key, data, meta = {}) {
     window.dispatchEvent(new CustomEvent('sovereign:context-update', {
       detail: { key, data, moduleId: meta.moduleId || null, snapshot: { ...state } },
     }));
-  } catch { /* noop */ }
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
   // 2) Drive the Resonance Field — the field paints whatever was just
   //    committed, even if the user isn't currently in that tool's slot.
@@ -94,10 +94,10 @@ export function commit(key, data, meta = {}) {
       peak:   clamp01((vec.peak ?? 0.5) * k),
     };
     window.dispatchEvent(new CustomEvent('sovereign:pulse', { detail: burst }));
-  } catch { /* noop */ }
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
   // 3) Local subscribers (React hook callers)
-  subscribers.forEach((fn) => { try { fn(state); } catch { /* noop */ } });
+  subscribers.forEach((fn) => { try { fn(state); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
 }
 
 /** read() — current snapshot. Always returns a fresh object. */
@@ -116,12 +116,12 @@ export function subscribe(fn) {
 export function clear() {
   state = initial();
   persist();
-  subscribers.forEach((fn) => { try { fn(state); } catch { /* noop */ } });
+  subscribers.forEach((fn) => { try { fn(state); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
   try {
     window.dispatchEvent(new CustomEvent('sovereign:context-update', {
       detail: { key: '__cleared__', data: null, snapshot: { ...state } },
     }));
-  } catch { /* noop */ }
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 /**

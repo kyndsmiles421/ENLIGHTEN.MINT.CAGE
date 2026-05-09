@@ -274,7 +274,7 @@ export function useSentientRegistryV2(options = {}) {
         // Persist to localStorage
         try {
           localStorage.setItem('cosmic_visit_memory', JSON.stringify(newMemory));
-        } catch {}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         
         return newMemory;
       });
@@ -507,7 +507,7 @@ export function useSentientRegistryV2(options = {}) {
       
       try {
         localStorage.setItem('cosmic_visit_memory', JSON.stringify(decayed));
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       
       return decayed;
     });
@@ -519,7 +519,7 @@ export function useSentientRegistryV2(options = {}) {
     setBreadcrumbs([]);
     try {
       localStorage.removeItem('cosmic_visit_memory');
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
   
   // ═══════════════════════════════════════════════════════════════════

@@ -626,7 +626,7 @@ export default function StarseedWorlds() {
         origin_id: activeOrigin,
         ts: Date.now(),
       }));
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     navigate(`/starseed-adventure?realm=${encodeURIComponent(selectedRealm.id)}&origin=${encodeURIComponent(activeOrigin)}`);
   }, [selectedRealm, activeOrigin, exploring, navigate]);
 

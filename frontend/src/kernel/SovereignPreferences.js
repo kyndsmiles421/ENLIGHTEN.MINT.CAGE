@@ -71,7 +71,7 @@ let cache = readRaw();
 function writeRaw(next) {
   cache = next;
   try { localStorage.setItem(LS_KEY, JSON.stringify(next)); } catch { /* quota */ }
-  listeners.forEach(fn => { try { fn(clone(cache)); } catch { /* ignore */ } });
+  listeners.forEach(fn => { try { fn(clone(cache)); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('sovereign:preferences', { detail: clone(cache) }));
   }

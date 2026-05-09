@@ -60,7 +60,7 @@ export default function RockHounding() {
     try {
       const res = await axios.get(`${API}/rock-hounding/collection`, { headers });
       setCollection(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [headers]);
 
   useEffect(() => { fetchMine(); }, [fetchMine]);

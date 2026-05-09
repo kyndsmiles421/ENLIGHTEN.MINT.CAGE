@@ -130,7 +130,7 @@ export default function SageVoiceCommand({ size = 'compact' }) {
               id: intent.route,
               color: '#A78BFA',
             });
-          } catch { /* noop */ }
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
           // 3. Sage acknowledges aloud (best-effort, non-blocking) in
           //    the active LanguageBar language so the OS feels native
           //    to the user's selection.
@@ -138,17 +138,17 @@ export default function SageVoiceCommand({ size = 'compact' }) {
             SageVoice.speak(`Opening ${intent.phrase}`, {
               language: langRef.current,
             }).catch(() => {});
-          } catch { /* noop */ }
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
           // 4. Navigate.
           navigate(intent.route);
         }
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
     rec.onend = () => setListening(false);
     rec.onerror = () => setListening(false);
     recognitionRef.current = rec;
     return () => {
-      try { rec.stop(); } catch { /* noop */ }
+      try { rec.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       recognitionRef.current = null;
     };
   }, [navigate]);
@@ -157,12 +157,12 @@ export default function SageVoiceCommand({ size = 'compact' }) {
     const rec = recognitionRef.current;
     if (!rec) return;
     if (listening) {
-      try { rec.stop(); } catch { /* noop */ }
+      try { rec.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       setListening(false);
     } else {
       // Apply the current LanguageBar selection just before starting
       // so a user who switches languages sees STT match instantly.
-      try { rec.lang = STT_LOCALE[langRef.current] || 'en-US'; } catch { /* noop */ }
+      try { rec.lang = STT_LOCALE[langRef.current] || 'en-US'; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       try {
         rec.start();
         setListening(true);

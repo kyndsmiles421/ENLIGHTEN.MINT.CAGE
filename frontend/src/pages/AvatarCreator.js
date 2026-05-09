@@ -546,7 +546,7 @@ export default function AvatarCreator() {
           setActiveAvatarTimestamp(activeRes.value.data.created_at);
           setGeneratedAvatar(activeRes.value.data);
         }
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       setLoaded(true);
     };
     load();
@@ -614,7 +614,7 @@ export default function AvatarCreator() {
         };
         busCommit('entityState', entity, { moduleId: 'AVATAR_GEN' });
         avatarResonance.triggerPulse(aiDescription, 'AVATAR_GEN');
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
       // Refresh gallery and global avatar
       const galleryRes = await axios.get(`${API}/ai-visuals/my-avatars`, { headers: authHeaders });

@@ -109,7 +109,7 @@ export default function DailyBriefing() {
               const affirmation = data?.mayan?.meaning || data?.element?.focus || 'You are aligned with the cosmos';
               const r = await axios.post(`${API}/ai-visuals/daily-card`, { theme, affirmation: affirmation.slice(0, 150) }, { headers: authHeaders, timeout: 120000 });
               setDailyCard(r.data.image_b64);
-            } catch {}
+            } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
             setGenCard(false);
           }} disabled={genCard}
             data-testid="gen-daily-card"

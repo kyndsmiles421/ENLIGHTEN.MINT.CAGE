@@ -128,7 +128,7 @@ export default function ConsciousnessPanel({ compact = false, onNavigate }) {
     try {
       const res = await axios.get(`${API}/consciousness/status`, { headers: authHeaders });
       setData(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [authHeaders]);
 
@@ -139,7 +139,7 @@ export default function ConsciousnessPanel({ compact = false, onNavigate }) {
       await axios.post(`${API}/consciousness/display-mode`, { mode }, { headers: authHeaders });
       setData(prev => ({ ...prev, display_mode: mode }));
       toast.success(`Display mode: ${mode}`);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const handleLevelClick = (lvl) => {

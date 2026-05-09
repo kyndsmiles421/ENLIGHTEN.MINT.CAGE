@@ -15,7 +15,7 @@ export default function MantraOfTheDay() {
       const res = await axios.get(`${API}/mantras?count=1`);
       const m = res.data.mantras?.[0];
       if (m) setMantra(m);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoaded(true);
   };
 
@@ -31,7 +31,7 @@ export default function MantraOfTheDay() {
           setLoaded(true);
           return;
         }
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
     fetchMantra();
   }, []);

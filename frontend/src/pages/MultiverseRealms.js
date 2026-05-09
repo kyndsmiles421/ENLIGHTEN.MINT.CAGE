@@ -177,11 +177,11 @@ export default function MultiverseRealms() {
         practice: practiceKey,
         ts: Date.now(),
       }, { moduleId: moduleId || 'REALM' });
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     if (moduleId && processor && typeof processor.pull === 'function') {
       processor.pull(moduleId);
       toast.success(`${practiceKey.replace(/_/g, ' ')} activated`);
-      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { /* noop */ }
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       return;
     }
     const route = PRACTICE_TO_ROUTE[practiceKey];
@@ -488,7 +488,7 @@ export default function MultiverseRealms() {
                 const SceneIcon = scene.icon;
                 const launch = () => {
                   toast(`Entering ${scene.label}`);
-                  try { window.SovereignUniverse?.checkQuestLogic(`realm:enter:${activeRealm.realm.id}`, 'multiverse'); } catch {}
+                  try { window.SovereignUniverse?.checkQuestLogic(`realm:enter:${activeRealm.realm.id}`, 'multiverse'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
                   navigate(scene.route);
                 };
                 return (

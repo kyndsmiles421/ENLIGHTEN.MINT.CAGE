@@ -43,7 +43,7 @@ const CATEGORY_PILLARS = [
       { label: 'Yoga', path: '/yoga' },
       { label: 'Mudras', path: '/mudras' },
       { label: 'Mantras', path: '/mantras' },
-      { label: 'Light Therapy', path: '/light-therapy' },
+      { label: 'Light Resonance', path: '/light-therapy' },
     ],
   },
   {
@@ -87,7 +87,7 @@ const CATEGORY_PILLARS = [
     path: '/nourishment',
     highlights: [
       { label: 'Nourishment', path: '/nourishment' },
-      { label: 'Aromatherapy', path: '/aromatherapy' },
+      { label: 'Aromatic Resonance', path: '/aromatherapy' },
       { label: 'Herbology', path: '/herbology' },
       { label: 'Elixirs', path: '/elixirs' },
       { label: 'Acupressure', path: '/acupressure' },

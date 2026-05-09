@@ -80,9 +80,9 @@ export function useCosmicAmbient() {
     if (gainRef.current && ctxRef.current) {
       gainRef.current.gain.linearRampToValueAtTime(0, ctxRef.current.currentTime + 1.5);
       setTimeout(() => {
-        nodesRef.current.forEach(n => { try { n.stop(); } catch {} });
+        nodesRef.current.forEach(n => { try { n.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
         nodesRef.current = [];
-        try { ctxRef.current.close(); } catch {}
+        try { ctxRef.current.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         ctxRef.current = null;
       }, 2000);
     }

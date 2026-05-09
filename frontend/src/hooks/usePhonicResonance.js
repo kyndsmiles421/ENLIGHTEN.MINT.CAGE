@@ -104,7 +104,7 @@ export function usePhonicResonance(enabled = true, volume = 0.025) {
       await axios.post(`${API}/api/phonic/record-movement`, {
         route, duration_ms: durationMs, velocity: 0,
       }, { headers: authHeaders });
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   // Fetch generative flourish from backend
@@ -117,7 +117,7 @@ export function usePhonicResonance(enabled = true, volume = 0.025) {
       if (res.data?.sonic_profile) {
         setSonicProfile(res.data.sonic_profile);
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   // Smooth frequency transition
@@ -194,7 +194,7 @@ export function usePhonicResonance(enabled = true, volume = 0.025) {
 
         // Refresh flourish every 5 minutes
         flourishIntervalRef.current = setInterval(fetchFlourish, 5 * 60 * 1000);
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
 
     const handleInteraction = () => { initAudio(); };
@@ -235,11 +235,11 @@ export function usePhonicResonance(enabled = true, volume = 0.025) {
         try {
           gainRef.current.gain.linearRampToValueAtTime(0, ctxRef.current.currentTime + 0.5);
           setTimeout(() => {
-            try { oscRef.current?.stop(); } catch {}
-            try { oscRRef.current?.stop(); } catch {}
-            try { ctxRef.current?.close(); } catch {}
+            try { oscRef.current?.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+            try { oscRRef.current?.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+            try { ctxRef.current?.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
           }, 600);
-        } catch {}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }
     };
   }, []);
@@ -358,8 +358,8 @@ export function useProximityHarmonics() {
     if (pair && ctxRef.current) {
       pair.gain.gain.linearRampToValueAtTime(0, ctxRef.current.currentTime + 0.3);
       setTimeout(() => {
-        try { pair.oscA.stop(); } catch {}
-        try { pair.oscB.stop(); } catch {}
+        try { pair.oscA.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+        try { pair.oscB.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         delete oscillatorsRef.current[pairKey];
       }, 400);
     }
@@ -369,10 +369,10 @@ export function useProximityHarmonics() {
   useEffect(() => {
     return () => {
       Object.values(oscillatorsRef.current).forEach(pair => {
-        try { pair.oscA.stop(); } catch {}
-        try { pair.oscB.stop(); } catch {}
+        try { pair.oscA.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+        try { pair.oscB.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       });
-      try { ctxRef.current?.close(); } catch {}
+      try { ctxRef.current?.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
   }, []);
 
@@ -433,8 +433,8 @@ export function usePredictiveSonicTug() {
 
   useEffect(() => {
     return () => {
-      try { oscRef.current?.stop(); } catch {}
-      try { ctxRef.current?.close(); } catch {}
+      try { oscRef.current?.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+      try { ctxRef.current?.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
   }, []);
 

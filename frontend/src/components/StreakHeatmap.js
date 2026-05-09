@@ -98,7 +98,7 @@ export default function StreakHeatmap() {
       setStreak(heatRes.data.current_streak || 0);
       setLoops(loopRes.data.loops || []);
       setOverview(loopRes.data.overview || null);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [authHeaders]);
 

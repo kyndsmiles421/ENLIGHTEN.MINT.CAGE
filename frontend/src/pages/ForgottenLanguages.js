@@ -417,7 +417,7 @@ export default function ForgottenLanguages() {
     try {
       const res = await axios.get(`${API}/forgotten-languages/daily`, { headers });
       setDaily(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [headers]);
 
@@ -425,7 +425,7 @@ export default function ForgottenLanguages() {
     try {
       const res = await axios.get(`${API}/forgotten-languages/mastery`, { headers });
       setMastery(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [headers]);
 
   useEffect(() => { fetchDaily(); }, [fetchDaily]);
@@ -447,7 +447,7 @@ export default function ForgottenLanguages() {
         const glyphColor = (daily?.glyphs || []).find((g) => g.id === glyphId)?.color
           || daily?.script_color || '#FBBF24';
         dispatchUnlock({ kind: 'glyph', id: glyphId, color: glyphColor });
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       controller.refreshState();
 
       // Update local state

@@ -44,7 +44,7 @@ export default function CommunityComments({ feature, title }) {
         headers: authHeaders,
       });
       load();
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const displayComments = expanded ? comments : comments.slice(0, 3);

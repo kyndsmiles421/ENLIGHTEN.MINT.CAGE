@@ -22,7 +22,7 @@ export function MantraBanner({ category = '', className = '' }) {
           setFading(false);
         }, 400);
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [category]);
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export function MantraOverlay() {
       try {
         const res = await axios.get(`${API}/mantras?count=5`);
         setMantras(res.data.mantras || []);
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
     fetchAll();
     const interval = setInterval(fetchAll, 30000);

@@ -85,7 +85,7 @@ export function useResonanceCapture(canvasComponentRef, audioCtxRef, masterGainR
       recorder.onstop = () => {
         // Disconnect the audio destination node
         if (audioDestRef.current && masterGain) {
-          try { masterGain.disconnect(audioDestRef.current); } catch {}
+          try { masterGain.disconnect(audioDestRef.current); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
           audioDestRef.current = null;
         }
 

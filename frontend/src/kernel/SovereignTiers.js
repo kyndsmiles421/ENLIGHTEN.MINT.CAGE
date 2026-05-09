@@ -33,7 +33,7 @@ function read() {
 }
 
 function write(obj) {
-  try { localStorage.setItem(LS_KEY, JSON.stringify(obj)); } catch {}
+  try { localStorage.setItem(LS_KEY, JSON.stringify(obj)); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('sovereign:tier', { detail: obj }));
   }

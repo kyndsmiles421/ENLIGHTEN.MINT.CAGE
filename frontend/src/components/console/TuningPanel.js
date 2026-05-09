@@ -72,7 +72,7 @@ export default function TuningPanel() {
           detail: { bass: 0.10, mid: 0.18, treble: 0.20, peak: 0.05 },
         }));
       }, 800);
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   return (

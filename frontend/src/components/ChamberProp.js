@@ -52,7 +52,7 @@ export default function ChamberProp({
     // Haptic is independent of visual prefs — short, non-intrusive.
     try {
       if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(10);
-    } catch { /* ignore */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     onActivate();
   };
 

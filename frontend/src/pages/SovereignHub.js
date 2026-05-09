@@ -68,7 +68,7 @@ const PILLARS = [
     { label: 'Yoga', route: '/yoga' },
     { label: 'Mudras', route: '/mudras' },
     { label: 'Mantras', route: '/mantras' },
-    { label: 'Light Therapy', route: '/light-therapy' },
+    { label: 'Light Resonance', route: '/light-therapy' },
     { label: 'Affirmations', route: '/affirmations' },
     { label: 'Daily Ritual', route: '/daily-ritual' },
     { label: 'Mood Tracker', route: '/mood' },
@@ -112,7 +112,7 @@ const PILLARS = [
   ]},
   { title: 'Nourish & Heal', color: '#22C55E', items: [
     { label: 'Nourishment', route: '/nourishment' },
-    { label: 'Aromatherapy', route: '/aromatherapy' },
+    { label: 'Aromatic Resonance', route: '/aromatherapy' },
     { label: 'Herbology', route: '/herbology' },
     { label: 'Elixirs', route: '/elixirs' },
     { label: 'Crystals & Stones', route: '/crystals' },
@@ -593,7 +593,7 @@ export default function SovereignHub() {
       try {
         const slot = document.querySelector('[data-testid="matrix-render-slot"]');
         if (slot) slot.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       return;
     }
     navigate(route);
@@ -637,7 +637,7 @@ export default function SovereignHub() {
         await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
         toast.success('Link copied to clipboard');
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const handleSever = () => {

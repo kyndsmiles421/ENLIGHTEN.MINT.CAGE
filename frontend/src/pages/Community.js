@@ -68,7 +68,7 @@ function PostCard({ post, currentUserId, authHeaders, onDelete, onUpdate }) {
     try {
       const res = await axios.get(`${API}/community/posts/${post.id}/comments`);
       setComments(res.data);
-    } catch {} finally { setLoadingComments(false); }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } finally { setLoadingComments(false); }
   };
 
   const toggleComments = () => {
@@ -438,7 +438,7 @@ export default function Community() {
     try {
       const res = await axios.get(`${API}/community/feed`);
       setFeed(res.data.posts || []);
-    } catch {} finally { setLoading(false); }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('community', 8); }, []);

@@ -152,7 +152,7 @@ function stopNodes(nodes) {
     try {
       if (n.kind === 'osc') n.node.stop();
       else if (n.kind === 'interval') clearInterval(n.id);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }
 }
 
@@ -190,7 +190,7 @@ export default function CulturalMixerPanel() {
     return () => {
       Object.values(audioRefs.current).forEach(slot => {
         stopNodes(slot.nodes);
-        try { slot.ctx?.close(); } catch {}
+        try { slot.ctx?.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       });
     };
   }, []);

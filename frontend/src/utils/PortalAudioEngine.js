@@ -179,7 +179,7 @@ const PortalAudioEngine = (() => {
     // Auto-stop after duration
     setTimeout(() => {
       voices.forEach(v => {
-        try { v.osc.stop(); } catch (e) {}
+        try { v.osc.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       });
       activeNodes = activeNodes.filter(n => n.type !== 'shepard');
       console.log('[PortalAudio] Shepard zoom complete');
@@ -260,7 +260,7 @@ const PortalAudioEngine = (() => {
     domeNodes.forEach(node => {
       node.gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + fadeTime);
       setTimeout(() => {
-        try { node.osc.stop(); } catch (e) {}
+        try { node.osc.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }, fadeTime * 1000 + 100);
     });
     activeNodes = activeNodes.filter(n => n.type !== 'dome');
@@ -297,7 +297,7 @@ const PortalAudioEngine = (() => {
       try {
         node.gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
         setTimeout(() => node.osc.stop(), 350);
-      } catch (e) {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     });
     activeNodes = [];
     console.log('[PortalAudio] All audio stopped');

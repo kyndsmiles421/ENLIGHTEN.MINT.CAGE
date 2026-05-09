@@ -4,6 +4,31 @@
 
 ---
 
+## 2026-02-09 V1.2.2 GLOBAL INTEGRITY OVERHAUL — Systemic Fix Pass
+
+### MISS #14 — Double-Click State Conflict (4 nav components)
+- **Files:** `HelixNav3D.js`, `UnifiedSingularityHub.js`, `CrystalSingularityHub.js`, `nebula/Islands.js`
+- **Bug:** `setTimeout(navigate, 300-600ms)` with NO click-debounce → users tapped twice during the delay → second tap re-fired the navigation, producing the "needs double-click" feel.
+- **Fix:** Added `navigatingRef` guard + reduced delays to 150-200ms.
+- **Status:** FIXED.
+
+### MISS #15 — 370 silent `catch {}` blocks (global malpractice)
+- **Files:** 185 across the codebase.
+- **Bug:** Empty catch swallowed all errors. Council deadlock was just the most visible.
+- **Fix:** Codemod converted all to `catch (e) { if (NODE_ENV !== 'production') console.warn(e); }`. 4 documented exceptions preserved.
+- **Status:** FIXED — 0 silent catches remain.
+
+### MISS #16 — Kicker labels still contained `Chromotherapy`/`Light Therapy`/`Aromatherapy`
+- **Files:** `LightTherapy.js` kicker, `OmniVitalityCore.js` comment, `Journey.js` visual key, `SovereignHub.js` Hub list, `Landing.js` cards.
+- **Bug:** Initial scrub missed kicker labels (uppercase H1 caption above main title) and Hub-list rendered labels.
+- **Fix:** Scrubbed all visible-rendered strings + added route aliases `/light-resonance` and `/aromatic-resonance`.
+- **Status:** FIXED + CI-guarded.
+
+### NEW TOOL — `/app/scripts/compliance_guard.sh`
+- Fails the build on (a) any empty catch block, (b) any medical-claim term in user-visible render strings. Run before every deploy.
+
+---
+
 ## 2026-02-09 V1.2.1 EMERGENCY PASS — Council Deadlock + Quantum Field Restoration
 
 ### MISS #10 — "Begin Session" silent failure (Council deadlock)

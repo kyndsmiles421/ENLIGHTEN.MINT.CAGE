@@ -174,7 +174,7 @@ export function EnlightenmentCafeProvider({ children }) {
         colorMode,
         atmosphere,
       }));
-    } catch (e) {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [viewTier, colorMode, atmosphere]);
 
   useEffect(() => {

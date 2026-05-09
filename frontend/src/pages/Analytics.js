@@ -38,7 +38,7 @@ export default function Analytics() {
         setAnalytics(anaRes.data);
         // Record today's coherence
         axios.post(`${API}/achievements/record-coherence`, {}, { headers: authHeaders }).catch(() => {});
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       setLoading(false);
     };
     load();

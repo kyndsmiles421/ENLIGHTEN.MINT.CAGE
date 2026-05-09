@@ -28,7 +28,7 @@ function MantraItem({ mantra, index }) {
         try {
           const btn = playerRef.current?.querySelector('button');
           if (btn) btn.click();
-        } catch {}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }, 350);
     }
   };

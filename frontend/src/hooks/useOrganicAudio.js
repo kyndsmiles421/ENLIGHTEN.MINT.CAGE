@@ -234,7 +234,7 @@ export function useOrganicAudio(enabled = true) {
   // Cleanup
   useEffect(() => {
     return () => {
-      try { ctxRef.current?.close(); } catch {}
+      try { ctxRef.current?.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
   }, []);
 

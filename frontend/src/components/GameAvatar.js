@@ -125,7 +125,7 @@ export default function GameAvatarPanel({ authHeaders }) {
       setActiveId(catRes.data.active_avatar);
       setCredits(catRes.data.credits);
       setProfile(profRes.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [authHeaders]);
 

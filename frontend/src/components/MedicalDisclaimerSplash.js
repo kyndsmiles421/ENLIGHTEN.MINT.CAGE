@@ -39,7 +39,7 @@ export default function MedicalDisclaimerSplash() {
       localStorage.setItem(STORAGE_KEY, 'true');
       localStorage.setItem(STORAGE_VERSION_KEY, String(DISCLAIMER_VERSION));
       localStorage.setItem(STORAGE_DATE_KEY, new Date().toISOString());
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setVisible(false);
   };
 

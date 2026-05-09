@@ -146,7 +146,7 @@ export function SensoryProvider({ children }) {
   // Hard kill — long-press action: stop ALL oscillators, clear ALL sources
   const sovereignKillAll = useCallback(() => {
     // Stop internal ambient
-    nodesRef.current.forEach(n => { try { n.stop(); } catch {} });
+    nodesRef.current.forEach(n => { try { n.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
     nodesRef.current = [];
     setAmbientOn(false);
 
@@ -257,7 +257,7 @@ export function SensoryProvider({ children }) {
     const ctx = getAudioCtx();
     if (!ctx) return;
     // Stop any existing
-    nodesRef.current.forEach(n => { try { n.stop(); } catch(e) {} try { n.disconnect(); } catch(e) {} });
+    nodesRef.current.forEach(n => { try { n.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } try { n.disconnect(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
     nodesRef.current = [];
 
     // Deep cosmic drone - layered oscillators
@@ -320,7 +320,7 @@ export function SensoryProvider({ children }) {
       gainRef.current.gain.setValueAtTime(gainRef.current.gain.value, ctx.currentTime);
       gainRef.current.gain.linearRampToValueAtTime(0, ctx.currentTime + 1);
       setTimeout(() => {
-        nodesRef.current.forEach(n => { try { n.stop(); } catch(e) {} });
+        nodesRef.current.forEach(n => { try { n.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
         nodesRef.current = [];
       }, 1200);
     }
@@ -340,7 +340,7 @@ export function SensoryProvider({ children }) {
       g.connect(ctx.destination);
       osc.start();
       osc.stop(ctx.currentTime + 0.15);
-    } catch(e) {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [getAudioCtx]);
 
   const playChime = useCallback(() => {
@@ -362,7 +362,7 @@ export function SensoryProvider({ children }) {
         osc.start(ctx.currentTime + i * 0.08);
         osc.stop(ctx.currentTime + i * 0.08 + 0.5);
       });
-    } catch(e) {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [getAudioCtx]);
 
   const playCelebration = useCallback(() => {
@@ -398,7 +398,7 @@ export function SensoryProvider({ children }) {
       gg.connect(ctx.destination);
       gong.start();
       gong.stop(ctx.currentTime + 2);
-    } catch(e) {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [getAudioCtx]);
 
   // ━━━ CONVOLUTION REVERB ENGINE ━━━
@@ -514,7 +514,7 @@ export function SensoryProvider({ children }) {
 
       osc.start();
       osc.stop(ctx.currentTime + 0.3);
-    } catch(e) {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [getAudioCtx, getConvolver, prefs.soundEffects, prefs.sovereignMute, prefs.audioTier]);
 
   // ━━━ SINGING BOWL (multi-sampled synthesis for Artisan+) ━━━
@@ -579,7 +579,7 @@ export function SensoryProvider({ children }) {
 
       osc.start();
       osc.stop(ctx.currentTime + duration);
-    } catch(e) {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [getAudioCtx, getConvolver, prefs.soundEffects, prefs.sovereignMute, prefs.audioTier]);
 
   // ━━━ SET AUDIO TIER FROM MASTERY ━━━
@@ -606,8 +606,8 @@ export function SensoryProvider({ children }) {
 
   useEffect(() => {
     return () => {
-      nodesRef.current.forEach(n => { try { n.stop(); } catch(e) {} });
-      if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch(e) {} }
+      nodesRef.current.forEach(n => { try { n.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
+      if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
     };
   }, []);
 

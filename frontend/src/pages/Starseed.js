@@ -88,7 +88,7 @@ export default function Starseed() {
       }, { headers: authHeaders });
       toast.success('Journey Saved', { description: `You are ${chapter.origin?.name}` });
       setMyOrigin({ origin: chapter.origin, gift: chapter.gift });
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [chapter, path, authHeaders]);
 
   const restart = () => { setPhase('intro'); setChapter(null); setPath([]); };

@@ -61,7 +61,7 @@ export default function ResonanceShare() {
           const next = [entry, ...existing.filter(e => e.share_id !== shareId)].slice(0, 8);
           localStorage.setItem(RECENT_STORAGE, JSON.stringify(next));
           setRecentCache(next);
-        } catch {}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       })
       .catch(() => setError('Pattern not found'));
   }, [shareId]);
@@ -77,7 +77,7 @@ export default function ResonanceShare() {
       const r = await axios.get(`${API}/share/pattern`, { headers: { Authorization: `Bearer ${token}` } });
       setViewerPattern(r.data?.pattern);
       setSyncOn(true);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setSyncLoading(false);
   };
 
@@ -324,7 +324,7 @@ export default function ResonanceShare() {
                   try {
                     const r = await axios.get(`${API}/share/pattern`, { headers: { Authorization: `Bearer ${token}` } });
                     setViewerPattern(r.data?.pattern);
-                  } catch {}
+                  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
                 }
               }
               setCouncilMode(true);

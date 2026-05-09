@@ -101,7 +101,7 @@ export function getSignature() {
 export function pinSignature(title) {
   const prefs = SovereignPreferences.get();
   const next = { ...prefs, identity: { ...(prefs.identity || {}), pinnedSignature: title } };
-  try { localStorage.setItem('sovereign_preferences_v1', JSON.stringify(next)); } catch {}
+  try { localStorage.setItem('sovereign_preferences_v1', JSON.stringify(next)); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new CustomEvent('sovereign:preferences', { detail: next }));
   }

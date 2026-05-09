@@ -124,7 +124,7 @@ export default function GrowthTimeline() {
     if (!data) return;
     const text = `My ENLIGHTEN.MINT.CAFE Journey:\n${data.stats.days_active} days active | ${data.milestones_earned} milestones earned | ${data.stats.unique_features} features explored | ${data.stats.ai_sessions} AI sessions\n\nJoin the collective!`;
     if (navigator.share) {
-      try { await navigator.share({ title: 'My Spiritual Growth', text }); } catch {}
+      try { await navigator.share({ title: 'My Spiritual Growth', text }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     } else {
       navigator.clipboard.writeText(text);
       toast.success('Journey copied to clipboard');

@@ -61,7 +61,7 @@ function AtmosphereCard({ atm, onApply, onDelete, accent }) {
           try {
             const dataUrl = await generateShareCard(atm);
             downloadShareCard(dataUrl, atm.name);
-          } catch {}
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
           setSharing(false);
         }}
           className="p-2 rounded-lg active:scale-90 transition-all"
@@ -121,7 +121,7 @@ export function AtmosphereJournal({ isOpen, onClose, onApply, accent = '#FB923C'
         localStorage.setItem('sage_fx_gallery', JSON.stringify(local.filter(a => a.id !== atmId)));
       }
       setGallery(prev => prev.filter(a => a.id !== atmId));
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
 
   if (!isOpen) return null;

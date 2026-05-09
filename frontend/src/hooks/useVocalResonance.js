@@ -50,11 +50,11 @@ export function useVocalResonance() {
       rafRef.current = null;
     }
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => { try { t.stop(); } catch { /* noop */ } });
+      streamRef.current.getTracks().forEach((t) => { try { t.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
       streamRef.current = null;
     }
     if (ctxRef.current) {
-      try { ctxRef.current.close(); } catch { /* noop */ }
+      try { ctxRef.current.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       ctxRef.current = null;
     }
     analyserRef.current = null;
@@ -65,7 +65,7 @@ export function useVocalResonance() {
       window.dispatchEvent(new CustomEvent('sovereign:pulse', {
         detail: { bass: 0.10, mid: 0.18, treble: 0.20, peak: 0.05 },
       }));
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
 
   const start = useCallback(async () => {
@@ -116,7 +116,7 @@ export function useVocalResonance() {
         };
         try {
           window.dispatchEvent(new CustomEvent('sovereign:pulse', { detail }));
-        } catch { /* noop */ }
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         setLevels(detail);
       };
 

@@ -221,7 +221,7 @@ export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
     try {
       const label = relicId.replace(/-/g, ' ');
       SageVoice.speak(`Claimed: ${label}`).catch(() => {});
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     // V1.1.6 — Broadcast to the rest of the OS so HelixNav3D ripples
     // its 81-node lattice. Same color as the relic so the wave reads
     // visually connected to the unlock.
@@ -231,7 +231,7 @@ export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
         id: relicId,
         color: target?.color || '#FCD34D',
       });
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     unlockTimeoutRef.current = setTimeout(() => setUnlockedId(null), 2600);
   }, [relics]);
   useEffect(() => () => {
@@ -293,7 +293,7 @@ export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (r.ok) setVaultState(await r.json());
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
   useEffect(() => { fetchVault(); }, [fetchVault]);
 
@@ -345,7 +345,7 @@ export default function TesseractVault({ onClose, relics = DEFAULT_RELICS }) {
         toast(`Released · ${relicId.replace(/-/g, ' ')}`);
         await fetchVault();
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     finally { setLoadingClaim(null); }
   }, [fetchVault]);
 

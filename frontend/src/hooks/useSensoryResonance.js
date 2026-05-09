@@ -234,7 +234,7 @@ export function useSensoryResonance() {
     try {
       osc.disconnect();
       gain.disconnect();
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     
     // Remove from active nodes
     activeNodesRef.current = activeNodesRef.current.filter(
@@ -275,14 +275,14 @@ export function useSensoryResonance() {
       
       // Disconnect all active audio nodes (Ghost Layer cleanup)
       activeNodesRef.current.forEach(({ osc, gain }) => {
-        try { osc.stop(); osc.disconnect(); } catch {}
-        try { gain.disconnect(); } catch {}
+        try { osc.stop(); osc.disconnect(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+        try { gain.disconnect(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       });
       activeNodesRef.current = [];
       
       // Close audio context
       if (audioCtxRef.current && audioCtxRef.current.state !== 'closed') {
-        try { audioCtxRef.current.close(); } catch {}
+        try { audioCtxRef.current.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }
       
       // Remove from global registry

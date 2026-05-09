@@ -274,7 +274,7 @@ export function MeshNetworkProvider({ children }) {
         stored.weights = decayed;
         stored.lastDecay = Date.now();
         localStorage.setItem('mesh_sympathy', JSON.stringify(stored));
-      } catch (e) {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       
       return decayed;
     });
@@ -307,7 +307,7 @@ export function MeshNetworkProvider({ children }) {
         const stored = JSON.parse(localStorage.getItem('mesh_sympathy') || '{}');
         stored.weights = newMap;
         localStorage.setItem('mesh_sympathy', JSON.stringify(stored));
-      } catch (e) {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       
       return newMap;
     });
@@ -361,7 +361,7 @@ export function MeshNetworkProvider({ children }) {
       const stored = JSON.parse(localStorage.getItem('mesh_sympathy') || '{}');
       stored.bridges = bridges;
       localStorage.setItem('mesh_sympathy', JSON.stringify(stored));
-    } catch (e) {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   // ─── Get Sympathy Weight ───

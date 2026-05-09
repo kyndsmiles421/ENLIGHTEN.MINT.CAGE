@@ -376,7 +376,7 @@ export default function EvolutionLab() {
           id: `${assetId}:${type}`,
           color: stageColor,
         });
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       fetchData();
       controller.refreshState();
     } catch (err) {

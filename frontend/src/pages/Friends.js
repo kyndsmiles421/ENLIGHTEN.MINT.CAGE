@@ -110,7 +110,7 @@ function FindTab({ authHeaders, onMessage }) {
       try {
         const res = await axios.get(`${API}/friends/search?q=${encodeURIComponent(query)}`, { headers: authHeaders });
         setResults(res.data.users);
-      } catch {} finally { setLoading(false); }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } finally { setLoading(false); }
     }, 300);
   }, [query, authHeaders]);
 
@@ -205,7 +205,7 @@ function RequestsTab({ authHeaders, onUpdate }) {
     try {
       const res = await axios.get(`${API}/friends/requests`, { headers: authHeaders });
       setRequests(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   useEffect(() => { load(); }, [load]);
@@ -329,7 +329,7 @@ function MessagesTab({ authHeaders, initialChat, onBack }) {
     try {
       const res = await axios.get(`${API}/messages/conversations`, { headers: authHeaders });
       setConvos(res.data.conversations);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   const loadMessages = useCallback(async (convoId) => {
@@ -337,7 +337,7 @@ function MessagesTab({ authHeaders, initialChat, onBack }) {
       const res = await axios.get(`${API}/messages/${convoId}`, { headers: authHeaders });
       setMessages(res.data.messages);
       setTimeout(() => msgEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   useEffect(() => {
@@ -556,7 +556,7 @@ function ChallengesTab({ authHeaders }) {
       setHistory(histRes.data.history);
       setTotalXp(histRes.data.total_xp);
       setLeaderboard(lbRes.data.leaderboard);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   useEffect(() => { load(); }, [load]);

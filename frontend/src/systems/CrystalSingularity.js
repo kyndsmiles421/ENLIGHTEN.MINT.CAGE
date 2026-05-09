@@ -82,7 +82,7 @@ const EnlightenMintCafe = (() => {
     // Haptic feedback
     if (navigator.vibrate) {
       const pattern = [30 + Math.floor(freq / 20), 20, 15];
-      try { navigator.vibrate(pattern); } catch (e) {}
+      try { navigator.vibrate(pattern); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
   };
 

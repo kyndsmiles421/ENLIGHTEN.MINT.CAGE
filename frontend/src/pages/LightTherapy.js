@@ -154,15 +154,15 @@ function useColorAudio(colors, muted) {
       const ctx = ctxRef.current;
       if (ctx && ctx.state !== 'closed') {
         Object.values(nodesRef.current).forEach(({ g, sg }) => {
-          try { g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5); } catch(e){}
-          try { sg.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5); } catch(e){}
+          try { g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+          try { sg.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.5); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         });
       }
       const snap = { ...nodesRef.current };
       nodesRef.current = {};
       const t = setTimeout(() => {
         Object.values(snap).forEach(({ o, s }) => {
-          try { o.stop(); } catch(e){} try { s.stop(); } catch(e){}
+          try { o.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } try { s.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         });
       }, 600);
       return () => clearTimeout(t);
@@ -179,12 +179,12 @@ function useColorAudio(colors, muted) {
     Object.keys(nodesRef.current).forEach(id => {
       if (!activeSet.has(id)) {
         const n = nodesRef.current[id];
-        try { n.g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4); } catch(e){}
-        try { n.sg.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4); } catch(e){}
+        try { n.g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+        try { n.sg.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.4); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         const captured = n;
         delete nodesRef.current[id];
         setTimeout(() => {
-          try { captured.o.stop(); } catch(e){} try { captured.s.stop(); } catch(e){}
+          try { captured.o.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } try { captured.s.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }, 500);
       }
     });
@@ -204,8 +204,8 @@ function useColorAudio(colors, muted) {
 
         nodesRef.current[c.id] = { o, s, g, sg };
       } else {
-        try { nodesRef.current[c.id].g.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.3); } catch(e){}
-        try { nodesRef.current[c.id].sg.gain.linearRampToValueAtTime(subVol, ctx.currentTime + 0.3); } catch(e){}
+        try { nodesRef.current[c.id].g.gain.linearRampToValueAtTime(vol, ctx.currentTime + 0.3); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+        try { nodesRef.current[c.id].sg.gain.linearRampToValueAtTime(subVol, ctx.currentTime + 0.3); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }
     });
 
@@ -223,7 +223,7 @@ function useColorAudio(colors, muted) {
           const subBase = s._baseFreq || s.frequency.value;
           if (!s._baseFreq) s._baseFreq = subBase;
           s.frequency.setTargetAtTime(chaosDrift(subBase, cv, 1.5), ctx.currentTime, 0.1);
-        } catch(e){}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       });
       chaosRaf.current = requestAnimationFrame(chaosLoop);
     };
@@ -233,10 +233,10 @@ function useColorAudio(colors, muted) {
   useEffect(() => () => {
     cancelAnimationFrame(chaosRaf.current);
     Object.values(nodesRef.current).forEach(({ o, s }) => {
-      try { o.stop(); } catch(e){} try { s.stop(); } catch(e){}
+      try { o.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } try { s.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     });
     nodesRef.current = {};
-    try { ctxRef.current?.close(); } catch(e){}
+    try { ctxRef.current?.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
 }
 
@@ -376,11 +376,11 @@ function ImmersiveSession({ colors, duration, onEnd, resonanceName, sceneUrl }) 
         sub.connect(sg); sg.connect(ctx.destination); sub.start();
         audioNodesRef.current.push(sub, sg);
       });
-    } catch(e){}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     return () => {
-      audioNodesRef.current.forEach(n => { try { n.stop?.(); } catch(e){} });
+      audioNodesRef.current.forEach(n => { try { n.stop?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
       audioNodesRef.current = [];
-      try { audioCtxRef.current?.close(); } catch(e){}
+      try { audioCtxRef.current?.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
   }, [colors]);
 
@@ -616,7 +616,7 @@ export default function LightTherapy() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <div className="flex items-center justify-between mb-3">
             <p className="text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: accent }}>
-              <Sun size={12} className="inline mr-1.5" /> Chromotherapy
+              <Sun size={12} className="inline mr-1.5" /> Chromatic Resonance
             </p>
             {selected.length > 0 && (
               <motion.button

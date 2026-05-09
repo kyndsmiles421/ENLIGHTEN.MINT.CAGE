@@ -120,7 +120,7 @@ const SovereignStreamline = {
         try {
           left?.stop();
           right?.stop();
-        } catch (e) {}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         this.binauralNodes = { active: false };
       }, 1500);
 
@@ -516,7 +516,7 @@ const SovereignStreamline = {
 
       osc.start();
       osc.stop(this.ctx.currentTime + duration);
-    } catch (e) {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   },
 
   // V68.78 — Sovereign Signature Tone
@@ -525,7 +525,7 @@ const SovereignStreamline = {
   playSovereignSignature(frequency = 963, duration = 1.2) {
     if (!this.ctx) this.initAudio();
     if (!this.ctx || this.ctx.state !== 'running') {
-      try { this.ctx && this.ctx.resume(); } catch (e) {}
+      try { this.ctx && this.ctx.resume(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       if (!this.ctx || this.ctx.state !== 'running') return;
     }
     try {
@@ -543,7 +543,7 @@ const SovereignStreamline = {
       gain.connect(this.ctx.destination);
       osc.start(now);
       osc.stop(now + duration + 0.05);
-    } catch (e) {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   },
 
   playHarmonicChord(duration = 3) {
@@ -574,7 +574,7 @@ const SovereignStreamline = {
       });
 
       console.log('[SovereignStreamline] Harmonic chord played');
-    } catch (e) {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   },
 
   // ═══════════════════════════════════════════════════════════════════════════

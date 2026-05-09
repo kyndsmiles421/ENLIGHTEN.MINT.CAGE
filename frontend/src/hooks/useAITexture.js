@@ -65,7 +65,7 @@ async function _fetchTexture(category, refId, prompt) {
     let dataUrl = null;
     try {
       dataUrl = localStorage.getItem(_lsKey(category, refId));
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
     if (!dataUrl) {
       // Network — public endpoint, auth optional
@@ -86,7 +86,7 @@ async function _fetchTexture(category, refId, prompt) {
       // on heavy users — wrap in try/catch and silently skip on failure.
       try {
         if (dataUrl) localStorage.setItem(_lsKey(category, refId), dataUrl);
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
 
     if (!dataUrl) throw new Error('No data_url in response');

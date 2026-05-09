@@ -54,7 +54,7 @@ export default function SovereignDashboard() {
       setSentinelLog(sLog);
       setSentinelMutes(Array.isArray(sMutes) ? sMutes : []);
       setFeeSliderValue(cfg.fee_percent || 5);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [token, authHeaders]);
 
@@ -71,7 +71,7 @@ export default function SovereignDashboard() {
       const data = await res.json();
       setConfig(data);
       if (data.fee_percent != null) setFeeSliderValue(data.fee_percent);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setSaving(false);
   };
 
@@ -80,7 +80,7 @@ export default function SovereignDashboard() {
       const res = await fetch(`${API}/api/treasury/skeleton/export`, { headers: authHeaders });
       const data = await res.json();
       setSkeleton(data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const downloadSkeleton = () => {
@@ -331,7 +331,7 @@ export default function SovereignDashboard() {
                             headers: authHeaders,
                           });
                           fetchAll();
-                        } catch {}
+                        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
                         setSaving(false);
                       }}
                       className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] transition-all"
@@ -406,7 +406,7 @@ export default function SovereignDashboard() {
                                   headers: authHeaders,
                                 });
                                 fetchAll();
-                              } catch {}
+                              } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
                             }}
                             className="px-2 py-1 rounded text-[8px]"
                             style={{ background: 'rgba(34,197,94,0.08)', color: '#22C55E', cursor: 'pointer', border: '1px solid rgba(34,197,94,0.15)' }}

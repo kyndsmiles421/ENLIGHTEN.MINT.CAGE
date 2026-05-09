@@ -642,7 +642,7 @@ export const initializeOmnisCore = () => {
             el.style.display = 'none';
             el.style.pointerEvents = 'none';
           });
-        } catch {}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       });
     };
     purgeGhosts();

@@ -160,7 +160,7 @@ function RegionTile({ region, onExplore }) {
     const msg = discovered
       ? `🔒 ${region.name} · Reach Lv ${region.level_req} to enter`
       : `🔒 Hidden region · Reach Lv ${region.level_req} to discover`;
-    try { toast(msg, { duration: 2200 }); } catch {}
+    try { toast(msg, { duration: 2200 }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
   return (
     <button
@@ -330,7 +330,7 @@ export default function RPGPage() {
             setTab('shop');
             fetchData();
           }
-        } catch { /* ignore */ }
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         window.history.replaceState({}, '', '/rpg');
       })();
     }

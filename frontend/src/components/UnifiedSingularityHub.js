@@ -16,13 +16,20 @@ const UnifiedSingularityHub = ({
   const navigate = useNavigate();
   const initialized = useRef(false);
 
+  const navigatingRef = useRef(false);
+
   const handleNoduleActivate = useCallback((e) => {
     const { id, path, freq, label } = e.detail;
     
     if (onNoduleActivate) {
       onNoduleActivate({ id, path, freq, label });
     } else if (path) {
-      setTimeout(() => navigate(path), 600);
+      if (navigatingRef.current) return;
+      navigatingRef.current = true;
+      setTimeout(() => {
+        navigate(path);
+        navigatingRef.current = false;
+      }, 200);
     }
   }, [navigate, onNoduleActivate]);
 

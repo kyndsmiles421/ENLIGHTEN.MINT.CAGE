@@ -225,11 +225,11 @@ export default function Settings() {
       });
       toast.success('Account permanently deleted');
       // purge local state and bail to the landing page
-      try { logout?.(); } catch { /* noop */ }
+      try { logout?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       try {
         localStorage.clear();
         sessionStorage.clear();
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       setTimeout(() => { window.location.href = '/'; }, 400);
     } catch (err) {
       setDeleting(false);

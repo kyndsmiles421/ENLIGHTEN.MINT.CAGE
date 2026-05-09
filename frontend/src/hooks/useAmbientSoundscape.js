@@ -30,8 +30,8 @@ function getCtx() {
 
 function stopAll() {
   activeSources.forEach(s => {
-    try { s.gain?.gain.linearRampToValueAtTime(0, (audioCtx?.currentTime || 0) + 1); } catch {}
-    setTimeout(() => { try { s.source?.stop(); } catch {} }, 1200);
+    try { s.gain?.gain.linearRampToValueAtTime(0, (audioCtx?.currentTime || 0) + 1); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+    setTimeout(() => { try { s.source?.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }, 1200);
   });
   activeSources = [];
   currentScape = null;
@@ -40,7 +40,7 @@ function stopAll() {
   
   // Also suspend the context
   if (audioCtx && audioCtx.state !== 'closed') {
-    try { audioCtx.suspend(); } catch {}
+    try { audioCtx.suspend(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }
 }
 

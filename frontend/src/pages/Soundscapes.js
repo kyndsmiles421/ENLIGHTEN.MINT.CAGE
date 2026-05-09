@@ -143,7 +143,7 @@ export default function Soundscapes() {
     try {
       const res = await axios.get(`${API}/soundscapes/my-mixes`, { headers: authHeaders });
       setSavedMixes(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [user, authHeaders]);
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('soundscapes', 8); }, []);
@@ -171,8 +171,8 @@ export default function Soundscapes() {
   const stopSound = useCallback((soundId) => {
     const ch = channelsRef.current[soundId];
     if (!ch) return;
-    ch.nodes.forEach(n => { try { n.stop?.(); } catch {} });
-    try { ch.gain.disconnect(); } catch {}
+    ch.nodes.forEach(n => { try { n.stop?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
+    try { ch.gain.disconnect(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     delete channelsRef.current[soundId];
   }, []);
 
@@ -193,7 +193,7 @@ export default function Soundscapes() {
   useEffect(() => {
     return () => {
       Object.keys(channelsRef.current).forEach(id => stopSound(id));
-      if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch {} }
+      if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
     };
   }, [stopSound]);
 
@@ -228,7 +228,7 @@ export default function Soundscapes() {
       await axios.delete(`${API}/soundscapes/mix/${id}`, { headers: authHeaders });
       setSavedMixes(prev => prev.filter(m => m.id !== id));
       toast.success('Deleted');
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   return (

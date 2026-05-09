@@ -13,7 +13,7 @@ import CollectiveResonance from './CollectiveResonance';
 
 /* ── Haptic helper with weight support ── */
 let Haptics;
-try { Haptics = require('@capacitor/haptics').Haptics; } catch {}
+try { Haptics = require('@capacitor/haptics').Haptics; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 function haptic(style = 'Light') {
   try { Haptics?.impact({ style }); } catch {
     const ms = style === 'Heavy' ? 25 : style === 'Medium' ? 15 : 8;
@@ -420,7 +420,7 @@ export default function OrbitalMixer() {
           }
           lastPostCheckRef.current = latest;
         }
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
     checkFeeds();
     const interval = setInterval(checkFeeds, 30000);

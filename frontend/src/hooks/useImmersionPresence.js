@@ -64,7 +64,7 @@ export function useImmersionPresence(sceneId, options = {}) {
       // V68.8 Belt-and-suspenders: true presence requires BOTH focus AND visibility
       // (prevents parked-tab farming even when visibility API misreports)
       if (!activeRef.current) return;
-      try { if (typeof document.hasFocus === 'function' && !document.hasFocus()) return; } catch {}
+      try { if (typeof document.hasFocus === 'function' && !document.hasFocus()) return; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       try {
         const res = await axios.post(
           `${API}/presence/tick`,
@@ -77,11 +77,11 @@ export function useImmersionPresence(sceneId, options = {}) {
             duration: 2500,
           });
           // Refresh global wallet so Hub pills update
-          try { window.SovereignUniverse?.refreshGlobalUI?.(); } catch {}
+          try { window.SovereignUniverse?.refreshGlobalUI?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
           // Fire cross-domain signal
-          try { window.SovereignUniverse?.checkQuestLogic?.(`scene:immersion:${sceneId}`, sceneId); } catch {}
+          try { window.SovereignUniverse?.checkQuestLogic?.(`scene:immersion:${sceneId}`, sceneId); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
 
     timerRef.current = setInterval(tick, TICK_MS);

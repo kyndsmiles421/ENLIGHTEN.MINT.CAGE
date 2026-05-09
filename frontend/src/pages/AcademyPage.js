@@ -550,7 +550,7 @@ export default function AcademyPage() {
       const data = await res.json();
       setPrograms(data.programs || []);
       if (data.zones) setZones(data.zones);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   const fetchAccreditation = useCallback(async () => {
@@ -559,7 +559,7 @@ export default function AcademyPage() {
       const res = await fetch(`${API}/api/academy/accreditation`, { headers: authHeaders });
       const data = await res.json();
       setAccreditation(data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   useEffect(() => {
@@ -591,7 +591,7 @@ export default function AcademyPage() {
         setActiveForgeLab({ programId, moduleId: module.id, forgeData: fd, module });
         setForgeResult(null);
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const completeLesson = async () => {
@@ -609,7 +609,7 @@ export default function AcademyPage() {
         setForgeResult(data);
       } else { setActiveLesson(null); }
       fetchPrograms(); fetchAccreditation();
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setCompleting(false);
   };
 
@@ -624,7 +624,7 @@ export default function AcademyPage() {
       const data = await res.json();
       setForgeResult(data);
       fetchPrograms(); fetchAccreditation();
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setCompleting(false);
   };
 

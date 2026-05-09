@@ -37,7 +37,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
       const res = await fetch(`${API}/api/guilds/identity`, { headers: authHeaders });
       const data = await res.json();
       setIdentity(data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   const fetchChannels = useCallback(async () => {
@@ -46,7 +46,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
       const res = await fetch(`${API}/api/guilds/channels`, { headers: authHeaders });
       const data = await res.json();
       setChannels(data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   const fetchPosts = useCallback(async (feedId) => {
@@ -56,7 +56,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
       });
       const data = await res.json();
       setPosts(Array.isArray(data) ? data : []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
       });
       const data = await res.json();
       setIdentity(data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const handlePost = async () => {
@@ -103,7 +103,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
       });
       setPostText('');
       fetchPosts(activeFeed);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setPosting(false);
   };
 
@@ -115,7 +115,7 @@ export default function CommunityPanel({ isOpen, onClose }) {
         headers: authHeaders,
       });
       setActiveFeed(feedId);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   if (!isOpen) return null;

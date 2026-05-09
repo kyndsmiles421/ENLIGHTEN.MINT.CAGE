@@ -87,7 +87,7 @@ export function useHarmonyEngine() {
       try {
         const res = await axios.post(`${API}/api/phonic/harmony-score`, payload, { headers: authHeaders });
         setHarmonyScore(res.data);
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
       // Streak check in idle time
       if (typeof requestIdleCallback !== 'undefined') {
@@ -103,7 +103,7 @@ export function useHarmonyEngine() {
               setTimeout(() => setGoldenPulse(false), 3000);
               setTimeout(() => setXpFlash(null), 4000);
             }
-          } catch {}
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }, { timeout: 5000 });
       }
     };

@@ -61,7 +61,7 @@ function NewDreamForm({ onSaved, symbols }) {
           symbols: found,
         }, { moduleId: 'DREAM_VIZ' });
         dreamResonance.triggerPulse(content.trim(), 'DREAM_VIZ');
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
       setTitle(''); setContent(''); setMood('neutral'); setVividness(5); setLucid(false); setInterpretation('');
       onSaved();
@@ -115,7 +115,7 @@ function NewDreamForm({ onSaved, symbols }) {
               try {
                 const r = await axios.post(`${API}/ai-visuals/dream`, { description: content.slice(0, 300) }, { headers: authHeaders, timeout: 120000 });
                 setDreamVisual(r.data.image_b64);
-              } catch {}
+              } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
               setGenDreamVisual(false);
             }} disabled={genDreamVisual}
               data-testid="gen-dream-visual"

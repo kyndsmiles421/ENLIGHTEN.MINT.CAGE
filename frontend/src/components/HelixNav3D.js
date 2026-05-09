@@ -111,7 +111,7 @@ function HelixNode({ node, isActive, onSelect, rippleRef, rippleColor }) {
         try { matRef.current.emissive.set(rippleColor); }
         catch { /* invalid color string — keep base */ }
       } else if (rippleK < 0.05 && matRef.current.emissive) {
-        try { matRef.current.emissive.set(color); } catch {}
+        try { matRef.current.emissive.set(color); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }
     }
   });
@@ -225,9 +225,20 @@ export default function HelixNav3D({ height = 480, autoRotate = true }) {
     setActiveNode(match || null);
   }, [location.pathname, nodes]);
 
+  // Single-click guard: blocks redundant taps during camera-fly transition
+  // so users don't double-fire the route. Cleared after navigate completes.
+  const navigatingRef = useRef(false);
+
   const onSelect = (node) => {
+    if (navigatingRef.current) return;
+    navigatingRef.current = true;
     setActiveNode(node);
-    setTimeout(() => navigate(node.module.route), 600);  // let camera fly first
+    // 200ms is enough to see the activation pulse without feeling laggy.
+    // Previous 600ms made every click feel like it required a double-tap.
+    setTimeout(() => {
+      navigate(node.module.route);
+      navigatingRef.current = false;
+    }, 200);
   };
 
   return (

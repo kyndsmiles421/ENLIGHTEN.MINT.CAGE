@@ -217,7 +217,7 @@ export default function EconomyPage() {
       const data = await res.json();
       setTiers(data.tiers || []);
       setCurrentTier(data.current_tier || 'discovery');
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   const fetchPacks = useCallback(async () => {
@@ -227,7 +227,7 @@ export default function EconomyPage() {
       const data = await res.json();
       setPacks(data.packs || []);
       setHasPolymath(data.has_polymath || false);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   const fetchCommissions = useCallback(async () => {
@@ -236,7 +236,7 @@ export default function EconomyPage() {
       const res = await fetch(`${API}/api/economy/commissions`, { headers: authHeaders });
       const data = await res.json();
       setCommissions(data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('economy', 8); }, []);
@@ -293,7 +293,7 @@ export default function EconomyPage() {
           body: JSON.stringify({}),
         });
         fetchTiers();
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       setLoading('');
       return;
     }
@@ -306,7 +306,7 @@ export default function EconomyPage() {
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading('');
   };
 
@@ -320,7 +320,7 @@ export default function EconomyPage() {
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading('');
   };
 
@@ -334,7 +334,7 @@ export default function EconomyPage() {
       });
       const data = await res.json();
       if (data.url) window.location.href = data.url;
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading('polymath');
   };
 
@@ -344,7 +344,7 @@ export default function EconomyPage() {
       const res = await fetch(`${API}/api/copilot/drafts`, { headers: authHeaders });
       const data = await res.json();
       setDrafts(data.drafts || []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   useEffect(() => { if (activeTab === 'generator') fetchDrafts(); }, [activeTab, fetchDrafts]);
@@ -362,7 +362,7 @@ export default function EconomyPage() {
         setGenResult(data);
         fetchDrafts();
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setGenerating(false);
   };
 
@@ -787,7 +787,7 @@ export default function EconomyPage() {
                           setGenResult(prev => ({ ...prev, published: true, pack_id: data.pack_id }));
                           fetchDrafts();
                         }
-                      } catch {}
+                      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
                     }}
                       disabled={genResult.published}
                       className="w-full py-2 rounded-lg text-[10px] font-medium flex items-center justify-center gap-1.5"

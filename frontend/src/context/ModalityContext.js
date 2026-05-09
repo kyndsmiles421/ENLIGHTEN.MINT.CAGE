@@ -87,7 +87,7 @@ export function ModalityProvider({ children }) {
       const data = await res.json();
       setModality(data.modality);
       setModalityData(data.modality_data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [token, authHeaders]);
 
@@ -103,7 +103,7 @@ export function ModalityProvider({ children }) {
       const data = await res.json();
       setIntensity(data.intensity);
       setIntensityData(data.intensity_data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [token, authHeaders]);
 
@@ -116,7 +116,7 @@ export function ModalityProvider({ children }) {
         headers: { ...authHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ intensity, auto_advance: val }),
       });
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders, intensity]);
 
   const dismissAutoScale = useCallback(() => {
@@ -132,7 +132,7 @@ export function ModalityProvider({ children }) {
         headers: { ...authHeaders, 'Content-Type': 'application/json' },
         body: JSON.stringify({ intensity, learning_toggle: val }),
       });
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders, intensity]);
 
   const contextValue = useMemo(() => ({

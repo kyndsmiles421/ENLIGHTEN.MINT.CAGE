@@ -308,7 +308,7 @@ function DivePanel({ material, isOpen, onClose, accentColor, moduleId }) {
               const t = localStorage.getItem('zen_token');
               if (t && t !== 'guest_token') axios.post(`${API}/sparks/earn`, { action: 'workshop_material_dive', context: material.id }, { headers: { Authorization: `Bearer ${t}` } }).catch(() => {});
               // V68.4: Fire Sovereign Universe signal for quest auto-detect
-              try { window.SovereignUniverse?.checkQuestLogic(`${moduleId}:dive:${material.id}:${newDepth}`, moduleId); } catch {}
+              try { window.SovereignUniverse?.checkQuestLogic(`${moduleId}:dive:${material.id}:${newDepth}`, moduleId); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
             }}
               className="flex-1 flex items-center justify-center gap-1 py-2 rounded-lg text-[10px] uppercase tracking-wider"
               style={{ background: `${dc}12`, color: dc, border: `1px solid ${dc}30` }} data-testid="dive-deeper">
@@ -362,15 +362,15 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
       const preset = mixer.RESONANCE_PRESETS[chamberKey];
       if (!preset) return;
       setResonanceOffer(preset);
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [chamberKey, mixer, presetKey]);
   const acceptResonance = useCallback(() => {
-    try { sessionStorage.setItem(presetKey, 'accepted'); } catch {}
-    try { mixer?.applyResonancePreset?.(chamberKey); } catch {}
+    try { sessionStorage.setItem(presetKey, 'accepted'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+    try { mixer?.applyResonancePreset?.(chamberKey); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setResonanceOffer(null);
   }, [chamberKey, mixer, presetKey]);
   const declineResonance = useCallback(() => {
-    try { sessionStorage.setItem(presetKey, 'declined'); } catch {}
+    try { sessionStorage.setItem(presetKey, 'declined'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setResonanceOffer(null);
   }, [presetKey]);
 
@@ -399,14 +399,14 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
     });
   }, [apiModuleId, authHeaders, token, isFullAuth]);
 
-  useEffect(() => { try { localStorage.setItem(storageKey, String(actions)); } catch {} }, [actions, storageKey]);
+  useEffect(() => { try { localStorage.setItem(storageKey, String(actions)); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }, [actions, storageKey]);
 
   const handleMatTap = useCallback(() => {
     if (!selMat) return;
     // V68.26: tapping the material now opens a real themed chamber game.
     setGameKey('material');
     if (typeof window.__workAccrue === 'function') window.__workAccrue(`${moduleId}_inspect`, 5);
-    try { if (selMat) window.SovereignUniverse?.checkQuestLogic(`${moduleId}:material:${selMat.id}`, moduleId); } catch {}
+    try { if (selMat) window.SovereignUniverse?.checkQuestLogic(`${moduleId}:material:${selMat.id}`, moduleId); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [moduleId, selMat]);
 
   const handleToolSelect = useCallback(async (tool) => {
@@ -427,7 +427,7 @@ export default function UniversalWorkshop({ moduleId, dataModuleId, title, subti
         try {
           const tut = await axios.post(`${API}/knowledge/deep-dive`, { topic: `${tool.name} on ${selMat.name}`, category: moduleId, context: ctx }, { headers: authHeaders, timeout: 90000 });
           setTutorial(tut.data?.content || 'Tutorial complete.');
-          try { await axios.post(`${API}/rpg/character/gain-xp`, { amount: 12, source: `${moduleId}_${tool.id}` }, { headers: authHeaders }); } catch {}
+          try { await axios.post(`${API}/rpg/character/gain-xp`, { amount: 12, source: `${moduleId}_${tool.id}` }, { headers: authHeaders }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         } catch { setTutorial(`${tool.name} Technique:\n\n${tool.technique}\n\n${matLabel}: ${selMat.name}\n${selMat.origin || ''}\n\n${tool.description}`); }
       } else {
         setTutorial(`${tool.name} Technique:\n\n${tool.technique}\n\n${matLabel}: ${selMat.name}\n${selMat.origin || ''}\n\n${tool.description}`);

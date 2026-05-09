@@ -265,7 +265,7 @@ function DailyCard() {
       const res = await axios.get(`${API}/cardology/daily-card`);
       setCard(res.data.card);
       setRevealed(true);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
 
   const SuitIcon = card ? (SUIT_ICONS[card.suit] || Star) : Sparkles;
@@ -352,7 +352,7 @@ function YearlySpread() {
     try {
       const res = await axios.get(`${API}/cardology/yearly-spread?month=${month}&day=${day}&birth_year=${birthYear}`);
       setSpread(res.data.spread);
-    } catch { }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   };
 

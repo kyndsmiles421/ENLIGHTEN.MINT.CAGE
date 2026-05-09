@@ -50,7 +50,7 @@ function ForecastCard({ forecast, onDelete, onShare }) {
     try {
       const cached = localStorage.getItem(cacheKey);
       if (cached) { setAiVisual(cached); return; }
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setGenVisual(true);
     axios.post(`${API}/ai-visuals/forecast`, {
       system: forecast.system_name,
@@ -245,7 +245,7 @@ export default function Forecasts() {
       ]);
       setSystems(sysRes.data.systems || {});
       setHistory(histRes.data || []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [user, authHeaders]);
 
@@ -288,7 +288,7 @@ export default function Forecasts() {
           (fc.summary || '') + ' ' + JSON.stringify(fc.themes || []),
           'FORECASTS',
         );
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     } catch {
       toast.error('Could not generate forecast. Please try again.');
     }
@@ -301,7 +301,7 @@ export default function Forecasts() {
       setHistory(prev => prev.filter(h => h.id !== id));
       if (activeForecast?.id === id) setActiveForecast(null);
       toast.success('Forecast removed');
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const shareForecast = async (forecast) => {

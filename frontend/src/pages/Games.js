@@ -572,9 +572,7 @@ export default function Games() {
         toast.success(`New best score: ${score}!`);
         if (typeof window.__workAccrue === 'function') window.__workAccrue('task_completion', Math.min(30, score / 10));
       }
-    } catch {
-      /* ignore */
-    } finally {
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } finally {
       setSaving(false);
     }
   }, [activeGame, authHeaders, saving, scores]);

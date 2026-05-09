@@ -55,21 +55,21 @@ export default function MediaLibrary() {
     try {
       const res = await axios.post(`${API}/api/media-library/${itemId}/like`, {}, { headers: authHeaders });
       setItems(prev => prev.map(i => i.id === itemId ? { ...i, like_count: res.data.like_count, likes: res.data.liked ? [...(i.likes || []), user?.id] : (i.likes || []).filter(x => x !== user?.id) } : i));
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const deleteItem = async (itemId) => {
     try {
       await axios.delete(`${API}/api/media-library/${itemId}`, { headers: authHeaders });
       setItems(prev => prev.filter(i => i.id !== itemId));
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const togglePublic = async (item) => {
     try {
       await axios.put(`${API}/api/media-library/${item.id}`, { is_public: !item.is_public }, { headers: authHeaders });
       setItems(prev => prev.map(i => i.id === item.id ? { ...i, is_public: !i.is_public } : i));
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const shareItem = async (item) => {
@@ -80,7 +80,7 @@ export default function MediaLibrary() {
       } else {
         await navigator.clipboard.writeText(url);
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const formatDuration = (sec) => {

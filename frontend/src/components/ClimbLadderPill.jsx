@@ -57,7 +57,7 @@ export default function ClimbLadderPill({
         headers: { Authorization: `Bearer ${token}` },
       });
       if (r.ok) return await r.json();
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     return null;
   }, []);
 
@@ -95,7 +95,7 @@ export default function ClimbLadderPill({
           localStorage.setItem('sov_pending_unlock', JSON.stringify({
             kind: 'vault', relic_id: relicId, ts: Date.now(),
           }));
-        } catch {}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }
       const r = await fetch(`${API}/economy/subscribe`, {
         method: 'POST',

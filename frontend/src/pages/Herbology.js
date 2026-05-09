@@ -212,12 +212,12 @@ export default function Herbology() {
                     sparks: discovery.sparks_credited || 0,
                   },
                 }));
-              } catch { /* noop */ }
+              } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
               if (discovery.sparks_credited) {
                 toast.success(`+${discovery.sparks_credited} Sparks \u2014 ${item.name} illuminated`);
               }
             }
-          } catch { /* noop */ }
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }}
       />
     </HolographicChamber>

@@ -82,10 +82,10 @@ export function unlockAudio() {
     const p = a.play();
     if (p && typeof p.catch === 'function') p.catch(() => { /* ok */ });
     setTimeout(() => {
-      try { a.pause(); a.currentTime = 0; a.muted = false; } catch { /* noop */ }
+      try { a.pause(); a.currentTime = 0; a.muted = false; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }, 50);
     _gestureUnlocked = true;
-  } catch { /* noop */ }
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 // V1.0.16 — Singleton AudioContext + AnalyserNode for FFT vertex
@@ -144,12 +144,12 @@ function _setState(next, reason = null) {
   if (STATE.state === next && STATE.reason === reason) return;
   STATE.state = next;
   STATE.reason = reason;
-  subscribers.forEach((fn) => { try { fn({ ...STATE }); } catch { /* noop */ } });
+  subscribers.forEach((fn) => { try { fn({ ...STATE }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
   try {
     window.dispatchEvent(new CustomEvent('sage-voice:state', {
       detail: { ...STATE },
     }));
-  } catch { /* noop */ }
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 export function subscribe(fn) {
@@ -163,7 +163,7 @@ export function getState() { return { ...STATE }; }
 export function stop() {
   const a = _audio();
   if (a) {
-    try { a.pause(); a.currentTime = 0; } catch { /* noop */ }
+    try { a.pause(); a.currentTime = 0; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }
   currentRequestId += 1; // any in-flight fetch becomes stale
   _setState('idle');
@@ -176,7 +176,7 @@ export async function speak(text, opts = {}) {
   if (unavailableNoticed) return;   // be quiet after a 503 'no key' result
 
   let token = null;
-  try { token = localStorage.getItem('zen_token'); } catch { /* noop */ }
+  try { token = localStorage.getItem('zen_token'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   if (!token || token === 'guest_token') return;
 
   const reqId = ++currentRequestId;
@@ -224,11 +224,11 @@ export async function speak(text, opts = {}) {
     a.volume = calm ? 0.4 : 1.0;
     // V1.0.16 — wire analyser graph just-in-time (after first user gesture)
     _ensureAnalyser();
-    if (_audioCtx && _audioCtx.state === 'suspended') { try { await _audioCtx.resume(); } catch {} }
+    if (_audioCtx && _audioCtx.state === 'suspended') { try { await _audioCtx.resume(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
     _setState('speaking');
     try {
       // Notify any FFT consumers (Chamber3DGame meshes) that Sage is speaking
-      try { window.dispatchEvent(new CustomEvent('sage:narrate', { detail: { url: data.audio_url } })); } catch {}
+      try { window.dispatchEvent(new CustomEvent('sage:narrate', { detail: { url: data.audio_url } })); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       await a.play();
     } catch {
       _setState('idle');
@@ -247,7 +247,7 @@ export async function previewSample(opts = {}) {
   _maybeResetUnavailable();
   if (unavailableNoticed) return;
   let token = null;
-  try { token = localStorage.getItem('zen_token'); } catch { /* noop */ }
+  try { token = localStorage.getItem('zen_token'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   if (!token || token === 'guest_token') return;
 
   const reqId = ++currentRequestId;
@@ -286,7 +286,7 @@ export async function previewSample(opts = {}) {
 
 export async function checkAvailability() {
   let token = null;
-  try { token = localStorage.getItem('zen_token'); } catch { /* noop */ }
+  try { token = localStorage.getItem('zen_token'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   if (!token || token === 'guest_token') return { configured: false };
   try {
     const url = `${process.env.REACT_APP_BACKEND_URL}/api/voice/sage-narrate/status`;

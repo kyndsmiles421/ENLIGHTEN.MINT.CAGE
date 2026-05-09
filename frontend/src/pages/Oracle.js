@@ -280,7 +280,7 @@ export default function Oracle() {
             body: r.interpretation || r.reading || r.meditation || '',
             cards: r.cards || null,
           }, { moduleId: 'ORACLE' });
-        } catch { /* noop */ }
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         setTimeout(() => setRevealed(true), 300);
         setLoading(false);
         // Silent dust accrual for oracle reading

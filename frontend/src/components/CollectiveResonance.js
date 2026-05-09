@@ -214,7 +214,7 @@ export default function CollectiveResonance({ isOpen, onClose }) {
         const dataMatrix = await resMatrix.json();
         setGlobalMatrix(dataMatrix?.matrix || null);
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [token, authHeaders]);
 

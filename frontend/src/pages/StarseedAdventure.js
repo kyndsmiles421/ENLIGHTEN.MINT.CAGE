@@ -78,7 +78,7 @@ export default function StarseedAdventure() {
         if (bgRes.data.backgrounds?.length) {
           setSceneImage(bgRes.data.backgrounds[Math.floor(Math.random() * bgRes.data.backgrounds.length)]);
         }
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     } finally {
       setImageLoading(false);
     }
@@ -140,7 +140,7 @@ export default function StarseedAdventure() {
           (sceneRes.data.scene?.description || sceneRes.data.scene?.title || '') + ' ' + (origin?.name || ''),
           'STARSEED',
         );
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     } catch (err) {
       // V1.0.8 — Specific 401 handling. If the token expired mid-flow,
       // tell the user instead of silently bouncing them back.
@@ -236,7 +236,7 @@ export default function StarseedAdventure() {
           res.data.scene?.description || res.data.scene?.title || '',
           'STARSEED',
         );
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     } catch {
       toast.error('The cosmos falters... try again');
     } finally {

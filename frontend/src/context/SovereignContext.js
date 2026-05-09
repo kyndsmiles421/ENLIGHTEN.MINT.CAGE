@@ -68,7 +68,7 @@ export function SovereignProvider({ children }) {
       setExperience(d.experience || {});
       setPerks(d.perks || []);
       eventBus.publish('tier_updated', { tier: d.tier, capabilities: d.effective_capabilities });
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     // Fetch mastery multipliers (non-blocking)
     try {
       const mRes = await axios.get(`${API}/sovereign-mastery/status`, { headers: authHeaders });
@@ -79,7 +79,7 @@ export function SovereignProvider({ children }) {
       eventBus.publish('mastery_updated', {
         tier: m.current_tier, gravity: m.gravity_multiplier, bloom: m.bloom_multiplier,
       });
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoaded(true);
   }, [authHeaders, authLoading, token]);
 
@@ -216,7 +216,7 @@ export function SovereignProvider({ children }) {
       await axios.post(`${API}/sovereign/events/publish`, {
         event_type: eventType, payload, source_tier: tier,
       }, { headers: authHeaders });
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders, tier]);
 
   // GATEKEEPER: Memoize context value

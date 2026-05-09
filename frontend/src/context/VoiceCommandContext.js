@@ -53,24 +53,24 @@ export function VoiceCommandProvider({ children }) {
     recognition.onerror = () => {
       setTimeout(() => {
         if (wakeWordEnabled) {
-          try { recognition.start(); } catch {}
+          try { recognition.start(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }
       }, 1000);
     };
 
     recognition.onend = () => {
       if (wakeWordEnabled && !isRecording) {
-        try { recognition.start(); } catch {}
+        try { recognition.start(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }
     };
 
     recognitionRef.current = recognition;
-    try { recognition.start(); setIsListening(true); } catch {}
+    try { recognition.start(); setIsListening(true); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [wakeWordEnabled, isRecording]);
 
   const stopWakeWordDetection = useCallback(() => {
     if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch {}
+      try { recognitionRef.current.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       recognitionRef.current = null;
     }
     setIsListening(false);
@@ -129,7 +129,7 @@ export function VoiceCommandProvider({ children }) {
       // user mid-record.
       if (pendingStopRef.current) {
         pendingStopRef.current = false;
-        try { mediaRecorder.stop(); } catch {}
+        try { mediaRecorder.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         setIsRecording(false);
       }
     } catch (err) {
@@ -149,7 +149,7 @@ export function VoiceCommandProvider({ children }) {
   const stopRecording = useCallback(() => {
     const rec = mediaRecorderRef.current;
     if (rec && rec.state === 'recording') {
-      try { rec.stop(); } catch {}
+      try { rec.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       setIsRecording(false);
       return;
     }

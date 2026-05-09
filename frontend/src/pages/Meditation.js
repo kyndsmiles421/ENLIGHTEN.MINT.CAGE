@@ -240,7 +240,7 @@ function GuidedSession({ meditation, onEnd }) {
     if (rootRef.current && typeof rootRef.current.scrollIntoView === 'function') {
       rootRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
-      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch {}
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
   }, [meditation.id]);
 
@@ -248,10 +248,10 @@ function GuidedSession({ meditation, onEnd }) {
   const toggleSound = useCallback(() => {
     if (soundOn) {
       // Stop sound
-      nodesRef.current.forEach(n => { try { n.stop?.(); } catch {} });
+      nodesRef.current.forEach(n => { try { n.stop?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
       nodesRef.current = [];
       if (audioCtxRef.current) { 
-        try { audioCtxRef.current.close(); } catch {} 
+        try { audioCtxRef.current.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } 
       }
       audioCtxRef.current = null;
       setSoundOn(false);
@@ -263,7 +263,7 @@ function GuidedSession({ meditation, onEnd }) {
           audioCtxRef.current = ctx;
           nodesRef.current = startAmbientSound(ctx, meditation.sound);
           setSoundOn(true);
-        } catch {}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }
     }
   }, [soundOn, meditation.sound]);
@@ -282,14 +282,14 @@ function GuidedSession({ meditation, onEnd }) {
           }, { headers: { Authorization: `Bearer ${token}` }, timeout: 90000 });
           setAiAmbient(r.data.image_b64);
         }
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
     genAmbient();
     
     // Cleanup on unmount - kill any audio that might be playing
     return () => {
-      nodesRef.current.forEach(n => { try { n.stop?.(); } catch {} });
-      try { audioCtxRef.current?.close(); } catch {}
+      nodesRef.current.forEach(n => { try { n.stop?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
+      try { audioCtxRef.current?.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
   }, [meditation.name, meditation.category]);
 
@@ -500,9 +500,9 @@ function TimerMode() {
   const progress = 1 - timeLeft / (preset.minutes * 60);
 
   const stopAudio = useCallback(() => {
-    nodesRef.current.forEach(n => { try { n.stop?.(); } catch {} });
+    nodesRef.current.forEach(n => { try { n.stop?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
     nodesRef.current = [];
-    if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch {} }
+    if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
     audioCtxRef.current = null;
   }, []);
 
@@ -648,7 +648,7 @@ function BuildYourOwn({ onPlay }) {
     try {
       const res = await axios.get(`${API}/meditation/my-custom`, { headers: authHeaders });
       setSaved(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [user, authHeaders]);
 
   useEffect(() => { loadSaved(); }, [loadSaved]);
@@ -721,7 +721,7 @@ function BuildYourOwn({ onPlay }) {
       await axios.delete(`${API}/meditation/custom/${id}`, { headers: authHeaders });
       setSaved(prev => prev.filter(s => s.id !== id));
       toast.success('Deleted');
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const generateAudio = async () => {
@@ -1093,7 +1093,7 @@ function ConstellationMeditations({ onPlay, highlightId }) {
       setThemes(themesRes.data.themes || []);
       setUserZodiac(themesRes.data.user_zodiac);
       setSaved(savedRes.data || []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [user, authHeaders]);
 
@@ -1146,7 +1146,7 @@ function ConstellationMeditations({ onPlay, highlightId }) {
       await axios.delete(`${API}/meditation/constellation/${id}`, { headers: authHeaders });
       setSaved(prev => prev.filter(s => s.id !== id));
       toast.success('Removed');
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   if (!user) return (
@@ -1567,7 +1567,7 @@ export default function Meditation() {
                 if (res.data?.shared) {
                   toast.success('Shared to community!');
                 }
-              } catch {}
+              } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
               setActiveSession(null);
             }} />
           </motion.div>

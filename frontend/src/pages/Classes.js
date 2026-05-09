@@ -37,7 +37,7 @@ export default function Classes() {
         setEnrollments(authRes[0]?.data || []);
         setCerts(authRes[1]?.data || []);
       }
-    } catch {} finally { setLoading(false); }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } finally { setLoading(false); }
   }, [user, authHeaders]);
 
   useEffect(() => { loadData(); }, [loadData]);

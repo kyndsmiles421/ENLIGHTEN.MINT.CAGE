@@ -68,7 +68,7 @@ export function playSolfeggio(freq = 528, duration = 1.8, gain = 0.18) {
     osc2.start(now);
     osc1.stop(now + duration + 0.05);
     osc2.stop(now + duration * 0.7 + 0.05);
-  } catch {}
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 /**

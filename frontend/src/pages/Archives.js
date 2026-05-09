@@ -80,7 +80,7 @@ export default function Archives() {
       gain.connect(ctx.destination);
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + 2.2);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
 
   const handleTraceComplete = useCallback((accuracy) => {

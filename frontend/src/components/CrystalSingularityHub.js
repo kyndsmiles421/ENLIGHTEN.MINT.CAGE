@@ -16,6 +16,8 @@ const CrystalSingularityHub = ({
   const navigate = useNavigate();
   const initialized = useRef(false);
 
+  const navigatingRef = useRef(false);
+
   // Handle nodule activation
   const handleNoduleActivate = useCallback((e) => {
     const { id, path, freq, label } = e.detail;
@@ -23,8 +25,13 @@ const CrystalSingularityHub = ({
     if (onNoduleActivate) {
       onNoduleActivate({ id, path, freq, label });
     } else if (path) {
-      // Delay navigation for visual effect
-      setTimeout(() => navigate(path), 500);
+      // Single-click guard + reduced delay for snappy navigation
+      if (navigatingRef.current) return;
+      navigatingRef.current = true;
+      setTimeout(() => {
+        navigate(path);
+        navigatingRef.current = false;
+      }, 200);
     }
   }, [navigate, onNoduleActivate]);
 

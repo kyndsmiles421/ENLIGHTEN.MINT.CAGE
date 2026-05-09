@@ -810,7 +810,7 @@ export default function InteractiveModule({
   useEffect(() => {
     const saved = localStorage.getItem(`discovered_${category}`);
     if (saved) {
-      try { setDiscoveredSet(new Set(JSON.parse(saved))); } catch {}
+      try { setDiscoveredSet(new Set(JSON.parse(saved))); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
   }, [category]);
 
@@ -829,7 +829,7 @@ export default function InteractiveModule({
     // unified node from /entity/{id} and commits to ContextBus so
     // the rest of the engine reacts (lattice repaints, Oracle/Tarot
     // primer absorbs the entity for the next pull).
-    if (onItemOpen) { try { onItemOpen(item); } catch { /* noop */ } }
+    if (onItemOpen) { try { onItemOpen(item); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
   }, [onItemOpen]);
 
   // Shuffle items on each mount so order varies per visit

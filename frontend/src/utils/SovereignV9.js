@@ -109,12 +109,12 @@ const SovereignV9 = {
         try {
           left?.stop();
           right?.stop();
-        } catch (e) {}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         this.binauralNodes = { active: false };
       }, 1500);
       
       console.log("[Sovereign] Binaural stopped.");
-    } catch (e) {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   },
 
   // ═══════════════════════════════════════════════════════════════════════════

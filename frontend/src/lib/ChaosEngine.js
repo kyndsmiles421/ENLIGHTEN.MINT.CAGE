@@ -66,10 +66,10 @@ export function useChaosOscillator({ chaosCoeff = 1.0, driftRange = 5, chaosEnab
     const ctx = ctxRef.current;
     if (ctx && nodesRef.current) {
       nodesRef.current.forEach(n => {
-        try { n.gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.8); } catch {}
+        try { n.gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.8); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       });
       setTimeout(() => {
-        nodesRef.current?.forEach(n => { try { n.osc.stop(); } catch {} });
+        nodesRef.current?.forEach(n => { try { n.osc.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
         nodesRef.current = null;
       }, 900);
     }
@@ -89,8 +89,8 @@ export function useChaosOscillator({ chaosCoeff = 1.0, driftRange = 5, chaosEnab
     if (nodesRef.current) {
       cancelAnimationFrame(rafRef.current);
       nodesRef.current.forEach(n => {
-        try { n.gain.gain.linearRampToValueAtTime(0, ctxRef.current.currentTime + 0.3); } catch {}
-        setTimeout(() => { try { n.osc.stop(); } catch {} }, 400);
+        try { n.gain.gain.linearRampToValueAtTime(0, ctxRef.current.currentTime + 0.3); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+        setTimeout(() => { try { n.osc.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }, 400);
       });
       nodesRef.current = null;
     }
@@ -141,20 +141,20 @@ export function useChaosOscillator({ chaosCoeff = 1.0, driftRange = 5, chaosEnab
           setChaosState(cv);
           nodesRef.current.forEach(n => {
             const drifted = chaosDrift(n.base, cv, driftRange * (n.base / hz));
-            try { n.osc.frequency.setTargetAtTime(drifted, ctx.currentTime, 0.08); } catch {}
+            try { n.osc.frequency.setTargetAtTime(drifted, ctx.currentTime, 0.08); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
           });
           rafRef.current = requestAnimationFrame(drift);
         };
         rafRef.current = requestAnimationFrame(drift);
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [activeName, stopAll, chaosCoeff, driftRange, chaosEnabled]);
 
   // Cleanup on unmount
   useEffect(() => () => {
     cancelAnimationFrame(rafRef.current);
-    nodesRef.current?.forEach(n => { try { n.osc.stop(); } catch {} });
-    try { ctxRef.current?.close(); } catch {};
+    nodesRef.current?.forEach(n => { try { n.osc.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
+    try { ctxRef.current?.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); };
   }, []);
 
   return { toggle, activeHz, activeName, chaosState, stopAll };

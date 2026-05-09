@@ -125,7 +125,7 @@ export default function TimeCapsuleDrawer({ open, onClose }) {
       });
       // Pull the saved active module if it was non-idle
       if (capsule.active_module && capsule.active_module !== 'IDLE') {
-        try { pull(capsule.active_module); } catch { /* noop */ }
+        try { pull(capsule.active_module); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }
     } finally {
       setTimeout(() => {

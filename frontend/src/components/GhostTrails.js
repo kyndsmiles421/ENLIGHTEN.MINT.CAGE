@@ -129,7 +129,7 @@ export default function GhostTrails({ room, stillnessTimer = 0, userId, avatarCo
         setTrails(data.trails || []);
         setSparks(data.sparks || []);
         setResonance(data.resonance || null);
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
     fetchTrails();
     pollRef.current = setInterval(fetchTrails, visible ? 5000 : 15000);
@@ -152,7 +152,7 @@ export default function GhostTrails({ room, stillnessTimer = 0, userId, avatarCo
             stillness_s: stillnessTimer,
           }),
         });
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
     sendUpdate();
     updateRef.current = setInterval(sendUpdate, 8000);

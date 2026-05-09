@@ -42,7 +42,7 @@ function BuildYourOwn() {
     try {
       const res = await axios.get(`${API}/affirmations/my-sets`, { headers: authHeaders });
       setSaved(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [user, authHeaders]);
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('affirmations', 8); }, []);
@@ -82,7 +82,7 @@ function BuildYourOwn() {
       setSaved(prev => prev.filter(s => s.id !== id));
       if (viewingSet?.id === id) setViewingSet(null);
       toast.success('Deleted');
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const startEdit = (i) => { setEditIdx(i); setEditText(generatedAffirmations[i]); };

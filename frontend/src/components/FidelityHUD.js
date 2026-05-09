@@ -25,7 +25,7 @@ export default function FidelityHUD({ authHeaders }) {
       if (res.data.fidelity_boost_active && prefs.immersionLevel !== 'full') {
         updatePref('immersionLevel', 'full');
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [authHeaders, prefs.immersionLevel, updatePref]);
 

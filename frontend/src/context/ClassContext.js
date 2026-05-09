@@ -56,7 +56,7 @@ export function ClassProvider({ children }) {
       const data = await res.json();
       setActiveClass(data.class_id);
       setClassData(data.class_data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [token, authHeaders]);
 
@@ -71,7 +71,7 @@ export function ClassProvider({ children }) {
       const data = await res.json();
       setXP(data.xp);
       setLevel(data.level);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders, activeClass]);
 
   // Check if an affinity is boosted by the active class

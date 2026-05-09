@@ -133,7 +133,7 @@ const narrationSystem = {
             }
             unlockedAudio.pause();
             unlockedAudio.currentTime = 0;
-        } catch { /* noop */ }
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
         try {
             // Attempt primary Backend API first

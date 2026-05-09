@@ -63,7 +63,7 @@ export default function TraditionLens({ module = 'general', topic = '', context 
   // after the user has navigated to another herb.
   useEffect(() => {
     return () => {
-      if (abortRef.current) { try { abortRef.current.abort(); } catch { /* noop */ } }
+      if (abortRef.current) { try { abortRef.current.abort(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
     };
   }, [topic]);
 
@@ -76,7 +76,7 @@ export default function TraditionLens({ module = 'general', topic = '', context 
     // V68.62 — abort after 25s so the spinner never sticks if the
     // backend or LLM hangs. Track the controller in a ref so a
     // close-click can also kill an in-flight request.
-    if (abortRef.current) { try { abortRef.current.abort(); } catch { /* noop */ } }
+    if (abortRef.current) { try { abortRef.current.abort(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
     const controller = new AbortController();
     abortRef.current = controller;
     // Mark this as the active fetch so the dismiss handler can flag
@@ -84,7 +84,7 @@ export default function TraditionLens({ module = 'general', topic = '', context 
     // an error message after we've already cleared the panel.
     controller._intentional = false;
     const timeoutHandle = setTimeout(() => {
-      try { controller.abort(); } catch { /* noop */ }
+      try { controller.abort(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }, 25000);
 
     try {
@@ -129,8 +129,8 @@ export default function TraditionLens({ module = 'general', topic = '', context 
   const dismissLens = useCallback(() => {
     if (abortRef.current) {
       // Mark before abort so the catch block knows to stay quiet.
-      try { abortRef.current._intentional = true; } catch { /* noop */ }
-      try { abortRef.current.abort(); } catch { /* noop */ }
+      try { abortRef.current._intentional = true; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+      try { abortRef.current.abort(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       abortRef.current = null;
     }
     setLoading(false);

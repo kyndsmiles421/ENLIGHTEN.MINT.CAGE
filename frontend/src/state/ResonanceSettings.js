@@ -35,7 +35,7 @@ function load() {
 }
 
 function save(settings) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); } catch { /* noop */ }
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(settings)); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 /** Initialize once at app boot. Idempotent. */
@@ -64,5 +64,5 @@ export function setResonanceSettings(patch) {
   save(next);
   try {
     window.dispatchEvent(new CustomEvent('sovereign:resonance-settings', { detail: next }));
-  } catch { /* noop */ }
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }

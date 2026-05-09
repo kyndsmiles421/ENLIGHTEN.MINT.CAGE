@@ -58,7 +58,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
       const res = await fetch(`${API}/api/constellations/mine`, { headers: authHeaders });
       const data = await res.json();
       setMyRecipes(Array.isArray(data) ? data : []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [token, authHeaders]);
 
@@ -68,7 +68,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
       const res = await fetch(`${API}/api/constellations/community`);
       const data = await res.json();
       setCommunityRecipes(Array.isArray(data) ? data : []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, []);
 
@@ -78,7 +78,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
       const res = await fetch(`${API}/api/constellations/marketplace`);
       const data = await res.json();
       setMarketRecipes(Array.isArray(data) ? data : []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, []);
 
@@ -124,7 +124,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
         setDescription('');
         setTimeout(() => setSaveSuccess(false), 2000);
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setSaving(false);
   };
 
@@ -138,7 +138,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
       if (data.module_ids) {
         onLoadConstellation(data.module_ids);
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const handleLike = async (id) => {
@@ -150,7 +150,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
       });
       if (tab === 'community') fetchCommunity();
       if (tab === 'marketplace') fetchMarketplace();
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const handleDelete = async (id) => {
@@ -161,7 +161,7 @@ export default function ConstellationPanel({ activeModuleIds, onLoadConstellatio
         headers: authHeaders,
       });
       fetchMyRecipes();
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const handlePurchase = async (recipe) => {

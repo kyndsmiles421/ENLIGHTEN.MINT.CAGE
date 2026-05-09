@@ -72,7 +72,7 @@ function creditSparks(zone, seconds) {
     .catch(() => {});
   try {
     window.dispatchEvent(new CustomEvent('sovereign:immersion-tick'));
-  } catch { /* noop */ }
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 function haptic() {
@@ -90,7 +90,7 @@ function haptic() {
         navigator.vibrate(10);
       }
     }
-  } catch { /* ignore */ }
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 export default function ChamberMiniGame({
@@ -217,14 +217,14 @@ export default function ChamberMiniGame({
       const es = busReadKey('entityState');
       setActiveEntity(es?.activeEntity || null);
       setActiveEntityName(es?.name || null);
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     // Live subscribe so an entity swap mid-game (rare but possible) updates the fragments.
     const unsub = busSubscribe(() => {
       try {
         const es = busReadKey('entityState');
         setActiveEntity(es?.activeEntity || null);
         setActiveEntityName(es?.name || null);
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     });
     return unsub;
   }, [open]);
@@ -282,7 +282,7 @@ export default function ChamberMiniGame({
   // we let the user reclaim the UI immediately.
   const lessonAbortRef = useRef(null);
   const cancelLesson = useCallback(() => {
-    try { lessonAbortRef.current?.abort?.('user-cancel'); } catch { /* noop */ }
+    try { lessonAbortRef.current?.abort?.('user-cancel'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     lessonAbortRef.current = null;
     setLessonLoading(false);
   }, []);
@@ -311,7 +311,7 @@ export default function ChamberMiniGame({
         { headers, timeout: 30000, signal: ctrl.signal },
       );
       setLessonText(res.data?.content || 'No teaching returned — try again.');
-      try { fireBrain('learn', { topic: effTeach.topic }); } catch { /* noop */ }
+      try { fireBrain('learn', { topic: effTeach.topic }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     } catch (err) {
       // Distinguish user-cancel from a genuine failure so we don't
       // show an error toast when the user themselves aborted.
@@ -344,7 +344,7 @@ export default function ChamberMiniGame({
       const x = (tapEvent?.clientX ?? tapEvent?.touches?.[0]?.clientX) ?? null;
       const y = (tapEvent?.clientY ?? tapEvent?.touches?.[0]?.clientY) ?? null;
       if (x != null && y != null) showFragmentAt(x, y);
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [zone, fireBrain, showFragmentAt]);
 
   const onTargetCleared = useCallback(() => {
@@ -361,10 +361,10 @@ export default function ChamberMiniGame({
           try {
             const nextLvl = Math.min(maxLevel, level + 1);
             localStorage.setItem(levelKey, String(nextLvl));
-          } catch { /* ignore */ }
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }
         fireBrain('complete', { cleared: next, xp_awarded: scaledCompletionXP });
-        try { onComplete?.({ level, cleared: next, xp: scaledCompletionXP }); } catch { /* noop */ }
+        try { onComplete?.({ level, cleared: next, xp: scaledCompletionXP }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
         // V1.0.8 — Generate completion souvenir image. Themed by the
         // chamber zone + the active entity (herb, rock, etc). Cached
@@ -402,7 +402,7 @@ export default function ChamberMiniGame({
                 .finally(() => setSouvenirLoading(false));
             }
           }
-        } catch { /* noop */ }
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }
       return next;
     });
@@ -419,7 +419,7 @@ export default function ChamberMiniGame({
       // Announce entry to the brain so quests that require "visit X" fire.
       try {
         brain?.checkQuestLogic?.(brainSignal || `${effZone}:${effMode}:enter`, zone);
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
@@ -776,8 +776,8 @@ export default function ChamberMiniGame({
                           return Number.isFinite(v) ? v : 0;
                         } catch { return 0; }
                       });
-                      try { onGoDeeper?.(next, rest); } catch { /* noop */ }
-                      try { fireBrain('go_deeper', { next_zone: next.zone }); } catch { /* noop */ }
+                      try { onGoDeeper?.(next, rest); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+                      try { fireBrain('go_deeper', { next_zone: next.zone }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
                     }}
                     style={{
                       background: `${effColor}`, border: `1px solid ${effColor}`,
@@ -1049,7 +1049,7 @@ function RhythmStage({ count, color, verb, Icon, onHit, onCleared, onFlash, redu
       lastTapWasInZoneRef.current = true;
       try {
         onFlash(window.innerWidth * pos, window.innerHeight * 0.55);
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     } else {
       lastTapWasInZoneRef.current = false;
       // soft penalty: nothing, user retries

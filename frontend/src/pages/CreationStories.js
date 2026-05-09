@@ -69,7 +69,7 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
           try {
             const gen = await axios.post(`${API}/ai-visuals/generate-scene`, { story_id: story.id, scene_index: i }, { headers: authHeaders, timeout: 120000 });
             setScenes(prev => { const u = [...prev]; u[i] = { ...u[i], image_b64: gen.data.image_b64 }; return u; });
-          } catch {}
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }
       }
     } catch { toast.error('Failed to prepare cinematic scenes'); }
@@ -116,7 +116,7 @@ function CinematicStoryMode({ story, fullStory, authHeaders, onClose }) {
             const poll = await axios.get(`${API}/ai-visuals/video-status/${res.data.job_id}`, { headers: authHeaders });
             if (poll.data.status === 'complete' && poll.data.video_url) { clearInterval(pollRef.current); setVideoUrl(poll.data.video_url); setVideoStatus('complete'); }
             else if (poll.data.status === 'failed') { clearInterval(pollRef.current); setVideoStatus('failed'); toast.error('Video generation failed'); }
-          } catch {}
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }, 5000);
       }
     } catch { setVideoStatus('failed'); toast.error('Could not start video generation'); }

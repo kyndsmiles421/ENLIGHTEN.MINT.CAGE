@@ -229,7 +229,7 @@ export default function Pricing() {
             id: tierId,
             color: TIER_COLORS[tierId] || '#FCD34D',
           });
-        } catch {}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         // V1.1.5 — Sovereign Bridge: if a ClimbLadderPill stashed a
         // pending unlock target before redirecting to Stripe, route
         // the user back there now so the 3D unfold animation fires
@@ -248,7 +248,7 @@ export default function Pricing() {
               }
             }
           }
-        } catch {}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         window.history.replaceState({}, '', '/pricing');
         return;
       }

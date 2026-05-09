@@ -29,12 +29,12 @@ function loadPrefs() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) return JSON.parse(saved);
-  } catch {}
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   return { voice: 'nova', speed: 1.0 };
 }
 
 function savePrefs(prefs) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs)); } catch {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs)); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4FE', context = '' }) {

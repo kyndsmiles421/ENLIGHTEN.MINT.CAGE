@@ -73,7 +73,7 @@ export default function LiveSessions() {
       setSessions(sessRes.data.sessions || []);
       setRecurringSeries(recurRes.data.series || []);
       setPastRecordings(pastRes.data.recordings || []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   };
 
@@ -89,7 +89,7 @@ export default function LiveSessions() {
           ? { ...s, is_subscribed: !isSubscribed, subscriber_count: s.subscriber_count + (isSubscribed ? -1 : 1) }
           : s
       ));
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const activeSessions = sessions.filter(s => s.status === 'active');
@@ -680,7 +680,7 @@ function PastSessionCard({ recording, types, delay, onReplay, authHeaders }) {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   return (
@@ -795,7 +795,7 @@ function ReplayModal({ recording, types, onClose, authHeaders }) {
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const modalContent = (

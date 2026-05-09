@@ -28,7 +28,7 @@ export function useHubAudio() {
       if (satGainRef.current) {
         satGainRef.current.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
         const old = satOscRef.current;
-        setTimeout(() => { try { old?.stop(); } catch {} }, 300);
+        setTimeout(() => { try { old?.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }, 300);
       }
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -41,14 +41,14 @@ export function useHubAudio() {
       osc.start(ctx.currentTime);
       satOscRef.current = osc;
       satGainRef.current = gain;
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [ensureCtx]);
 
   const stopSatellite = useCallback(() => {
     if (satGainRef.current && ctxRef.current) {
       satGainRef.current.gain.linearRampToValueAtTime(0, ctxRef.current.currentTime + 0.3);
       const old = satOscRef.current;
-      setTimeout(() => { try { old?.stop(); } catch {} }, 400);
+      setTimeout(() => { try { old?.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }, 400);
       satOscRef.current = null;
       satGainRef.current = null;
     }
@@ -68,7 +68,7 @@ export function useHubAudio() {
       gain.connect(ctx.destination);
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + 0.35);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [ensureCtx]);
 
   const startAmbience = useCallback((weather) => {
@@ -108,7 +108,7 @@ export function useHubAudio() {
       ambOscRef.current = osc;
       ambGainRef.current = gain;
       ambActiveRef.current = true;
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [ensureCtx]);
 
   const stopAmbience = useCallback(() => {
@@ -117,8 +117,8 @@ export function useHubAudio() {
       const osc = ambOscRef.current;
       const lfo = ambLfoRef.current;
       setTimeout(() => {
-        try { osc?.stop(); } catch {}
-        try { lfo?.stop(); } catch {}
+        try { osc?.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+        try { lfo?.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }, 1700);
       ambOscRef.current = null;
       ambGainRef.current = null;
@@ -135,7 +135,7 @@ export function useHubAudio() {
       // Stop existing chord
       if (chordGainRef.current) {
         chordGainRef.current.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.2);
-        chordOscsRef.current.forEach(o => { setTimeout(() => { try { o.stop(); } catch {} }, 300); });
+        chordOscsRef.current.forEach(o => { setTimeout(() => { try { o.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }, 300); });
         chordOscsRef.current = [];
         chordGainRef.current = null;
       }
@@ -153,14 +153,14 @@ export function useHubAudio() {
         osc.start(ctx.currentTime);
         chordOscsRef.current.push(osc);
       });
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [ensureCtx]);
 
   const stopHarmonicChord = useCallback(() => {
     if (chordGainRef.current && ctxRef.current) {
       chordGainRef.current.gain.linearRampToValueAtTime(0, ctxRef.current.currentTime + 0.8);
       const oscs = chordOscsRef.current;
-      setTimeout(() => { oscs.forEach(o => { try { o.stop(); } catch {} }); }, 1000);
+      setTimeout(() => { oscs.forEach(o => { try { o.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }); }, 1000);
       chordOscsRef.current = [];
       chordGainRef.current = null;
     }
@@ -168,10 +168,10 @@ export function useHubAudio() {
 
   useEffect(() => {
     return () => {
-      try { satOscRef.current?.stop(); } catch {}
-      try { ambOscRef.current?.stop(); } catch {}
-      try { ambLfoRef.current?.stop(); } catch {}
-      chordOscsRef.current.forEach(o => { try { o.stop(); } catch {} });
+      try { satOscRef.current?.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+      try { ambOscRef.current?.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+      try { ambLfoRef.current?.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+      chordOscsRef.current.forEach(o => { try { o.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
     };
   }, []);
 

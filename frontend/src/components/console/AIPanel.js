@@ -129,7 +129,7 @@ export default function AIPanel({ monitorFilters, setMonitorFilters, handleNav, 
             amount: 25,
             source: `game_generator_${currentModule.replace(/\s+/g, '_')}`,
           }, { headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` } });
-        } catch {} // Non-fatal
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } // Non-fatal
       }
     } catch {
       toast.error('Generator unavailable. Try again.');

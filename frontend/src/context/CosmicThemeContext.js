@@ -141,7 +141,7 @@ export function CosmicThemeProvider({ children }) {
       try {
         const parsed = JSON.parse(saved);
         return { ...initialTheme, ...parsed, palette: MOOD_PALETTES[parsed.mood] || MOOD_PALETTES.cosmic };
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
     return initialTheme;
   });

@@ -82,7 +82,7 @@ export function MixerProvider({ children }) {
   useEffect(() => {
     try {
       window.dispatchEvent(new CustomEvent('sovereign:pillar-levels', { detail: { pillarLevels } }));
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [pillarLevels]);
   const [showStore, setShowStore] = useState(false);
   const [storeItems, setStoreItems] = useState([]);
@@ -242,7 +242,7 @@ export function MixerProvider({ children }) {
     try {
       if (navigator.share) await navigator.share(shareData);
       else { await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`); toast.success('Link copied'); }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
 
   const handleSever = useCallback(() => {

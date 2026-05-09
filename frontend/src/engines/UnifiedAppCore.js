@@ -224,7 +224,7 @@ export const executeEmergencyStop = async () => {
   if (window.AudioContext) {
     const contexts = window.__audioContexts || [];
     contexts.forEach(ctx => {
-      try { ctx.close(); } catch (e) {}
+      try { ctx.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     });
   }
   

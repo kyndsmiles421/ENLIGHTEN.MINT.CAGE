@@ -17,7 +17,7 @@ export function AllianceChat({ allianceId, authHeaders, userId }) {
     try {
       const res = await axios.get(`${API}/starseed/realm/chat/${allianceId}`, { headers: authHeaders });
       setMessages(res.data.messages || []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [allianceId, authHeaders]);
 
   useEffect(() => {

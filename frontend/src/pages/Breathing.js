@@ -110,7 +110,7 @@ function BuildYourOwn({ onSelectPattern }) {
     try {
       const res = await axios.get(`${API}/breathing/my-custom`, { headers: authHeaders });
       setSaved(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [user, authHeaders]);
 
   useEffect(() => { loadSaved(); }, [loadSaved]);
@@ -135,7 +135,7 @@ function BuildYourOwn({ onSelectPattern }) {
       await axios.delete(`${API}/breathing/custom/${id}`, { headers: authHeaders });
       setSaved(prev => prev.filter(s => s.id !== id));
       toast.success('Deleted');
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const playCustom = (p) => {

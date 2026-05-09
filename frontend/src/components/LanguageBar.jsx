@@ -92,7 +92,7 @@ function revertAll() {
 
 async function translateOne(text, target, sacred) {
   let token = null;
-  try { token = localStorage.getItem('zen_token'); } catch { /* noop */ }
+  try { token = localStorage.getItem('zen_token'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   const headers = token && token !== 'guest_token' ? { Authorization: `Bearer ${token}` } : {};
   const res = await axios.post(
     `${API}/translator/translate`,
@@ -108,7 +108,7 @@ async function translateOne(text, target, sacred) {
 async function translateBatch(texts, target, sacred) {
   if (!texts || !texts.length) return [];
   let token = null;
-  try { token = localStorage.getItem('zen_token'); } catch { /* noop */ }
+  try { token = localStorage.getItem('zen_token'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   const headers = token && token !== 'guest_token' ? { Authorization: `Bearer ${token}` } : {};
   const out = new Array(texts.length).fill(null);
   // Slice into 60-string chunks and run them concurrently (small fan-out
@@ -231,7 +231,7 @@ export default function LanguageBar() {
     setVoiceError(null);
     // V1.1.8 — Auth header (was missing → some installs 401'd silently)
     let voiceToken = null;
-    try { voiceToken = localStorage.getItem('zen_token'); } catch {}
+    try { voiceToken = localStorage.getItem('zen_token'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     const voiceHeaders = voiceToken && voiceToken !== 'guest_token'
       ? { Authorization: `Bearer ${voiceToken}` }
       : {};
@@ -265,7 +265,7 @@ export default function LanguageBar() {
         STORAGE_KEY,
         JSON.stringify({ autoFollow, sacred }),
       );
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [autoFollow, sacred]);
 
   const cur = useMemo(
@@ -325,7 +325,7 @@ export default function LanguageBar() {
   // one-tap re-run pills.
   const fetchRecentChains = useCallback(async () => {
     let token = null;
-    try { token = localStorage.getItem('zen_token'); } catch { /* noop */ }
+    try { token = localStorage.getItem('zen_token'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     if (!token || token === 'guest_token') return;
     setRecentLoading(true);
     try {
@@ -375,7 +375,7 @@ export default function LanguageBar() {
       return;
     }
     let token = null;
-    try { token = localStorage.getItem('zen_token'); } catch { /* noop */ }
+    try { token = localStorage.getItem('zen_token'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     if (!token || token === 'guest_token') {
       setForgeError('Sign in to forge a ritual chain.');
       return;

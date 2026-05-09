@@ -46,8 +46,7 @@ export default function Codex() {
       setEntries(res.data.entries || []);
       setSections(res.data.sections || []);
       setTier(res.data.tier || 'observer');
-    } catch {
-    } finally {
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } finally {
       setLoading(false);
     }
   }, [authHeaders, authLoading, token, activeSection, search]);

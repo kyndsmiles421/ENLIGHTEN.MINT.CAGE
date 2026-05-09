@@ -137,7 +137,7 @@ async function initializeOmniHealing() {
         // The Prism Fixed Point - Locking the Brain Flow to Stability
         prism_anchor: 1.0,
         
-        // Rainbow Spectrum for Chromotherapy
+        // Rainbow Spectrum for Chromatic Resonance
         spectrum: RAINBOW_FREQUENCIES,
         
         // Encrypted Refraction Logic (The Loop)

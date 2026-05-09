@@ -111,7 +111,7 @@ export function AvatarProvider({ children }) {
     setWorldProgress(prev => {
       if (prev[route]) return prev;
       const next = { ...prev, [route]: Date.now() };
-      try { localStorage.setItem('emcafe_world_progress', JSON.stringify(next)); } catch {}
+      try { localStorage.setItem('emcafe_world_progress', JSON.stringify(next)); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       return next;
     });
   }, []);

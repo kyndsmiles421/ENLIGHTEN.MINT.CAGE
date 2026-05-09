@@ -352,7 +352,7 @@ export default function SovereignAdvisors() {
       setUtilitiesOwned(data.utilities_owned || 0);
       setUtilitiesTotal(data.utilities_total || 5);
       setDiscountRate(data.discount_rate || 10);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('council_advisors', 8); }, []);
@@ -501,7 +501,7 @@ export default function SovereignAdvisors() {
         method: 'DELETE', headers: authHeaders,
       });
       setMessages([]);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const handleBridge = (bridgeId) => {

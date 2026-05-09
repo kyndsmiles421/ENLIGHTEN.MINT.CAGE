@@ -459,7 +459,7 @@ const SovereignSingularity = {
           el.style.setProperty('left', '0', 'important');
           el.classList.add('cellular-active');
         });
-      } catch (e) {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     });
 
     console.log("[V53.0] Ghostbuster Complete. Glass screens shattered.");

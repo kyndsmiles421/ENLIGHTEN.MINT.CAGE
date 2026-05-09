@@ -113,7 +113,7 @@ export default function TradeCircle() {
       ]);
       setListings(listRes.data.listings);
       setStats(statsRes.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [authHeaders, category, searchQ]);
 
@@ -121,14 +121,14 @@ export default function TradeCircle() {
     try {
       const res = await axios.get(`${API}/trade-circle/my-offers`, { headers: authHeaders });
       setMyOffers(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   const fetchLeaderboard = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/trade-circle/karma-leaderboard`, { headers: authHeaders });
       setLeaderboard(res.data.leaderboard || []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   useEffect(() => { fetchListings(); }, [fetchListings]);

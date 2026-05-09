@@ -375,9 +375,9 @@ export function usePhoneticSynthesizer(options = {}) {
         fadeOutGain.gain.setValueAtTime(gainRef.current.gain.value, ctx.currentTime);
         fadeOutGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.05);
         setTimeout(() => {
-          try { oldSource.stop(); } catch (e) {}
+          try { oldSource.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }, 60);
-      } catch (e) {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
     
     const buffer = createResonantHum(ctx);
@@ -405,7 +405,7 @@ export function usePhoneticSynthesizer(options = {}) {
     if (resonantHumRef.current) {
       try {
         resonantHumRef.current.stop();
-      } catch (e) {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       resonantHumRef.current = null;
     }
   }, []);
@@ -416,7 +416,7 @@ export function usePhoneticSynthesizer(options = {}) {
     activeSourcesRef.current.forEach(source => {
       try {
         source.stop();
-      } catch (e) {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     });
     activeSourcesRef.current = [];
     

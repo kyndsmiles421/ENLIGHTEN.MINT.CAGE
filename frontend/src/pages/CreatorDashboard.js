@@ -69,7 +69,7 @@ export default function CreatorDashboard() {
       await axios.put(`${API}/creator/feedback/${id}/status`, { status }, { headers: authHeaders });
       setFeedback(prev => prev.map(f => f.id === id ? { ...f, status } : f));
       toast.success(`Feedback ${status.replace('_', ' ')}`);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const deleteComment = async (id) => {
@@ -77,7 +77,7 @@ export default function CreatorDashboard() {
       await axios.delete(`${API}/creator/comments/${id}`, { headers: authHeaders });
       setComments(prev => prev.filter(c => c.id !== id));
       toast.success('Comment deleted');
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const searchUsers = useCallback(async (q) => {
@@ -94,7 +94,7 @@ export default function CreatorDashboard() {
     try {
       const r = await axios.get(`${API}/creator/live-feed`, { headers: authHeaders });
       setLiveFeed(r.data.events || []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   useEffect(() => {
@@ -114,7 +114,7 @@ export default function CreatorDashboard() {
       document.body.appendChild(a); a.click(); a.remove();
       window.URL.revokeObjectURL(url);
       toast.success(`${collection} exported`);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const viewUserDetail = async (userId) => {
@@ -130,7 +130,7 @@ export default function CreatorDashboard() {
       setShowUserDetail(prev => prev ? { ...prev, disabled } : null);
       setRecentUsers(prev => prev.map(u => u.id === userId ? { ...u, disabled } : u));
       toast.success(disabled ? 'User disabled' : 'User enabled');
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   if (authLoading || loading) {

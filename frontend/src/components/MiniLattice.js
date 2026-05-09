@@ -92,7 +92,7 @@ export default function MiniLattice() {
       } else if (navigator.clipboard) {
         await navigator.clipboard.writeText(`${caption}\n${absoluteUrl}`);
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   // Build the resonance line (SVG polyline) across last_path coords

@@ -214,9 +214,9 @@ export default function CosmicBroker({ authHeaders }) {
           if (window.SovereignStreamline?.playSovereignSignature) {
             window.SovereignStreamline.playSovereignSignature(963, 1.4);
           }
-        } catch {}
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [authHeaders]);
 

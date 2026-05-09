@@ -130,7 +130,7 @@ class ResonanceEngine {
     
     try {
       navigator.vibrate(pattern);
-    } catch (err) {}
+    } catch (err) { if (process.env.NODE_ENV !== 'production') console.warn(err); }
   }
 
   // 3. FLUID DYNAMICS: The "Cream Foam" Particle System
@@ -310,7 +310,7 @@ class ResonanceEngine {
         node.oscillator.disconnect();
         node.gainNode.disconnect();
         node.panner.disconnect();
-      } catch (err) {}
+      } catch (err) { if (process.env.NODE_ENV !== 'production') console.warn(err); }
       this.pannerNodes.delete(id);
     }
   }

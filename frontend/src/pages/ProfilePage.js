@@ -60,8 +60,8 @@ function TonePlayer({ frequency, playing }) {
       oscRef.current.start();
     }
     return () => {
-      if (oscRef.current) { try { oscRef.current.stop(); } catch {} }
-      if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch {} }
+      if (oscRef.current) { try { oscRef.current.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
+      if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
     };
   }, [playing, frequency]);
 
@@ -249,7 +249,7 @@ export default function ProfilePage() {
                       url: `${window.location.origin}/profile/${user?.id}`,
                     };
                     if (navigator.share) {
-                      try { await navigator.share(shareData); } catch {}
+                      try { await navigator.share(shareData); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
                     } else {
                       await navigator.clipboard.writeText(shareData.url);
                       toast.success('Profile link copied to clipboard');

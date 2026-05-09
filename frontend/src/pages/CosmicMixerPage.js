@@ -233,7 +233,7 @@ export default function CosmicMixerPage() {
         });
         setSeasonalFreqs(prev => prev.map(f => f.seasonId === seasonId ? { ...f, collected: true } : f));
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const allFrequencies = [
@@ -280,7 +280,7 @@ export default function CosmicMixerPage() {
     setActiveLight(null);
     setVibeOn(false);
     if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
-    try { navigator.vibrate(0); } catch {}
+    try { navigator.vibrate(0); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [ctxStopAll]);
 
   // Update per-channel filter in real time
@@ -298,11 +298,11 @@ export default function CosmicMixerPage() {
   const toggleVibe = useCallback(() => {
     if (vibeOn) {
       if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
-      try { navigator.vibrate(0); } catch {}
+      try { navigator.vibrate(0); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       setVibeOn(false);
     } else {
       const pattern = firstActiveFreq ? Math.max(50, Math.round(1000 / firstActiveFreq.hz * 10)) : 200;
-      const pulse = () => { try { navigator.vibrate([pattern, pattern]); } catch {} };
+      const pulse = () => { try { navigator.vibrate([pattern, pattern]); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } };
       pulse();
       vibeIntervalRef.current = setInterval(pulse, pattern * 2 + 50);
       setVibeOn(true);
@@ -313,7 +313,7 @@ export default function CosmicMixerPage() {
     if (vibeOn && firstActiveFreq) {
       if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
       const pattern = Math.max(50, Math.round(1000 / firstActiveFreq.hz * 10));
-      const pulse = () => { try { navigator.vibrate([pattern, pattern]); } catch {} };
+      const pulse = () => { try { navigator.vibrate([pattern, pattern]); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } };
       vibeIntervalRef.current = setInterval(pulse, pattern * 2 + 50);
     }
   }, [firstActiveFreq, vibeOn]);
@@ -564,7 +564,7 @@ export default function CosmicMixerPage() {
       ]);
       setSavedSoundscapes(mine.data);
       setCommunitySoundscapes(community.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   useEffect(() => { fetchSoundscapes(); }, [fetchSoundscapes]);
@@ -588,7 +588,7 @@ export default function CosmicMixerPage() {
         }, 1500);
       }
       fetchSoundscapes();
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setSoundscapeSaving(false);
   }, [hasActive, getSnapshot, soundscapeName, authHeaders, fetchSoundscapes]);
 
@@ -603,7 +603,7 @@ export default function CosmicMixerPage() {
     try {
       await axios.delete(`${API}/mixer-presets/sessions/${id}`, { headers: authHeaders });
       fetchSoundscapes();
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders, fetchSoundscapes]);
 
   return (
@@ -960,7 +960,7 @@ export default function CosmicMixerPage() {
                           setFreqWaveforms(prev => ({...prev, [hz]: w}));
                           // Update live oscillator waveform
                           const nodes = freqNodesMapRef.current[hz];
-                          if (nodes) nodes.forEach(n => { if (n.type !== undefined && n.frequency) { try { n.type = w; } catch {} } });
+                          if (nodes) nodes.forEach(n => { if (n.type !== undefined && n.frequency) { try { n.type = w; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } } });
                         }} />
                     </ChannelStrip>
                   );

@@ -120,7 +120,7 @@ if (typeof window !== 'undefined') {
   window.addEventListener('sovereign:interact', (e) => {
     const { toolId, domain } = e.detail || {};
     if (toolId && domain) {
-      try { record({ toolId, domain, correct: true, durationSec: null }); } catch { /* ignore */ }
+      try { record({ toolId, domain, correct: true, durationSec: null }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
   });
   window.__sovereignMastery = { record, scoreFor, allScores, suggestDifficulty, effectiveDifficulty };

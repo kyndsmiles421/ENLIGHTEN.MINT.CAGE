@@ -187,7 +187,7 @@ export default function CosmicForge() {
       setSkillTypes(skillsRes.data.skills || []);
       setConsciousnessLevel(toolsRes.data.consciousness_level || 1);
       setInventory(invRes.data.items || []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [authHeaders]);
 

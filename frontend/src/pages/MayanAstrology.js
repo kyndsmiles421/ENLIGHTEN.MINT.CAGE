@@ -309,7 +309,7 @@ function TodaySign() {
       const res = await axios.get(`${API}/mayan/today`);
       setData(res.data);
       setRevealed(true);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
 
   return (

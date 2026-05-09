@@ -38,7 +38,7 @@ export default function BackgroundPicker({ isOpen, onClose, onSelect, currentBg,
       });
       setMyBackgrounds(prev => [{ id: r.data.id, url: r.data.url, name: r.data.name }, ...prev]);
       setActiveCategory('My Backgrounds');
-    } catch { }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -47,7 +47,7 @@ export default function BackgroundPicker({ isOpen, onClose, onSelect, currentBg,
     try {
       await axios.delete(`${API}/backgrounds/${bgId}`, { headers: authHeaders });
       setMyBackgrounds(prev => prev.filter(b => b.id !== bgId));
-    } catch { }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   if (!isOpen) return null;

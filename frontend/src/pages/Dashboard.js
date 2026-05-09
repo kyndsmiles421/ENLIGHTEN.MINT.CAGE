@@ -272,7 +272,7 @@ export default function Dashboard() {
   const saveLayout = useCallback(async (order, hidden, pinned) => {
     try {
       await axios.put(`${API}/dashboard/layout`, { sections_order: order, hidden_sections: hidden, pinned_shortcuts: pinned }, { headers: authHeaders });
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   const moveSection = (idx, dir) => {

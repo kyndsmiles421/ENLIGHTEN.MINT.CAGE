@@ -123,7 +123,7 @@ export default function MyQRSheet({ open, onClose }) {
 
   const copyUrl = async () => {
     if (!absoluteUrl) return;
-    try { await navigator.clipboard.writeText(absoluteUrl); setCopied(true); setTimeout(() => setCopied(false), 1400); } catch { /* noop */ }
+    try { await navigator.clipboard.writeText(absoluteUrl); setCopied(true); setTimeout(() => setCopied(false), 1400); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const nativeShare = async () => {

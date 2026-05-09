@@ -63,7 +63,7 @@ function useSovereignSocket(roomId, peerId) {
         }
         if (msg.type === 'pong') setPeerCount(msg.peers);
         if (msg.type === 'atmosphere_sync') setAtmosphere(msg.payload);
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
 
     ws.onclose = () => {

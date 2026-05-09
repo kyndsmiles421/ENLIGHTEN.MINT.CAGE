@@ -757,7 +757,7 @@ export default function Journey() {
     try {
       const res = await axios.get(`${API}/journey/progress`, { headers: authHeaders });
       setProgress(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [user, authHeaders]);
 
   useEffect(() => { loadProgress(); }, [loadProgress]);

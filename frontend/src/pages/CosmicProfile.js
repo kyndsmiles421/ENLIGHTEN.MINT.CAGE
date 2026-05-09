@@ -67,7 +67,7 @@ export default function CosmicProfile() {
     try {
       const res = await axios.get(`${API}/cosmic-profile`, { headers: authHeaders });
       setProfile(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [user, authHeaders]);
 
@@ -160,7 +160,7 @@ export default function CosmicProfile() {
                       `${profile.zodiac_sign || ''} ${profile.dominant_element || ''} ${profile.dominant_energy_type || ''}`,
                       'COSMIC_PORTRAIT',
                     );
-                  } catch { /* noop */ }
+                  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
                 } catch { /* silent */ }
                 setGenPortrait(false);
               }} disabled={genPortrait}

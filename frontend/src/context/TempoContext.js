@@ -46,7 +46,7 @@ export function TempoProvider({ children }) {
 
     return () => {
       connectedLfos.forEach(({ lfo, lfoGain }) => {
-        try { lfo.stop(); lfo.disconnect(); lfoGain.disconnect(); } catch {}
+        try { lfo.stop(); lfo.disconnect(); lfoGain.disconnect(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       });
     };
   }, [bpm]);
@@ -59,7 +59,7 @@ export function TempoProvider({ children }) {
     if (bpm <= 0) return;
 
     let Hap;
-    try { Hap = require('@capacitor/haptics').Haptics; } catch {}
+    try { Hap = require('@capacitor/haptics').Haptics; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     const doHaptic = () => {
       try { Hap?.impact({ style: 'Light' }); } catch { navigator.vibrate?.([8]); }
     };

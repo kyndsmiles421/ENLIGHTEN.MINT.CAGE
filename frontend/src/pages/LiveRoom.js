@@ -240,7 +240,7 @@ export default function LiveRoom() {
           default:
             break;
         }
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
 
     ws.onclose = () => {
@@ -615,7 +615,7 @@ export default function LiveRoom() {
   };
 
   const startSession = async () => {
-    try { await axios.post(`${API}/live/sessions/${sessionId}/start`, {}, { headers: authHeaders }); } catch {}
+    try { await axios.post(`${API}/live/sessions/${sessionId}/start`, {}, { headers: authHeaders }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const endSession = async () => {
@@ -629,7 +629,7 @@ export default function LiveRoom() {
       }
       cleanupAllPeers();
       await axios.post(`${API}/live/sessions/${sessionId}/end`, {}, { headers: authHeaders });
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   // Audio recording

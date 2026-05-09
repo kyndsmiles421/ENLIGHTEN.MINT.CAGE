@@ -119,7 +119,7 @@ export default function ContentBroker({ authHeaders }) {
       setCatalog(res.data.assets || []);
       setUserTier(res.data.user_tier);
       setDiscountPct(res.data.discount_pct);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [authHeaders, filter]);
 
@@ -127,7 +127,7 @@ export default function ContentBroker({ authHeaders }) {
     try {
       const res = await axios.get(`${API}/content-broker/my-content`, { headers: authHeaders });
       setMyContent(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   useEffect(() => { fetchCatalog(); fetchMyContent(); }, [fetchCatalog, fetchMyContent]);

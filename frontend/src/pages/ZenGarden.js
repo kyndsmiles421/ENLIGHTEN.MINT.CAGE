@@ -146,7 +146,7 @@ function PlantCare({ user, authHeaders }) {
     try {
       const res = await axios.get(`${API}/zen-garden/plants`, { headers: authHeaders });
       setPlants(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [user, authHeaders]);
 
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('zen_garden', 8); }, []);
@@ -749,7 +749,7 @@ function LanternRelease() {
     // 320px-tall overflow-hidden container after ~3s (it flew to
     // bottom:450px of a 320px box), so the user saw a brief flash
     // and assumed the button was dead.
-    try { toast?.success('Released · let it go', { duration: 2200 }); } catch { /* noop */ }
+    try { toast?.success('Released · let it go', { duration: 2200 }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setTimeout(() => setLanterns(prev => prev.filter(l => l.id !== newLantern.id)), 14000);
   };
 
@@ -885,8 +885,8 @@ function RainScene() {
       const g = actx.createGain(); g.gain.value = intensity * 0.12;
       src.connect(filt); filt.connect(g); g.connect(actx.destination); src.start();
       nodesRef.current = [src, g];
-    } catch {}
-    return () => { cancelAnimationFrame(animRef.current); nodesRef.current.forEach(n => { try { n.stop?.(); } catch {} }); try { audioRef.current?.close(); } catch {} };
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+    return () => { cancelAnimationFrame(animRef.current); nodesRef.current.forEach(n => { try { n.stop?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }); try { audioRef.current?.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } };
   }, []);
 
   useEffect(() => { const g = nodesRef.current[1]; if (g?.gain) g.gain.value = intensity * 0.12; }, [intensity]);

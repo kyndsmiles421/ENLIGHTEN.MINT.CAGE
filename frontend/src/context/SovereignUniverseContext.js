@@ -69,7 +69,7 @@ export function SovereignUniverseProvider({ children }) {
       window.dispatchEvent(new CustomEvent('sovereign:update', {
         detail: { sparks: w?.data?.sparks, quests: q?.data?.quests },
       }));
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
 
   // ─── Auto-detect quest advancement ───
@@ -108,7 +108,7 @@ export function SovereignUniverseProvider({ children }) {
               detail: { color: t.color || '#A78BFA', quest_complete: t.quest_complete, reward_sparks: t.reward_sparks },
             }));
           });
-        } catch { /* noop */ }
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         // Refresh to sync sparks / new cards
         refreshGlobalUI();
       }
@@ -161,7 +161,7 @@ export function SovereignUniverseProvider({ children }) {
       beat += 1;
       try {
         window.dispatchEvent(new CustomEvent('sovereign:pulse', { detail: { beat } }));
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       if (beat % 10 === 0) {
         refreshGlobalUI();
       }

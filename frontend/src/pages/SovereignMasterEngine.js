@@ -185,7 +185,7 @@ export default function SovereignMasterEngine() {
       } else {
         await navigator.clipboard.writeText(`${text} ${window.location.href}`);
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   return (

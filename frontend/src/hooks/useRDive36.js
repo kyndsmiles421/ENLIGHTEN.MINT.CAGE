@@ -476,7 +476,7 @@ export function useRDive36(options = {}) {
       const seeds = JSON.parse(localStorage.getItem('cosmic_seeds') || '[]');
       seeds.push(seed);
       localStorage.setItem('cosmic_seeds', JSON.stringify(seeds.slice(-100))); // Keep last 100
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     
     // Also save to backend API
     try {

@@ -219,7 +219,7 @@ export default function MusicLounge() {
   }, []);
 
   const stopCurrent = useCallback(() => {
-    nodesRef.current.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch {} });
+    nodesRef.current.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
     if (nodesRef.current._interval) clearInterval(nodesRef.current._interval);
     nodesRef.current = [];
   }, []);

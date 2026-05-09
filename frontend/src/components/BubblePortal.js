@@ -68,7 +68,7 @@ function playExpansionTone(masteryTier = 0) {
     }
 
     setTimeout(() => ctx.close(), (duration + 0.2) * 1000);
-  } catch {}
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 function BubbleLoader({ color }) {

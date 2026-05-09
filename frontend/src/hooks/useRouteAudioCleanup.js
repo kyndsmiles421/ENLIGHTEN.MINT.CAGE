@@ -38,7 +38,7 @@ export function useRouteAudioCleanup() {
           if (ctx && ctx.state !== 'closed') {
             try { 
               ctx.close();
-            } catch {}
+            } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
           }
         });
         window.__cosmicAudioContexts = [];

@@ -67,7 +67,7 @@ export function useResonance() {
       setTimeout(() => {
         window.dispatchEvent(new CustomEvent('sovereign:pulse', { detail: applyGain(base, live.gain) }));
       }, 700);
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
     return final;
   }, []);

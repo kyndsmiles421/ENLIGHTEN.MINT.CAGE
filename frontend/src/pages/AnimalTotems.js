@@ -112,7 +112,7 @@ function BirthTotemCalc({ totems, onSelect }) {
     try {
       const r = await axios.get(`${API}/animal-totems/birth?month=${month}&day=${day}`);
       setResult(r.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   return (

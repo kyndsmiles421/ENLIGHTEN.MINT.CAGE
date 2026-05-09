@@ -31,7 +31,7 @@ export function TreasuryProvider({ children }) {
       const res = await fetch(`${API}/api/treasury/balance`, { headers: authHeaders });
       const data = await res.json();
       setBalance(data.balance || 0);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [hasAuth, authHeaders]);
 
   const refreshHubWallet = useCallback(async () => {
@@ -42,7 +42,7 @@ export function TreasuryProvider({ children }) {
       setDust(data.dust || 0);
       setGems(data.gems || 0);
       setHubData(data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export function TreasuryProvider({ children }) {
         setGems(data.gems_balance || 0);
         return data;
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   const transmute = useCallback(async (dustAmount) => {

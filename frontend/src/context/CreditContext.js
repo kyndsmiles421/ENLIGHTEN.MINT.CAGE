@@ -20,7 +20,7 @@ export function CreditProvider({ children }) {
         const data = await res.json();
         setCreditInfo(data);
       }
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [user]);
 
   useEffect(() => { fetchCredits(); 

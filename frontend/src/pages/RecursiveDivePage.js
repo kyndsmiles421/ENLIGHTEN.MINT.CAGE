@@ -31,7 +31,7 @@ export default function RecursiveDivePage() {
     try {
       const seeds = JSON.parse(localStorage.getItem('cosmic_seeds') || '[]');
       setMintedSeeds(seeds);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
   
   const handleSeedMinted = useCallback((seed) => {

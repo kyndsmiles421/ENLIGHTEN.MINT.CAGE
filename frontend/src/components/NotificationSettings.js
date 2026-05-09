@@ -47,7 +47,7 @@ export default function NotificationSettings({ onClose }) {
         setVapidKey(keyRes.data.public_key);
         setIsSubscribed(statusRes.data.subscribed);
         if (statusRes.data.preferences) setPrefs(statusRes.data.preferences);
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       setLoading(false);
     };
     init();
@@ -104,7 +104,7 @@ export default function NotificationSettings({ onClose }) {
     setPrefs(newPrefs);
     try {
       await axios.post(`${API}/notifications/preferences`, newPrefs, { headers: authHeaders });
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const sendTest = async () => {

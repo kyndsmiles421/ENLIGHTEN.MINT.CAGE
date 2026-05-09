@@ -28,7 +28,7 @@ function LoreDefaultToggle({ palette }) {
     catch { return 'closed'; }
   });
   const set = (v) => {
-    try { localStorage.setItem('global_lore_default', v); } catch {}
+    try { localStorage.setItem('global_lore_default', v); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setPref(v);
   };
   const opts = [

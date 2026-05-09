@@ -38,7 +38,7 @@ export default function HexagramGrid({ isOpen, onClose }) {
       });
       const data = await res.json();
       setH2Data(data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [token, authHeaders]);
 

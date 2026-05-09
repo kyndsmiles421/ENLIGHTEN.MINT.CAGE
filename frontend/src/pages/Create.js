@@ -45,7 +45,7 @@ export default function Create() {
       const results = await Promise.all(promises);
       setSharedCreations(results[0].data);
       if (user && results[1]) setMyCreations(results[1].data);
-    } catch {} finally { setLoading(false); }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } finally { setLoading(false); }
   }, [user, authHeaders]);
 
   useEffect(() => { loadData(); }, [loadData]);
@@ -100,7 +100,7 @@ export default function Create() {
       await axios.put(`${API}/creations/${id}/like`);
       toast.success('Liked!');
       await loadData();
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const filteredShared = filterType === 'all' ? sharedCreations : sharedCreations.filter(c => c.type === filterType);

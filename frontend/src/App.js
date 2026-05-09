@@ -332,7 +332,7 @@ function CafeApp() {
         if (osModule.default?.ignite) osModule.default.ignite();
         const omnis = omnisModule.default?.();
         if (omnis) console.log(`SINGULARITY V30.2: ${omnis.version}`);
-      } catch {} // Non-fatal — engines are enhancements
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } // Non-fatal — engines are enhancements
     };
     if ('requestIdleCallback' in window) {
       window.requestIdleCallback(initEngines);
@@ -522,6 +522,7 @@ function AnimatedRoutes() {
         <Route path="/classes" element={<Classes />} />
         <Route path="/create" element={<Create />} />
         <Route path="/light-therapy" element={<LightTherapy />} />
+        <Route path="/light-resonance" element={<LightTherapy />} />
         <Route path="/zen-garden" element={<ZenGarden />} />
         <Route path="/mantras" element={<Mantras />} />
         <Route path="/hooponopono" element={<Hooponopono />} />
@@ -540,6 +541,7 @@ function AnimatedRoutes() {
         <Route path="/dreams" element={<Dreams />} />
         <Route path="/green-journal" element={<GreenJournal />} />
         <Route path="/aromatherapy" element={<Aromatherapy />} />
+        <Route path="/aromatic-resonance" element={<Aromatherapy />} />
         <Route path="/herbology" element={<Herbology />} />
         <Route path="/elixirs" element={<Elixirs />} />
         <Route path="/meal-planning" element={<MealPlanning />} />

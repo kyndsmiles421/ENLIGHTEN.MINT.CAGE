@@ -331,14 +331,14 @@ export default function DanceMusicStudio() {
         notes: recordedNotes,
       }, { headers: authHeaders });
       setRecordings(prev => [{ id: r.data.id, title: r.data.title, instrument: selectedInstrument.id, notes: recordedNotes, duration: recordedNotes[recordedNotes.length - 1]?.time || 0, created_at: new Date().toISOString() }, ...prev]);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   const deleteRecording = async (id) => {
     try {
       await axios.delete(`${API}/music/recordings/${id}`, { headers: authHeaders });
       setRecordings(prev => prev.filter(r => r.id !== id));
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   // ─── Build Scale Notes ───

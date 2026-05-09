@@ -31,7 +31,7 @@ export function guardCheckoutForTWA(reason = 'checkout') {
     // (Silent if window.alert stubs aren't available.)
     console.info('[PaymentGate] TWA detected — routing', reason, '→ web.');
     window.open(WEB_TOPUP_URL, '_blank', 'noopener,noreferrer');
-  } catch { /* ignore */ }
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   return true;
 }
 

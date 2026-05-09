@@ -42,7 +42,7 @@ export default function SovereignArchitecture() {
       setStatus(s.data);
       setTiers(t.data);
       setUnits(u.data);
-    } catch {} finally { setLoading(false); }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } finally { setLoading(false); }
   }, [authHeaders, authLoading, token]);
 
   useEffect(() => { load(); }, [load]);

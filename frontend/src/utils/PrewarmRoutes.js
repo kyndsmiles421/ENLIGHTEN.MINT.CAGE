@@ -41,7 +41,7 @@ const READY_LISTENERS = new Set();
 function notifyReady(route) {
   READY.add(route);
   for (const l of READY_LISTENERS) {
-    try { l(route); } catch { /* noop */ }
+    try { l(route); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }
 }
 
@@ -53,7 +53,7 @@ export function onPrewarmReady(handler) {
   READY_LISTENERS.add(handler);
   // Replay already-ready routes so late subscribers don't miss them.
   for (const r of READY) {
-    try { handler(r); } catch { /* noop */ }
+    try { handler(r); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }
   return () => READY_LISTENERS.delete(handler);
 }

@@ -120,13 +120,19 @@ function CrystalIsland({
     }
   });
   
+  const navigatingRef = useRef(false);
   const handleClick = (e) => {
     e.stopPropagation();
     if (onClick) {
       onClick(config.id);
     }
-    // Navigate after brief delay for visual feedback
-    setTimeout(() => navigate(config.path), 300);
+    if (navigatingRef.current) return;
+    navigatingRef.current = true;
+    // Brief feedback delay; click guard prevents double-fire
+    setTimeout(() => {
+      navigate(config.path);
+      navigatingRef.current = false;
+    }, 150);
   };
   
   // Crystal detail level based on features

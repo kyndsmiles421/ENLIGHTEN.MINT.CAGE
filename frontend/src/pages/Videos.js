@@ -268,7 +268,7 @@ export default function Videos() {
               setGeneratingId(null);
               toast.error('Video generation failed');
             }
-          } catch {}
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }, 5000);
       }
     } catch {
@@ -311,7 +311,7 @@ export default function Videos() {
               toast.success(`Batch complete! ${poll.data.completed} videos generated.`);
               setBatchId(null);
             }
-          } catch {}
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }, 8000);
       }
     } catch {

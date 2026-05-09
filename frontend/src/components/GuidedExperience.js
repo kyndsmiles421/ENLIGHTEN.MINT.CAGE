@@ -33,7 +33,7 @@ function loadVoicePrefs() {
   try {
     const saved = localStorage.getItem(VOICE_STORAGE_KEY);
     if (saved) return JSON.parse(saved);
-  } catch {}
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   return { voice: 'nova', speed: 0.8 };
 }
 

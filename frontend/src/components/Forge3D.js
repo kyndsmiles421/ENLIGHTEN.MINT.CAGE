@@ -178,7 +178,7 @@ export default function Forge3D({ onClose, color = '#FB7185', running = true }) 
       // Pressure scales with mode (math: phi-stabilized base × mode multiplier)
       const baseP = LOX_PULSE_DNA.base_pressure;
       lox.pressure = baseP * (loxMode === 'MAXIMUM' ? 3 : loxMode === 'HYPER' ? 2.2 : loxMode === 'BOOST' ? 1.5 : 1);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [loxMode]);
 
   // Use calculateMechanicalAdvantage to derive ω for downstream gears.

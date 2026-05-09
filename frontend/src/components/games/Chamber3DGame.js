@@ -40,11 +40,11 @@ function creditSparks(zone, seconds) {
     { seconds, zone },
     { headers: { Authorization: `Bearer ${token}` } },
   ).catch(() => {});
-  try { window.dispatchEvent(new CustomEvent('sovereign:immersion-tick')); } catch {}
+  try { window.dispatchEvent(new CustomEvent('sovereign:immersion-tick')); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 function haptic() {
-  try { if (navigator.vibrate) navigator.vibrate(15); } catch {}
+  try { if (navigator.vibrate) navigator.vibrate(15); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 // ── V1.0.15 Sage Voice Reaction Hook ────────────────────────────
@@ -128,7 +128,7 @@ function useTierFidelity() {
     let raw = 'discovery';
     try {
       raw = (localStorage.getItem('zen_tier') || localStorage.getItem('zen_user_tier') || 'discovery').toLowerCase();
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     // Normalize legacy values (SOVEREIGN, FOUNDER, etc.) to canonical tier ids
     const tier = raw.replace(/\s+/g, '_');
     const high = ['sovereign_founder', 'sovereign', 'founder', 'architect'].some((k) => tier.includes(k));

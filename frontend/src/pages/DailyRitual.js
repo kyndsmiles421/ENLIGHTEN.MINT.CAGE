@@ -250,7 +250,7 @@ export default function DailyRitual() {
     try {
       const r = await axios.get(`${API}/daily-ritual/profile`, { headers: authHeaders });
       setProfile(r.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [token, authHeaders]);
 
   useEffect(() => {

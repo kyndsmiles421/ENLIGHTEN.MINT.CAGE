@@ -46,7 +46,7 @@ const SceneGenerator = {
             source_prompt: sourcePrompt || null,
             prompt_used: data.prompt_used || null,
           }, { moduleId: 'SCENE_GEN' });
-        } catch { /* noop */ }
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         return {
           imageUrl: `${process.env.REACT_APP_BACKEND_URL}${data.image_url}`,
           promptUsed: data.prompt_used,

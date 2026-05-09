@@ -365,7 +365,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
       setShowSaveModal(false);
       setSaveName(''); setSaveDesc(''); setSavePublic(false);
       if (showPresets && presetsTab === 'mine') fetchPresets('mine');
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [saveName, saveDesc, savePublic, getCurrentLayers, authHeaders, showPresets, presetsTab, fetchPresets]);
 
   const loadPreset = useCallback(async (preset) => {
@@ -376,14 +376,14 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
     try {
       const res = await axios.post(`${API}/mixer-presets/${presetId}/like`, {}, { headers: authHeaders });
       setPresets(prev => prev.map(p => p.id === presetId ? { ...p, liked: res.data.liked, like_count: res.data.like_count, likes: res.data.liked ? [...(p.likes || []), user?.id] : (p.likes || []).filter(x => x !== user?.id) } : p));
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders, user]);
 
   const deletePreset = useCallback(async (presetId) => {
     try {
       await axios.delete(`${API}/mixer-presets/${presetId}`, { headers: authHeaders });
       setPresets(prev => prev.filter(p => p.id !== presetId));
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   const getCtx = useCallback(async () => {
@@ -436,7 +436,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
   }, [bpm, connectToGains]);
 
   const stopNodes = (nodesRef) => {
-    nodesRef.current.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch {} });
+    nodesRef.current.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
     if (nodesRef.current._interval) clearInterval(nodesRef.current._interval);
     nodesRef.current = [];
   };
@@ -444,7 +444,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
   const stopNodesForKey = (mapRef, key) => {
     const nodes = mapRef.current[key];
     if (!nodes) return;
-    nodes.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch {} });
+    nodes.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
     if (nodes._interval) clearInterval(nodes._interval);
     delete mapRef.current[key];
   };
@@ -562,11 +562,11 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
   const toggleVibe = useCallback(() => {
     if (vibeOn) {
       if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
-      try { navigator.vibrate(0); } catch {}
+      try { navigator.vibrate(0); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       setVibeOn(false);
     } else {
       const pattern = firstActiveFreq ? Math.max(50, Math.round(1000 / firstActiveFreq.hz * 10)) : 200;
-      const pulse = () => { try { navigator.vibrate([pattern, pattern]); } catch {} };
+      const pulse = () => { try { navigator.vibrate([pattern, pattern]); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } };
       pulse();
       vibeIntervalRef.current = setInterval(pulse, pattern * 2 + 50);
       setVibeOn(true);
@@ -577,7 +577,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
     if (vibeOn && firstActiveFreq) {
       if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
       const pattern = Math.max(50, Math.round(1000 / firstActiveFreq.hz * 10));
-      const pulse = () => { try { navigator.vibrate([pattern, pattern]); } catch {} };
+      const pulse = () => { try { navigator.vibrate([pattern, pattern]); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } };
       vibeIntervalRef.current = setInterval(pulse, pattern * 2 + 50);
     }
   }, [firstActiveFreq, vibeOn]);
@@ -589,13 +589,13 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
     stopAllInMap(droneNodesMapRef);
     if (mantraAudioRef.current) { mantraAudioRef.current.pause(); mantraAudioRef.current = null; }
     if (vibeIntervalRef.current) clearInterval(vibeIntervalRef.current);
-    try { navigator.vibrate(0); } catch {}
+    try { navigator.vibrate(0); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setActiveFreqs(new Set()); setActiveSounds(new Set()); setActiveMantra(null);
     setActiveDrones(new Set()); setVibeOn(false);
     setVisualLayers([]);
   }, []);
 
-  useEffect(() => () => { stopAll(); if (ctxRef.current) try { ctxRef.current.close(); } catch {} }, [stopAll]);
+  useEffect(() => () => { stopAll(); if (ctxRef.current) try { ctxRef.current.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }, [stopAll]);
 
   // Feed audio analyser data for fractal reactivity
   useEffect(() => {
@@ -701,7 +701,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
       const allCombined = [...allPresets, ...communityRes.data];
       const preset = allCombined.find(p => p.id === firstStep.preset_id || p.name === firstStep.preset_name);
       if (preset) await loadPresetByData(preset);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders, loadPresetByData]);
 
   // Playlist timer — ticks every second
@@ -736,7 +736,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
             const all = [...res.data, ...communityRes.data];
             const preset = all.find(p => p.id === nextStep.preset_id || p.name === nextStep.preset_name);
             if (preset) await loadPresetByData(preset);
-          } catch {}
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         })();
       } else {
         // Playlist complete
@@ -759,7 +759,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
       const all = [...res.data, ...communityRes.data];
       const preset = all.find(p => p.id === step.preset_id || p.name === step.preset_name);
       if (preset) await loadPresetByData(preset);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [activePlaylist, playlistStepIdx, authHeaders, loadPresetByData]);
 
   const stopPlaylist = useCallback(() => {
@@ -833,7 +833,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
       setRecordDesc('');
       setRecordPublic(false);
       setRecordingTimeline([]);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [recordTitle, recordDesc, recordPublic, recordingElapsed, recordingTimeline, visualLayers, authHeaders]);
 
   // ─── Live Broadcast (send mixer state to live session participants) ───
@@ -849,7 +849,7 @@ export default function CosmicMixer({ isOpen: externalOpen, onToggle }) {
           drones: [...activeDrones].map(id => ({ id })),
         },
       }));
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [broadcastMode, visualLayers, activeFreqs, activeSounds, activeDrones]);
 
   // Auto-broadcast when mixer state changes in broadcast mode

@@ -331,7 +331,7 @@ const UnifiedSingularity = (() => {
 
     // Haptic
     if (navigator.vibrate) {
-      try { navigator.vibrate([30, 20, 30]); } catch (e) {}
+      try { navigator.vibrate([30, 20, 30]); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
   };
 

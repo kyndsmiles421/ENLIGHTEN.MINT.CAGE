@@ -215,7 +215,7 @@ async function checkBatterySaver() {
       // Consider battery saver if below 20% and not charging
       return battery.level < 0.2 && !battery.charging;
     }
-  } catch (e) {}
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   return false;
 }
 

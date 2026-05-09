@@ -165,7 +165,7 @@ export default function SuanpanMixer() {
         setTemplates(tplRes.data.templates || []);
         setRecordingConfig(recCfgRes.data);
         setAiCapabilities(aiCapRes.data);
-      } catch {} finally { setLoading(false); }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } finally { setLoading(false); }
     };
     load();
   }, [authHeaders, authLoading, token]);
@@ -188,7 +188,7 @@ export default function SuanpanMixer() {
       setBonusPacks(packRes.data.packs || []);
       setRecommendations(recRes.data.recommendations || []);
       setHexagramInfo(recRes.data.hexagram || null);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders]);
 
   const addTrack = useCallback((source) => {
@@ -243,7 +243,7 @@ export default function SuanpanMixer() {
       const remaining = layerCap > 0 ? layerCap - tracks.length : 50;
       setTracks(prev => [...prev, ...newTracks.slice(0, remaining)]);
       toast.success(`Added ${Math.min(newTracks.length, remaining)} tracks from pack`);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [authHeaders, tracks.length, layerCap]);
 
   const purchasePack = useCallback(async (packId) => {
@@ -446,7 +446,7 @@ export default function SuanpanMixer() {
 
   const togglePlayAll = useCallback(() => {
     if (isPlaying) {
-      nodesRef.current.forEach(n => { try { n.stop(); } catch {} });
+      nodesRef.current.forEach(n => { try { n.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
       nodesRef.current = [];
       setIsPlaying(false);
       return;
@@ -471,10 +471,10 @@ export default function SuanpanMixer() {
         nodesRef.current.push(osc);
       });
       setIsPlaying(true);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [isPlaying, tracks]);
 
-  useEffect(() => { return () => { nodesRef.current.forEach(n => { try { n.stop(); } catch {} }); }; }, []);
+  useEffect(() => { return () => { nodesRef.current.forEach(n => { try { n.stop(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }); }; }, []);
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center" style={{ background: '#06060e' }}>

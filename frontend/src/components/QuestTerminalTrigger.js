@@ -60,7 +60,7 @@ export default function QuestTerminalTrigger({ signal, label, hint, color = '#8B
     try {
       const res = await checkQuestLogic(signal, signal.split(':')[0]);
       if (res?.count > 0) setFired(true);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setFiring(false);
   };
 

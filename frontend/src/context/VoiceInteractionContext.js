@@ -66,7 +66,7 @@ export function VoiceInteractionProvider({ children }) {
 
   // Persist voiceMode whenever it flips.
   useEffect(() => {
-    try { localStorage.setItem(STORAGE_VOICE_MODE, voiceMode); } catch { /* noop */ }
+    try { localStorage.setItem(STORAGE_VOICE_MODE, voiceMode); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [voiceMode]);
 
   // Fetch tier features once auth is ready.
@@ -127,7 +127,7 @@ export function VoiceInteractionProvider({ children }) {
     try {
       if (window.speechSynthesis) window.speechSynthesis.cancel();
       setSpeaking(false);
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
 
   // translate(text, target_lang, sacred?) — async POST to backend.

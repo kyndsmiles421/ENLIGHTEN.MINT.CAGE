@@ -215,7 +215,7 @@ export default function MultiverseMap() {
     setSelectedRegion(null);
     try {
       await axios.post(`${API}/multiverse/travel`, { universe_id: uid }, { headers });
-    } catch { /* ignore */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   };
 
   if (loading) return (

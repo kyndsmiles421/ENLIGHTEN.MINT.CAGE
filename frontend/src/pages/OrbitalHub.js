@@ -340,13 +340,13 @@ export default function OrbitalHub() {
       // Trigger Bloom with full sensory feedback
       setHubState('bloom');
       orbitalResonance.bloom(); // Haptic + Audio + Visual bloom
-      try { audio.playSatellite('bloom'); } catch {}
+      try { audio.playSatellite('bloom'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     } else if (hubState === 'bloom') {
       // Collapse back to latent
       setHubState('latent');
       setExtractedId(null);
       orbitalResonance.collapse();
-      try { audio.collapseSound(); } catch {}
+      try { audio.collapseSound(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     } else if (hubState === 'extracted') {
       // Tap core when extracted = navigate to extracted module
       if (extractedId) {
@@ -374,8 +374,8 @@ export default function OrbitalHub() {
     if (hubState === 'bloom' || hubState === 'extracted') {
       // Any click in bloom/extracted state navigates directly
       console.log(`[HUB] PHI-Lock: Navigating to ${sat.path}`);
-      try { orbitalResonance.navigate(e.currentTarget); } catch {}
-      try { audio.stopSatellite(); } catch {}
+      try { orbitalResonance.navigate(e.currentTarget); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+      try { audio.stopSatellite(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       if (navigator.vibrate) navigator.vibrate([30, 50, 30]); // Haptic snap
       navigate(sat.path);
     }
@@ -449,8 +449,8 @@ export default function OrbitalHub() {
         // EXTRACTION: Either quick tap OR drag past threshold
         setHubState('extracted');
         setExtractedId(currentTargetId);
-        try { orbitalResonance.extract(); } catch {}
-        try { audio.playSatellite(currentTargetId); } catch {}
+        try { orbitalResonance.extract(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+        try { audio.playSatellite(currentTargetId); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }
       
       setDragTarget(null);
@@ -474,7 +474,7 @@ export default function OrbitalHub() {
     if (hubState !== 'extracted' || sat.id !== extractedId) return;
     
     orbitalResonance.navigate();
-    try { audio.stopSatellite(); } catch {}
+    try { audio.stopSatellite(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setTimeout(() => navigate(sat.path), 150);
   }, [hubState, extractedId, navigate, audio, orbitalResonance]);
 
@@ -484,7 +484,7 @@ export default function OrbitalHub() {
     setHubState('bloom');
     setExtractedId(null);
     orbitalResonance.collapse();
-    try { audio.collapseSound(); } catch {}
+    try { audio.collapseSound(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [audio, orbitalResonance]);
 
   // ═══ EMERGENCY STOP HANDLER ═══
@@ -492,9 +492,9 @@ export default function OrbitalHub() {
     console.log('[V25.0] EMERGENCY STOP ACTIVATED');
     
     // Stop all audio
-    try { audio.stopAll?.(); } catch {}
-    try { audio.stopSatellite?.(); } catch {}
-    try { audio.collapseSound?.(); } catch {}
+    try { audio.stopAll?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+    try { audio.stopSatellite?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
+    try { audio.collapseSound?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     
     // Stop all HTML audio elements
     document.querySelectorAll('audio').forEach(a => {
@@ -507,7 +507,7 @@ export default function OrbitalHub() {
       try {
         const contexts = window.__audioContexts || [];
         contexts.forEach(ctx => ctx.close());
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
     
     // Reset hub state

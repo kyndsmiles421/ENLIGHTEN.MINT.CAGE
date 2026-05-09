@@ -95,7 +95,7 @@ export default function VirtualReality() {
   // Ambient cosmic audio with 3D Spatial Panner
   const toggleAudio = useCallback(() => {
     if (ambientAudio) {
-      audioNodesRef.current.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch {} });
+      audioNodesRef.current.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
       audioNodesRef.current = [];
       pannerRef.current = null;
       if (audioCtxRef.current) { audioCtxRef.current.close(); audioCtxRef.current = null; }
@@ -184,7 +184,7 @@ export default function VirtualReality() {
 
   useEffect(() => {
     return () => {
-      audioNodesRef.current.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch {} });
+      audioNodesRef.current.forEach(n => { try { n.stop?.(); n.disconnect?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
       if (audioCtxRef.current) audioCtxRef.current.close();
     };
   }, []);
@@ -996,7 +996,7 @@ export default function VirtualReality() {
           try {
             const gen = await axios.post(`${API}/ai-visuals/generate-scene`, { story_id: story.id, scene_index: i }, { headers: authHeaders, timeout: 120000 });
             scenes[i] = { ...scenes[i], image_b64: gen.data.image_b64 };
-          } catch {}
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }
       }
       setVrTheater(prev => prev ? { ...prev, scenes, fullStory, loading: false } : null);
@@ -1033,7 +1033,7 @@ export default function VirtualReality() {
               clearInterval(theaterPollRef.current);
               setTheaterVideoStatus('failed');
             }
-          } catch {}
+          } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         }, 5000);
       }
     } catch {

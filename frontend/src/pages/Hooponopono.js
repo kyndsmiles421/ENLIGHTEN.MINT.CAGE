@@ -62,10 +62,10 @@ function HooponoponoSession({ target, targetName, duration, onEnd }) {
         osc.start(); l.start(); nodes.push(osc, l);
       });
       nodesRef.current = nodes;
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     return () => {
-      nodesRef.current.forEach(n => { try { n.stop?.(); } catch {} });
-      try { audioCtxRef.current?.close(); } catch {};
+      nodesRef.current.forEach(n => { try { n.stop?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
+      try { audioCtxRef.current?.close(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); };
     };
   }, []);
 

@@ -67,7 +67,7 @@ const EnlightenMintSystem = (() => {
     // Haptic feedback
     if (navigator.vibrate) {
       const pulse = Math.max(20, 100 - freq / 10);
-      try { navigator.vibrate([pulse, 30, pulse / 2]); } catch (e) {}
+      try { navigator.vibrate([pulse, 30, pulse / 2]); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
   };
 

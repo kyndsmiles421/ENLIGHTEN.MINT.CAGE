@@ -28,7 +28,7 @@ function triggerHaptic(pattern) {
     click: [10],
     shatter: [50, 20, 80, 20, 120],
   };
-  try { navigator.vibrate(patterns[pattern] || [10]); } catch {}
+  try { navigator.vibrate(patterns[pattern] || [10]); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 // ── Typewriter Text ──
@@ -442,11 +442,11 @@ export default function DreamRealms() {
   }, [headers]);
 
   const fetchHistory = useCallback(async () => {
-    try { const res = await axios.get(`${API}/dream-realms/history`, { headers }); setHistory(res.data.realms || []); } catch {}
+    try { const res = await axios.get(`${API}/dream-realms/history`, { headers }); setHistory(res.data.realms || []); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [headers]);
 
   const fetchLegendaries = useCallback(async () => {
-    try { const res = await axios.get(`${API}/dream-realms/legendary-frequencies`, { headers }); setLegendaries(res.data.frequencies || []); } catch {}
+    try { const res = await axios.get(`${API}/dream-realms/legendary-frequencies`, { headers }); setLegendaries(res.data.frequencies || []); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [headers]);
 
   useEffect(() => { fetchData(); }, [fetchData]);

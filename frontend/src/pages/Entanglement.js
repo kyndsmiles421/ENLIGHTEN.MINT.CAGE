@@ -105,7 +105,7 @@ export default function Entanglement() {
       setMeditations(medRes.data.meditations);
       setOpenSessions(openRes.data.sessions);
       setMySessions(myRes.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [token]);
 

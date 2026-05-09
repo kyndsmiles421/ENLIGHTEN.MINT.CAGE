@@ -359,7 +359,7 @@ export default function EscrowDashboard({ authHeaders, userId }) {
     try {
       const res = await axios.get(`${API}/trade-circle/escrows`, { headers: authHeaders });
       setEscrows(res.data.escrows || []);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     setLoading(false);
   }, [authHeaders]);
 

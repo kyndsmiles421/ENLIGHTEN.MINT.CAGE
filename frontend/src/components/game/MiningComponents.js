@@ -16,7 +16,7 @@ const EL_COLORS = { wood: '#22C55E', fire: '#EF4444', earth: '#F59E0B', metal: '
 const EL_ICONS = { wood: Sprout, fire: Flame, earth: Mountain, metal: Gem, water: Droplets };
 const RARITY_COLORS = { common: '#9CA3AF', uncommon: '#22C55E', rare: '#3B82F6', epic: '#A855F7', legendary: '#FCD34D', mythic: '#EF4444' };
 
-export function triggerHaptic(p) { try { navigator.vibrate?.({ strike: [30, 10, 30], discover: [50, 20, 80], legendary: [50, 20, 80, 20, 120] }[p] || [10]); } catch {} }
+export function triggerHaptic(p) { try { navigator.vibrate?.({ strike: [30, 10, 30], discover: [50, 20, 80], legendary: [50, 20, 80, 20, 120] }[p] || [10]); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
 
 export { EL_COLORS, EL_ICONS, RARITY_COLORS };
 
@@ -320,7 +320,7 @@ export function NexusPassShop({ headers, onPurchased, currentDust }) {
     try {
       const res = await axios.get(`${API}/game-core/passes`, { headers });
       setPasses(res.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [headers]);
 
   useEffect(() => { if (showShop) fetchPasses(); }, [showShop, fetchPasses]);

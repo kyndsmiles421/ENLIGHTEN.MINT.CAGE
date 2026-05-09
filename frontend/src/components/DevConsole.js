@@ -53,7 +53,7 @@ export default function DevConsole({ isOpen, onClose, authHeaders }) {
         axios.get(`${API}/health`).catch(() => ({ data: { status: 'error' } })),
       ]);
       setHealth(healthRes.data);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
     if (authHeaders) {
       try {
@@ -66,7 +66,7 @@ export default function DevConsole({ isOpen, onClose, authHeaders }) {
           released: escrows.filter(e => e.state === 'released').length,
           disputed: escrows.filter(e => e.state === 'disputed').length,
         });
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
   }, [authHeaders]);
 
@@ -90,11 +90,11 @@ export default function DevConsole({ isOpen, onClose, authHeaders }) {
       }
     });
 
-    try { observer.observe({ entryTypes: ['resource'] }); } catch {}
+    try { observer.observe({ entryTypes: ['resource'] }); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
     return () => {
       clearInterval(intervalRef.current);
-      try { observer.disconnect(); } catch {}
+      try { observer.disconnect(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
   }, [isOpen, fetchMetrics]);
 

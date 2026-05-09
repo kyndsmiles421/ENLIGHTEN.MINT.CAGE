@@ -69,7 +69,7 @@ export function useEngineLoad() {
         setViewed(d.viewed || 0);
         setDepth(typeof d.ratio === 'number' ? d.ratio : 0);
         setNextCells(d.unexplored_sample || []);
-        try { window.__sovereignDepth = { ratio: d.ratio || 0, viewed: d.viewed || 0, total: d.total || 0 }; } catch { /* noop */ }
+        try { window.__sovereignDepth = { ratio: d.ratio || 0, viewed: d.viewed || 0, total: d.total || 0 }; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       } catch { /* noop — keeps last value */ }
     };
     refresh();
@@ -112,7 +112,7 @@ export function useEngineLoad() {
         const st = classify(v);
         setLoad(v);
         setState(st);
-        try { window.__sovereignGauge = { load: v, state: st, t: Date.now() }; } catch { /* noop */ }
+        try { window.__sovereignGauge = { load: v, state: st, t: Date.now() }; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       }
     };
     raf = requestAnimationFrame(loop);

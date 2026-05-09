@@ -77,7 +77,7 @@ export default function InteractiveMasonry({ room = 'default', authHeaders = {},
       try {
         const res = await fetch(`${API}/api/omni-bridge/node-mythology/${index}`);
         if (res.ok) setNodeMyth(await res.json());
-      } catch {}
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }
   }, [lockedNodes]);
 
@@ -87,14 +87,14 @@ export default function InteractiveMasonry({ room = 'default', authHeaders = {},
       const res = await fetch(`${API}/api/masonry/materials/${room}`);
       const data = await res.json();
       setMaterials(data.total || 0);
-    } catch {}
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [room]);
 
   useEffect(() => { fetchMaterials(); }, [fetchMaterials]);
 
   // Save progress
   useEffect(() => {
-    try { localStorage.setItem('emcafe_masonry_nodes', JSON.stringify(lockedNodes)); } catch {}
+    try { localStorage.setItem('emcafe_masonry_nodes', JSON.stringify(lockedNodes)); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [lockedNodes]);
 
   // Unlock a node

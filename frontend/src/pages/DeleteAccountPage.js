@@ -27,7 +27,7 @@ export default function DeleteAccountPage() {
         data: { confirm: 'DELETE' },
       });
       setDone(true);
-      try { localStorage.clear(); sessionStorage.clear(); } catch { /* noop */ }
+      try { localStorage.clear(); sessionStorage.clear(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     } catch (err) {
       setError(err?.response?.data?.detail || err?.message || 'Deletion failed');
     } finally {

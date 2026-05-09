@@ -22,7 +22,7 @@ const WIDGET_FOCUS_KEY = 'cosmic_widget_focus';
 
 /* ── Try native haptics, fallback to vibrate ── */
 let Haptics;
-try { Haptics = require('@capacitor/haptics').Haptics; } catch {}
+try { Haptics = require('@capacitor/haptics').Haptics; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 function haptic(style = 'Light') {
   try { Haptics?.impact({ style }); } catch { navigator.vibrate?.(8); }
 }
@@ -204,7 +204,7 @@ export default function SmartDock() {
     setDockOrientation(orient);
 
     // Persist dock orientation for class preset restore
-    try { localStorage.setItem('dock_orientation', orient); localStorage.setItem('dock_snapped', edge || 'none'); } catch {}
+    try { localStorage.setItem('dock_orientation', orient); localStorage.setItem('dock_snapped', edge || 'none'); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
     return { x: sx, y: sy };
   }, []);

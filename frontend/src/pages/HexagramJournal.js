@@ -172,8 +172,7 @@ export default function HexagramJournal() {
     try {
       const res = await axios.get(`${API}/hexagram/journal?limit=50`, { headers: authHeaders });
       setEntries(res.data.entries || []);
-    } catch {
-    } finally {
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } finally {
       setLoading(false);
     }
   }, [authHeaders, authLoading, token]);
@@ -188,8 +187,7 @@ export default function HexagramJournal() {
       if (res.data.recorded) {
         loadJournal();
       }
-    } catch {
-    } finally {
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } finally {
       setRecording(false);
     }
   };

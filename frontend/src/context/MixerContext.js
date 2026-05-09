@@ -330,7 +330,7 @@ export function MixerProvider({ children }) {
     const nodes = mapRef.current[key];
     if (!nodes) return;
     if (nodes._interval) clearInterval(nodes._interval);
-    nodes.forEach?.(n => { try { n.stop?.(); n.disconnect?.(); } catch {} });
+    nodes.forEach?.(n => { try { n.stop?.(); n.disconnect?.(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
     delete mapRef.current[key];
   }, []);
 
@@ -393,7 +393,7 @@ export function MixerProvider({ children }) {
     // V68.26 — broadcast to any open HolographicChamber / ChamberMiniGame
     // so mixer nodules have a FUNCTION inside the current module (pulse
     // the prop, bias the rhythm band, etc.).
-    try { window.dispatchEvent(new CustomEvent('sovereign:mixer-tick', { detail: { kind: 'freq', id: freq.hz, color: freq.color } })); } catch {}
+    try { window.dispatchEvent(new CustomEvent('sovereign:mixer-tick', { detail: { kind: 'freq', id: freq.hz, color: freq.color } })); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [activeFreqs, getCtx, channelVols, stopNodesForKey]);
 
   const toggleSound = useCallback(async (sound, options = {}) => {
@@ -421,7 +421,7 @@ export function MixerProvider({ children }) {
     soundNodesMapRef.current[sound.id] = nodes;
     if (!channelVols[`sound-${sound.id}`]) setChannelVols(v => ({...v, [`sound-${sound.id}`]: 75}));
     setActiveSounds(prev => new Set(prev).add(sound.id));
-    try { window.dispatchEvent(new CustomEvent('sovereign:mixer-tick', { detail: { kind: 'sound', id: sound.id, color: sound.color } })); } catch {}
+    try { window.dispatchEvent(new CustomEvent('sovereign:mixer-tick', { detail: { kind: 'sound', id: sound.id, color: sound.color } })); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [activeSounds, getCtx, channelVols, stopNodesForKey]);
 
   const toggleDrone = useCallback(async (drone, options = {}) => {
@@ -476,7 +476,7 @@ export function MixerProvider({ children }) {
   // Build voice effects chain
   const buildVoiceChain = useCallback((ctx, masterGain, morph) => {
     if (voiceChainRef.current) {
-      voiceChainRef.current.nodes.forEach(n => { try { n.disconnect(); } catch {} });
+      voiceChainRef.current.nodes.forEach(n => { try { n.disconnect(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } });
     }
     const nodes = [];
     let last;
@@ -561,15 +561,15 @@ export function MixerProvider({ children }) {
     if (!mantraAudioRef.current || !ctxRef.current || !masterGainRef.current) return;
     const source = mantraSourceRef.current;
     if (!source) return;
-    try { source.disconnect(); } catch {}
+    try { source.disconnect(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     const chainInput = buildVoiceChain(ctxRef.current, masterGainRef.current, voiceMorph);
     source.connect(chainInput);
   }, [voiceMorph, buildVoiceChain]);
 
   const toggleMantra = useCallback(async (mantra, authHeaders) => {
     if (mantraAudioRef.current) { mantraAudioRef.current.pause(); mantraAudioRef.current = null; }
-    if (mantraSourceRef.current) { try { mantraSourceRef.current.disconnect(); } catch {} mantraSourceRef.current = null; }
-    if (voiceChainRef.current) { voiceChainRef.current.nodes.forEach(n => { try { n.disconnect(); } catch {} }); voiceChainRef.current = null; }
+    if (mantraSourceRef.current) { try { mantraSourceRef.current.disconnect(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } mantraSourceRef.current = null; }
+    if (voiceChainRef.current) { voiceChainRef.current.nodes.forEach(n => { try { n.disconnect(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }); voiceChainRef.current = null; }
     if (activeMantra?.id === mantra.id) { setActiveMantra(null); return; }
     setActiveMantra(mantra);
     setMantraLoading(true);
@@ -608,8 +608,8 @@ export function MixerProvider({ children }) {
     Object.keys(soundNodesMapRef.current).forEach(k => stopNodesForKey(soundNodesMapRef, k));
     Object.keys(droneNodesMapRef.current).forEach(k => stopNodesForKey(droneNodesMapRef, k));
     if (mantraAudioRef.current) { mantraAudioRef.current.pause(); mantraAudioRef.current = null; }
-    if (mantraSourceRef.current) { try { mantraSourceRef.current.disconnect(); } catch {} mantraSourceRef.current = null; }
-    if (voiceChainRef.current) { voiceChainRef.current.nodes.forEach(n => { try { n.disconnect(); } catch {} }); voiceChainRef.current = null; }
+    if (mantraSourceRef.current) { try { mantraSourceRef.current.disconnect(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } mantraSourceRef.current = null; }
+    if (voiceChainRef.current) { voiceChainRef.current.nodes.forEach(n => { try { n.disconnect(); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }); voiceChainRef.current = null; }
     setActiveFreqs(new Set()); setActiveSounds(new Set()); setActiveDrones(new Set()); setActiveMantra(null);
     setMantraLoading(false);
   }, [stopNodesForKey]);
@@ -658,7 +658,7 @@ export function MixerProvider({ children }) {
     return Math.min(...Array.from(activeFreqs));
   }, [activeFreqs]);
   useEffect(() => {
-    try { window.__sovereignHz = currentResonanceHz || null; } catch { /* noop */ }
+    try { window.__sovereignHz = currentResonanceHz || null; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, [currentResonanceHz]);
 
   // ─── V68.27 Resonance Preset application ─────────────────────────
@@ -671,17 +671,17 @@ export function MixerProvider({ children }) {
     // Turn ON freqs that aren't already active
     for (const hz of preset.freqs || []) {
       const f = FREQUENCIES.find(x => x.hz === hz);
-      if (f && !activeFreqs.has(hz)) { try { await toggleFreq(f); } catch {} }
+      if (f && !activeFreqs.has(hz)) { try { await toggleFreq(f); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
     }
     for (const sid of preset.sounds || []) {
       const s = SOUNDS.find(x => x.id === sid);
-      if (s && !activeSounds.has(sid)) { try { await toggleSound(s); } catch {} }
+      if (s && !activeSounds.has(sid)) { try { await toggleSound(s); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
     }
     for (const did of preset.drones || []) {
       const d = INSTRUMENT_DRONES.find(x => x.id === did);
-      if (d && !activeDrones.has(did)) { try { await toggleDrone(d); } catch {} }
+      if (d && !activeDrones.has(did)) { try { await toggleDrone(d); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); } }
     }
-    try { window.dispatchEvent(new CustomEvent('sovereign:resonance-preset', { detail: { preset: presetKey, label: preset.label } })); } catch {}
+    try { window.dispatchEvent(new CustomEvent('sovereign:resonance-preset', { detail: { preset: presetKey, label: preset.label } })); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     return preset;
   }, [activeFreqs, activeSounds, activeDrones, toggleFreq, toggleSound, toggleDrone]);
 

@@ -151,7 +151,7 @@ export function emitOutputPulse(moduleId, intensityOrOpts = 1.4) {
       const decay = applyGain(base, live.gain);
       window.dispatchEvent(new CustomEvent('sovereign:pulse', { detail: decay }));
     }, 600);
-  } catch { /* noop */ }
+  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 }
 
 function applyGain(vec, gain) {
@@ -454,7 +454,7 @@ if (typeof window !== 'undefined' && !window.__sageVoiceWired) {
       import('../services/SageVoiceController').then(({ speak }) => {
         speak(text).catch(() => { /* noop */ });
       }).catch(() => { /* noop */ });
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   });
   // Stop voice when a ritual aborts/completes so the audio doesn't
   // outlive the chain.
@@ -521,7 +521,7 @@ export function ProcessorStateProvider({ children }) {
       }
       // Avoid silencing of `blob` lint without using it
       void blob;
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
 
   const pull = useCallback((moduleId) => {
@@ -536,7 +536,7 @@ export function ProcessorStateProvider({ children }) {
     // V68.59 — publish the active module to a global so the
     // time-capsule beacon can capture the user's last "scene" on
     // tab-hide without subscribing to ProcessorState.
-    try { window.__sovereignActiveModule = moduleId; } catch { /* noop */ }
+    try { window.__sovereignActiveModule = moduleId; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     // V68.61 — Resonance Cross-Pollination. Refresh the primer for
     // the newly active module so its first generation already sees
     // the engine's accumulated state from other modules.
@@ -548,7 +548,7 @@ export function ProcessorStateProvider({ children }) {
     dwellStartRef.current = { moduleId: 'IDLE', startedAt: Date.now() };
     setActiveModule('IDLE');
     emitPulse('IDLE');
-    try { window.__sovereignActiveModule = 'IDLE'; } catch { /* noop */ }
+    try { window.__sovereignActiveModule = 'IDLE'; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     publishPrimer('IDLE');
   }, [flushDwell]);
 
@@ -605,7 +605,7 @@ export function ProcessorStateProvider({ children }) {
           window.dispatchEvent(new CustomEvent('ritual:step-skipped', {
             detail: { step, index: idx, reason: 'auto-visuals-off' },
           }));
-        } catch { /* noop */ }
+        } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
         idx += 1;
         continue;
       }
@@ -624,13 +624,13 @@ export function ProcessorStateProvider({ children }) {
       setRitualChain(null);
       try {
         window.dispatchEvent(new CustomEvent('ritual:chain-complete', { detail: { chain: finished } }));
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       // Drop back to IDLE so the matrix breathes between chains.
       flushDwell();
       dwellStartRef.current = { moduleId: 'IDLE', startedAt: Date.now() };
       setActiveModule('IDLE');
       emitPulse('IDLE');
-      try { window.__sovereignActiveModule = 'IDLE'; } catch { /* noop */ }
+      try { window.__sovereignActiveModule = 'IDLE'; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
       publishPrimer('IDLE');
       return;
     }
@@ -649,7 +649,7 @@ export function ProcessorStateProvider({ children }) {
     dwellStartRef.current = { moduleId, startedAt: Date.now() };
     setActiveModule(moduleId);
     emitPulse(moduleId);
-    try { window.__sovereignActiveModule = moduleId; } catch { /* noop */ }
+    try { window.__sovereignActiveModule = moduleId; } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     publishPrimer(moduleId);
 
     const next = { ...cur, stepIndex: idx, stepStartedAt: Date.now() };
@@ -660,7 +660,7 @@ export function ProcessorStateProvider({ children }) {
       window.dispatchEvent(new CustomEvent('ritual:step-active', {
         detail: { step, index: idx, immersion, total: steps.length },
       }));
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
 
     // Auto-advance after the step's declared duration as a safety net.
     // ContextBus commits also trigger advancement (whichever fires first).
@@ -670,7 +670,7 @@ export function ProcessorStateProvider({ children }) {
         window.dispatchEvent(new CustomEvent('ritual:step-complete', {
           detail: { step, index: idx, source: 'timer' },
         }));
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     }, dur * 1000);
   }, [flushDwell]);
 
@@ -707,7 +707,7 @@ export function ProcessorStateProvider({ children }) {
       setRitualChain(null);
       try {
         window.dispatchEvent(new CustomEvent('ritual:chain-aborted'));
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     };
     window.addEventListener('ritual:chain-start', onStart);
     window.addEventListener('ritual:step-complete', onComplete);
@@ -753,7 +753,7 @@ export function ProcessorStateProvider({ children }) {
         window.dispatchEvent(new CustomEvent('ritual:step-complete', {
           detail: { step, index: cur.stepIndex, source: 'bus' },
         }));
-      } catch { /* noop */ }
+      } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
     });
     return unsub;
   }, []);
@@ -761,7 +761,7 @@ export function ProcessorStateProvider({ children }) {
   const startRitualChain = useCallback((chain) => {
     try {
       window.dispatchEvent(new CustomEvent('ritual:chain-start', { detail: { chain } }));
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
   const skipRitualStep = useCallback(() => {
     const cur = ritualChainRef.current;
@@ -770,10 +770,10 @@ export function ProcessorStateProvider({ children }) {
       window.dispatchEvent(new CustomEvent('ritual:step-complete', {
         detail: { step: cur.steps?.[cur.stepIndex], index: cur.stepIndex, source: 'manual' },
       }));
-    } catch { /* noop */ }
+    } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
   const abortRitualChain = useCallback(() => {
-    try { window.dispatchEvent(new CustomEvent('ritual:chain-abort')); } catch { /* noop */ }
+    try { window.dispatchEvent(new CustomEvent('ritual:chain-abort')); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
   }, []);
 
   const value = useMemo(
