@@ -34,6 +34,7 @@ import { useLocation } from 'react-router-dom';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 import { useProcessorState } from '../state/ProcessorState';
 import { useVoiceCommand } from '../context/VoiceCommandContext';
+import { useVoicePersona } from '../hooks/useVoicePersona';
 import * as SageVoice from '../services/SageVoiceController';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -156,6 +157,7 @@ export default function LanguageBar() {
   const { language, setLanguage } = useLanguage();
   const location = useLocation();
   const { startRitualChain, ritualChain } = useProcessorState();
+  const { voice: persona, setVoice: setPersona, speed: personaSpeed, setSpeed: setPersonaSpeed, affinityFor } = useVoicePersona();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -223,7 +225,7 @@ export default function LanguageBar() {
 
     if (language === 'en') {
       setVoiceTranslated(transcript);
-      SageVoice.speak(transcript, { language: 'en' }).catch(() => {});
+      SageVoice.speak(transcript, { language: 'en', voiceId: persona }).catch(() => {});
       return;
     }
 
@@ -251,13 +253,18 @@ export default function LanguageBar() {
       // to eleven_multilingual_v2 (V1.1.14 backend bridge). Without
       // this, Sage spoke ZH/HI/AR text using the English voice model
       // → garbled phonetics → "voice doesn't translate".
-      SageVoice.speak(translated, { language }).catch(() => {});
+      // V1.2.7 — Unified persona. Pass the user's chosen voice
+      // (Sage / Nova / Onyx / …) so SageVoiceController routes to
+      // the right OpenAI voice id AND the language so it picks the
+      // multilingual model for non-English. No more language/voice
+      // mismatch in two separate panels.
+      SageVoice.speak(translated, { language, voiceId: persona }).catch(() => {});
     }).catch((err) => {
       setVoiceError(err?.response?.data?.detail || 'Translation failed');
     }).finally(() => {
       setVoiceBusy(false);
     });
-  }, [voice?.lastCommand, language, sacred]);
+  }, [voice?.lastCommand, language, sacred, persona]);
 
   useEffect(() => {
     try {
@@ -810,6 +817,112 @@ export default function LanguageBar() {
                 </button>
               </div>
             )}
+          </div>
+
+          {/* V1.2.7 — UNIFIED VOICE PERSONA picker. Replaces the
+              previously-separate floating Voice Selection panel that
+              forced users to toggle between two overlays. Now language
+              + voice live in ONE handshake: pick a language above,
+              and the voices best tuned for that phonology rise to the
+              top here. The choice persists across pages and is read
+              by NarrationPlayer, the Sage chat, and the voice
+              translator above. */}
+          <div
+            data-testid="voice-persona-block"
+            style={{
+              marginTop: 10,
+              padding: 8,
+              borderRadius: 8,
+              background: 'rgba(34,211,238,0.05)',
+              border: '1px solid rgba(34,211,238,0.18)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Volume2 size={10} style={{ color: '#67E8F9' }} />
+                <span style={{ fontSize: 8.5, letterSpacing: '0.20em', color: '#67E8F9' }}>
+                  VOICE PERSONA
+                </span>
+              </div>
+              <span style={{ fontSize: 8, letterSpacing: '0.16em', opacity: 0.55 }}>
+                tuned for {cur.flag}
+              </span>
+            </div>
+
+            {(() => {
+              const { recommended, discouraged } = affinityFor(language);
+              const Tile = ({ v, dim }) => {
+                const gc = v.gender === 'female' ? '#FDA4AF' : v.gender === 'male' ? '#93C5FD' : '#D8B4FE';
+                const selected = persona === v.id;
+                return (
+                  <button
+                    type="button"
+                    key={v.id}
+                    onClick={() => setPersona(v.id)}
+                    data-testid={`voice-persona-${v.id}`}
+                    aria-pressed={selected}
+                    title={`${v.label} · ${v.desc}${dim ? ' · may sound off in this language' : ''}`}
+                    style={{
+                      padding: '6px 4px',
+                      borderRadius: 6,
+                      background: selected ? `${gc}22` : 'rgba(255,255,255,0.02)',
+                      border: `1px solid ${selected ? `${gc}55` : 'rgba(255,255,255,0.08)'}`,
+                      color: selected ? gc : 'rgba(255,255,255,0.78)',
+                      fontSize: 9,
+                      lineHeight: 1.15,
+                      cursor: 'pointer',
+                      opacity: dim ? 0.55 : 1,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div style={{ fontWeight: 600 }}>{v.label}</div>
+                    <div style={{ fontSize: 7.5, opacity: 0.7, marginTop: 2 }}>{v.desc}</div>
+                  </button>
+                );
+              };
+              return (
+                <>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
+                    {recommended.map((v) => <Tile key={v.id} v={v} dim={false} />)}
+                  </div>
+                  {discouraged.length > 0 && (
+                    <>
+                      <p style={{ fontSize: 7.5, letterSpacing: '0.16em', opacity: 0.45, margin: '6px 0 4px' }}>
+                        OTHER VOICES
+                      </p>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 4 }}>
+                        {discouraged.map((v) => <Tile key={v.id} v={v} dim={true} />)}
+                      </div>
+                    </>
+                  )}
+                </>
+              );
+            })()}
+
+            <div style={{ display: 'flex', gap: 4, marginTop: 8 }}>
+              {[{v: 0.8, l: 'Slow'}, {v: 1.0, l: 'Normal'}, {v: 1.15, l: 'Brisk'}].map((s) => (
+                <button
+                  type="button"
+                  key={s.v}
+                  onClick={() => setPersonaSpeed(s.v)}
+                  data-testid={`voice-persona-speed-${s.v}`}
+                  aria-pressed={personaSpeed === s.v}
+                  style={{
+                    flex: 1,
+                    padding: '4px 6px',
+                    borderRadius: 6,
+                    background: personaSpeed === s.v ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.02)',
+                    border: `1px solid ${personaSpeed === s.v ? 'rgba(255,255,255,0.40)' : 'rgba(255,255,255,0.06)'}`,
+                    color: personaSpeed === s.v ? '#FFFFFF' : 'rgba(255,255,255,0.55)',
+                    fontSize: 8.5,
+                    letterSpacing: '0.10em',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {s.l}
+                </button>
+              ))}
+            </div>
           </div>
 
           <p

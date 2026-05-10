@@ -1,105 +1,72 @@
+/**
+ * NarrationPlayer — V1.2.7 unified-persona refactor.
+ *
+ * Previously this component carried its OWN voice/speed picker
+ * (a 9-tile grid + 3 speed pills inside a popover) which collided
+ * visually with the LanguageBar's translator panel. The architect
+ * called this out as the "two overlapping floating panels" problem
+ * (2026-02-10) and asked for a single Handshake protocol.
+ *
+ * This refactor:
+ *   • Removes the inline picker entirely. Voice + speed now come from
+ *     useVoicePersona() — the same hook the LanguageBar's Universal
+ *     Translator panel writes to. Pick once, used everywhere.
+ *   • Keeps the play / pause / stop controls and the waveform.
+ *   • Shows a tiny read-only chip with the current voice label so the
+ *     user knows which persona will play; tapping it scrolls to the
+ *     LanguageBar pill (the picker's home) instead of opening a
+ *     second panel.
+ *
+ * The narrationSystem.playVoice contract is unchanged; we just stop
+ * tracking voice/speed locally.
+ */
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2, VolumeX, Loader2, Pause, Play, ChevronDown, Settings2 } from 'lucide-react';
+import { Volume2, VolumeX, Loader2, Pause, Play } from 'lucide-react';
 import { narrationSystem } from '../engines/PerformanceManager';
+import { useVoicePersona } from '../hooks/useVoicePersona';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
-
-const VOICES = [
-  { id: 'nova', label: 'Nova', desc: 'Warm feminine', gender: 'female', accent: 'American' },
-  { id: 'shimmer', label: 'Shimmer', desc: 'Soft feminine', gender: 'female', accent: 'American' },
-  { id: 'coral', label: 'Coral', desc: 'Bright feminine', gender: 'female', accent: 'American' },
-  { id: 'sage', label: 'Sage', desc: 'Wise masculine', gender: 'male', accent: 'American' },
-  { id: 'ash', label: 'Ash', desc: 'Warm masculine', gender: 'male', accent: 'American' },
-  { id: 'onyx', label: 'Onyx', desc: 'Deep masculine', gender: 'male', accent: 'American' },
-  { id: 'echo', label: 'Echo', desc: 'Smooth masculine', gender: 'male', accent: 'American' },
-  { id: 'fable', label: 'Fable', desc: 'Expressive storyteller', gender: 'male', accent: 'British' },
-  { id: 'alloy', label: 'Alloy', desc: 'Balanced neutral', gender: 'neutral', accent: 'Neutral' },
-];
-
-const SPEEDS = [
-  { value: 0.8, label: 'Slow' },
-  { value: 1.0, label: 'Normal' },
-  { value: 1.15, label: 'Brisk' },
-];
-
-const STORAGE_KEY = 'cosmiccollective_voice_prefs';
-
-function loadPrefs() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return JSON.parse(saved);
-  } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
-  return { voice: 'nova', speed: 1.0 };
-}
-
-function savePrefs(prefs) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs)); } catch (e) { if (process.env.NODE_ENV !== 'production') console.warn(e); }
-}
-
-export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4FE', context = '' }) {
+export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4FE' }) {
   const [state, setState] = useState('idle');
-  const [showSettings, setShowSettings] = useState(false);
-  const [voice, setVoice] = useState(() => loadPrefs().voice);
-  const [speed, setSpeed] = useState(() => loadPrefs().speed);
-  const settingsRef = useRef(null);
+  const { voice, speed, VOICES } = useVoicePersona();
   const textRef = useRef(text);
   const playbackTimeRef = useRef(0);
 
-  // Keep textRef in sync without triggering re-renders
+  // Keep textRef in sync without triggering re-renders.
   useEffect(() => { textRef.current = text; }, [text]);
 
-  // Persist preferences
-  useEffect(() => { savePrefs({ voice, speed }); }, [voice, speed]);
+  // Cleanup on unmount — stop audio.
+  useEffect(() => () => { narrationSystem.stop(); }, []);
 
-  // Close settings dropdown on outside click
+  // If the persona changes mid-playback, stop so the new pick takes
+  // effect on the next play.
   useEffect(() => {
-    const handler = (e) => {
-      if (settingsRef.current && !settingsRef.current.contains(e.target)) setShowSettings(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  // Cleanup on unmount - stop audio
-  useEffect(() => {
-    return () => {
+    if (state === 'playing' || state === 'paused') {
       narrationSystem.stop();
-    };
-  }, []);
+      setState('idle');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [voice, speed]);
+
+  const currentVoice = VOICES.find((v) => v.id === voice) || VOICES[0];
+  const genderColor =
+    currentVoice.gender === 'female' ? '#FDA4AF'
+      : currentVoice.gender === 'male' ? '#93C5FD'
+      : '#D8B4FE';
 
   const handlePlay = useCallback(async () => {
-    // Pause currently playing
-    if (state === 'playing') {
-      narrationSystem.pause();
-      setState('paused');
-      return;
-    }
-
-    // Resume
-    if (state === 'paused') {
-      narrationSystem.resume();
-      setState('playing');
-      return;
-    }
-
-    const currentText = textRef.current;
-
-    // Use unified narration system with automatic fallback
+    if (state === 'playing') { narrationSystem.pause(); setState('paused'); return; }
+    if (state === 'paused')  { narrationSystem.resume(); setState('playing'); return; }
     setState('loading');
-    
-    narrationSystem.playVoice(currentText, {
+    narrationSystem.playVoice(textRef.current, {
       voice,
       speed,
       onStart: () => setState('playing'),
-      onEnd: () => {
-        playbackTimeRef.current = 0;
+      onEnd: () => { playbackTimeRef.current = 0; setState('idle'); },
+      onError: (err) => {
+        if (process.env.NODE_ENV !== 'production') console.warn('[NarrationPlayer]', err);
         setState('idle');
       },
-      onError: (err) => {
-        console.warn('[NarrationPlayer] Playback error:', err);
-        setState('idle');
-      }
     });
   }, [voice, speed, state]);
 
@@ -109,12 +76,16 @@ export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4
     setState('idle');
   }, []);
 
-  const currentVoice = VOICES.find(v => v.id === voice) || VOICES[0];
-  const genderColor = currentVoice.gender === 'female' ? '#FDA4AF' : currentVoice.gender === 'male' ? '#93C5FD' : '#D8B4FE';
+  // Tap the chip → bounce focus to the LanguageBar pill so the user
+  // knows where to change their voice without opening a second panel.
+  const focusPicker = useCallback(() => {
+    const el = document.querySelector('[data-testid="language-bar-toggle"]');
+    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus?.(); }
+  }, []);
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      {/* Play Button */}
+      {/* Play / Pause / Resume */}
       <button
         onClick={handlePlay}
         disabled={state === 'loading'}
@@ -123,7 +94,7 @@ export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4
           background: state === 'playing' ? `${color}20` : 'rgba(255,255,255,0.04)',
           border: `1px solid ${state === 'playing' ? `${color}40` : 'rgba(255,255,255,0.08)'}`,
           color: state === 'playing' ? color : 'var(--text-secondary)',
-          transition: 'all 0.3s',
+          transition: 'background-color 0.3s, color 0.3s, border-color 0.3s',
           opacity: state === 'loading' ? 0.6 : 1,
         }}
         data-testid="narration-play-btn"
@@ -139,7 +110,7 @@ export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4
         )}
       </button>
 
-      {/* Stop Button */}
+      {/* Stop */}
       <AnimatePresence>
         {(state === 'playing' || state === 'paused') && (
           <motion.button
@@ -171,87 +142,23 @@ export default function NarrationPlayer({ text, label = 'Listen', color = '#D8B4
         </div>
       )}
 
-      {/* Voice Settings */}
-      <div className="relative" ref={settingsRef}>
-        <button
-          onClick={() => setShowSettings(!showSettings)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs"
-          style={{
-            background: showSettings ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.02)',
-            border: `1px solid ${showSettings ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.06)'}`,
-            color: 'var(--text-muted)',
-            transition: 'all 0.3s',
-          }}
-          data-testid="voice-settings-btn"
-        >
-          <Settings2 size={11} />
-          <span style={{ color: genderColor }}>{currentVoice.label}</span>
-          <ChevronDown size={10} style={{ transform: showSettings ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-        </button>
-
-        <AnimatePresence>
-          {showSettings && (
-            <motion.div
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              className="absolute bottom-full left-0 mb-2 w-72 rounded-xl overflow-hidden z-50"
-              style={{
-                background: 'rgba(18, 20, 32, 0.98)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                backdropFilter: 'none',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-              }}
-            >
-              <div className="p-4">
-                <p className="text-xs font-bold uppercase tracking-[0.15em] mb-3" style={{ color: 'var(--text-muted)' }}>Voice</p>
-                <div className="grid grid-cols-3 gap-1.5 mb-4">
-                  {VOICES.map(v => {
-                    const gc = v.gender === 'female' ? '#FDA4AF' : v.gender === 'male' ? '#93C5FD' : '#D8B4FE';
-                    const selected = voice === v.id;
-                    return (
-                      <button
-                        key={v.id}
-                        onClick={() => { setVoice(v.id); if (state !== 'idle') stop(); }}
-                        className="p-2 rounded-lg text-center"
-                        style={{
-                          background: selected ? `${gc}15` : 'rgba(255,255,255,0.02)',
-                          border: `1px solid ${selected ? `${gc}30` : 'rgba(255,255,255,0.06)'}`,
-                          transition: 'all 0.2s',
-                        }}
-                        data-testid={`voice-${v.id}`}
-                      >
-                        <p className="text-xs font-medium" style={{ color: selected ? gc : 'var(--text-secondary)' }}>{v.label}</p>
-                        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)', fontSize: '10px' }}>{v.desc}</p>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <p className="text-xs font-bold uppercase tracking-[0.15em] mb-3" style={{ color: 'var(--text-muted)' }}>Speed</p>
-                <div className="flex gap-2">
-                  {SPEEDS.map(s => (
-                    <button
-                      key={s.value}
-                      onClick={() => { setSpeed(s.value); if (state !== 'idle') stop(); }}
-                      className="flex-1 py-2 rounded-lg text-xs text-center"
-                      style={{
-                        background: speed === s.value ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.02)',
-                        border: `1px solid ${speed === s.value ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.06)'}`,
-                        color: speed === s.value ? 'var(--text-primary)' : 'var(--text-muted)',
-                        transition: 'all 0.2s',
-                      }}
-                      data-testid={`speed-${s.value}`}
-                    >
-                      {s.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+      {/* Read-only persona chip — tap routes user to the unified
+          picker in the LanguageBar pill. NO second panel. */}
+      <button
+        onClick={focusPicker}
+        className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs"
+        style={{
+          background: 'rgba(255,255,255,0.02)',
+          border: '1px solid rgba(255,255,255,0.06)',
+          color: 'var(--text-muted)',
+          transition: 'background-color 0.2s, border-color 0.2s',
+        }}
+        data-testid="narration-persona-chip"
+        title="Voice persona — change in the Translator pill"
+      >
+        <Volume2 size={11} />
+        <span style={{ color: genderColor }}>{currentVoice.label}</span>
+      </button>
     </div>
   );
 }
