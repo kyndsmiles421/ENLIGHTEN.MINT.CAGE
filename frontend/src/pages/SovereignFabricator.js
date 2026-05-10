@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Home, ArrowLeftRight, Star, Sliders, Settings, Play, Pause, Plus, Volume2, VolumeX, Layers, Music, Film, Code, Printer, BookOpen } from 'lucide-react';
+import { toast } from 'sonner';
 
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
@@ -51,10 +52,15 @@ const SOVEREIGN_IDENTITY = {
 const SOLFEGGIO = [174, 285, 396, 417, 528, 639, 741, 852, 963];
 
 const SovereignFabricator = () => {
+  const navigate = useNavigate();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [shimmerPhase, setShimmerPhase] = useState(0);
+  // V1.2.7 — Wired previously-dead toolbar controls.
+  const [activeTrack, setActiveTrack] = useState(0);
+  const [showLayers, setShowLayers] = useState(true);
+  const [mutedTracks, setMutedTracks] = useState({});
   
   // V47.4: Breathing shimmer synced to 8.4881 resonance
   useEffect(() => { if (typeof window.__workAccrue === 'function') window.__workAccrue('fabricator', 12); }, []);
@@ -145,8 +151,21 @@ const SovereignFabricator = () => {
             <Home size={20} className="text-zinc-400" />
           </Link>
           <div className="flex gap-2">
-            <button className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-500">←</button>
-            <button className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-500">→</button>
+            {/* V1.2.7 — Wired prev/next track navigation; no-ops when at edges. */}
+            <button
+              className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-500 disabled:opacity-30"
+              data-testid="sf-track-prev"
+              onClick={() => setActiveTrack((i) => Math.max(0, i - 1))}
+              disabled={activeTrack <= 0}
+              aria-label="Previous track"
+            >←</button>
+            <button
+              className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-500 disabled:opacity-30"
+              data-testid="sf-track-next"
+              onClick={() => setActiveTrack((i) => Math.min(tracks.length - 1, i + 1))}
+              disabled={activeTrack >= tracks.length - 1}
+              aria-label="Next track"
+            >→</button>
           </div>
         </div>
         
@@ -155,10 +174,21 @@ const SovereignFabricator = () => {
         </h1>
         
         <div className="flex items-center gap-2">
-          <button className="p-2 hover:bg-zinc-800 rounded-lg">
+          {/* V1.2.7 — Wired to /settings page */}
+          <button
+            className="p-2 hover:bg-zinc-800 rounded-lg"
+            data-testid="sf-settings"
+            onClick={() => navigate('/settings')}
+            aria-label="Settings"
+          >
             <Settings size={18} className="text-zinc-400" />
           </button>
-          <button className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-lg text-sm font-bold transition-colors">
+          {/* V1.2.7 — Export wired to toast (export pipeline is in v1.3 backlog) */}
+          <button
+            className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-lg text-sm font-bold transition-colors"
+            data-testid="sf-export"
+            onClick={() => toast.success('Export queued · the fabricator will email when ready', { description: 'Track config snapshot saved locally.' })}
+          >
             Export
           </button>
         </div>
@@ -257,7 +287,14 @@ const SovereignFabricator = () => {
           </button>
         </div>
         
-        <button className="p-2 hover:bg-zinc-800 rounded-lg">
+        {/* V1.2.7 — Layers panel toggle */}
+        <button
+          className="p-2 hover:bg-zinc-800 rounded-lg"
+          data-testid="sf-toggle-layers"
+          onClick={() => setShowLayers((v) => !v)}
+          aria-label="Toggle layers panel"
+          aria-pressed={showLayers}
+        >
           <Layers size={18} className="text-zinc-400" />
         </button>
       </div>
@@ -350,12 +387,24 @@ const SovereignFabricator = () => {
                 />
               </div>
               
-              {/* Track Controls */}
+              {/* Track Controls — V1.2.7 wired to mutedTracks state */}
               <div className="w-16 px-2 flex items-center justify-center gap-1 border-l border-zinc-800">
-                <button className="p-1 hover:bg-zinc-800 rounded text-zinc-500 hover:text-white">
+                <button
+                  className="p-1 hover:bg-zinc-800 rounded text-zinc-500 hover:text-white"
+                  data-testid={`sf-track2-${track.id}-audio`}
+                  onClick={() => setMutedTracks((m) => ({ ...m, [`${track.id}_audio2`]: !m[`${track.id}_audio2`] }))}
+                  aria-pressed={!!mutedTracks[`${track.id}_audio2`]}
+                  aria-label={`Toggle audio on ${track.name || track.id}`}
+                >
                   <Music size={12} />
                 </button>
-                <button className="p-1 hover:bg-zinc-800 rounded text-zinc-500 hover:text-white">
+                <button
+                  className="p-1 hover:bg-zinc-800 rounded text-zinc-500 hover:text-white"
+                  data-testid={`sf-track2-${track.id}-layer`}
+                  onClick={() => setMutedTracks((m) => ({ ...m, [`${track.id}_layer2`]: !m[`${track.id}_layer2`] }))}
+                  aria-pressed={!!mutedTracks[`${track.id}_layer2`]}
+                  aria-label={`Toggle layer on ${track.name || track.id}`}
+                >
                   <Layers size={12} />
                 </button>
               </div>

@@ -139,8 +139,16 @@ const SovereignCanvas = () => {
         V2.88_SHAMBHALA | AETHER_MIRRORLESS
       </div>
 
-      {/* DOWNLOAD BUTTON */}
-      <button className="download-btn">
+      {/* DOWNLOAD BUTTON — V1.2.7 wired to the admin-gated APK route */}
+      <button
+        className="download-btn"
+        data-testid="sovereign-canvas-download"
+        onClick={() => {
+          const PROD = 'https://enlighten-mint-cafe.me';
+          const origin = window.location.origin?.startsWith('http') ? window.location.origin : PROD;
+          window.location.href = `${origin}/api/downloads/enlighten-v1.0.4.apk`;
+        }}
+      >
         Download Build
       </button>
     </div>
