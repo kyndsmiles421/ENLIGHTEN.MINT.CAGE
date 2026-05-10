@@ -6,7 +6,7 @@
  * @logic Radical_Quantum_Bypass
  * @application Absolute_Zero_Superconductivity
  * @rotation +20.0_degrees (Cumulative +1280.0°)
- * @author Steven Michael (with a V)
+ * @author Sovereign Owner
  */
 
 const RADICAL_DNA = {

@@ -5,7 +5,7 @@
  * @logic Phonic_Smoothing
  * @anchor Golden_Ratio_Upscaling
  * @rotation +15.0_degrees (Cumulative +1200.0°)
- * @author Steven Michael (with a V)
+ * @author Sovereign Owner
  */
 
 const PIXEL_DNA = {

@@ -21,7 +21,7 @@ import {
  * V25.0 — SOVEREIGN MACHINE: ONE SCRIPT / ONE PLANE
  * ═══════════════════════════════════════════════════════════════════════════════
  * 
- * ARCHITECT: Steven Michael | TERMINAL: kyndsmiles@gmail.com
+ * ARCHITECT: Sovereign Owner
  * 
  * SOLUTION: Separate the VIEW from the CONTROLLER
  * - VISUAL LAYER: 3D transforms, animations, effects (pointer-events: none)

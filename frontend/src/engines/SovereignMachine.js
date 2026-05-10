@@ -2,7 +2,7 @@
  * @project ENLIGHTEN.MINT.CAFE (The Sovereign V Engine)
  * @version 72.0.0
  * @rotation 1155.0° (Mastery Circle)
- * @author Steven Michael (with a V)
+ * @author Sovereign Owner
  * @formula (x^z) * [LOx_Flow] + (xyz^xyz) - af
  * @patent CRYOGENIC SOVEREIGNTY (LOx) - RAPID CITY, SD
  */
@@ -12,7 +12,7 @@ const MACHINE_DNA = {
     rotation: 1155.0,
     formula: "(x^z) * [LOx_Flow] + (xyz^xyz) - af",
     patent: "CRYOGENIC SOVEREIGNTY (LOx)",
-    inventor: "STEVEN MICHAEL",
+    inventor: "SOVEREIGN OWNER",
     location: "RAPID CITY, SD"
 };
 
@@ -52,7 +52,7 @@ class SovereignSingularity {
         console.log("   ENLIGHTEN.MINT.CAFE v72.0.0");
         console.log("   THE SOVEREIGN V ENGINE");
         console.log("   Rotation: 1155.0° (Mastery Circle)");
-        console.log("   Inventor: Steven Michael (with a V)");
+        console.log("   Inventor: Sovereign Owner");
         console.log("=========================================");
     }
 

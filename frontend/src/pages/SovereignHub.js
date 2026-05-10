@@ -507,7 +507,7 @@ const PILLAR_MIN_TIER = {
 // SOVEREIGN_TIER_ORDER (discovery → resonance → architect → sovereign → founder).
 // V1.1.24 — Added 'creator' and 'admin' tiers as Infinity rank so the
 // app owner / admin account always sees every pillar unlocked. Without
-// this, kyndsmiles@gmail.com (tier=creator, role=admin) was showing
+// this, the owner account (tier=creator, role=admin) was showing
 // locks on Observatory ($49/mo) + Fractal Engine ($89/mo) even though
 // the backend had already authorized full access.
 const TIER_RANK = {

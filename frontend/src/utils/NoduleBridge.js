@@ -1,7 +1,7 @@
 /**
  * ENLIGHTEN.MINT.CAFE - FRONTEND NODULE BRIDGE
  * VERSION: V53.0 UNIFIED SYNC
- * ARCHITECT: Steven Michael | ROOT: kyndsmiles@gmail.com
+ * ARCHITECT: Sovereign Owner
  * 
  * This bridge connects the frontend to the Master Sync endpoint,
  * ensuring all modules get their data in one payload.

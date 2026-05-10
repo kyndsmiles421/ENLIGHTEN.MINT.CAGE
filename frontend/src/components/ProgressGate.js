@@ -32,13 +32,14 @@ export default function ProgressGate({ gateId, children, color = '#A78BFA' }) {
   useEffect(() => {
     if (!gate || !user) { setLoading(false); return; }
 
-    // V57.5 — admin / owner bypass. The developer-account should never be
+    // V57.5 — admin / owner bypass. The owner account should never be
     // locked out of their own app while testing; there's nothing to "earn"
     // when you OWN the universe. Anyone else with a real account still
-    // hits the normal milestone progression.
+    // hits the normal milestone progression. Role-based only — no PII
+    // hardcoded in the client bundle.
     const isPrivileged = user?.role === 'admin' || user?.role === 'owner'
-      || user?.is_admin === true || user?.tier === 'sovereign'
-      || (typeof user?.email === 'string' && user.email === 'kyndsmiles@gmail.com');
+      || user?.role === 'creator' || user?.is_admin === true || user?.is_owner === true
+      || user?.tier === 'sovereign' || user?.gilded_tier === 'sovereign_founder';
     if (isPrivileged) { setUnlocked(true); setLoading(false); return; }
 
     const checkGate = async () => {

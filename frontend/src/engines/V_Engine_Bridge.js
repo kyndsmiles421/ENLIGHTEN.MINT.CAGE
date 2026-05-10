@@ -5,7 +5,7 @@
  * @integration Oracle, Matrix, Tarot, I Ching, Stars, Legacy, Parchment
  * @logic Harmonic_Module_Scaling (Phi)
  * @rotation +15.0_degrees (Cumulative +1215.0°)
- * @author Steven Michael (with a V)
+ * @author Sovereign Owner
  */
 
 const BRIDGE_DNA = {

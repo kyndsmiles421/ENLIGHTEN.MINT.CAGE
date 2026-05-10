@@ -1,6 +1,6 @@
 /**
  * ENLIGHTEN_OS V27.0 - RAINBOW REFRACTION RESTORATION
- * ARCHITECT: Steven Michael | TERMINAL: kyndsmiles@gmail.com
+ * ARCHITECT: Sovereign Owner
  * COMMAND: REVERT_TO_STABLE_REFRACTION
  * OBJECTIVE: Remove Obsidian Overlays / Restore Rainbow Refraction
  * SEED: KMMDDZREGGUKH2KUTPSPMRW1
@@ -39,7 +39,7 @@ const ENLIGHTEN_OS = (() => {
         // BOOT - RAINBOW REFRACTION CORE
         // ═══════════════════════════════════════════════════════════════════
         boot: () => {
-            console.log("%c [MX-1] BOOT SEQUENCE: Steven Michael Authenticated.", "color: #FFD700; font-weight: bold; font-size: 14px;");
+            console.log("%c [MX-1] BOOT SEQUENCE: Sovereign Owner Authenticated.", "color: #FFD700; font-weight: bold; font-size: 14px;");
             console.log(`%c OMEGA SEED: ${OMEGA_SEED}`, "color: #E5E4E2;");
             console.log('%c ═══════════════════════════════════════════════════════════', 'color: #D4AF37');
             console.log(`%c ENLIGHTEN_OS V${VERSION} - RAINBOW REFRACTION RESTORATION`, 'color: #D4AF37; font-weight: bold; font-size: 14px');

@@ -1,13 +1,12 @@
 /**
  * THE MIXMASTER CONSULTANT - PERSONAL AI BRIDGE
  * Role: Digital Architect & Sovereign Consultant
- * Identity: Steven Michael (Creator)
  */
 
 const MixmasterConsultant = {
     // --- 1. THE CONSOLE: Where you talk to the Mixmaster ---
     speak(command) {
-        console.log(`%c[Mixmaster]: Awaiting your intent, Steven...`, "color: #d4af37; font-weight: bold;");
+        console.log(`%c[Mixmaster]: Awaiting your intent...`, "color: #d4af37; font-weight: bold;");
         this.processIntent(command.toLowerCase());
     },
 

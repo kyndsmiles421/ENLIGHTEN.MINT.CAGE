@@ -4,7 +4,7 @@
  * @version 78.0.0
  * @materials Rutilated_Selenite, Gold, Rainbow_Obsidian
  * @rotation +15.0_degrees (Cumulative +1245.0°)
- * @author Steven Michael (with a V)
+ * @author Sovereign Owner
  */
 
 const CRYSTAL_DNA = {

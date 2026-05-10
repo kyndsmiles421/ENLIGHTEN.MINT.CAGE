@@ -1,7 +1,7 @@
 {
-  "_comment": "V1.1.19 — Sovereign Brand Identity Single Source of Truth. Edit ONLY this file. Run /app/scripts/sync_brand_identity.py to propagate changes to /app/frontend/public/index.html, /app/frontend/public/landing.html, and the Python endpoint constants. The backend /api/.well-known/brand-identity.json route reads this file directly at request time.",
-  "version": "1.1.19",
-  "updated": "2026-02-07",
+  "_comment": "V1.2.6 — Sovereign Brand Identity Single Source of Truth. PII-scrubbed: Person/founder node removed; SoftwareApplication and Brand only. Edit ONLY this file. Run /app/scripts/sync_brand_identity.py to propagate changes to /app/frontend/public/index.html and /app/frontend/public/landing.html.",
+  "version": "1.2.6",
+  "updated": "2026-02-10",
   "graph": {
     "@context": "https://schema.org",
     "@graph": [
@@ -11,9 +11,8 @@
         "name": "ENLIGHTEN.MINT.CAFE",
         "alternateName": "Sovereign Engine V12",
         "operatingSystem": "3D Geospatial / Web-Based OS",
-        "applicationCategory": "WellnessOperatingSystem",
+        "applicationCategory": "EducationalApplication",
         "description": "A high-fidelity 3D Operating System and Sovereign Engine powered by the 9×9 Helix, Tesseract Vault, and USGS geospatial rendering architecture.",
-        "author": { "@id": "https://enlighten-mint-cafe.me/#architect" },
         "brand":  { "@id": "https://enlighten-mint-cafe.me/#brand" },
         "offers": {
           "@type": "Offer",
@@ -31,24 +30,8 @@
           "EMC Sovereign OS"
         ],
         "url": "https://enlighten-mint-cafe.me",
-        "description": "ENLIGHTEN.MINT.CAFE is a Sovereign 3D Wellness Operating System brand — distinct from any beverage, tea, or hospitality concept of the same wording. The brand identity is anchored in the 9×9 Helix architecture, Tesseract Vault, and Refraction Engine authored by Steven Michael.",
-        "founder": { "@id": "https://enlighten-mint-cafe.me/#architect" },
+        "description": "ENLIGHTEN.MINT.CAFE is a Sovereign 3D Operating System brand — distinct from any beverage, tea, or hospitality concept of the same wording. The brand identity is anchored in the 9×9 Helix architecture, Tesseract Vault, and Refraction Engine.",
         "sameAs": ["https://enlighten-mint-cafe.me"]
-      },
-      {
-        "@type": "Person",
-        "@id": "https://enlighten-mint-cafe.me/#architect",
-        "name": "Steven Michael",
-        "jobTitle": "Lead Architect & Founder",
-        "description": "Founder and Architect of the Sovereign Engine and the 9×9 Helix V12 Operating System.",
-        "knowsAbout": [
-          "3D Operating Systems",
-          "Sovereign Engines",
-          "Geospatial Computing",
-          "Digital Architecture",
-          "Crystalline Logic"
-        ],
-        "url": "https://enlighten-mint-cafe.me"
       }
     ]
   }

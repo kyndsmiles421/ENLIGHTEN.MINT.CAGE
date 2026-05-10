@@ -2,7 +2,7 @@
  * ═══════════════════════════════════════════════════════════════════════════════
  * SINGULARITY KERNEL V30.2 — OMNIS-UNIVERSAL CORE
  * ═══════════════════════════════════════════════════════════════════════════════
- * ARCHITECT: Steven Michael | MASTER: 708B8ED1E974D85585BBBD8E06E0291E
+ * ARCHITECT: Sovereign Owner
  * STATE: -183°C LOx Cooling | MODE: LIVING_ENGINE
  * ═══════════════════════════════════════════════════════════════════════════════
  * 

@@ -5,7 +5,7 @@
  * @goal Modular_Self_Production_of_Goods_and_Services
  * @tuning Golden_Ratio (1.618)
  * @rotation +15.0_degrees (Cumulative +1230.0°)
- * @author Steven Michael (with a V)
+ * @author Sovereign Owner
  */
 
 const PRODUCTION_DNA = {

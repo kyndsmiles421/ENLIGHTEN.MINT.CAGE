@@ -4,7 +4,7 @@
  * @version 79.0.0
  * @materials Rainbow_Obsidian_Shielding
  * @rotation +15.0_degrees (Cumulative +1260.0°)
- * @author Steven Michael (with a V)
+ * @author Sovereign Owner
  */
 
 const MEMORY_DNA = {

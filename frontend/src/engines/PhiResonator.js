@@ -5,7 +5,7 @@
  * @constant PHI 1.61803398875
  * @logic Fibonacci_Recursive_Computing
  * @rotation +15.0_degrees (Cumulative +1185.0°)
- * @author Steven Michael (with a V)
+ * @author Sovereign Owner
  */
 
 const PHI_DNA = {

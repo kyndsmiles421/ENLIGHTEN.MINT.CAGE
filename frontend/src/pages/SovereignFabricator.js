@@ -6,32 +6,33 @@ import { Home, ArrowLeftRight, Star, Sliders, Settings, Play, Pause, Plus, Volum
  * ═══════════════════════════════════════════════════════════════════════════════
  * V47.4 SOVEREIGN FABRICATOR — MASTER MANIFEST [FINAL SOLDER]
  * ═══════════════════════════════════════════════════════════════════════════════
- * 
- * ARCHITECT: Steven Michael
- * IDENTITY: kyndsmiles@gmail.com
+ *
  * ENGINE: ENLIGHTEN.MINT.CAFE
  * RESONANCE: 8.4881 | COMPOSITE: 690Hz | HAPTIC: [80, 50, 120]
- * 
+ *
  * Track 1: CODE WRITER (Indigo) - Logic Injection Active
  * Track 2: PRINTER (Cyan) - Video Container Live
  * Track 3: READER (Gold) - Knowledge Vault Open
  * Track 4: VIDEO OUTPUT (Prismatic) - Data Storm Locked
- * 
+ *
  * FORMULA: z^xr2 * z^xr2 (+)(-) n^xr2 (+)(-) y^xr2 {π}{√7.3}
  * ═══════════════════════════════════════════════════════════════════════════════
  */
 
-// V47.4 CREATOR IDENTITY LOCK
+// V47.4 CREATOR IDENTITY — role-based (no hardcoded PII).
+// Owner email is resolved server-side via the JWT; the client only checks role/tier.
 const SOVEREIGN_IDENTITY = {
-  rootEmail: "kyndsmiles@gmail.com",
-  operator: "STEVEN MICHAEL",
   resonance: 8.4881,
   composite: 690,
   haptic: [80, 50, 120],
-  
-  validateAccess: (email) => {
-    if (email === SOVEREIGN_IDENTITY.rootEmail) {
-      console.log("[V47.4] CREATOR_DETECTED: Unlocking 8.4881 Manifold...");
+
+  validateAccess: (user) => {
+    const isCreator = !!user && (
+      user.role === 'admin' || user.role === 'owner' || user.role === 'creator' ||
+      user.is_admin === true || user.is_owner === true ||
+      user.tier === 'sovereign' || user.gilded_tier === 'sovereign_founder'
+    );
+    if (isCreator) {
       return {
         mode: "CREATOR",
         role: "SUPREME_CREATOR",

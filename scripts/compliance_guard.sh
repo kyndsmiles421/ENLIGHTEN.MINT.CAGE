@@ -80,6 +80,29 @@ else
   echo "✅ Pass — no medical-claim leaks in render path."
 fi
 
+echo "[3/3] Personal-PII leaks in render strings…"
+
+# PII patterns the architect explicitly flagged on 2026-02-10. These must
+# never reach a public artifact, source map, or HTML meta tag.
+PII_HITS=$(grep -rniE \
+    "(kyndsmiles@gmail|318 ?National (Street|St)|National Street #2|\bSteven Michael\b|\bSTEVEN MICHAEL\b)" \
+    "$SRC_DIR" frontend/public 2>/dev/null \
+  | grep -viE "$EXEMPT" \
+  | grep -viE "_orphans/|node_modules/|\.cache/|babel-loader/" \
+  || true)
+
+if [ -n "$PII_HITS" ]; then
+  echo "❌ FAIL — Personal PII in shipping files:"
+  echo "$PII_HITS"
+  echo ""
+  echo "→ Replace operator name with 'ENLIGHTEN.MINT.CAFE' or 'Sovereign Owner'."
+  echo "→ Replace personal email with 'privacy@enlighten-mint-cafe.me'."
+  echo "→ Strip home address entirely; legal disclosures go behind written request."
+  FAIL=1
+else
+  echo "✅ Pass — no PII leaks in shipping files."
+fi
+
 echo ""
 echo "═══════════════════════════════════════════════════════════"
 if [ $FAIL -eq 0 ]; then

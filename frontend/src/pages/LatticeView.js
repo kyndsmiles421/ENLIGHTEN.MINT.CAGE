@@ -6,7 +6,7 @@ import { ArrowLeft, Layers, Zap } from 'lucide-react';
 /**
  * ═══════════════════════════════════════════════════════════════════════════════
  * THE CALIBRATION CHAMBER — V6.1
- * ARCHITECT: Steven Michael
+ * ARCHITECT: Sovereign Owner
  * ENGINE: ENLIGHTEN_OS V7.0
  * PURPOSE: 81-Node Metatron Lattice Visualization
  * ═══════════════════════════════════════════════════════════════════════════════

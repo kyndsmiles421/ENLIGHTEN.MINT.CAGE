@@ -1,7 +1,6 @@
 /**
  * MASTER CREATOR MIXER BOARD - ENLIGHTEN.MINT.CAFE
  * Controls: Visual Skin, Functional Logic, & Web Apparatus
- * Developed for: Steven Michael (Sovereign Creator)
  */
 
 const CreatorMixer = {

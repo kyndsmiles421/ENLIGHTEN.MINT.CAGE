@@ -5,7 +5,7 @@
  * @logic Viscous_Liquid_Logic
  * @constraint Harmonic_Balance (432Hz / 7.83Hz)
  * @rotation +15.0_degrees (Cumulative +1170.0°)
- * @author Steven Michael (with a V)
+ * @author Sovereign Owner
  */
 
 const GOVERNOR_DNA = {

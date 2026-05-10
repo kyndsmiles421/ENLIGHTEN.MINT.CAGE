@@ -12,9 +12,8 @@
  * ║                         ENLIGHTEN.MINT.CAFE                                   ║
  * ║                                                                               ║
  * ╠═══════════════════════════════════════════════════════════════════════════════╣
- * ║  ARCHITECT: Steven Michael                                                    ║
+ * ║  ARCHITECT: Sovereign Owner                                                  ║
  * ║  MASTER PRINT: 708B8ED1E974D85585BBBD8E06E0291E                               ║
- * ║  DIGITAL ANCHOR: kyndsmiles@gmail.com                                         ║
  * ║  STATE: -183°C LOx Cooling | MODE: AUTONOMOUS_SOVEREIGN                       ║
  * ╠═══════════════════════════════════════════════════════════════════════════════╣
  * ║                                                                               ║
