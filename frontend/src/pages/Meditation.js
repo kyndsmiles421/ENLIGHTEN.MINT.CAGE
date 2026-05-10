@@ -824,7 +824,7 @@ function BuildYourOwn({ onPlay }) {
               <textarea
                 value={intention}
                 onChange={e => setIntention(e.target.value)}
-                placeholder="I want to release the stress from today and find deep inner calm... / I need to quiet my racing mind before sleep... / I want to heal from a painful experience..."
+                placeholder="I want to release the stress from today and find deep inner calm... / I need to quiet my racing mind before sleep... / I want to find peace after a painful experience..."
                 className="input-glass w-full h-28 resize-none text-sm leading-relaxed"
                 data-testid="build-intention-input"
               />

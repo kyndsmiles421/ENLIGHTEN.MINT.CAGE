@@ -80,7 +80,7 @@ const CATEGORY_PILLARS = [
   },
   {
     id: 'nourish',
-    title: 'Nourish & Heal',
+    title: 'Nourish & Restore',
     subtitle: 'Holistic body care',
     icon: Leaf,
     color: '#22C55E',

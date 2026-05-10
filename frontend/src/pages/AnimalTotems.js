@@ -58,7 +58,7 @@ function AnimalDetail({ animal, onBack, isBirthTotem, companion, challenger }) {
         {[
           { label: 'Power & Gift', content: animal.power, color: '#22C55E' },
           { label: 'Shadow', content: animal.shadow, color: '#FB923C' },
-          { label: 'Medicine', content: animal.medicine, color: animal.color },
+          { label: 'Teaching', content: animal.medicine, color: animal.color },
           { label: 'When This Spirit Appears', content: animal.when_appears, color: '#A78BFA' },
           { label: 'Dream Meaning', content: animal.dream_meaning, color: '#3B82F6' },
         ].filter(s => s.content).map(section => (

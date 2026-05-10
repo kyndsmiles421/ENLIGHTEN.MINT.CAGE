@@ -13,6 +13,16 @@ Finalize the "Sovereign Unified Engine" (PWA) for Google Play Store submission u
 - **Cybernetic Loop** — Generators → `ContextBus` → `ResonanceAnalyzer` → `CrystallineLattice3D` + `SageEngineGauge`
 - **Closed-loop Economy** — Credits (server-issued) → Dust/Gems/Components via AI Merchant; Stripe is the only real-money gateway
 
+
+### V1.2.5 — "Heal" Bare-Verb Compliance Patch (2026-02-10) ✅
+**Mandate:** User screenshot exposed `Nourish & Heal` pillar tile on `/hub` — the V1.2.4 CI guard caught `healing` (gerund) but not the bare verb `heal`.
+- **3 frontend strings replaced** `Nourish & Heal` → **`Nourish & Restore`** (`SovereignHub.js` x2, `Landing.js` x1).
+- **CI guard regex tightened** in `scripts/compliance_guard.sh` to include `heal | heals | healed | healer | healers | therapy | therapies | therapeutic | treatment | treatments | medical | medicine | diagnos[ei]s? | prescribed?`. Push-time gate now blocks any of these in JSX render-path strings.
+- **6 cascade fixes** caught by tightened guard: `AnimalTotems` Medicine→Teaching tab, `Meditation` placeholder, `Journey` x3 narration lines, `DanceMusicStudio` description.
+- Verified: `bash scripts/compliance_guard.sh` → ✅ ALL CHECKS PASSED, `grep "Nourish & Heal"` → 0 hits.
+- ⚠ User must click **Deploy** to push fix to `enlighten-mint-cafe.me` production.
+
+
 ### V1.1.19 — Brand Identity Single Source of Truth (Drift Killer) (2026-02-07) ✅
 **Mandate:** "One source of truth for HTML head + JSON endpoint. Future renames must propagate in one edit."
 - **`/app/shared/brand_identity.json`** (NEW) — canonical brand graph + version + updated date. The ONLY file you edit going forward when renaming, adding alternateNames, or bumping the version.

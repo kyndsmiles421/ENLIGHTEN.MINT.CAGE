@@ -110,7 +110,7 @@ const PILLARS = [
     { label: 'Sanctuary Room', route: '/sanctuary' },
     { label: 'Media Library', route: '/media-library' },
   ]},
-  { title: 'Nourish & Heal', color: '#22C55E', items: [
+  { title: 'Nourish & Restore', color: '#22C55E', items: [
     { label: 'Nourishment', route: '/nourishment' },
     { label: 'Aromatic Resonance', route: '/aromatherapy' },
     { label: 'Herbology', route: '/herbology' },
@@ -278,7 +278,7 @@ const PILLAR_VERB = {
   'Practice':              { verb: '✦ Inhale',   gloss: 'breath into the engine' },
   'Divination':            { verb: '✦ Channel',  gloss: 'channel the oracle' },
   'Sanctuary':             { verb: '✦ Enter',    gloss: 'cross the threshold' },
-  'Nourish & Heal':        { verb: '✦ Restore',  gloss: 'restore the body-field' },
+  'Nourish & Restore':        { verb: '✦ Restore',  gloss: 'restore the body-field' },
   'Knowledge':             { verb: '✦ Receive',  gloss: 'receive the teaching' },
   'Creators & Generators': { verb: '✦ Manifest', gloss: 'manifest from the field' },
   'Sage AI Coach':         { verb: '✦ Commune',  gloss: 'commune with the sage' },

@@ -47,7 +47,7 @@ const STAGES = [
         id: 's0-energy', title: 'Understanding Life Force Energy',
         desc: 'Learn about prana, chi, and the vital energy that powers your body and mind.',
         visual: 'energy',
-        narration: 'Every living thing is sustained by a vital life force energy. In yoga, it is called Prana. In Chinese medicine, it is Chi. In Japanese tradition, it is Ki. This energy flows through channels in your body, nourishing every cell, organ, and thought. When this energy flows freely, you feel vibrant, clear, and alive. When it is blocked, you may feel tired, anxious, or unwell. The practices in this journey are all designed to cultivate, balance, and direct this energy for your highest good.',
+        narration: 'Every living thing is sustained by a vital life force energy. In yoga, it is called Prana. In Chinese tradition, it is Chi. In Japanese tradition, it is Ki. This energy flows through channels in your body, nourishing every cell, organ, and thought. When this energy flows freely, you feel vibrant, clear, and alive. When it is blocked, you may feel tired, anxious, or unwell. The practices in this journey are all designed to cultivate, balance, and direct this energy for your highest good.',
         content: [
           { type: 'text', value: 'Life force energy goes by many names: Prana (Sanskrit), Chi/Qi (Chinese), Ki (Japanese), Mana (Hawaiian), Ruach (Hebrew). Despite different names, all traditions describe the same fundamental energy that animates all life.' },
           { type: 'chakra_visual' },
@@ -138,7 +138,7 @@ const STAGES = [
         id: 's1-movement', title: 'Mindful Movement',
         desc: 'Introduction to Qigong and gentle energy exercises.',
         visual: 'qigong',
-        narration: 'Movement is medicine. When you combine conscious breathing with gentle, intentional movement, you create a powerful practice for health and vitality. Qigong, which means energy cultivation, has been practiced in China for over 4,000 years. The slow, flowing movements massage your internal organs, open your energy meridians, and build your life force. You do not need to be flexible or athletic. Qigong meets you where you are.',
+        narration: 'Movement is sacred. When you combine conscious breathing with gentle, intentional movement, you create a powerful practice for health and vitality. Qigong, which means energy cultivation, has been practiced in China for over 4,000 years. The slow, flowing movements massage your internal organs, open your energy meridians, and build your life force. You do not need to be flexible or athletic. Qigong meets you where you are.',
         content: [
           { type: 'text', value: 'Qigong (Chi Kung) combines slow movement, breathing, and mental focus to cultivate and balance life force energy. Studies show it reduces chronic pain by 40%, improves balance by 30%, and significantly reduces blood pressure.' },
           { type: 'text', value: 'Key principle: In Qigong, the mind leads the chi, and the chi leads the body. Where your attention goes, energy flows.' },
@@ -246,7 +246,7 @@ const STAGES = [
         id: 's3-light', title: 'Chromatic Resonance & Light',
         desc: 'Learn how different colors of light affect your energy and mood.',
         visual: 'chromotherapy',
-        narration: 'Color is simply light vibrating at different frequencies. Each color carries a unique energy that affects your body and mind. Red stimulates vitality and grounds you in your physical body. Orange ignites creativity and emotional flow. Yellow boosts confidence and personal power. Green heals the heart and restores balance. Blue calms the mind and aids communication. Indigo deepens intuition. Violet connects you to spiritual awareness. By intentionally bathing in these colors, you can shift your energy and support specific aspects of your well-being.',
+        narration: 'Color is simply light vibrating at different frequencies. Each color carries a unique energy that affects your body and mind. Red stimulates vitality and grounds you in your physical body. Orange ignites creativity and emotional flow. Yellow boosts confidence and personal power. Green soothes the heart and restores balance. Blue calms the mind and aids communication. Indigo deepens intuition. Violet connects you to spiritual awareness. By intentionally bathing in these colors, you can shift your energy and support specific aspects of your well-being.',
         content: [
           { type: 'text', value: 'Chromatic resonance (color attunement) has roots in ancient Egyptian and Greek cultural practice. Many practitioners observe that blue tones bring calm, red tones invite warmth, and green tones soothe the senses.' },
           { type: 'chakra_colors' },

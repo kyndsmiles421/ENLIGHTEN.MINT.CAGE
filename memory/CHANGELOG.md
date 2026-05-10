@@ -3,6 +3,35 @@ Append-only running log of work shipped. Most recent first.
 
 ---
 
+## 2026-02-10 — V1.2.5 "Heal" Bare-Verb Patch
+
+### 🔴 P0 — Visible-string medical leak fixed
+User screenshot showed pillar tile **"Nourish & Heal"** still rendering on `/hub`. The previous CI regex caught `healing` (gerund) but not bare `heal`. Replaced in 3 places with **"Nourish & Restore"** (matches existing `verb: '✦ Restore'` gloss):
+- `frontend/src/pages/SovereignHub.js` — pillar title + verb-map key + DOMAIN_TO_PILLAR value
+- `frontend/src/pages/Landing.js` — landing-page domain card title
+
+### 🛡 CI guard tightened (`scripts/compliance_guard.sh`)
+Forbidden-term regex extended to: `heal | heals | healed | healer | healers | healing | therapy | therapies | therapeutic | treatment | treatments | cured? | cures? | patient[s]? | clinical | aromatherapy | light therapy | chromotherapy | medical | medicine | diagnos[ei]s? | prescribed?`. The bare verb "heal" can no longer slip past pre-push.
+
+### Cascade catches (6 additional leaks the tightened guard found and we fixed)
+- `AnimalTotems.js` `'Medicine'` tab → `'Teaching'`
+- `Meditation.js` placeholder "I want to heal from a painful experience" → "find peace after a painful experience"
+- `Journey.js` "In Chinese medicine" → "In Chinese tradition"
+- `Journey.js` "Movement is medicine" → "Movement is sacred"
+- `Journey.js` "Green heals the heart" → "Green soothes the heart"
+- `DanceMusicStudio.js` "spiritual medicine and prayers" → "spiritual significance and prayers"
+
+### Verification
+- `bash scripts/compliance_guard.sh` → ✅ ALL CHECKS PASSED (9/9 runtime tests + static scans)
+- `grep "Nourish & Heal" frontend/src/**` → 0 hits
+- `grep "Nourish & Restore" frontend/src/**` → 3 hits (correct)
+
+### ⚠ Production reminder
+Fixes live on **preview only**. User must click **Deploy** in Emergent dashboard to push to `enlighten-mint-cafe.me`.
+
+---
+
+
 ## 2026-02-09 — V1.2.4 ZERO-WASTE COMPLETION
 
 ### 🔴 P0 — Boundary Translation Layer (`utils/compliance_labels.py`)

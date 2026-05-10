@@ -54,7 +54,7 @@ EXEMPT='MedicalDisclaimerSplash|WellnessDisclaimer|TermsPage|/api/healing|api/he
 # Skip route paths (/light-therapy, /aromatherapy) and programmatic ID keys (id: 'healing')
   # User-facing kicker labels and rendered text
 HITS=$(grep -rniE \
-    "(title|label|placeholder|description|desc|tagline|subtitle|content|heading|name|message|prompt|narration|caption|kicker)\s*[:=]\s*[\"'][^\"']*\b(healing|therapy|treatment|cure[ds]?|patient[s]?|clinical|aromatherapy|light therapy|chromotherapy)\b" \
+    "(title|label|placeholder|description|desc|tagline|subtitle|content|heading|name|message|prompt|narration|caption|kicker)\s*[:=]\s*[\"'][^\"']*\b(heal|heals|healed|healer|healers|healing|therapy|therapies|therapeutic|treatment|treatments|cure[ds]?|patient[s]?|clinical|aromatherapy|light therapy|chromotherapy|medical|medicine|diagnos[ei]s?|prescrib[ei]d?)\b" \
     "$SRC_DIR" --include="*.js" --include="*.jsx" 2>/dev/null \
   | grep -viE "$EXEMPT" \
   | grep -viE "Aromatic Resonance|Light Resonance|Resonance|Alignment|Chromatic" \
