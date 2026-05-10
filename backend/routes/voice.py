@@ -45,6 +45,48 @@ DEFAULT_MODEL_ID = "eleven_flash_v2_5"   # ~75ms latency, ENG + multilingual
 MAX_TEXT_LEN = 800   # narrations are short — defensive cap so a runaway
                       # paste can't blow the user's ElevenLabs quota.
 
+# V1.2.7 — Persona → ElevenLabs voice-id resolver.
+#
+# The frontend's unified Voice Persona picker (useVoicePersona.js) ships
+# OpenAI-style friendly ids — sage, nova, coral, onyx, etc. — because
+# those are the labels the architect chose for the visible UI. ElevenLabs
+# requires an alphanumeric premade-voice id. Without this map every
+# voice-translator request hit `voice_not_found` and silently latched
+# the frontend's "unavailable" branch — the bug the architect described
+# as "voice translator was never working".
+#
+# Each entry below is a `premade` voice from ElevenLabs's public library
+# so it works on free + paid accounts without per-user cloning. Keys are
+# kept lowercase to match the persona ids exactly. Unknown values fall
+# through to DEFAULT_VOICE_ID so a typo never breaks playback.
+PERSONA_TO_ELEVEN = {
+    "nova":    "EXAVITQu4vr4xnSDxMaL",  # Bella — warm feminine
+    "shimmer": "XB0fDUnXU5powFXDhCwa",  # Charlotte — soft feminine
+    "coral":   "AZnzlk1XvdvUeBnXmlld",  # Domi — bright feminine
+    "sage":    DEFAULT_VOICE_ID,         # the existing Sage default
+    "ash":     "IKne3meq5aSn9XLyUdCD",   # Charlie — warm masculine
+    "onyx":    "VR6AewLTigWG4xSOukaG",   # Arnold — deep masculine
+    "echo":    "flq6f7yk4E4fJM5XTYuZ",   # Michael — smooth masculine
+    "fable":   "onwK4e9ZLuTAKqWW03F9",   # Daniel — British storyteller
+    "alloy":   "pNInz6obpgDQGcFmaJgB",   # Adam — balanced neutral
+}
+
+
+def _resolve_voice_id(raw: Optional[str]) -> str:
+    """Map a persona id ('sage', 'nova', …) or raw ElevenLabs id to a
+    valid ElevenLabs voice id. Unknown / empty → DEFAULT_VOICE_ID."""
+    if not raw:
+        return DEFAULT_VOICE_ID
+    s = str(raw).strip()
+    if not s:
+        return DEFAULT_VOICE_ID
+    # Persona shorthand → premade id.
+    mapped = PERSONA_TO_ELEVEN.get(s.lower())
+    if mapped:
+        return mapped
+    # Raw ElevenLabs ids are 20-char alphanumerics; let them through.
+    return s
+
 
 class NarrateBody(BaseModel):
     text: str
@@ -131,7 +173,7 @@ async def sage_narrate(
     if len(text) > MAX_TEXT_LEN:
         text = text[:MAX_TEXT_LEN]
 
-    voice_id = (body.voice_id or DEFAULT_VOICE_ID).strip() or DEFAULT_VOICE_ID
+    voice_id = _resolve_voice_id(body.voice_id)
     model_id = (body.model_id or DEFAULT_MODEL_ID).strip() or DEFAULT_MODEL_ID
     # V1.1.14 — Auto-route non-English to the multilingual model. The
     # default flash-v2_5 supports ENG natively but other languages
@@ -167,6 +209,7 @@ async def sage_narrate(
         pass  # cache layer is non-fatal — fall through to live synthesis
 
     started = time.time()
+    audio_bytes = None
     try:
         audio_bytes = await asyncio.wait_for(
             asyncio.get_event_loop().run_in_executor(
@@ -181,30 +224,51 @@ async def sage_narrate(
     except Exception as e:
         msg = str(e)
         logger.error(f"Sage narrate error: {msg}")
+        # V1.2.7 — Self-healing fallback. If the picked voice id isn't in
+        # the user's ElevenLabs library, retry ONCE with DEFAULT_VOICE_ID
+        # so the user still hears something instead of silent failure.
+        # The previous behavior — raise 503 → frontend latches
+        # "unavailable" — is exactly what made the user say "voice
+        # translator was never working".
+        if "voice_not_found" in msg and voice_id != DEFAULT_VOICE_ID:
+            logger.warning(f"voice_id {voice_id} not in library, retrying with default")
+            try:
+                audio_bytes = await asyncio.wait_for(
+                    asyncio.get_event_loop().run_in_executor(
+                        None, _synthesize_sync, text, DEFAULT_VOICE_ID, model_id, calm,
+                    ),
+                    timeout=20,
+                )
+                voice_id = DEFAULT_VOICE_ID  # reflect the fallback in the response
+                # fall through to the audio_bytes-success path below
+            except Exception as e2:
+                msg = str(e2)
+                logger.error(f"Sage narrate fallback also failed: {msg}")
         # Map common ElevenLabs error strings to actionable 503s so the
         # frontend's existing "unavailable" branch lights up instead of
         # generic "synth failed".
-        if "detected_unusual_activity" in msg or "Free Tier usage disabled" in msg:
-            raise HTTPException(
-                status_code=503,
-                detail=(
-                    "Sage Voice unavailable — ElevenLabs blocked the request "
-                    "(free tier disabled for cloud/proxy IPs). Upgrade to any "
-                    "paid plan at https://elevenlabs.io/app/subscription to "
-                    "enable narration from this server."
-                ),
-            )
-        if "voice_not_found" in msg:
-            raise HTTPException(
-                status_code=503,
-                detail="Sage Voice unavailable — voice_id not in your library.",
-            )
-        if "quota" in msg.lower() or "out of credits" in msg.lower():
-            raise HTTPException(
-                status_code=503,
-                detail="Sage Voice unavailable — ElevenLabs character quota exhausted.",
-            )
-        raise HTTPException(502, f"Sage voice synthesis failed: {msg[:160]}")
+        if not audio_bytes:
+            if "detected_unusual_activity" in msg or "Free Tier usage disabled" in msg:
+                raise HTTPException(
+                    status_code=503,
+                    detail=(
+                        "Sage Voice unavailable — ElevenLabs blocked the request "
+                        "(free tier disabled for cloud/proxy IPs). Upgrade to any "
+                        "paid plan at https://elevenlabs.io/app/subscription to "
+                        "enable narration from this server."
+                    ),
+                )
+            if "voice_not_found" in msg:
+                raise HTTPException(
+                    status_code=503,
+                    detail="Sage Voice unavailable — voice_id not in your library.",
+                )
+            if "quota" in msg.lower() or "out of credits" in msg.lower():
+                raise HTTPException(
+                    status_code=503,
+                    detail="Sage Voice unavailable — ElevenLabs character quota exhausted.",
+                )
+            raise HTTPException(502, f"Sage voice synthesis failed: {msg[:160]}")
 
     if not audio_bytes:
         raise HTTPException(502, "Sage voice returned empty audio.")
