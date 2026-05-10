@@ -6,17 +6,28 @@ export default function ShareButton() {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
-    // V1.1.25 — Share an explicit, guest-safe landing URL instead of
-    // window.location.origin. The apex root redirects through RootGate
-    // which can race on slow mobile connections and land the recipient
-    // on a 404 catch-all. /landing.html is the static marketing page
-    // that works for both authed AND guest recipients with zero JS
-    // routing — guaranteed to render for whoever opens the share.
-    const origin = window.location.origin || 'https://enlighten-mint-cafe.me';
-    const url = `${origin}/landing.html`;
+    // V1.2.7 — Share-link bug fix. Use the canonical hyphenated domain
+    // EXPLICITLY in both the URL field AND the visible text. Previously
+    // the text contained the brand wordmark "ENLIGHTEN.MINT.CAFE"
+    // (with periods) which Facebook's preview displays prominently and
+    // recipients were typing into their browser bar — landing on
+    // `http://enlighten.mint.cafe/` (which is NOT a real domain — the
+    // owner has `.me`, not `.cafe`) and getting ERR_NAME_NOT_RESOLVED.
+    //
+    // Strategy: drop the wordmark from the share text; always
+    // hand-craft the URL to `https://enlighten-mint-cafe.me` so neither
+    // the Share API nor a clipboard copy can ever produce the broken
+    // form. window.location.origin is still preferred when the user is
+    // already on the production domain, but we guard against the
+    // preview origin leaking into a share by hard-replacing it with
+    // the canonical production URL.
+    const PROD = 'https://enlighten-mint-cafe.me';
+    const liveOrigin = (typeof window !== 'undefined' && window.location?.origin) || '';
+    const isProd = liveOrigin === PROD || liveOrigin === 'http://enlighten-mint-cafe.me';
+    const url = `${isProd ? liveOrigin : PROD}/landing.html`;
     const shareData = {
-      title: 'The ENLIGHTEN.MINT.CAFE',
-      text: 'Your sanctuary for breathwork, meditation, and spiritual growth. Join The ENLIGHTEN.MINT.CAFE.',
+      title: 'ENLIGHTEN MINT CAFE — Sovereign Engine',
+      text: 'Sanctuary for breathwork, meditation, and spiritual growth. Open the Sovereign Engine →',
       url,
     };
 

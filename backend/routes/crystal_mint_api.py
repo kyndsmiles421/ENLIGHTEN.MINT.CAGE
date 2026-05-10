@@ -170,7 +170,7 @@ async def get_user_nfts(user=Depends(get_current_user)):
                 "image_uri": nft["artifact"]["image_uri"],
                 "attributes": nft["artifact"]["attributes"],
                 "qr_languages": list(nft["artifact"]["qr_offsets"].keys()),
-                "verification_url": f"https://enlighten.mint.cafe/verify/{nft['verification_hash']}",
+                "verification_url": f"https://enlighten-mint-cafe.me/verify/{nft['verification_hash']}",
             })
         
         return {

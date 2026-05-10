@@ -238,7 +238,18 @@ export function MixerProvider({ children }) {
   }, [navigate]);
 
   const handleBroadcast = useCallback(async () => {
-    const shareData = { title: 'ENLIGHTEN.MINT.CAFE', text: 'Sovereign Spiritual Instrument', url: window.location.origin };
+    // V1.2.7 — Always share the canonical hyphenated production URL.
+    // Avoid the "ENLIGHTEN.MINT.CAFE" dotted wordmark in the title so
+    // recipients don't paste it into a URL bar (it isn't a real
+    // domain — `.cafe` TLD without us owning `mint.cafe`).
+    const PROD = 'https://enlighten-mint-cafe.me';
+    const liveOrigin = window.location.origin || '';
+    const isProd = liveOrigin === PROD || liveOrigin === 'http://enlighten-mint-cafe.me';
+    const shareData = {
+      title: 'ENLIGHTEN MINT CAFE — Sovereign Engine',
+      text: 'Sovereign Spiritual Instrument',
+      url: isProd ? liveOrigin : PROD,
+    };
     try {
       if (navigator.share) await navigator.share(shareData);
       else { await navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`); toast.success('Link copied'); }

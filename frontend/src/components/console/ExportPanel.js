@@ -25,7 +25,17 @@ export default function ExportPanel({ selectedAspectRatio, setSelectedAspectRati
           style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)' }} data-testid="export-video">
           <div className="text-[10px] font-bold text-green-400">Export</div>
         </button>
-        <button onClick={() => { navigator.share?.({ title: 'ENLIGHTEN.MINT.CAFE', text: 'Created with the Sovereign Engine', url: window.location.origin }).catch(() => {}); }}
+        <button onClick={() => {
+          // V1.2.7 — Always broadcast the canonical hyphenated URL.
+          const PROD = 'https://enlighten-mint-cafe.me';
+          const liveOrigin = window.location.origin || '';
+          const isProd = liveOrigin === PROD || liveOrigin === 'http://enlighten-mint-cafe.me';
+          navigator.share?.({
+            title: 'ENLIGHTEN MINT CAFE — Sovereign Engine',
+            text: 'Created with the Sovereign Engine',
+            url: isProd ? liveOrigin : PROD,
+          }).catch(() => {});
+        }}
           className="p-3 rounded-xl text-center active:scale-95" style={{ background: 'rgba(56,189,248,0.08)', border: '1px solid rgba(56,189,248,0.2)' }} data-testid="broadcast-btn">
           <div className="text-[10px] font-bold text-sky-400">Broadcast</div>
         </button>

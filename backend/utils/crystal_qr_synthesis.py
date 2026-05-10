@@ -229,7 +229,7 @@ class CrystalQRSynthesis:
             "symbol": self.COLLECTION_SYMBOL,
             "description": f"Sovereign Mastery Certificate for {member_name}. This immutable digital seal represents mastery within the Enlighten.Mint.Sovereign.Trust ecosystem.",
             "image_uri": "https://arweave.net/crystal_render_v1",  # Placeholder - would be actual Arweave URI
-            "external_url": "https://enlighten.mint.cafe/verify",
+            "external_url": "https://enlighten-mint-cafe.me/verify",
             
             # NFT Attributes (OpenSea/Metaplex compatible)
             "attributes": [
@@ -354,7 +354,7 @@ class CrystalQRSynthesis:
             "message": f"Sovereign Mastery: {member_name} READY FOR ASCENSION",
             "mint_record": mint_record,
             "asset_address": artifact["asset_address"],
-            "verification_url": f"https://enlighten.mint.cafe/verify/{artifact['verification_hash']}",
+            "verification_url": f"https://enlighten-mint-cafe.me/verify/{artifact['verification_hash']}",
         }
     
     async def get_user_nfts(self, user_id: str) -> List[Dict[str, Any]]:

@@ -49,7 +49,7 @@ class SovereignEngine:
         
         # SendGrid Configuration
         self.sendgrid_key = os.getenv('SENDGRID_API_KEY')
-        self.from_email = os.getenv('SENDGRID_FROM_EMAIL', 'admin@enlighten.mint.cafe')
+        self.from_email = os.getenv('SENDGRID_FROM_EMAIL', 'admin@enlighten-mint-cafe.me')
         self._sendgrid_client = None
         
         # Status flags
