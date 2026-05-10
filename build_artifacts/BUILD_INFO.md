@@ -13,9 +13,9 @@
 | `aab-sha256.txt` | Integrity hash of the AAB file |
 
 ## Signing Credentials (store these in a password manager NOW)
-- **Keystore alias:** `enlightenmintcafe`
-- **Keystore password:** `Sovereign2026!`
-- **Key password:** `Sovereign2026!` (same)
+- **Keystore alias:** *[REDACTED — see /app/.private]*
+- **Keystore password:** *[REDACTED — see /app/.private]*
+- **Key password:** *[REDACTED — see /app/.private]*
 - **Validity:** 30 years (until 2056-04-12)
 - **Algorithm:** RSA 4096, SHA384withRSA
 

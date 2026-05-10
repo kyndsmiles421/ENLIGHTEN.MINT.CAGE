@@ -3,140 +3,24 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Launch Vault — ENLIGHTEN.MINT.CAFE</title>
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<title>Restricted — ENLIGHTEN.MINT.CAFE</title>
 <style>
   :root { color-scheme: dark; }
-  *, *::before, *::after { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: #000; color: #E6E9F2; font-family: "Cormorant Garamond", Georgia, serif; min-height: 100vh; }
-  .wrap { max-width: 720px; margin: 0 auto; padding: 32px 20px 80px; }
-  .telemetry { font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; font-size: 10px; letter-spacing: 0.28em; color: #94a3b8; text-transform: uppercase; }
-  h1 { font-weight: 400; font-size: 36px; line-height: 1.1; margin: 8px 0 24px; letter-spacing: -0.01em; background: linear-gradient(135deg,#F4D58D 0%,#D4AF37 50%,#9C6A2E 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  h2 { font-weight: 500; font-size: 20px; margin: 40px 0 12px; color: #F4D58D; letter-spacing: 0.01em; }
-  p { font-size: 17px; line-height: 1.5; color: #CBD5E1; margin: 0 0 14px; }
-  .sub { color: #94a3b8; font-size: 14px; font-family: "JetBrains Mono", monospace; }
-  .btn {
-    display: flex; align-items: center; justify-content: space-between;
-    width: 100%; padding: 18px 20px; margin: 10px 0;
-    background: rgba(212,175,55,0.06); border: 1px solid rgba(212,175,55,0.22);
-    border-radius: 14px; color: #F4D58D; text-decoration: none;
-    font-size: 17px; font-weight: 500; font-family: inherit;
-    transition: transform .15s ease, background .2s ease, border-color .2s ease;
-  }
-  .btn:active, .btn:hover { transform: scale(0.985); background: rgba(212,175,55,0.12); border-color: rgba(212,175,55,0.5); }
-  .btn .meta { font-family: "JetBrains Mono", monospace; font-size: 10px; color: #94a3b8; letter-spacing: 0.18em; text-transform: uppercase; text-align: right; }
-  .btn.primary { background: linear-gradient(135deg, rgba(212,175,55,0.18), rgba(156,106,46,0.12)); border-color: rgba(244,213,141,0.55); color: #fff; }
-  .btn.danger  { background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.3); color: #FCA5A5; }
-  .btn.quiet   { background: rgba(255,255,255,0.02); border-color: rgba(255,255,255,0.08); color: #CBD5E1; }
-  .btn.quiet .meta { color: #64748B; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-  .note { margin-top: 16px; padding: 14px 16px; border-left: 2px solid rgba(212,175,55,0.5); background: rgba(212,175,55,0.04); border-radius: 0 10px 10px 0; }
-  .note strong { color: #F4D58D; }
-  footer { margin-top: 60px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); color: #64748B; font-size: 13px; }
-  code { font-family: "JetBrains Mono", monospace; background: rgba(255,255,255,0.05); padding: 2px 7px; border-radius: 4px; font-size: 0.9em; color: #F4D58D; }
+  html, body { margin: 0; padding: 0; background: #000; color: #E6E9F2; font-family: Georgia, serif; min-height: 100vh; }
+  main { max-width: 480px; margin: 14vh auto; padding: 0 24px; text-align: center; }
+  h1 { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 300; font-size: 28px; letter-spacing: .04em; color: #E5C24A; margin: 0 0 18px; }
+  p { color: #C4B5FD; line-height: 1.7; font-size: 15px; }
+  a { color: #E5C24A; text-decoration: none; border-bottom: 1px solid rgba(229,194,74,0.35); }
+  .seal { display: inline-block; width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(229,194,74,0.45); margin-bottom: 22px; line-height: 38px; color: #E5C24A; }
 </style>
 </head>
 <body>
-<div class="wrap">
-
-  <p class="telemetry">Launch Vault · v1.0.2 · Feb 2026</p>
-  <h1>ENLIGHTEN.MINT.CAFE<br>Sovereign Release</h1>
-  <p>Tap any row to download. Long-press any row to copy the link. Files save to your Downloads folder.</p>
-
-  <h2>🔴 The three critical files — v1.0.4 (landing + refraction UI)</h2>
-
-  <a class="btn primary" href="/api/downloads/enlighten-v1.0.4.apk" download>
-    <span>📱 Android APK v1.0.4 — sideload to your phone</span>
-    <span class="meta">34 MB · Landing · Refraction</span>
-  </a>
-
-  <a class="btn primary" href="/api/downloads/enlighten-mint-cafe-v1.0.4.aab" download>
-    <span>🚀 Android App Bundle v1.0.4 — upload to Play Console</span>
-    <span class="meta">33 MB · versionCode 5</span>
-  </a>
-
-  <div class="note">
-    <strong>About the upload keystore.</strong>
-    For security, the keystore is no longer downloadable from this public page.
-    If you need it, grab it directly from <code>/app/build_artifacts/enlighten-mint-cafe-UPLOAD-KEY.keystore</code>
-    via the dev environment and back it up to 1Password or an encrypted drive immediately.
-    Password: <code>Sovereign2026!</code> · alias: <code>enlightenmintcafe</code>
-  </div>
-
-  <h2>🎨 Play Store listing assets</h2>
-
-  <a class="btn" href="/api/downloads/playstore/feature_graphic_1024x500.png" download>
-    <span>Feature graphic (1024 × 500)</span>
-    <span class="meta">152 KB · PNG</span>
-  </a>
-
-  <h2>📱 Phone screenshots (pick any 2–8)</h2>
-  <div class="grid">
-    <a class="btn quiet" href="/api/downloads/playstore/phone_00_landing.jpeg" download>
-      <span>Landing</span><span class="meta">JPEG</span>
-    </a>
-    <a class="btn quiet" href="/api/downloads/playstore/phone_01_hub.jpeg" download>
-      <span>Sovereign Hub</span><span class="meta">JPEG</span>
-    </a>
-    <a class="btn quiet" href="/api/downloads/playstore/phone_02_orbital.jpeg" download>
-      <span>Orbital Hub</span><span class="meta">JPEG</span>
-    </a>
-    <a class="btn quiet" href="/api/downloads/playstore/phone_03_mixer.jpeg" download>
-      <span>Cosmic Mixer</span><span class="meta">JPEG</span>
-    </a>
-    <a class="btn quiet" href="/api/downloads/playstore/phone_04_rock.jpeg" download>
-      <span>Rock Hounding</span><span class="meta">JPEG</span>
-    </a>
-    <a class="btn quiet" href="/api/downloads/playstore/phone_05_reflexology.jpeg" download>
-      <span>Reflex Sanctuary</span><span class="meta">JPEG · new</span>
-    </a>
-  </div>
-
-  <h2>📟 Tablet screenshots (optional)</h2>
-  <div class="grid">
-    <a class="btn quiet" href="/api/downloads/playstore/tablet7_hub.jpeg" download>
-      <span>7" Hub</span><span class="meta">JPEG</span>
-    </a>
-    <a class="btn quiet" href="/api/downloads/playstore/tablet7_mixer.jpeg" download>
-      <span>7" Mixer</span><span class="meta">JPEG</span>
-    </a>
-    <a class="btn quiet" href="/api/downloads/playstore/tablet10_hub.jpeg" download>
-      <span>10" Hub</span><span class="meta">JPEG</span>
-    </a>
-    <a class="btn quiet" href="/api/downloads/playstore/tablet10_mixer.jpeg" download>
-      <span>10" Mixer</span><span class="meta">JPEG</span>
-    </a>
-  </div>
-
-  <h2>📄 Copy-paste text</h2>
-
-  <a class="btn quiet" href="/api/downloads/playstore/LISTING_COPY.md" download>
-    <span>Play Store listing copy (app name + descriptions)</span>
-    <span class="meta">MD</span>
-  </a>
-  <a class="btn quiet" href="/api/downloads/TEST_REPORT.md" download>
-    <span>Regression test report (4/4 pass)</span>
-    <span class="meta">MD</span>
-  </a>
-  <a class="btn quiet" href="/api/downloads/BUILD_INFO.md" download>
-    <span>Build & re-build instructions</span>
-    <span class="meta">MD</span>
-  </a>
-  <a class="btn quiet" href="/api/downloads/INSTALL.md" download>
-    <span>Sideload install steps</span>
-    <span class="meta">MD</span>
-  </a>
-  <a class="btn quiet" href="/api/downloads/KEYSTORE_FINGERPRINTS.txt" download>
-    <span>Keystore SHA fingerprints</span>
-    <span class="meta">TXT</span>
-  </a>
-  <a class="btn quiet" href="/privacy.html">
-    <span>Privacy Policy (for Play Console)</span>
-    <span class="meta">HTML</span>
-  </a>
-
-  <footer>
-    Launch Vault · Operated by Steven Michael · Rapid City, SD · kyndsmiles@gmail.com
-  </footer>
-</div>
+<main>
+  <span class="seal" aria-hidden="true">×</span>
+  <h1>Restricted — Sovereign Vault</h1>
+  <p>This page has been retired for security. Release artifacts and signing materials are no longer published over the public web.</p>
+  <p>If you are the owner, retrieve build artifacts from your authenticated dev environment. <br/><a href="/">Return to ENLIGHTEN.MINT.CAFE</a></p>
+</main>
 </body>
 </html>
