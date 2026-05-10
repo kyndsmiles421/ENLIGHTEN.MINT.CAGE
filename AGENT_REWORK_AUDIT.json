@@ -1,0 +1,3247 @@
+{
+  "generated": "2026-05-10T08:58:23.099110Z",
+  "deletions": [
+    {
+      "sha": "31e0a2a4815f",
+      "date": "2026-04-29 16:22:08 +0000",
+      "deleted_path": "build_artifacts/KEYSTORE_FINGERPRINTS.txt",
+      "commit_subject": "auto-commit for 77fb86cb-f55c-4251-bb2f-ad4c12f5b079",
+      "created_sha": "8c21ac585b2b",
+      "created_date": "2026-04-20 17:44:22 +0000"
+    },
+    {
+      "sha": "31e0a2a4815f",
+      "date": "2026-04-29 16:22:08 +0000",
+      "deleted_path": "build_artifacts/enlighten-mint-cafe-UPLOAD-KEY.keystore",
+      "commit_subject": "auto-commit for 77fb86cb-f55c-4251-bb2f-ad4c12f5b079",
+      "created_sha": "8c21ac585b2b",
+      "created_date": "2026-04-20 17:44:22 +0000"
+    },
+    {
+      "sha": "31e0a2a4815f",
+      "date": "2026-04-29 16:22:08 +0000",
+      "deleted_path": "frontend/android/infinity-sovereign.keystore.legacy",
+      "commit_subject": "auto-commit for 77fb86cb-f55c-4251-bb2f-ad4c12f5b079",
+      "created_sha": "8c21ac585b2b",
+      "created_date": "2026-04-20 17:44:22 +0000"
+    },
+    {
+      "sha": "31e0a2a4815f",
+      "date": "2026-04-29 16:22:08 +0000",
+      "deleted_path": "twa/enlighten.keystore",
+      "commit_subject": "auto-commit for 77fb86cb-f55c-4251-bb2f-ad4c12f5b079",
+      "created_sha": "478cba3c92de",
+      "created_date": "2026-04-13 06:05:09 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/docs/ARCHITECTURE.txt",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "64c7a282c43a",
+      "created_date": "2026-04-17 12:14:04 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/docs/DEMO_SCRIPT.txt",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "64c7a282c43a",
+      "created_date": "2026-04-17 12:14:04 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/docs/README.txt",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "64c7a282c43a",
+      "created_date": "2026-04-17 12:14:04 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/docs/master-print.txt",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "64c7a282c43a",
+      "created_date": "2026-04-17 12:14:04 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/01_landing.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/02_auth.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/03_sovereign_hub.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/04_zen_garden.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/05_breathing.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/06_meditation.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/07_journal.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/08_coach.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/09_reflexology.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/10_herbology.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/11_aromatherapy.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/12_crystals.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/13_oracle.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/14_sacred_texts.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/15_encyclopedia.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/16_numerology.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/17_yoga.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/18_mudras.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/19_mantras.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/20_elixirs.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/21_acupressure.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/22_dreams.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/23_soundscapes.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/24_cosmic_calendar.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/25_forecasts.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/26_trade_circle.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/27_sage_advisors.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/28_membership.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/29_settings.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/30_profile.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/A1_lantern_before.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/A2_lantern_typed.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/A3_lantern_released.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/B1_plant_garden.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/B2_koi_pond.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/B3_sand_drawing.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/B4_rain_scene.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/D10_out.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/D11_me.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/D1_orbit.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/D2_mix.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/D3_culture.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/D4_audio.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/D5_text.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/D6_layer.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/D7_rec.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/D8_fx.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/D9_ai.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/index.html",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof/manifest.json",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "1401d6c3948f",
+      "created_date": "2026-04-26 00:46:38 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/01_auth_before.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/02_auth_filled.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/03_after_login.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/04_breathing_before.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/05_breathing_after.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/06_oracle_before.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/07_oracle_after.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/08_journal_before.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/09_journal_typed.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/10_journal_saved.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/11_herbology_before.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/12_herbology_detail.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/13_crystals_before.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/14_crystals_after.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/15_reflexology_before.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/16_reflexology_after.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/17_coach_before.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/20_trade_before.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/21_lantern_before.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/22_lantern_typed.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/23_lantern_released.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/24_profile_loaded.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/25_dock_idle.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/26_dock_mix_open.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/27_dock_audio_open.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/28_dock_me_open.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/C1_culture_panel.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "539ef3ff3aff",
+      "created_date": "2026-04-26 04:49:30 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/C2_clapstick_active.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "539ef3ff3aff",
+      "created_date": "2026-04-26 04:49:30 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/C3_two_layers_active.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "539ef3ff3aff",
+      "created_date": "2026-04-26 04:49:30 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/C4_three_layers_active.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "539ef3ff3aff",
+      "created_date": "2026-04-26 04:49:30 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/C5_volume_changed.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "539ef3ff3aff",
+      "created_date": "2026-04-26 04:49:30 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/C6_cleared.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "539ef3ff3aff",
+      "created_date": "2026-04-26 04:49:30 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/F1_creator_dashboard.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "34cdfd02266b",
+      "created_date": "2026-04-26 14:15:53 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/F2_creator_export_clicked.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "34cdfd02266b",
+      "created_date": "2026-04-26 14:15:53 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/F3_profile_editing.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "34cdfd02266b",
+      "created_date": "2026-04-26 14:15:53 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/F4_profile_picker_scrolled.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "34cdfd02266b",
+      "created_date": "2026-04-26 14:15:53 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/G10_tesseract.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "ab8522962ad2",
+      "created_date": "2026-04-26 05:58:08 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/G11_dimensional_space.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "ab8522962ad2",
+      "created_date": "2026-04-26 05:58:08 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/G12_multiverse_map.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "ab8522962ad2",
+      "created_date": "2026-04-26 05:58:08 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/G1_realms_gallery.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "ab8522962ad2",
+      "created_date": "2026-04-26 05:58:08 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/G2_rpg_character.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "ab8522962ad2",
+      "created_date": "2026-04-26 05:58:08 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/G3_starseed_adventure.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "ab8522962ad2",
+      "created_date": "2026-04-26 05:58:08 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/G4_starseed_worlds.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "ab8522962ad2",
+      "created_date": "2026-04-26 05:58:08 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/G5_multiverse_realms.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "ab8522962ad2",
+      "created_date": "2026-04-26 05:58:08 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/G6_dream_realms.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "ab8522962ad2",
+      "created_date": "2026-04-26 05:58:08 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/G7_cryptic_quest.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "ab8522962ad2",
+      "created_date": "2026-04-26 05:58:08 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/G8_games.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "ab8522962ad2",
+      "created_date": "2026-04-26 05:58:08 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/G9_observatory.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "ab8522962ad2",
+      "created_date": "2026-04-26 05:58:08 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN10_vr_index.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN11_sovereign_fabricator.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN12_sovereign_canvas.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN13_sovereign_lab.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN14_sovereign_architecture.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN1_avatar_creator.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN2_spiritual_avatar.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN3_avatar_gallery.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN4_creation_stories.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN5_videos.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN6_dreams_visualizer.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN7_daily_briefing.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN8_forecasts.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/GEN9_cosmic_profile.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "f450e63bee14",
+      "created_date": "2026-04-27 05:34:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/M4_props_inside_chamber.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "452c9b3184d7",
+      "created_date": "2026-04-27 05:20:10 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/PSS1_idle_lattice_with_pill.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "e02bca889949",
+      "created_date": "2026-04-27 05:49:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/PSS2_pulled_avatar_gen.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "e02bca889949",
+      "created_date": "2026-04-27 05:49:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/Q01_quests_hub.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "4b6412ad8ada",
+      "created_date": "2026-04-26 04:42:58 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/Q02_quest_expanded.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "4b6412ad8ada",
+      "created_date": "2026-04-26 04:42:58 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/Q03_navigated_to_breathing.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "4b6412ad8ada",
+      "created_date": "2026-04-26 04:42:58 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/RF4_hub_default_levels.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "85d3dc27a6c2",
+      "created_date": "2026-04-27 04:49:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/RF5_PRA_only_violet.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "85d3dc27a6c2",
+      "created_date": "2026-04-27 04:49:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/RF6_BOD_only_orange.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "85d3dc27a6c2",
+      "created_date": "2026-04-27 04:49:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/RF7_all_maxed.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "85d3dc27a6c2",
+      "created_date": "2026-04-27 04:49:45 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/T1_tesseract_mobile_fixed.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "7456c8780bb5",
+      "created_date": "2026-04-27 05:02:13 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/T4_audio_reactive_pulse.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "7456c8780bb5",
+      "created_date": "2026-04-27 05:02:13 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/UN2_starseed_unlocked_owner.jpeg",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "74ad75d7d920",
+      "created_date": "2026-04-27 04:36:54 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/index.html",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/proof2/manifest.json",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "491361ab3f06",
+      "created_date": "2026-04-26 04:37:28 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/qr-code.png",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "04e90d6243d0",
+      "created_date": "2026-04-15 04:34:53 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/showcase.mp4",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "fa7d4a64a703",
+      "created_date": "2026-04-15 04:29:43 +0000"
+    },
+    {
+      "sha": "0a54c4920c6d",
+      "date": "2026-04-27 08:39:02 +0000",
+      "deleted_path": "frontend/public/showcase.webm",
+      "commit_subject": "auto-commit for 9718b755-80e4-42e3-b12a-e2597d4172be",
+      "created_sha": "fa7d4a64a703",
+      "created_date": "2026-04-15 04:29:43 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/enlighten-mint-cafe-v1.0.0.aab",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "8c21ac585b2b",
+      "created_date": "2026-04-20 17:44:22 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/enlighten-mint-cafe-v1.0.1.aab",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "763636743ee6",
+      "created_date": "2026-04-20 18:56:01 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/enlighten-mint-cafe-v1.0.2.aab",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "e170a23dec34",
+      "created_date": "2026-04-20 20:00:02 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/enlighten-mint-cafe-v1.0.3.aab",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "d4d8febaad5e",
+      "created_date": "2026-04-21 05:39:43 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/enlighten-v1.0.1.apk",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "d91dbc06b513",
+      "created_date": "2026-04-20 19:28:58 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/enlighten-v1.0.1.apks",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "d91dbc06b513",
+      "created_date": "2026-04-20 19:28:58 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/enlighten-v1.0.2.apk",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "e170a23dec34",
+      "created_date": "2026-04-20 20:00:02 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/enlighten-v1.0.2.apks",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "e170a23dec34",
+      "created_date": "2026-04-20 20:00:02 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/enlighten-v1.0.3.apk",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "d4d8febaad5e",
+      "created_date": "2026-04-21 05:39:43 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/enlighten-v1.0.3.apks",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "d4d8febaad5e",
+      "created_date": "2026-04-21 05:39:43 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/test_shots/01_sovereign_hub.jpeg",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "e170a23dec34",
+      "created_date": "2026-04-20 20:00:02 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/test_shots/02_orbital_hub_before.jpeg",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "e170a23dec34",
+      "created_date": "2026-04-20 20:00:02 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/test_shots/02_orbital_hub_fixed.jpeg",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "e170a23dec34",
+      "created_date": "2026-04-20 20:00:02 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/test_shots/03_cosmic_mixer.jpeg",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "e170a23dec34",
+      "created_date": "2026-04-20 20:00:02 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/test_shots/04_rock_hounding.jpeg",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "e170a23dec34",
+      "created_date": "2026-04-20 20:00:02 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/test_shots/05_reflexology_study.jpeg",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "d4d8febaad5e",
+      "created_date": "2026-04-21 05:39:43 +0000"
+    },
+    {
+      "sha": "ffe61d3b9edf",
+      "date": "2026-04-25 17:31:45 +0000",
+      "deleted_path": "build_artifacts/test_shots/06_reflexology_locate.jpeg",
+      "commit_subject": "auto-commit for e3dbe73e-bb4c-40a9-95b6-80493a50350f",
+      "created_sha": "d4d8febaad5e",
+      "created_date": "2026-04-21 05:39:43 +0000"
+    },
+    {
+      "sha": "cb4e3e183a63",
+      "date": "2026-04-22 06:41:48 +0000",
+      "deleted_path": "backend/routes/buy_time.py",
+      "commit_subject": "auto-commit for 3aa8b349-260c-42ae-bf93-37aea52e583b",
+      "created_sha": "0e106e4e3224",
+      "created_date": "2026-04-22 05:33:35 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/public/icon-512.png",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "4854131bbe0d",
+      "created_date": "2026-03-30 18:17:44 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/public/images/hero-bridge.png",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "2694ef56e089",
+      "created_date": "2026-04-07 22:08:32 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/public/sovereign-grid.png",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "d09c61ab3bfb",
+      "created_date": "2026-04-09 04:25:05 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/public/sovereign-processor.png",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "d09c61ab3bfb",
+      "created_date": "2026-04-09 04:25:05 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/public/sovereign-trademark.png",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "d09c61ab3bfb",
+      "created_date": "2026-04-09 04:25:05 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/public/store-assets/_captures/cap_dome.png",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "90b6602b4d72",
+      "created_date": "2026-04-18 16:22:26 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/public/store-assets/_captures/cap_dream.png",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "90b6602b4d72",
+      "created_date": "2026-04-18 16:22:26 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/public/store-assets/_captures/cap_evolution.png",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "90b6602b4d72",
+      "created_date": "2026-04-18 16:22:26 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/public/store-assets/_captures/cap_hub.png",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "90b6602b4d72",
+      "created_date": "2026-04-18 16:22:26 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/public/store-assets/_captures/cap_hub2.png",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "90b6602b4d72",
+      "created_date": "2026-04-18 16:22:26 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/public/store-assets/_captures/cap_tesseract.png",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "90b6602b4d72",
+      "created_date": "2026-04-18 16:22:26 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/src/components/AcademyPortal.js",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "5224fc67ea3a",
+      "created_date": "2026-04-10 14:46:49 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/src/components/CircularProtocol.js",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "18bd6f0bb7cd",
+      "created_date": "2026-04-10 14:37:04 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/src/utils/BiometricSync.js",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "8553b34588dd",
+      "created_date": "2026-04-10 14:29:34 +0000"
+    },
+    {
+      "sha": "c89ca3655d3e",
+      "date": "2026-04-19 17:57:56 +0000",
+      "deleted_path": "frontend/src/utils/OmnisExecution.js",
+      "commit_subject": "auto-commit for afed3034-fb51-4f17-aee8-e549270a6fed",
+      "created_sha": "8553b34588dd",
+      "created_date": "2026-04-10 14:29:34 +0000"
+    },
+    {
+      "sha": "75c9f3e1b19e",
+      "date": "2026-04-18 15:59:40 +0000",
+      "deleted_path": "frontend/public/store-assets/icon-1024-source.png",
+      "commit_subject": "auto-commit for e1777515-6e5e-497b-9d78-78bbebbf2c34",
+      "created_sha": "e3c823cc0ea6",
+      "created_date": "2026-04-18 15:44:38 +0000"
+    },
+    {
+      "sha": "75c9f3e1b19e",
+      "date": "2026-04-18 15:59:40 +0000",
+      "deleted_path": "frontend/public/store-assets/splash-source.png",
+      "commit_subject": "auto-commit for e1777515-6e5e-497b-9d78-78bbebbf2c34",
+      "created_sha": "e3c823cc0ea6",
+      "created_date": "2026-04-18 15:44:38 +0000"
+    },
+    {
+      "sha": "75c9f3e1b19e",
+      "date": "2026-04-18 15:59:40 +0000",
+      "deleted_path": "frontend/public/store-assets/tile-source.png",
+      "commit_subject": "auto-commit for e1777515-6e5e-497b-9d78-78bbebbf2c34",
+      "created_sha": "e3c823cc0ea6",
+      "created_date": "2026-04-18 15:44:38 +0000"
+    },
+    {
+      "sha": "cec00c4e0abd",
+      "date": "2026-04-18 06:52:51 +0000",
+      "deleted_path": "frontend/src/components/JourneyTrail.js",
+      "commit_subject": "auto-commit for 0f6089ae-d786-4ec4-aaff-b6e4a3f8b0c9",
+      "created_sha": "1b267ed5e8cb",
+      "created_date": "2026-04-18 06:43:26 +0000"
+    },
+    {
+      "sha": "cec00c4e0abd",
+      "date": "2026-04-18 06:52:51 +0000",
+      "deleted_path": "frontend/src/context/JourneyContext.js",
+      "commit_subject": "auto-commit for 0f6089ae-d786-4ec4-aaff-b6e4a3f8b0c9",
+      "created_sha": "1b267ed5e8cb",
+      "created_date": "2026-04-18 06:43:26 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "generate-store-assets.js",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "6121c31df9f9",
+      "created_date": "2026-04-17 23:40:45 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "promo_videos/01_obsidian_void_awakening.mp4",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "b39be5f3ca0b",
+      "created_date": "2026-04-09 19:11:07 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "promo_videos/02_crystal_rainbow_refraction.mp4",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "f438ccd07b5f",
+      "created_date": "2026-04-09 18:28:38 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "promo_videos/03_digital_oracle_interface.mp4",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "f438ccd07b5f",
+      "created_date": "2026-04-09 18:28:38 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "promo_videos/04_wellness_transformation.mp4",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "b39be5f3ca0b",
+      "created_date": "2026-04-09 19:11:07 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "promo_videos/05_mobile_sanctuary_reveal.mp4",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "b39be5f3ca0b",
+      "created_date": "2026-04-09 19:11:07 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "promo_videos/06_immersive_experience.mp4",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "b39be5f3ca0b",
+      "created_date": "2026-04-09 19:11:07 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "promo_videos/08_brand_finale.mp4",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "b39be5f3ca0b",
+      "created_date": "2026-04-09 19:11:07 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "promo_videos/balance_test.mp4",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "b39be5f3ca0b",
+      "created_date": "2026-04-09 19:11:07 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "promo_videos/demo_enlighten_cafe.mp4",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "227b15c217bb",
+      "created_date": "2026-04-09 18:03:00 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "promo_videos/enlighten_cafe_promo_84s.mp4",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "b39be5f3ca0b",
+      "created_date": "2026-04-09 19:11:07 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "promo_videos/filelist.txt",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "b39be5f3ca0b",
+      "created_date": "2026-04-09 19:11:07 +0000"
+    },
+    {
+      "sha": "64f19fd615a5",
+      "date": "2026-04-18 02:04:14 +0000",
+      "deleted_path": "promo_videos/generation_log.txt",
+      "commit_subject": "auto-commit for 37a0252a-3059-49f5-a7ea-8f6143ef254f",
+      "created_sha": "f438ccd07b5f",
+      "created_date": "2026-04-09 18:28:38 +0000"
+    },
+    {
+      "sha": "cda1b01d26d2",
+      "date": "2026-04-17 06:37:19 +0000",
+      "deleted_path": "frontend/src/pages/BibleStudyWorkbench.js",
+      "commit_subject": "auto-commit for deb6779a-d01f-47cd-b59c-b907ff363325",
+      "created_sha": "ccca3223284f",
+      "created_date": "2026-04-17 05:45:02 +0000"
+    },
+    {
+      "sha": "cda1b01d26d2",
+      "date": "2026-04-17 06:37:19 +0000",
+      "deleted_path": "frontend/src/pages/CarpentryWorkbench.js",
+      "commit_subject": "auto-commit for deb6779a-d01f-47cd-b59c-b907ff363325",
+      "created_sha": "9d16d8db0630",
+      "created_date": "2026-04-17 04:09:11 +0000"
+    },
+    {
+      "sha": "cda1b01d26d2",
+      "date": "2026-04-17 06:37:19 +0000",
+      "deleted_path": "frontend/src/pages/ChildCareWorkbench.js",
+      "commit_subject": "auto-commit for deb6779a-d01f-47cd-b59c-b907ff363325",
+      "created_sha": "62cf66b26c35",
+      "created_date": "2026-04-17 05:55:32 +0000"
+    },
+    {
+      "sha": "cda1b01d26d2",
+      "date": "2026-04-17 06:37:19 +0000",
+      "deleted_path": "frontend/src/pages/ElderCareWorkbench.js",
+      "commit_subject": "auto-commit for deb6779a-d01f-47cd-b59c-b907ff363325",
+      "created_sha": "62cf66b26c35",
+      "created_date": "2026-04-17 05:55:32 +0000"
+    },
+    {
+      "sha": "cda1b01d26d2",
+      "date": "2026-04-17 06:37:19 +0000",
+      "deleted_path": "frontend/src/pages/ElectricalWorkbench.js",
+      "commit_subject": "auto-commit for deb6779a-d01f-47cd-b59c-b907ff363325",
+      "created_sha": "ccca3223284f",
+      "created_date": "2026-04-17 05:45:02 +0000"
+    },
+    {
+      "sha": "cda1b01d26d2",
+      "date": "2026-04-17 06:37:19 +0000",
+      "deleted_path": "frontend/src/pages/LandscapingWorkbench.js",
+      "commit_subject": "auto-commit for deb6779a-d01f-47cd-b59c-b907ff363325",
+      "created_sha": "ccca3223284f",
+      "created_date": "2026-04-17 05:45:02 +0000"
+    },
+    {
+      "sha": "cda1b01d26d2",
+      "date": "2026-04-17 06:37:19 +0000",
+      "deleted_path": "frontend/src/pages/MasonryWorkbench.js",
+      "commit_subject": "auto-commit for deb6779a-d01f-47cd-b59c-b907ff363325",
+      "created_sha": "c3f561bdd8c8",
+      "created_date": "2026-04-17 03:57:15 +0000"
+    },
+    {
+      "sha": "cda1b01d26d2",
+      "date": "2026-04-17 06:37:19 +0000",
+      "deleted_path": "frontend/src/pages/NursingWorkbench.js",
+      "commit_subject": "auto-commit for deb6779a-d01f-47cd-b59c-b907ff363325",
+      "created_sha": "ccca3223284f",
+      "created_date": "2026-04-17 05:45:02 +0000"
+    },
+    {
+      "sha": "cda1b01d26d2",
+      "date": "2026-04-17 06:37:19 +0000",
+      "deleted_path": "frontend/src/pages/PlumbingWorkbench.js",
+      "commit_subject": "auto-commit for deb6779a-d01f-47cd-b59c-b907ff363325",
+      "created_sha": "ccca3223284f",
+      "created_date": "2026-04-17 05:45:02 +0000"
+    },
+    {
+      "sha": "703c0c523edc",
+      "date": "2026-04-08 06:23:30 +0000",
+      "deleted_path": "frontend/public/images/trademark-banner.png",
+      "commit_subject": "auto-commit for 8ab97f60-801a-425e-9096-8ac66cd112a2",
+      "created_sha": "0cd3e428cba7",
+      "created_date": "2026-04-08 06:13:26 +0000"
+    },
+    {
+      "sha": "703c0c523edc",
+      "date": "2026-04-08 06:23:30 +0000",
+      "deleted_path": "frontend/src/components/RainbowTrademarkBanner.js",
+      "commit_subject": "auto-commit for 8ab97f60-801a-425e-9096-8ac66cd112a2",
+      "created_sha": "b840be760c04",
+      "created_date": "2026-04-08 06:20:15 +0000"
+    },
+    {
+      "sha": "4854131bbe0d",
+      "date": "2026-03-30 18:17:44 +0000",
+      "deleted_path": "frontend/src/components/BackToTop.js",
+      "commit_subject": "auto-commit for d1b74062-58d9-44fc-aca4-f38065a58f4e",
+      "created_sha": "9ff642456081",
+      "created_date": "2026-03-27 06:23:31 +0000"
+    },
+    {
+      "sha": "4854131bbe0d",
+      "date": "2026-03-30 18:17:44 +0000",
+      "deleted_path": "frontend/src/components/QuickMeditateFAB.js",
+      "commit_subject": "auto-commit for d1b74062-58d9-44fc-aca4-f38065a58f4e",
+      "created_sha": "1c323d4dcf82",
+      "created_date": "2026-03-30 15:30:38 +0000"
+    },
+    {
+      "sha": "4854131bbe0d",
+      "date": "2026-03-30 18:17:44 +0000",
+      "deleted_path": "frontend/src/components/VoiceCommandButton.js",
+      "commit_subject": "auto-commit for d1b74062-58d9-44fc-aca4-f38065a58f4e",
+      "created_sha": "61599beb291b",
+      "created_date": "2026-03-30 14:06:21 +0000"
+    }
+  ],
+  "rewrites": [
+    {
+      "sha": "c3920ef09a1d",
+      "date": "2026-04-21 06:08:51 +0000",
+      "subject": "auto-commit for 5ed44359-58fb-4496-b0b4-4850615bd9aa",
+      "path": "frontend/public/landing.html",
+      "lines_added": 206,
+      "lines_removed": 234,
+      "net": -28
+    },
+    {
+      "sha": "bce58e1880f1",
+      "date": "2026-04-16 23:29:17 +0000",
+      "subject": "auto-commit for d23ee077-eaf0-403c-8da8-19f3f46f991c",
+      "path": "frontend/src/components/InteractiveModule.js",
+      "lines_added": 511,
+      "lines_removed": 264,
+      "net": 247
+    },
+    {
+      "sha": "e204e8d65c6a",
+      "date": "2026-04-15 18:10:07 +0000",
+      "subject": "auto-commit for cc642beb-0a7c-4383-aa62-f22c8f4a3674",
+      "path": "frontend/src/pages/Observatory.js",
+      "lines_added": 387,
+      "lines_removed": 292,
+      "net": 95
+    },
+    {
+      "sha": "22ae20b11661",
+      "date": "2026-04-13 22:40:44 +0000",
+      "subject": "auto-commit for d8ebe929-c061-4784-bf22-2fde81c5a876",
+      "path": "frontend/src/components/UnifiedCreatorConsole.js",
+      "lines_added": 481,
+      "lines_removed": 486,
+      "net": -5
+    },
+    {
+      "sha": "34f65293e826",
+      "date": "2026-04-13 22:00:29 +0000",
+      "subject": "auto-commit for 99073166-ac32-4eac-a76c-11c61240c72f",
+      "path": "frontend/src/components/UnifiedCreatorConsole.js",
+      "lines_added": 351,
+      "lines_removed": 280,
+      "net": 71
+    },
+    {
+      "sha": "480c4f48051a",
+      "date": "2026-04-13 13:52:57 +0000",
+      "subject": "auto-commit for 9594db2c-449d-443e-a47d-b38ef5922a6a",
+      "path": "frontend/src/components/UnifiedCreatorConsole.js",
+      "lines_added": 417,
+      "lines_removed": 379,
+      "net": 38
+    },
+    {
+      "sha": "cfa3615e72ac",
+      "date": "2026-04-10 02:50:24 +0000",
+      "subject": "auto-commit for 55f23cf5-3d9d-4476-880f-257a2b9b3017",
+      "path": "frontend/src/pages/OrbitalHub.js",
+      "lines_added": 429,
+      "lines_removed": 288,
+      "net": 141
+    },
+    {
+      "sha": "caa7fa645cc3",
+      "date": "2026-04-10 02:21:54 +0000",
+      "subject": "auto-commit for 90a73bcc-0fa4-4015-b637-a1635e1dc0f2",
+      "path": "frontend/src/pages/OrbitalHub.js",
+      "lines_added": 729,
+      "lines_removed": 401,
+      "net": 328
+    },
+    {
+      "sha": "2dc4e61bf4b8",
+      "date": "2026-04-10 01:35:56 +0000",
+      "subject": "auto-commit for 42fe7c7b-9b1f-43d2-bd7a-20053181252f",
+      "path": "frontend/src/pages/OrbitalHub.js",
+      "lines_added": 283,
+      "lines_removed": 285,
+      "net": -2
+    },
+    {
+      "sha": "0f65820959c7",
+      "date": "2026-04-09 23:00:48 +0000",
+      "subject": "auto-commit for b6368f75-6c32-4808-a5ed-c1f2c08da7d2",
+      "path": "frontend/src/pages/OrbitalHub.js",
+      "lines_added": 280,
+      "lines_removed": 752,
+      "net": -472
+    },
+    {
+      "sha": "66a4a19718e4",
+      "date": "2026-04-09 07:33:38 +0000",
+      "subject": "auto-commit for e41062a0-c611-480f-a166-ade42ea08554",
+      "path": "frontend/src/utils/EnlightenOS.js",
+      "lines_added": 229,
+      "lines_removed": 246,
+      "net": -17
+    },
+    {
+      "sha": "34582f343283",
+      "date": "2026-04-09 07:19:30 +0000",
+      "subject": "auto-commit for 744b25c9-8440-49f7-a9fc-77fb8aea88f5",
+      "path": "frontend/src/utils/EnlightenOS.js",
+      "lines_added": 219,
+      "lines_removed": 292,
+      "net": -73
+    },
+    {
+      "sha": "59bcbcfbbd3e",
+      "date": "2026-04-09 07:12:41 +0000",
+      "subject": "auto-commit for 9cfdac69-0f07-4538-9594-c2a259565727",
+      "path": "frontend/src/utils/EnlightenOS.js",
+      "lines_added": 599,
+      "lines_removed": 920,
+      "net": -321
+    },
+    {
+      "sha": "173a3e39eea9",
+      "date": "2026-04-09 06:35:25 +0000",
+      "subject": "auto-commit for 6d32e68a-eb85-4c8d-8c66-29516c89fa5f",
+      "path": "frontend/src/utils/EnlightenOS.js",
+      "lines_added": 517,
+      "lines_removed": 228,
+      "net": 289
+    },
+    {
+      "sha": "63825ce3cd2d",
+      "date": "2026-04-05 08:41:07 +0000",
+      "subject": "auto-commit for 3b7427a7-feaa-4a97-bc76-090918a86008",
+      "path": "frontend/src/pages/EnlightenMintHub.js",
+      "lines_added": 409,
+      "lines_removed": 430,
+      "net": -21
+    },
+    {
+      "sha": "4ae29f4a1cfc",
+      "date": "2026-04-05 07:55:30 +0000",
+      "subject": "auto-commit for eda2e8df-4644-42dd-9f1a-9fe006a39104",
+      "path": "frontend/src/pages/CelestialDome.js",
+      "lines_added": 518,
+      "lines_removed": 213,
+      "net": 305
+    },
+    {
+      "sha": "ebab97ce0ce5",
+      "date": "2026-04-04 18:27:53 +0000",
+      "subject": "auto-commit for 3085bac6-bc7a-4a8b-8284-2b67eb2cd894",
+      "path": "frontend/src/components/TieredNavigation.js",
+      "lines_added": 399,
+      "lines_removed": 318,
+      "net": 81
+    },
+    {
+      "sha": "b855a8a5305f",
+      "date": "2026-04-04 03:19:40 +0000",
+      "subject": "auto-commit for 918c175b-816f-46ad-9925-573664d7fc04",
+      "path": "frontend/src/pages/OrbitalHub.js",
+      "lines_added": 532,
+      "lines_removed": 331,
+      "net": 201
+    },
+    {
+      "sha": "7ce13906876a",
+      "date": "2026-04-04 01:34:48 +0000",
+      "subject": "auto-commit for 853e60cd-a293-4252-ab76-47f06e329451",
+      "path": "frontend/src/pages/OrbitalHub.js",
+      "lines_added": 276,
+      "lines_removed": 211,
+      "net": 65
+    },
+    {
+      "sha": "2cfa06c2231e",
+      "date": "2026-04-03 22:40:38 +0000",
+      "subject": "auto-commit for 2f9eac82-6065-4c08-a11a-428b1e6c66f7",
+      "path": "backend/routes/sovereigns.py",
+      "lines_added": 447,
+      "lines_removed": 329,
+      "net": 118
+    },
+    {
+      "sha": "43b02bfe25d8",
+      "date": "2026-04-03 21:13:47 +0000",
+      "subject": "auto-commit for f34c0b0f-60eb-4ee5-bd2c-337afb2752f8",
+      "path": "frontend/src/pages/SovereignAdvisors.js",
+      "lines_added": 395,
+      "lines_removed": 251,
+      "net": 144
+    },
+    {
+      "sha": "55f85e9d4c7c",
+      "date": "2026-04-03 18:57:12 +0000",
+      "subject": "auto-commit for 88b45553-fe6e-4b59-98ca-12dd90ac7d5a",
+      "path": "frontend/src/pages/AcademyPage.js",
+      "lines_added": 338,
+      "lines_removed": 478,
+      "net": -140
+    },
+    {
+      "sha": "3d574fc420e8",
+      "date": "2026-04-03 18:34:30 +0000",
+      "subject": "auto-commit for a4a8b030-46d6-4806-874a-1bb2a9c1757b",
+      "path": "frontend/src/pages/AcademyPage.js",
+      "lines_added": 906,
+      "lines_removed": 357,
+      "net": 549
+    },
+    {
+      "sha": "95a1238f7d43",
+      "date": "2026-04-02 23:08:56 +0000",
+      "subject": "auto-commit for 029eeed8-b15a-47ef-8ccf-ad6eb508402e",
+      "path": "frontend/src/pages/SuanpanMixer.js",
+      "lines_added": 530,
+      "lines_removed": 432,
+      "net": 98
+    },
+    {
+      "sha": "674ba810c7f8",
+      "date": "2026-04-02 22:40:47 +0000",
+      "subject": "auto-commit for 2a968f42-b8a1-4e22-8e88-76f896783392",
+      "path": "frontend/src/pages/SuanpanMixer.js",
+      "lines_added": 701,
+      "lines_removed": 590,
+      "net": 111
+    },
+    {
+      "sha": "0e7266ce1e72",
+      "date": "2026-04-02 09:50:59 +0000",
+      "subject": "auto-commit for 8b1ce2a8-eee1-499f-92b8-7b0d2827522e",
+      "path": "frontend/src/pages/OrbitalHub.js",
+      "lines_added": 341,
+      "lines_removed": 282,
+      "net": 59
+    },
+    {
+      "sha": "e393a0bdf339",
+      "date": "2026-04-02 02:56:02 +0000",
+      "subject": "auto-commit for 6d53d7ef-d23e-4b86-8f10-319b74a33d45",
+      "path": "backend/tests/test_iteration189_power_spots_celestial.py",
+      "lines_added": 426,
+      "lines_removed": 312,
+      "net": 114
+    },
+    {
+      "sha": "d7ac46322e27",
+      "date": "2026-04-02 02:40:00 +0000",
+      "subject": "auto-commit for f7900bf7-7f96-4c04-b2ba-9cc403fcd9e7",
+      "path": "frontend/src/pages/CosmicMap.js",
+      "lines_added": 382,
+      "lines_removed": 218,
+      "net": 164
+    },
+    {
+      "sha": "ff0322190aa1",
+      "date": "2026-04-02 01:50:27 +0000",
+      "subject": "auto-commit for a39ebdc1-195b-4629-a8d1-d262a5849ba8",
+      "path": "frontend/src/pages/MasteryAvenues.js",
+      "lines_added": 561,
+      "lines_removed": 240,
+      "net": 321
+    },
+    {
+      "sha": "faf38fbbc0bd",
+      "date": "2026-04-01 00:44:35 +0000",
+      "subject": "auto-commit for 89bdc8d0-4cbb-40f3-8617-2d95d5ff5d61",
+      "path": "frontend/src/pages/DreamRealms.js",
+      "lines_added": 355,
+      "lines_removed": 520,
+      "net": -165
+    },
+    {
+      "sha": "3ff14f49a27f",
+      "date": "2026-03-30 17:31:08 +0000",
+      "subject": "auto-commit for 2f62246d-e118-49b8-9980-e6206e07774e",
+      "path": "frontend/src/components/SmartDock.js",
+      "lines_added": 293,
+      "lines_removed": 295,
+      "net": -2
+    },
+    {
+      "sha": "b0f0a4ec2671",
+      "date": "2026-03-30 02:50:48 +0000",
+      "subject": "auto-commit for ef3e31b1-f0ad-4b53-a60f-58d531d1c425",
+      "path": "frontend/src/components/CosmicMixer.js",
+      "lines_added": 329,
+      "lines_removed": 214,
+      "net": 115
+    },
+    {
+      "sha": "30f048dc7acf",
+      "date": "2026-03-29 23:18:41 +0000",
+      "subject": "auto-commit for bb77ea22-f254-4c99-b622-46a5a9969f29",
+      "path": "frontend/src/pages/LiveRoom.js",
+      "lines_added": 601,
+      "lines_removed": 242,
+      "net": 359
+    },
+    {
+      "sha": "1c1846935170",
+      "date": "2026-03-29 22:05:17 +0000",
+      "subject": "auto-commit for d2b5e162-315a-499e-b0b2-4e5c3db2a571",
+      "path": "frontend/src/pages/CreatorDashboard.js",
+      "lines_added": 433,
+      "lines_removed": 217,
+      "net": 216
+    },
+    {
+      "sha": "0cba7ad2cf5b",
+      "date": "2026-03-29 17:42:35 +0000",
+      "subject": "auto-commit for 9511d59f-e5f1-412f-ab4b-5509f278e2d2",
+      "path": "frontend/src/pages/Dashboard.js",
+      "lines_added": 647,
+      "lines_removed": 412,
+      "net": 235
+    },
+    {
+      "sha": "5aef43010138",
+      "date": "2026-03-29 08:44:27 +0000",
+      "subject": "auto-commit for 2dfad2ac-adef-4bd5-a6ea-864274db1cc1",
+      "path": "frontend/src/pages/Crystals.js",
+      "lines_added": 576,
+      "lines_removed": 274,
+      "net": 302
+    },
+    {
+      "sha": "5aef43010138",
+      "date": "2026-03-29 08:44:27 +0000",
+      "subject": "auto-commit for 2dfad2ac-adef-4bd5-a6ea-864274db1cc1",
+      "path": "frontend/src/pages/Encyclopedia.js",
+      "lines_added": 466,
+      "lines_removed": 234,
+      "net": 232
+    },
+    {
+      "sha": "7f9b1792b54a",
+      "date": "2026-03-29 07:57:21 +0000",
+      "subject": "auto-commit for 54c186ec-6064-4485-825b-ac962cd9cfb2",
+      "path": "frontend/src/pages/CreationStories.js",
+      "lines_added": 765,
+      "lines_removed": 471,
+      "net": 294
+    },
+    {
+      "sha": "1e33d563fb13",
+      "date": "2026-03-29 05:03:26 +0000",
+      "subject": "auto-commit for 76142348-16aa-4df3-a5d1-dc0e84fe928e",
+      "path": "frontend/src/components/GuidedTour.js",
+      "lines_added": 326,
+      "lines_removed": 230,
+      "net": 96
+    },
+    {
+      "sha": "e81ed5100f2f",
+      "date": "2026-03-27 04:56:24 +0000",
+      "subject": "auto-commit for a3c38845-9de0-4b7f-874c-3f0d77475d71",
+      "path": "frontend/src/components/Navigation.js",
+      "lines_added": 450,
+      "lines_removed": 252,
+      "net": 198
+    },
+    {
+      "sha": "94175be4c965",
+      "date": "2026-03-26 06:23:30 +0000",
+      "subject": "auto-commit for afb072ef-4a8f-464b-a09b-88501fedf541",
+      "path": "frontend/src/pages/StarChart.js",
+      "lines_added": 354,
+      "lines_removed": 348,
+      "net": 6
+    },
+    {
+      "sha": "1a35b2527767",
+      "date": "2026-03-25 12:13:42 +0000",
+      "subject": "auto-commit for 7ea7ee40-16ad-448b-b4a7-9a5cc9704054",
+      "path": "frontend/src/pages/ZenGarden.js",
+      "lines_added": 556,
+      "lines_removed": 276,
+      "net": 280
+    },
+    {
+      "sha": "08108741db83",
+      "date": "2026-03-25 10:33:16 +0000",
+      "subject": "auto-commit for ba8788f2-29bd-46d6-8703-33ed25d8a0d9",
+      "path": "frontend/src/pages/Meditation.js",
+      "lines_added": 489,
+      "lines_removed": 252,
+      "net": 237
+    }
+  ],
+  "renames": [
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ApexCreatorConsole.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/CinematicWalkthrough.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/CommandMode.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ConstellationMap.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/CosmicAssistant.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/CosmicBackground.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/CosmicToolbar.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/CreatorMixer.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/CreatorMixerUI.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/CrystalRadianceVisualizer.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/CrystalResonancePanel.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/DeepDataNode.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/DeepDiveSearch.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/DirectorTimeline.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/EconomyPortal.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ElasticNodule.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/EmergencyShutOff.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/EtherNode.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ExpandableInfoCard.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/FloatingAssistant.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/GlobalNodalMap.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/GlowPortal.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/GrandFinaleCoordinator.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/HTTPSHub.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/HarmonicStatus.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/IntroVideo.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/LearningToggle.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/MarketplaceGallery.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/MeshCanvasRenderer.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/MixerV27.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/OrbCorner.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/OrbitalNavigation.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/PaymentGate.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/PersistentWaveform.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/PerspectiveToggle.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/PulseEchoVisualizer.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/QuestHUD.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/QuickMeditationWidget.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/RefractionButton.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/SageAudience.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/SageAvatar.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ShambhalaCrystalSystem.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ShambhalaFrontSide.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/Skeletons.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/SovereignHUD.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/SovereignUI.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/SpatialRecorder.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/TieredAccess.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/TieredNavigation.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/TrialGraduation.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/UniversalCommand.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/VellumOverlay.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/VisualFilters.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ZeroPointExperience.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/orbital/ActiveSatellite.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/orbital/CentralOrb.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/orbital/ConnectionLines.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/orbital/GravityField.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/orbital/SatelliteInspector.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/orbital/WeatherRibbon.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/accordion.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/alert-dialog.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/aspect-ratio.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/badge.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/breadcrumb.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/carousel.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/collapsible.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/context-menu.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/drawer.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/dropdown-menu.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/hover-card.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/input-otp.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/menubar.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/navigation-menu.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/pagination.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/popover.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/radio-group.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/resizable.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/scroll-area.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/sheet.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/switch.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/tabs.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/textarea.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/toaster.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/toggle-group.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/ui/tooltip.jsx",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "34cdfd02266b",
+      "date": "2026-04-26 14:15:53 +0000",
+      "subject": "auto-commit for 905cab09-fb26-487f-863b-ded5538ef983",
+      "rename": "{frontend/src => _orphans/frontend}/components/workshop/WorkshopGameStage.js",
+      "similarity_pct": 100
+    },
+    {
+      "sha": "8c21ac585b2b",
+      "date": "2026-04-20 17:44:22 +0000",
+      "subject": "auto-commit for 895648c2-7ba6-486a-b618-e3262ad3786f",
+      "rename": "frontend/android/app/src/androidTest/java/{com/getcapacitor/myapp => cafe/mint/enlighten}/ExampleInstrumentedTest.java",
+      "similarity_pct": 78
+    },
+    {
+      "sha": "8c21ac585b2b",
+      "date": "2026-04-20 17:44:22 +0000",
+      "subject": "auto-commit for 895648c2-7ba6-486a-b618-e3262ad3786f",
+      "rename": "frontend/android/app/src/main/java/{com/cosmiccollective/app => cafe/mint/enlighten}/MainActivity.java",
+      "similarity_pct": 73
+    },
+    {
+      "sha": "8c21ac585b2b",
+      "date": "2026-04-20 17:44:22 +0000",
+      "subject": "auto-commit for 895648c2-7ba6-486a-b618-e3262ad3786f",
+      "rename": "frontend/android/app/src/test/java/{com/getcapacitor/myapp => cafe/mint/enlighten}/ExampleUnitTest.java",
+      "similarity_pct": 91
+    },
+    {
+      "sha": "8c21ac585b2b",
+      "date": "2026-04-20 17:44:22 +0000",
+      "subject": "auto-commit for 895648c2-7ba6-486a-b618-e3262ad3786f",
+      "rename": "frontend/android/{infinity-sovereign.keystore => infinity-sovereign.keystore.legacy}",
+      "similarity_pct": 100
+    }
+  ],
+  "high_churn": [
+    {
+      "path": "memory/PRD.md",
+      "modification_count": 576
+    },
+    {
+      "path": "frontend/src/App.js",
+      "modification_count": 273
+    },
+    {
+      "path": ".gitignore",
+      "modification_count": 174
+    },
+    {
+      "path": "backend/server.py",
+      "modification_count": 127
+    },
+    {
+      "path": "frontend/src/index.css",
+      "modification_count": 113
+    },
+    {
+      "path": "frontend/src/pages/SovereignHub.js",
+      "modification_count": 90
+    },
+    {
+      "path": "frontend/src/components/Navigation.js",
+      "modification_count": 77
+    },
+    {
+      "path": "frontend/src/pages/Landing.js",
+      "modification_count": 69
+    },
+    {
+      "path": "frontend/src/pages/Dashboard.js",
+      "modification_count": 67
+    },
+    {
+      "path": "frontend/src/pages/OrbitalHub.js",
+      "modification_count": 44
+    },
+    {
+      "path": "frontend/src/components/SmartDock.js",
+      "modification_count": 40
+    },
+    {
+      "path": "frontend/src/components/UnifiedCreatorConsole.js",
+      "modification_count": 40
+    },
+    {
+      "path": "frontend/src/pages/Meditation.js",
+      "modification_count": 37
+    },
+    {
+      "path": "frontend/src/pages/StarChart.js",
+      "modification_count": 34
+    },
+    {
+      "path": "frontend/src/components/CosmicMixer.js",
+      "modification_count": 28
+    },
+    {
+      "path": "frontend/public/index.html",
+      "modification_count": 27
+    },
+    {
+      "path": "frontend/src/pages/CosmicMixerPage.js",
+      "modification_count": 25
+    },
+    {
+      "path": "frontend/src/pages/TesseractExperience.js",
+      "modification_count": 23
+    },
+    {
+      "path": "frontend/src/pages/Settings.js",
+      "modification_count": 22
+    },
+    {
+      "path": "frontend/src/pages/TradeCircle.js",
+      "modification_count": 22
+    },
+    {
+      "path": "frontend/src/pages/Breathing.js",
+      "modification_count": 21
+    },
+    {
+      "path": "frontend/src/pages/StarseedAdventure.js",
+      "modification_count": 21
+    },
+    {
+      "path": "frontend/src/pages/Oracle.js",
+      "modification_count": 20
+    },
+    {
+      "path": "frontend/src/pages/RPGPage.js",
+      "modification_count": 20
+    },
+    {
+      "path": "frontend/src/pages/FractalEngine.js",
+      "modification_count": 20
+    },
+    {
+      "path": "frontend/src/styles/VoidShield.css",
+      "modification_count": 20
+    },
+    {
+      "path": "frontend/src/pages/SuanpanMixer.js",
+      "modification_count": 19
+    },
+    {
+      "path": "frontend/src/pages/VirtualReality.js",
+      "modification_count": 19
+    },
+    {
+      "path": "frontend/src/state/ProcessorState.js",
+      "modification_count": 19
+    },
+    {
+      "path": "frontend/src/components/BackToHub.js",
+      "modification_count": 19
+    },
+    {
+      "path": "frontend/src/pages/Frequencies.js",
+      "modification_count": 19
+    },
+    {
+      "path": "backend/routes/omnis_nodule.py",
+      "modification_count": 19
+    },
+    {
+      "path": "memory/test_credentials.md",
+      "modification_count": 18
+    },
+    {
+      "path": "frontend/src/components/EmergencyShutOff.js",
+      "modification_count": 18
+    },
+    {
+      "path": "frontend/src/components/InteractiveModule.js",
+      "modification_count": 17
+    },
+    {
+      "path": "frontend/src/pages/Herbology.js",
+      "modification_count": 17
+    },
+    {
+      "path": "frontend/package.json",
+      "modification_count": 17
+    },
+    {
+      "path": "frontend/public/AppController.js",
+      "modification_count": 17
+    },
+    {
+      "path": "frontend/src/pages/Affirmations.js",
+      "modification_count": 16
+    },
+    {
+      "path": "frontend/src/pages/Pricing.js",
+      "modification_count": 16
+    },
+    {
+      "path": "frontend/src/pages/ProfilePage.js",
+      "modification_count": 16
+    },
+    {
+      "path": "backend/routes/ai_visuals.py",
+      "modification_count": 16
+    },
+    {
+      "path": "frontend/src/components/SpatialRoom.js",
+      "modification_count": 16
+    },
+    {
+      "path": "frontend/src/pages/Observatory.js",
+      "modification_count": 16
+    },
+    {
+      "path": "backend/routes/rpg.py",
+      "modification_count": 15
+    },
+    {
+      "path": "frontend/src/pages/AcademyPage.js",
+      "modification_count": 15
+    },
+    {
+      "path": "frontend/src/pages/Soundscapes.js",
+      "modification_count": 15
+    },
+    {
+      "path": "frontend/src/pages/Videos.js",
+      "modification_count": 15
+    },
+    {
+      "path": "frontend/src/components/GuidedTour.js",
+      "modification_count": 15
+    },
+    {
+      "path": "frontend/src/pages/Crystals.js",
+      "modification_count": 15
+    },
+    {
+      "path": "frontend/src/pages/Mudras.js",
+      "modification_count": 15
+    },
+    {
+      "path": "frontend/src/pages/Journey.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/components/UniversalWorkshop.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/context/MixerContext.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/context/SensoryContext.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/pages/Forecasts.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/pages/Hooponopono.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/pages/LightTherapy.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/pages/LiveRoom.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/pages/Mantras.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/pages/Tantra.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/public/manifest.json",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/pages/Exercises.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/components/ApexCreatorConsole.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/utils/EnlightenOS.js",
+      "modification_count": 14
+    },
+    {
+      "path": "frontend/src/components/games/ChamberMiniGame.js",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/src/pages/CreationStories.js",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/src/pages/CreatorDashboard.js",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/src/pages/Friends.js",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/src/pages/MultiverseRealms.js",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/src/pages/Aromatherapy.js",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/public/landing.html",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/public/sw.js",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/src/pages/MoodTracker.js",
+      "modification_count": 13
+    },
+    {
+      "path": "backend/routes/trade_circle.py",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/public/proof2/index.html",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/src/pages/Teachings.js",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/src/pages/Nourishment.js",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/src/components/CosmicToolbar.js",
+      "modification_count": 13
+    },
+    {
+      "path": "frontend/src/pages/Community.js",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/pages/Create.js",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/pages/Dreams.js",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/pages/LiveSessions.js",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/pages/MayanAstrology.js",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/pages/RockHounding.js",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/pages/StarseedWorlds.js",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/pages/ZenGarden.js",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/pages/CosmicLedger.js",
+      "modification_count": 12
+    },
+    {
+      "path": "backend/routes/sovereign.py",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/pages/Numerology.js",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/pages/Journal.js",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/pages/Yantra.js",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/pages/Yoga.js",
+      "modification_count": 12
+    },
+    {
+      "path": "backend/routes/auth.py",
+      "modification_count": 12
+    },
+    {
+      "path": "frontend/src/components/MissionControl.js",
+      "modification_count": 12
+    },
+    {
+      "path": ".emergent/emergent.yml",
+      "modification_count": 11
+    },
+    {
+      "path": "backend/routes/dynamic.py",
+      "modification_count": 11
+    },
+    {
+      "path": "frontend/src/components/OrbitalMixer.js",
+      "modification_count": 11
+    },
+    {
+      "path": "frontend/src/pages/AvatarCreator.js",
+      "modification_count": 11
+    },
+    {
+      "path": "frontend/src/pages/Classes.js",
+      "modification_count": 11
+    },
+    {
+      "path": "frontend/src/pages/GrowthTimeline.js",
+      "modification_count": 11
+    },
+    {
+      "path": "frontend/src/pages/SovereignAdvisors.js",
+      "modification_count": 11
+    },
+    {
+      "path": "frontend/src/pages/Acupressure.js",
+      "modification_count": 11
+    },
+    {
+      "path": "backend/routes/coach.py",
+      "modification_count": 11
+    },
+    {
+      "path": "frontend/src/pages/SpiritualCoach.js",
+      "modification_count": 11
+    },
+    {
+      "path": "frontend/src/pages/Challenges.js",
+      "modification_count": 11
+    },
+    {
+      "path": "frontend/src/pages/StarseedRealm.js",
+      "modification_count": 11
+    },
+    {
+      "path": "frontend/src/pages/DanceMusicStudio.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/pages/EconomyPage.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/pages/Botany.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/pages/Cardology.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/pages/DailyRitual.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/pages/DreamRealms.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/pages/EvolutionLab.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/components/SceneEngine.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/pages/SpiritualAvatarCreator.js",
+      "modification_count": 10
+    },
+    {
+      "path": "backend/routes/knowledge.py",
+      "modification_count": 10
+    },
+    {
+      "path": "backend/requirements.txt",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/pages/AkashicRecords.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/android/app/build.gradle",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/pages/Bible.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/pages/SacredTexts.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/pages/CelestialDome.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/public/.well-known/assetlinks.json",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/components/CosmicAssistant.js",
+      "modification_count": 10
+    },
+    {
+      "path": "frontend/src/pages/CosmicMap.js",
+      "modification_count": 10
+    },
+    {
+      "path": "backend/.env",
+      "modification_count": 10
+    }
+  ],
+  "reverts": [],
+  "known_incidents": [
+    {
+      "name": "Keystore credentials exposed on public /launch.html",
+      "category": "Security",
+      "severity": "P0 / Critical",
+      "discovered": "2026-05-10",
+      "root_cause": "Earlier agent embedded the upload-key alias and password directly into the public Vault HTML page so the architect could grab the APK. The file shipped to production unredacted.",
+      "fix_commits": [
+        "11f147102e43",
+        "a3102eb0f0ad",
+        "f6d0c7a49095"
+      ],
+      "remediation": "Locked /launch.html down to a 26-line restricted notice; moved keystore to /app/.private/; gated /api/downloads/* via admin role check in deps.py.",
+      "preventive": "Pre-push CI guard now blocks any keystore filename pattern in public dirs."
+    },
+    {
+      "name": "Medical-claim terminology leaks across 100+ render strings",
+      "category": "Play Store / Legal Compliance",
+      "severity": "P0 / App-Store-Blocking",
+      "discovered": "Ongoing through 2026-02 to 2026-05",
+      "root_cause": "Earlier agents used wellness/clinical vocabulary ('Healing', 'Therapy', 'Treatment', 'Patient', 'Medical') in user-visible strings. The product is registered as Lifestyle / Entertainment / Education and cannot use medical claims.",
+      "remediation": "System-wide scrub: 370+ render strings replaced with 'Resonance / Alignment / Resonant Arts / Restore' equivalents. Backend boundary translator added at /app/backend/utils/compliance_labels.py.",
+      "preventive": "/app/scripts/compliance_guard.sh + /app/scripts/pre-push.sh now grep render-path JSX for forbidden terms; pushes are blocked on hit.",
+      "fix_commits": []
+    },
+    {
+      "name": "~370 empty catch blocks (silent failures swallowing real bugs)",
+      "category": "Code Quality / Reliability",
+      "severity": "P1",
+      "discovered": "2026-04-2026-05",
+      "root_cause": "Earlier agents wrote 'try { ... } catch {}' across the React codebase to silence linter warnings. Real runtime errors (voice-engine crashes, navigation failures) were being eaten silently \u2014 user reported them as 'broken' without console traces.",
+      "remediation": "Sweeping replacement: empty catches converted to 'catch (e) { if (process.env.NODE_ENV !== \"production\") console.warn(e); }'. Annotated /* SSR-safe */ exemptions where genuine.",
+      "preventive": "compliance_guard.sh now grep-blocks new empty catches.",
+      "fix_commits": []
+    },
+    {
+      "name": "Hardcoded setTimeout delays causing 'Double-Click' UI latency",
+      "category": "UX Performance",
+      "severity": "P1",
+      "discovered": "2026-05",
+      "root_cause": "Earlier agents inserted 100-500ms setTimeout delays around route navigation 'for animation polish' which made every tap feel like it required two clicks before the user got feedback.",
+      "remediation": "All non-essential setTimeout-wrapped navigations stripped. Routes now respond synchronously."
+    },
+    {
+      "name": "Workshop modules rendered 'undefined' for Brunton Compass / Seismograph and others",
+      "category": "Data / API",
+      "severity": "P1",
+      "discovered": "2026-05",
+      "root_cause": "Workshop tool records had blank `technique` / `description` fields; the React render path printed the literal JS undefined value to screen.",
+      "remediation": "All workshop tool records backfilled. Integration test test_compliance_serialization.py now asserts no 'undefined' string can leak from /api/workshop/*."
+    },
+    {
+      "name": "ElevenLabs voice stuck in 'Voice Resting' state with no retry path",
+      "category": "Integration / UX",
+      "severity": "P1",
+      "discovered": "2026-05",
+      "root_cause": "When the ElevenLabs key was missing or rate-limited, the React state set 'Voice Resting' but never offered a retry. User was permanently locked out of voice narration mid-scene.",
+      "remediation": "Tap-to-retry logic added in SageVoiceController.js so the user can re-attempt voice generation without reloading the route."
+    },
+    {
+      "name": "'Nourish & Heal' pillar tile shipped despite the V1.2.4 compliance guard",
+      "category": "Compliance Regression",
+      "severity": "P0 / User-Visible",
+      "discovered": "2026-02-10 (this session)",
+      "root_cause": "The previous CI regex caught 'healing' (gerund) but missed the bare verb 'heal'. Three frontend strings slipped past the gate.",
+      "remediation": "Replaced with 'Nourish & Restore'. Tightened compliance regex to include heal/heals/healed/healer + therapy/therapeutic + treatment + medical/medicine + diagnosis + prescribed.",
+      "fix_commits": [
+        "1b89b7f63ad3"
+      ]
+    }
+  ],
+  "summary": {
+    "total_deletions": 203,
+    "total_rewrites": 43,
+    "total_renames": 91,
+    "total_high_churn": 127,
+    "total_reverts": 0,
+    "total_named_incidents": 7
+  }
+}
