@@ -229,13 +229,20 @@
 
   .pillar {
     position: relative;
+    display: block;
     padding: 18px 22px 20px;
     border-radius: 18px;
     background: transparent;
     border: none;
     overflow: hidden;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, transform 0.15s ease;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
+  .pillar:active { transform: scale(0.985); }
+  .pillar:focus-visible { outline: 1px solid rgba(244,213,141,0.5); outline-offset: 2px; }
   .pillar::before {
     content: '';
     position: absolute; inset: 0;
@@ -485,65 +492,65 @@
   <!-- PILLARS -->
   <h2>Eleven Pillars <span class="h2-sub">· 261 blades</span></h2>
   <div class="pillars">
-    <div class="pillar" style="--aura: rgba(251,191,36,0.08)">
+    <a class="pillar" href="/workshop" data-testid="pillar-trade-craft" style="--aura: rgba(251,191,36,0.08)">
       <div class="pillar-name" style="color:#FBBF24">Trade &amp; Craft</div>
       <div class="pillar-desc">Masonry, carpentry, electrical, plumbing, welding, HVAC, forestry, machining.</div>
-    </div>
-    <div class="pillar" style="--aura: rgba(34,197,94,0.08)">
+    </a>
+    <a class="pillar" href="/herbology" data-testid="pillar-resonant-arts" style="--aura: rgba(34,197,94,0.08)">
       <div class="pillar-name" style="color:#22C55E">Resonant Arts</div>
       <div class="pillar-desc">Herbology, reflexology, acupressure, aromatherapy, reiki, nutrition, first aid.</div>
-    </div>
+    </a>
 
     <hr class="pillar-divider" />
 
-    <div class="pillar" style="--aura: rgba(244,213,141,0.08)">
+    <a class="pillar" href="/sacred-texts" data-testid="pillar-sacred-knowledge" style="--aura: rgba(244,213,141,0.08)">
       <div class="pillar-name" style="color:#F4D58D">Sacred Knowledge</div>
       <div class="pillar-desc">Bible study, hermetics, philosophy, sacred texts, numerology, creation stories.</div>
-    </div>
-    <div class="pillar" style="--aura: rgba(59,130,246,0.08)">
+    </a>
+    <a class="pillar" href="/observatory" data-testid="pillar-science-physics" style="--aura: rgba(59,130,246,0.08)">
       <div class="pillar-name" style="color:#3B82F6">Science &amp; Physics</div>
       <div class="pillar-desc">Robotics, anatomy, geology, astronomy, rock hounding.</div>
-    </div>
+    </a>
 
     <hr class="pillar-divider" />
 
-    <div class="pillar" style="--aura: rgba(236,72,153,0.08)">
+    <a class="pillar" href="/cosmic-mixer" data-testid="pillar-creative-arts" style="--aura: rgba(236,72,153,0.08)">
       <div class="pillar-name" style="color:#EC4899">Creative Arts</div>
       <div class="pillar-desc">Music theory, cardology, cinematic storytelling, the Cosmic Mixer.</div>
-    </div>
-    <div class="pillar" style="--aura: rgba(167,139,250,0.08)">
+    </a>
+    <a class="pillar" href="/meditation" data-testid="pillar-mind-spirit" style="--aura: rgba(167,139,250,0.08)">
       <div class="pillar-name" style="color:#A78BFA">Mind &amp; Spirit</div>
       <div class="pillar-desc">Meditation, breathwork, yoga, mudras, dreamwork, the Sage AI coach.</div>
-    </div>
+    </a>
 
     <hr class="pillar-divider" />
 
-    <div class="pillar" style="--aura: rgba(249,115,22,0.08)">
+    <a class="pillar" href="/starseed-adventure" data-testid="pillar-exploration" style="--aura: rgba(249,115,22,0.08)">
       <div class="pillar-name" style="color:#F97316">Exploration</div>
       <div class="pillar-desc">Public speaking, pedagogy, the Starseed Adventure.</div>
-    </div>
-    <div class="pillar" style="--aura: rgba(96,165,250,0.08)">
+    </a>
+    <a class="pillar" href="/nourishment" data-testid="pillar-body" style="--aura: rgba(96,165,250,0.08)">
       <div class="pillar-name" style="color:#60A5FA">Body</div>
       <div class="pillar-desc">Nourishment, elixirs, reflexology, acupressure, rock hounding.</div>
-    </div>
+    </a>
 
     <hr class="pillar-divider" />
 
-    <div class="pillar" style="--aura: rgba(45,212,191,0.08)">
+    <a class="pillar" href="/observatory" data-testid="pillar-observatory" style="--aura: rgba(45,212,191,0.08)">
       <div class="pillar-name" style="color:#2DD4BF">Observatory</div>
       <div class="pillar-desc">Star chart, live sky, data sonification, suanpan abacus mixer.</div>
-    </div>
-    <div class="pillar" style="--aura: rgba(192,132,252,0.08)">
+    </a>
+    <a class="pillar" href="/oracle" data-testid="pillar-oracle" style="--aura: rgba(192,132,252,0.08)">
       <div class="pillar-name" style="color:#C084FC">Oracle</div>
       <div class="pillar-desc">Divination, Tarot overlays, I-Ching, dream interpretation.</div>
-    </div>
+    </a>
 
     <hr class="pillar-divider" />
 
-    <div class="pillar" style="--aura: rgba(251,146,60,0.08); grid-column: 1 / -1;">
+    <a class="pillar" href="/trade-circle" data-testid="pillar-trade-circle" style="--aura: rgba(251,146,60,0.08); grid-column: 1 / -1;">
       <div class="pillar-name" style="color:#FB923C">Trade Circle</div>
       <div class="pillar-desc">Exchange resonant assets. Volunteer-work Fans. The Gilded Path — optional support, never a paywall.</div>
-    </div>
+    </a>
   </div>
 
   <!-- LAW OF THE HOUSE -->
