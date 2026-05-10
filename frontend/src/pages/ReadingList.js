@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { BookOpen, Loader2, Search, Star, Heart, Check, Sparkles, ChevronRight, X, MessageCircle, Filter } from 'lucide-react';
@@ -13,12 +14,26 @@ const LEVEL_BADGE = {
   Advanced: { bg: '#E879F912', color: '#E879F9', border: '#E879F920' },
 };
 
-function BookCard({ book, onSave, onComplete }) {
+function BookCard({ book, onSave, onComplete, onOpen }) {
   const badge = LEVEL_BADGE[book.level] || LEVEL_BADGE.Essential;
+  // V1.2.7 — Whole-card click opens the book in /sacred-texts. The
+  // heart + checkmark were the ONLY interactive zones before; every
+  // other surface (cover, title, author, description, tags) was inert.
+  // This was the architect's "9 dead buttons just on this one page"
+  // complaint. Heart + check stop propagation so they still toggle
+  // save/complete without triggering navigation.
+  const handleCardClick = () => onOpen && onOpen(book);
+  const handleCardKey = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen && onOpen(book); }
+  };
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
       className="rounded-2xl p-5 transition-all"
-      style={{ background: 'transparent', border: `1px solid ${book.color}10`, backdropFilter: 'none'}}
+      onClick={handleCardClick}
+      onKeyDown={handleCardKey}
+      role="button"
+      tabIndex={0}
+      style={{ background: 'transparent', border: `1px solid ${book.color}10`, backdropFilter: 'none', cursor: onOpen ? 'pointer' : 'default'}}
       data-testid={`book-card-${book.id}`}>
       <div className="flex items-start gap-4">
         <div className="w-11 h-14 rounded-lg flex-shrink-0 flex items-center justify-center"
@@ -47,7 +62,7 @@ function BookCard({ book, onSave, onComplete }) {
           </div>
         </div>
         <div className="flex flex-col gap-1.5 flex-shrink-0">
-          <button onClick={() => onSave(book)}
+          <button onClick={(e) => { e.stopPropagation(); onSave(book); }}
             data-testid={`book-save-${book.id}`}
             className="p-2 rounded-lg transition-all hover:scale-105"
             style={{
@@ -56,7 +71,7 @@ function BookCard({ book, onSave, onComplete }) {
             }}>
             <Heart size={12} style={{ color: book.saved ? '#EF4444' : 'var(--text-muted)', fill: book.saved ? '#EF4444' : 'none' }} />
           </button>
-          <button onClick={() => onComplete(book)}
+          <button onClick={(e) => { e.stopPropagation(); onComplete(book); }}
             data-testid={`book-complete-${book.id}`}
             className="p-2 rounded-lg transition-all hover:scale-105"
             style={{
@@ -73,6 +88,7 @@ function BookCard({ book, onSave, onComplete }) {
 
 export default function ReadingList() {
   const { token } = useAuth();
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -120,6 +136,19 @@ export default function ReadingList() {
       }));
       toast.success(action === 'complete' ? 'Marked as read' : 'Unmarked');
     } catch { toast.error('Could not update'); }
+  };
+
+  // V1.2.7 — Open a book in the Sacred Texts study page. Hand off the
+  // title via route state so SacredTexts can fuzzy-match against its
+  // own catalog (the reading-list endpoint and sacred-texts endpoint
+  // are two different lists with different id schemes).
+  const handleOpenBook = (book) => {
+    navigate('/sacred-texts', {
+      state: {
+        preselectTitle: book.title,
+        preselectTradition: book.tradition,
+      },
+    });
   };
 
   const getAiRecommendation = async () => {
@@ -188,7 +217,7 @@ export default function ReadingList() {
             </h2>
             <div className="space-y-3">
               {personalizedBooks.slice(0, 4).map(b => (
-                <BookCard key={b.id} book={b} onSave={handleSave} onComplete={handleComplete} />
+                <BookCard key={b.id} book={b} onSave={handleSave} onComplete={handleComplete} onOpen={handleOpenBook} />
               ))}
             </div>
           </div>
@@ -267,7 +296,7 @@ export default function ReadingList() {
         {/* Book List */}
         <div className="space-y-3">
           {filtered.map(b => (
-            <BookCard key={b.id} book={b} onSave={handleSave} onComplete={handleComplete} />
+            <BookCard key={b.id} book={b} onSave={handleSave} onComplete={handleComplete} onOpen={handleOpenBook} />
           ))}
           {filtered.length === 0 && (
             <p className="text-center text-xs py-8" style={{ color: 'var(--text-muted)' }}>No books found for your filters</p>

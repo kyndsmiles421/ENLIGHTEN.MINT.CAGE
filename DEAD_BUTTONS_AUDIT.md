@@ -1,6 +1,6 @@
 # DEAD BUTTON AUDIT — ENLIGHTEN.MINT.CAFE
 
-**Generated:** 2026-05-10T19:52:14.752540Z
+**Generated:** 2026-05-10T20:03:27.511327Z
 **Files scanned:** 716
 **Files with at least one dead control:** 0
 **Total dead controls found:** 0

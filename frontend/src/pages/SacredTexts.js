@@ -7,7 +7,7 @@ import {
   Sparkles, ChevronRight, Search, X, Globe, Eye, Maximize2, Minimize2,
   Headphones, BookMarked, Layers, Wind, Droplets, Flame, Moon
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { FixedSizeList } from 'react-window';
 import TranslateChip from '../components/TranslateChip';
@@ -805,6 +805,7 @@ function VirtualizedTextGrid({ items, onSelect, columns: forceCols }) {
 export default function SacredTexts() {
   const { token, authHeaders, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [texts, setTexts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -821,6 +822,30 @@ export default function SacredTexts() {
       .catch(() => toast.error('Failed to load sacred texts'))
       .finally(() => setLoading(false));
   }, []);
+
+  // V1.2.7 — Deep-link from /reading-list. When ReadingList navigates
+  // here with state.preselectTitle, fuzzy-match it against the loaded
+  // catalog and auto-open. Previously the book cards on /reading-list
+  // were dead — tapping did nothing. Now they hand off the title here
+  // and the user lands directly on the study panel for that text.
+  const preselectTitle = location.state?.preselectTitle;
+  const preselectTradition = location.state?.preselectTradition;
+  useEffect(() => {
+    if (!preselectTitle || !texts.length || selectedText) return;
+    const normalize = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+    const target = normalize(preselectTitle);
+    const targetTrad = normalize(preselectTradition);
+    // Strategy: exact title match → title contains → tradition match.
+    let match = texts.find((t) => normalize(t.title) === target);
+    if (!match) match = texts.find((t) => normalize(t.title).includes(target) || target.includes(normalize(t.title)));
+    if (!match && targetTrad) match = texts.find((t) => normalize(t.tradition).includes(targetTrad));
+    if (match) {
+      selectText(match);
+      // Clear the route state so back/refresh doesn't re-trigger
+      navigate(location.pathname, { replace: true, state: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [texts, preselectTitle]);
 
   const selectText = useCallback(async (text) => {
     setSelectedText(text);
